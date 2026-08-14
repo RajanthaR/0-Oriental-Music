@@ -1,0 +1,972 @@
+{
+  "version": "v1",
+  "policy": "Exact context-sensitive replacements only; no global literal-backtick replacement. Verified forms use explicit Sinhala corrections. Other forms use a conservative exact-form fallback and are flagged for editorial review.",
+  "record_count": 193,
+  "records": [
+    {
+      "source": "`",
+      "replacement": "",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 207. Contexts: ['grade_10_aghatathmaka_and_anaghatathmaka_padi.md:16 > Text was extracted from the PDF text layer with `pdftotext -layout`. OCR was not used.', 'grade_10_aghatathmaka_and_anaghatathmaka_padi.md:16 > Text was extracted from the PDF text layer with `pdftotext -layout`. OCR was not used.', 'grade_10_folk_song_classification.md:16 > Text was extracted from the PDF text layer with `pdftotext -layout`. OCR was not used.']"
+    },
+    {
+      "source": "`ක්",
+      "replacement": "ක්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['oriental_music_2018.md:4793 ූ?ත4 `ක්\\u200d ච']"
+    },
+    {
+      "source": "`දිපෙරදි",
+      "replacement": "දිපෙරදි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:361 `දිපෙරදි']"
+    },
+    {
+      "source": "`ය",
+      "replacement": "ය",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['oriental_music_2018.md:1362 %`ය']"
+    },
+    {
+      "source": "`ල",
+      "replacement": "ල",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 19. Contexts: ['oriental_music_2018.md:1186 ’ෟ ෟ0ෟූ  `ල ෟ', 'oriental_music_2018.md:1187 ෟ  `ල ූරැු', 'oriental_music_2018.md:1371 `ල 56 `ෟ0රෑෙ 9ුුෟ 1']"
+    },
+    {
+      "source": "`ලු",
+      "replacement": "ලු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['oriental_music_2018.md:1722 5ෟෙ    60 ඊ  ෟ   `ලු ූල', 'oriental_music_2018.md:3579 `ලු 40ළඵෟ, ෟඛ රැඍෟ, ෟ  භභණණණධධ:ූෟ']"
+    },
+    {
+      "source": "`ලුෟ",
+      "replacement": "ලුෟ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:1499 භනධ  `ලුෟ,  : ,']"
+    },
+    {
+      "source": "`ලුෟෟ",
+      "replacement": "ලුෟෟ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:1477 භභනධධ `ලුෟෟ,  : ෟ']"
+    },
+    {
+      "source": "`ලෟ",
+      "replacement": "ලෟ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 7. Contexts: ['oriental_music_2018.md:1479 ශ  ුූ,  ු,රැ   `ලෟ', 'oriental_music_2018.md:1483 `ලෟ ශ  ු0ු', 'oriental_music_2018.md:1509 ු `ලෟ   ෟ ,  ු']"
+    },
+    {
+      "source": "`ස",
+      "replacement": "ස",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['oriental_music_2018.md:390 ු1න්\\u200d ?`ස-), 8.)']"
+    },
+    {
+      "source": "`ෟ",
+      "replacement": "ෟ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 6. Contexts: ['grade_9_oriental_music_teacher_guide.md:186 9ෆ්\\u200dරඃ.`ෟ', 'oriental_music_2018.md:633 9ෆ්\\u200dරඃ.`ෟ', 'oriental_music_2018.md:1351 )ූ   6 `ෟ0රෑෙ ෟ/ශ ථ']"
+    },
+    {
+      "source": "අ`ගලක්",
+      "replacement": "අඟලක්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:3109 x අ`ගලක් පළල ඇලුමිනියම් පටි  කැබලි 3 ක්.']"
+    },
+    {
+      "source": "අ`ගල්",
+      "replacement": "අඟල්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 8. Contexts: ['grade_6_music_teacher_guide.md:3108 (අ`ගල් 9 ක් 8 ක් සහ 6 ක් වශයෙන්) හෝ', 'grade_6_music_teacher_guide.md:3110 (අ`ගල් 9 ක් 8 ක් සහ 6 ක් වශයෙන්) හෝ', 'grade_6_music_teacher_guide.md:3111 x අ`ගල් දෙකක් පළල ඝනත්වයෙන් වැඩි බුරුත, පලු, හල්මිල්ල වැනි ලී කැබලි 3 ක්.']"
+    },
+    {
+      "source": "අ`දින්ට",
+      "replacement": "අඳින්ට",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:2030 ඉක්මන් කර කම්බ සරොන් පට ලේන්සු දී අ`දින්ට']"
+    },
+    {
+      "source": "අ`දිනා",
+      "replacement": "අඳිනා",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_10_western_music.md:1949 අටවිසිමත් පැදිරූ රැසේ අ`දිනා ලෙසේ අත්•-', 'grade_10_western_music.md:3161 ” රූ රැසේ අ`දිනා ලෙසේ...” - සුසිල් ප්\\u200dරේමරත්න, ෂෙල්ටන් ප්\\u200dරේමරත්න']"
+    },
+    {
+      "source": "අත්වි`දි",
+      "replacement": "අත්විඳි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:2973 ගායනයෙන් තමා අත්වි`දි හැ`ගීම් අනුසාරයෙන්, නිදහස් අදහස් ප්\\u200dරකාශනයට•']"
+    },
+    {
+      "source": "අතැ`ගිලි",
+      "replacement": "අතැඟිලි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 4. Contexts: ['grade_10_western_music.md:1468 අතැ`ගිලි නිවැරදි ව හැසිරවීම ද අත්\\u200dයාවශ්\\u200dය ය.', 'grade_10_western_music.md:2384 නම් රූප සටහනක් මත අතැ`ගිලි හැසිරවීමට යොමු කරන්න.', 'grade_6_music_teacher_guide.md:1167 6 අතැ`ගිලි තැබීම සඳහා ද යොදා ගනී.']"
+    },
+    {
+      "source": "ඇ`ගිල්ල",
+      "replacement": "ඇඟිල්ල",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_10_western_music.md:1842 ස්වර මත ඒ ඒ මාත්\\u200dරාවට ඇ`ගිල්ල තබමින් ගණින්න. වෙනත් තාලයක දී ද 6 4', 'grade_10_western_music.md:2495 තිස්\\u200dයාහි කොටසේ මැදට මහපට ඇ`ගිල්ල හා දබරැ`ගිල්ල හැර ඉතිරි ඇ`ගිලි තුනෙන්']"
+    },
+    {
+      "source": "ඇ`ගිල්ලෙන්",
+      "replacement": "ඇඟිල්ලෙන්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:2497 ටස්\\u200dයාහි කොටසේ හරි මැදට දබර ඇ`ගිල්ලෙන් පමණක් තැලීමෙන් උපදී.']"
+    },
+    {
+      "source": "ඇ`ගිලි",
+      "replacement": "ඇඟිලි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 7. Contexts: ['grade_10_western_music.md:2495 තිස්\\u200dයාහි කොටසේ මැදට මහපට ඇ`ගිල්ල හා දබරැ`ගිල්ල හැර ඉතිරි ඇ`ගිලි තුනෙන්', 'grade_10_western_music.md:2509 කබායාවේ මුහුණතට වම් අත ඇ`ගිලි සියල්ල දිග හැර අල්ල ද සමග එකවර වදින', 'grade_10_western_music.md:2515 ගවම් අතෙහි මැදැ`ගිල්ල හා දබරැ`ගිල්ල යන ඇ`ගිලි දෙකෙන් එකකින් ලවය කොටසට']"
+    },
+    {
+      "source": "ඇ`දීම",
+      "replacement": "ඇඳීම",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:3068 සුවඳ පත්ම වැනි ඇ`දීම රහිත ගීතයක පළමු පාද කිහිපය බටහිර ක්\\u200dරමයට•']"
+    },
+    {
+      "source": "ඇ`දීමට",
+      "replacement": "ඇඳීමට",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:3056 සංකේත වෙන් කර සටහන් පොතේ ඇ`දීමට යොමු කරන්න.']"
+    },
+    {
+      "source": "ඇතු`ථ",
+      "replacement": "ඇතුථ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:3742 එක ඇතු`ථ කොට කොටුවට පිවිසෙන්න. Link Adress google Search How']"
+    },
+    {
+      "source": "ඉ`ගි",
+      "replacement": "ඉඟි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 5. Contexts: ['grade_10_western_music.md:3636 ඉ`ගි සඳහන් කරන ලද අත් පත්\\u200dරිකා කීපයක්.•', 'grade_10_western_music.md:3684 පියවර 02සිසුන් කණ්ඩායම් කර මුලින් සකස් කරගත් ඉ`ගි පත්\\u200dරිකා එක බැගින් බෙදා•', 'grade_10_western_music.md:3689 පරිගණක 4 ක් හෝ ලබා දී අදාළ ඉ`ගි සෙවීමෙහි පොළඹවන්න.']"
+    },
+    {
+      "source": "ඉ`ගිය",
+      "replacement": "ඉඟිය",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:3651 දක්නට  ඇත.  එය  මත  තමාට  සෙවීමට  අවශ්\\u200dය  වීඩියෝවේ  ඉ`ගිය']"
+    },
+    {
+      "source": "ඉ`ගියක්",
+      "replacement": "ඉඟියක්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:3690 සොයාගත්  තොරතුරු  එක්  ඉ`ගියක්  එක්  සිසුවෙකුට  බැගින්  වෙන්  වෙන්  ව•']"
+    },
+    {
+      "source": "ඉ`ගිවලට",
+      "replacement": "ඉඟිවලට",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:3686 වෙත පිවිස එම ඉ`ගිවලට අදාළ තොරතුරු ගවේෂණයට උපදෙස්• you tube']"
+    },
+    {
+      "source": "ඊළ`ග",
+      "replacement": "ඊළග",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_10_western_music.md:1300 හා ලියනුයේ (තනුවට) යටින් ඊළ`ග පේළිය  හෝ  දෙක  මත  ය.  එමCounter Part melody']"
+    },
+    {
+      "source": "එ`ථව",
+      "replacement": "එළව",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_11_music_textbook.md:2048 බාසෙන් කිව්වා නෙයිනා එ`ථව ගියා දුන්න අනට', 'grade_11_music_textbook.md:2061 ඔන්න එවිට ආව එ`ථව පැනගෙන මැතිඳුට අනින්ට']"
+    },
+    {
+      "source": "එ`ථවාගෙන්",
+      "replacement": "එළවාගෙන්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:2062 රෝසනෝනා   :කාගෙන් බේරුනත් බැරිය එ`ථවාගෙන් මාරු වෙන්ට']"
+    },
+    {
+      "source": "එ`ථවෙක්",
+      "replacement": "එළවෙක්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:2047 ගොනෙක් වගේ එ`ථවෙක් විත් පැන්නයි මැතිඳුට අනින්ට']"
+    },
+    {
+      "source": "එ`ඵවන්",
+      "replacement": "එළුන්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 3. Contexts: ['grade_6_music_teacher_guide.md:371 සාකච්ඡා කරයි.එ`ඵවන් කෑම, මේවර කෙළිය කළගෙඩි•', 'grade_6_music_teacher_guide.md:2670 (උදා: එ`ඵවන් කෑම, මේවරකෙළිය, ඔළිඳකෙළිය)', 'music_teacher_guide_part_2.md:87 සාකච්ඡා කරයි.එ`ඵවන් කෑම, මේවර කෙළිය කළගෙඩි•']"
+    },
+    {
+      "source": "එ`ඵවා",
+      "replacement": "එළුවා",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:2437 දෙනවද එ`ඵවා']"
+    },
+    {
+      "source": "එම`ගින්",
+      "replacement": "එමඟින්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:3631 එම`ගින් සංගීතයට අදාළ කරුණු ඉගෙනීමෙන් තෘප්තිමත් වෙයි.•']"
+    },
+    {
+      "source": "ක`ඵතර",
+      "replacement": "කළුතර",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 3. Contexts: ['grade_10_western_music.md:217 ඊ. ඒ. ප්\\u200dරේමසිරිගුරු උපදේශක, කලාප අධ්\\u200dයාපන කාර්යාලය, ක`ඵතර.', 'grade_11_music_textbook.md:244 ඊ. ඒ. ප්\\u200dරේමසිරිගුරු උපදේශක, කලාප අධ්\\u200dයාපන කාර්යාලය, ක`ඵතර.', 'grade_6_music_teacher_guide.md:220 ඊ. ඒ. ප්\\u200dරේමසිරිගුරු උපදේශක, කලාප අධ්\\u200dයාපන කාර්යාලය, ක`ඵතර']"
+    },
+    {
+      "source": "ක`ඵලෑල්ලේ",
+      "replacement": "කළුලෑල්ලේ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_10_western_music.md:3233 ජප්තාල ගී පාදය විභාග නොබෙදා දක්වා (ප්\\u200dරස්තාර නොකර) ක`ඵලෑල්ලේ•', 'grade_10_western_music.md:3237 දීප්චන්දි  ගී  පාදය  ද  විභාග  නොබෙදා  (ප්\\u200dරස්තාර  නොකර)  ක`ඵලෑල්ලේ•']"
+    },
+    {
+      "source": "කඳු`ඵ",
+      "replacement": "කඳුළු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:3014 කඳු`ඵ හෙළා නෑඹිලියට ගීතයත් යමන් රාගාශි්\\u200dරතව නිර්මිත නැති බැරි']"
+    },
+    {
+      "source": "කඳු`ඵහෙළා",
+      "replacement": "කඳුළුහෙළා",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:3002 ගුණාත්මක යෙදවුම්:කඳු`ඵහෙළා නෑඹිලියට/ඉපදුණ දා මා හඬා වැටෙන්නැති/ගමට කලින් හිරු/•']"
+    },
+    {
+      "source": "කපිරි`ක්",
+      "replacement": "කපිරික්",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_10_western_music.md:1704 හැ`දින්වීය. වයලීනයෙන් කපිරි`ක්\\u200dද්`ක්\\u200dදා ගීතයක් වාදනය කර පෙන්වීම වඩාත්']"
+    },
+    {
+      "source": "කුරු`ඵ",
+      "replacement": "කුරුළු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:843 2. ගී ගයන මේ කුරු`ඵ යාලුවන් හා - ‘‘ ස ’’ සිට ‘‘ රි ’’ දක්වා']"
+    },
+    {
+      "source": "ග`ගකතාාද",
+      "replacement": "ගඟකතාාද",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:2965 ග`ගකතාාද ැරුචි තුළත්  මේ']"
+    },
+    {
+      "source": "ග`ගුල්",
+      "replacement": "ගඟුල්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:1687 අන්න බලන් සඳ රන් තැටියෙන් සුදු සීත ග`ගුල් ගලනා']"
+    },
+    {
+      "source": "ග`ගුලෙ",
+      "replacement": "ගඟුලෙ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:2820 x සීත ග`ගුලෙ දී ඇඳ පේවෙනවා']"
+    },
+    {
+      "source": "ග`ගුලෙදි",
+      "replacement": "ගඟුලෙදි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:2076 තුන් සරණේ ගී - සීත ග`ගුලෙදි ඇඳ පේවෙනවා - සම්මා සම්බුදු වෙන•']"
+    },
+    {
+      "source": "ග`ගුලේ",
+      "replacement": "ගඟුලේ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:1531 බැස සීතල ග`ගුලේ ශ්\\u200dරී සෙත් සාදයි••']"
+    },
+    {
+      "source": "ගැට`ඵවක්",
+      "replacement": "ගැටළුවක්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:3633 තමාට විෂය කරුණු ඉගෙනුම පිළිබඳ ගැට`ඵවක් මතු වූ අවස්ථාවක ඊට•']"
+    },
+    {
+      "source": "ගොඩන`ගන්න",
+      "replacement": "ගොඩනඟන්න",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:2919 ගොඩන`ගන්න.']"
+    },
+    {
+      "source": "ගොඩන`ගා",
+      "replacement": "ගොඩනඟා",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 4. Contexts: ['grade_10_western_music.md:1695 පාඩම ගොඩන`ගා ගැනීමට ගුරුවරයා උත්සාහ ගත යුතු යි.', 'grade_8_music_teacher_guide.md:123 වීම සඳහා වූ ප්\\u200dරබෝධාත්මක සංස්කෘතියක් ගොඩන`ගා ගැනීමට ගුරු මාර්ගෝපදේශය පහුරක්, යාත්\\u200dරාවක්', 'grade_8_music_teacher_guide.md:212 විෂය නිර්දේශය ප්\\u200dරායෝගික නැඹුරුතාවකින් යුතු ව ගොඩන`ගා ඇති අතර ක්\\u200dරියාකාරකම්']"
+    },
+    {
+      "source": "ගොඩනැ`ගී",
+      "replacement": "ගොඩනැඟී",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:2516 ගොඩනැ`ගී ඇති ගීත විමසුමට ලක් කරන්න.']"
+    },
+    {
+      "source": "ගොඩනැ`ගුණු",
+      "replacement": "ගොඩනැඟුණු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 4. Contexts: ['grade_6_music_teacher_guide.md:268 බව හා නවතාවයන් පිළිබඳ ව හඳුනාගැනීමට ගුරුවරයාට සහාය කරගැනීමට හැකිවන සේ ගොඩනැ`ගුණු', 'grade_6_music_teacher_guide.md:2799 නිපුණතා මට්ටම 4.1 : ඇදහිලි හා විශ්වාස මත ගොඩනැ`ගුණු ගී පිළිබඳ අත්දැකීම් ලබයි.', 'grade_6_music_teacher_guide.md:2810 කරගනිමින්  ගොඩනැ`ගුණු ගී අතුරින් එක් ගීත  විශේෂයක් ලෙස තුන්']"
+    },
+    {
+      "source": "ගොඩනැ`ගූ",
+      "replacement": "ගොඩනැඟූ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_10_western_music.md:1559 යුගයෙහි විස්තර ලියන ලද උපදෙස් පත්\\u200dරිකා හෝ ඔබ විසින් ගොඩනැ`ගූ', 'grade_6_music_teacher_guide.md:3255 පහත අන්දමට ගොඩනැ`ගූ ස්වර රටා ගායනය කරවමින් ස රි ග ස්වර තුන ශ්\\u200dරවණයට සැලැස්වීම.b)']"
+    },
+    {
+      "source": "ගොප`ඵ",
+      "replacement": "ගොපළු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:1375 පුතා- හේන් කුඹුරු ගැන ගොප`ඵ ලියන් ගැන කතා අහනකොට අම්මේ']"
+    },
+    {
+      "source": "ජැංඩිසිංෙ`ක්",
+      "replacement": "ජැංඩිසිංෙක්",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:2005 දුවන ගිරියක් තල්ලු කරගෙන වම් පසින් ඇතුළුවෙන රෝස නෝනා සහ ජැංඩිසිංෙ`ක්\\u200dදා් සබාවෙන්']"
+    },
+    {
+      "source": "ඨ`",
+      "replacement": "ඨ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:4169 /ඨ`0ෟ ශ  ුෟ']"
+    },
+    {
+      "source": "ඨ`ල",
+      "replacement": "ඨල",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:1501 /ඨ`ල 1ත ු  ු']"
+    },
+    {
+      "source": "ත`",
+      "replacement": "ත",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:4109 ෟෟ ෟෟෟ’ ඔ8ත`']"
+    },
+    {
+      "source": "තර`ගකාරිත්වය",
+      "replacement": "තරඟකාරිත්වය",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:3565 අද ලෝකය පුරා ව්\\u200dයාප්ත වන තාක්\\u200dෂණික තර`ගකාරිත්වය තුළ සංගීතය පටිගත කිරීම,']"
+    },
+    {
+      "source": "තුංදබරැ`ගිල්ලෙන්",
+      "replacement": "තුංදබරැඟිල්ලෙන්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:2500 තුංදබරැ`ගිල්ලෙන් ස්\\u200dයාහි කොටසට විවෘතව තැළීමෙන් ‘‘තුං’’ අක්ෂරය උපදී.']"
+    },
+    {
+      "source": "දනමු`ඵ",
+      "replacement": "දනමුළු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:1948 සොළොස්මත් පැදිමන්මත් කරවන දනමු`ඵ දෙරණා•-']"
+    },
+    {
+      "source": "දබර`ගිල්ලෙන්",
+      "replacement": "දබරගිල්ලෙන්",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:2208 වමතේ දබර`ගිල්ලෙන් රූප සටහනේ  අංක 01 දරණ සිදුර වැසීමට']"
+    },
+    {
+      "source": "දබරැ`ගිල්ල",
+      "replacement": "දබරැඟිල්ල",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 3. Contexts: ['grade_10_western_music.md:2396 6 (දබරැ`ගිල්ල', 'grade_10_western_music.md:2495 තිස්\\u200dයාහි කොටසේ මැදට මහපට ඇ`ගිල්ල හා දබරැ`ගිල්ල හැර ඉතිරි ඇ`ගිලි තුනෙන්', 'grade_10_western_music.md:2515 ගවම් අතෙහි මැදැ`ගිල්ල හා දබරැ`ගිල්ල යන ඇ`ගිලි දෙකෙන් එකකින් ලවය කොටසට']"
+    },
+    {
+      "source": "දබරැ`ගිල්ලෙන්",
+      "replacement": "දබරැඟිල්ලෙන්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 5. Contexts: ['grade_10_western_music.md:2390 දබරැ`ගිල්ලෙන්', 'grade_10_western_music.md:2398 2 දබරැ`ගිල්ලෙන්', 'grade_10_western_music.md:2399 3 දබරැ`ගිල්ලෙන්']"
+    },
+    {
+      "source": "ද්`ක්",
+      "replacement": "ද්ක්",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 2. Contexts: ['grade_10_western_music.md:1703 ගායනයේ දී වයලීනය යොදා ගත් අතර එහිදී එය ‘රවිකි`ක්\\u200dද්`ක්\\u200dදා’ යන නමින්', 'grade_10_western_music.md:1704 හැ`දින්වීය. වයලීනයෙන් කපිරි`ක්\\u200dද්`ක්\\u200dදා ගීතයක් වාදනය කර පෙන්වීම වඩාත්']"
+    },
+    {
+      "source": "න`ගන්න",
+      "replacement": "නඟන්න",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 3. Contexts: ['grade_10_western_music.md:570 න`ගන්න.', 'grade_8_music_teacher_guide.md:1327 සාකච්ඡා කරමින් සටහන් පොතෙහි සටහනක් ගොඩ න`ගන්න.', 'grade_8_music_teacher_guide.md:1417 සාකච්ඡා කරමින් සටහන් පොතෙහි සටහනක් ගොඩ න`ගන්න.']"
+    },
+    {
+      "source": "න`ගමින්",
+      "replacement": "නඟමින්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:1817 ගොඩ න`ගමින්   සාමූහික ව කණ්ඩායම් වශයෙන් කොටස් බෙදා ගනිමින්']"
+    },
+    {
+      "source": "න`ගයි",
+      "replacement": "නඟයි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:1805 මිශ්\\u200dර මත් කැටි සහිත රිද්ම රටා ගොඩ න`ගයි.•']"
+    },
+    {
+      "source": "න`ගා",
+      "replacement": "නඟා",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:3004 පහත දැක්වෙන ස්වර ප්\\u200dරස්තාරය දෘශ්\\u200dය උපකරණයක් ලෙස ගොඩ න`ගා ගන්න.']"
+    },
+    {
+      "source": "න`ථ",
+      "replacement": "නළු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_11_music_textbook.md:1821 කි්\\u200dරයාකාරකම   : පහතරට සිංදු වන්නම් - න`ථ ගීතිකා තාලය', 'grade_11_music_textbook.md:2867 කරන්න. (කථා සාරය, තේමා වාදනය පිළිබඳ, න`ථ නිළියන්, පරිසරය, ආදිය']"
+    },
+    {
+      "source": "න`ඵ",
+      "replacement": "නළු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:1660 හැඳින්විය හැකි බවත් න`ඵ නිළියන් විසින් ම  ගීත ගායනය කරමින් රංගනයේ']"
+    },
+    {
+      "source": "නැ`ගී",
+      "replacement": "නැඟී",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:3206 නිසා ය. හින්දුස්ථානී තාල පද සියල්ල ගොඩ නැ`ගී ඇත්තේ තබ්ලාව']"
+    },
+    {
+      "source": "නැ`ගීමට",
+      "replacement": "නැඟීමට",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:1848 නැ`ගීමට පොලඹවන්න. නිර්මාණය කළ රිද්ම රටා ඇසුරින් රිද්ම රටා']"
+    },
+    {
+      "source": "නැෙ`ගන",
+      "replacement": "නැඟෙන",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 4. Contexts: ['grade_8_music_teacher_guide.md:3032 බටහිර සංගීත ප්\\u200dරස්තාර කිරීමේ කුසලතාව ලබා දීම සඳහා ගොඩ නැෙ`ගන', 'grade_8_music_teacher_guide.md:3209 තුනක් මූලික කරගෙන ගොඩ නැෙ`ගන නිසා එක ම තිතක දී වුවත් බෙර', 'grade_8_music_teacher_guide.md:3211 කරන්න. එක ම මාත්\\u200dරා ගණනකින් ගොඩ නැෙ`ගන තිත්තාල තනිතිත']"
+    },
+    {
+      "source": "නෙ`ගා්",
+      "replacement": "නෙගා්",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:1519 යමු යමු හණික නෙ`ගා්']"
+    },
+    {
+      "source": "ප`ඩිතුමා",
+      "replacement": "පණ්ඩිතුමා",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 5. Contexts: ['grade_10_western_music.md:750 ක්\\u200dරමික පුස්තක් මාලිකාභාත්ඛණ්ඩේ ප`ඩිතුමා• -', 'grade_10_western_music.md:825 ක්\\u200dරමික් පුස්තක් මාලිකා භාත්ඛණ්ඩේ ප`ඩිතුමා•I -', 'grade_11_music_textbook.md:1984 ප`ඩිතුමා   :ඔන්න  සුදනනේ  අසනුය  බින්න  නැත      අනේ']"
+    },
+    {
+      "source": "ප`ඩිඳුන්",
+      "replacement": "පණ්ඩිඳුන්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:1371 පුතා- මහ ප`ඩිඳුන් ගැන, මහ කිවිඳුන් ගැන, කතා අහනකොට අම්මේ']"
+    },
+    {
+      "source": "ප`ඩිවරුනට",
+      "replacement": "පණ්ඩිවරුනට",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:1373 අම්මා- මහ ප`ඩිවරුනට, මහ කවිවරුනට, තෝතැනි වූ ලක් දීපේ']"
+    },
+    {
+      "source": "ප`ඩිවරුන්",
+      "replacement": "පණ්ඩිවරුන්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:2655 චෛව’’ ශ්ලෝකය ගයමින් පැරණි භාරතීය ප`ඩිවරුන් නාද ස්වර දක්වා']"
+    },
+    {
+      "source": "පල`දිතේ",
+      "replacement": "පළඳිතේ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_8_music_teacher_guide.md:3958 සත් සියක් කපු පිළි වියන මම - සත් සියක් දෙන පල`දිතේ //', 'grade_8_music_teacher_guide.md:3960 සත් සියක් මල් දම් ගොතන මම - සත් සියක් ගෙල පල`දිතේ']"
+    },
+    {
+      "source": "පිළිබ`ඳ",
+      "replacement": "පිළිබඳ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:2540 පිළිබ`ඳ කෙටි විමසුමක් කරන්න.']"
+    },
+    {
+      "source": "පෙනහ`ඵ",
+      "replacement": "පෙනහළු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 4. Contexts: ['grade_6_music_teacher_guide.md:534 පේශීි ලිහිල් කර පෙනහ`ඵ තුළට වාතය ගලා ඒමට සැලැස්විය යුතු ය.  එවිට', 'grade_6_music_teacher_guide.md:535 කුස පිරී පිම්බී යා යුතු ය. මෙසේ වන්නේ  අප පෙනහ`ඵ වෙත ගන්නා', 'grade_6_music_teacher_guide.md:540 x පෙනහ`ඵ තුළ තිබෙන වාතය මුඛයෙන් ෂ් .......... හඬ නිකුත් කරමින් පිට']"
+    },
+    {
+      "source": "පෙනහ`ඵවල",
+      "replacement": "පෙනහළුවල",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:536 වාතයේ පීඩනය පෙනහ`ඵවල පහළ කොටස ඩයෆ්\\u200dරම්(ෘස්රේප) වෙත යොමු']"
+    },
+    {
+      "source": "පො`ගවන",
+      "replacement": "පොඟවන",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_6_music_teacher_guide.md:3131 x පො`ගවන ලද කඩදාසි කැබලි', 'grade_6_music_teacher_guide.md:3135 x එක් පැත්තකට  පො`ගවන ලද කඩදාසි  කැබැල්ලක් සිරකර  පිඹ බලන්න.  නිකුත් වන']"
+    },
+    {
+      "source": "බ`දින",
+      "replacement": "බඳින",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:1244 x දිල්රුබාවේ හරස් අතට බ`දින ලද ලෝහ යතුරු (පර්දා) 18 ක් ඇති අතර, එමගින් අදාළ ස්වර']"
+    },
+    {
+      "source": "බැ`දි",
+      "replacement": "බැඳි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 17. Contexts: ['grade_10_western_music.md:1085 ඉගෙනුම්  පල           :රාග විස්තර හා බැ`දි සංකල්ප නිර්වචනය කරයි.•', 'grade_10_western_music.md:1504 නිපුණතාව 3.0   :සංගීත රසාස්වාදයේ යෙදෙමින් ජීවිතයේ සතුට හා බැ`දි මානසික තත්ත්වයන්', 'grade_10_western_music.md:1587 නිපුණතාව 3.0   :සංගීත රසාස්වාදයේ යෙදෙමින් ජීවිතයේ සතුට හා බැ`දි මානසික තත්ත්වයන්']"
+    },
+    {
+      "source": "බැ`දීමකින්",
+      "replacement": "බැඳීමකින්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_7_11_oriental_music_teacher_guide.md:82 මානව අයිතිවාසිකම් ගරු කිරීම, යුතුකම් හා වගකීම් පිළිබඳ දැනුවත් වීම, හෘදයාංගම බැ`දීමකින්III', 'grade_8_music_teacher_guide.md:303 මානව අයිතිවාසිකම් ගරු කිරීම, යුතුකම් හා වගකීම් පිළිබඳ දැනුවත් වීම, හෘදයාංගම බැ`දීමකින්III']"
+    },
+    {
+      "source": "බැ`දීම්",
+      "replacement": "බැඳීම්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_7_11_oriental_music_teacher_guide.md:136 අයිතිවාසිකම්, වගකීම්, යුතුකම් සහ බැ`දීම්', 'grade_8_music_teacher_guide.md:357 අයිතිවාසිකම්, වගකීම්, යුතුකම් සහ බැ`දීම්']"
+    },
+    {
+      "source": "බි`ගු",
+      "replacement": "බිගු",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:3661 පියවර 01පියවර 01පියවර 01පියවර 01පියවර 01රොනට වඩින බි`ගු ඔබයි යන ගීතය ගයන්න. එ් පිළිබඳ අදහස් සිසුන්ගෙන්•']"
+    },
+    {
+      "source": "භභ`ලධධ",
+      "replacement": "භභලධධ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:1497 භභ`ලධධ ,ෟ19)රැක්\\u200d ෟ`ල']"
+    },
+    {
+      "source": "ම`ග",
+      "replacement": "මඟ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 14. Contexts: ['grade_6_music_teacher_guide.md:554 x වැඩිදුර ම`ග පෙන්වීම හා අභ්\\u200dයාස අතිරේක කියවීම් පොතේ යොදා ඇත.', 'grade_6_music_teacher_guide.md:3021 ම`ග පෙන්වීම තුළින් අනාගතයේ දී ඔවුන්ට ස්වාධීන ව සංගීත භාණ්ඩ', 'grade_8_music_teacher_guide.md:121 අපේක්ෂා කරන සාධනයන්, විෂය ඉගැන්වීමට ම`ග පෙන්වන සුසාධ්\\u200dයකරුවන් විසින් පාඩම']"
+    },
+    {
+      "source": "ම`ගපෙන්විම",
+      "replacement": "මඟපෙන්විම",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:3597 මෙය පරිගණක පාඩම සඳහා ආදර්ශයක් පමණි. අදාළ ම`ගපෙන්විම අනුව පරිගණක භාවිත']"
+    },
+    {
+      "source": "ම`ගින්",
+      "replacement": "මඟින්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 50. Contexts: ['grade_10_western_music.md:3520 පරිගණකය භාවිත කිරීම ම`ගින් බාහිරින් ඇතුල් කරන  තැටියක ඇති•CD', 'grade_10_western_music.md:3590 ස්ථාපන කරන ලද මෘදුකාංග ම`ගින් ද ඉතා පහසුවෙන් ඉහත කාර්ය', 'grade_10_western_music.md:3762 ගායනයෙන් හෝ කැසට්, සී. ඞී. යන්ත්\\u200dර ම`ගින් ගීත ශ්\\u200dරවණයට සලස්වන්න.•']"
+    },
+    {
+      "source": "මකුලො`ථව",
+      "replacement": "මකුලොථව",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:2575 ස්වර සුසංගත කිරීම වඩාත් රසවත් බව ඩබ්ලිව්. බී. මකුලො`ථව ශූරීන්ගේ']"
+    },
+    {
+      "source": "මහ`ගු",
+      "replacement": "මඟු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:2555 කිරීමටත්, මෙම පාඩම 10 ශ්\\u200dරේණියේ දරුවන්ට මහ`ගු පිටිවහලක් වනු ඇත.']"
+    },
+    {
+      "source": "මාජීළ`ගා",
+      "replacement": "මාජීළඟා",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:467 න/ මාජීළ`ගා']"
+    },
+    {
+      "source": "මාපටැ`ගිලි",
+      "replacement": "මාපටැඟිලි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:1168 xදෑතෙහි, මාපටැ`ගිලි දෙකත් සුළැ`ගිලි 2ත් හැර ඉතිරි ඇ`ගිලි 6 වාදනයේ දී සිදුරු ඇරීම']"
+    },
+    {
+      "source": "මැද`ග",
+      "replacement": "මැදග",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:2916 යතිය පැදියක අග සහ මැද`ග යන අවස්ථා දෙකේ ම යෙදෙන අයුරු•']"
+    },
+    {
+      "source": "මැදැ`ගිල්ල",
+      "replacement": "මැදැඟිල්ල",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_10_western_music.md:2515 ගවම් අතෙහි මැදැ`ගිල්ල හා දබරැ`ගිල්ල යන ඇ`ගිලි දෙකෙන් එකකින් ලවය කොටසට', 'grade_8_music_teacher_guide.md:1041 දකුණතේ සුළැ`ගිල්ල, වෙද`ගිල්ල, මැදැ`ගිල්ල යන අනුපිළිවෙළට']"
+    },
+    {
+      "source": "මු`ඵ",
+      "replacement": "මුළු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:3675 ගී පාදයේ මාත්\\u200dරා සංඛ්\\u200dයාව (මු`ඵ) 18 කි']"
+    },
+    {
+      "source": "මු`ඵල්ලේ",
+      "replacement": "මුළුල්ලේ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:3640 මු`ඵල්ලේ ම පරිගණකය ඉදිරිපිට සිට නැරඹුවත්  යේ ඇති වීඩියෝYou Tube']"
+    },
+    {
+      "source": "මෙම`ගින්",
+      "replacement": "මෙමඟින්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:77 ගුණාත්මක යෙදවුම් හා කි්\\u200dරයාකාරකම් තෝරා ගැනීමට ගුරුවරුන්ට අවශ්\\u200dය නිදහස මෙම`ගින් ලබා දී තිබේ.']"
+    },
+    {
+      "source": "ය`",
+      "replacement": "ය",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:2745 ත  ්\\u200dය`']"
+    },
+    {
+      "source": "යනවි`දියි",
+      "replacement": "යනවිදියි",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 2. Contexts: ['grade_10_western_music.md:392 රහ්මාන් යනවි`දියි.  මෙහෙයවීම  වැනි  විවිධ  පෞරුෂ', 'western_music_syllabus.md:122 රහ්මාන් යනවි`දියි.  මෙහෙයවීම  වැනි  විවිධ  පෞරුෂ']"
+    },
+    {
+      "source": "යි`දිමියිමිනලාං",
+      "replacement": "යිදිමියිමිනලාං",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:535 යි`දිමියිමිනලාං']"
+    },
+    {
+      "source": "ර`",
+      "replacement": "ර",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:412 %,.::* 5.්\\u200dර`']"
+    },
+    {
+      "source": "ර`ග",
+      "replacement": "රඟ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_10_western_music.md:3969 ලෙස කණ්ඩායම් වශයෙන්  හෝ ඒකල ව වේදිකාවේ ර`ග දැක්වීමට', 'grade_11_music_textbook.md:3836 ලෙස  කණ්ඩායම් වශයෙන්  හෝ ඒකලව වේදිකාවේ ර`ග දැක්වීමට']"
+    },
+    {
+      "source": "ර`ල",
+      "replacement": "රළ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['oriental_music_2018.md:1192 /්\\u200dර`ල  ,ෆූල-රැ,1ූ']"
+    },
+    {
+      "source": "රවිකි`ක්",
+      "replacement": "රවිකික්",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_10_western_music.md:1703 ගායනයේ දී වයලීනය යොදා ගත් අතර එහිදී එය ‘රවිකි`ක්\\u200dද්`ක්\\u200dදා’ යන නමින්']"
+    },
+    {
+      "source": "රසවි``දියි",
+      "replacement": "රසවිඳියි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_11_music_textbook.md:3091 මා පිය ගුණවරුණ ඇතුළත් ගීත රසවි``දියි', 'grade_11_music_textbook.md:3094 ක්\\u200dරියාකරකම  :මා පිය ගුණවරුණ ඇතුළත් ගීත රසවි``දියි']"
+    },
+    {
+      "source": "රසවි`දි",
+      "replacement": "රසවිඳි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:628 සංගීතෙගය. රසවි`දි']"
+    },
+    {
+      "source": "රසවි`දියි",
+      "replacement": "රසවිඳියි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_10_western_music.md:1593 තෝරා ගත් සරල ගී ඒවායේ අනන්\\u200dය ලක්\\u200dෂණ රකිමින් ගයා රසවි`දියි.•', 'grade_11_music_textbook.md:2188 නූතන ලෝකයේ ප්\\u200dරසිද්ධ යානි නම් සංගීතඥයාගේ නිර්මාණ රසවි`දියි.•']"
+    },
+    {
+      "source": "රසවි`දීමට",
+      "replacement": "රසවිඳීමට",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:3880 ඉගෙනුම්  පල  :ජග්ජිත් සිං. රහුමාන් යන සංගීතඥයින් ගේ නිර්මාණ රසවි`දීමට කැමැත්ත•']"
+    },
+    {
+      "source": "රැ`",
+      "replacement": "රැ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 2. Contexts: ['oriental_music_2018.md:2560 රැ` ෟ,ක්\\u200d ෟෟ-', 'oriental_music_2018.md:2903 රැ`9     ,ල 6ක0   ීෟ']"
+    },
+    {
+      "source": "රැ`ල",
+      "replacement": "රැළ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 4. Contexts: ['oriental_music_2018.md:3534 ෟ: රැ  රැ`ල ූූඛ,ඝු5 රැ', 'oriental_music_2018.md:3540 ෟ  ෟඛු ෟථ ූූඛ,ග 55 රැ`ල', 'oriental_music_2018.md:3581 ෟථෟ  රැ`ල ෟ, ඝුෟ ෟ ෟ 6) ෟෟ1']"
+    },
+    {
+      "source": "රැ`ලෑ",
+      "replacement": "රැලෑ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:3538 ෟ,ෟථ:ූෟ ු ෟථ ූූඛ, රැ`ලෑ ෟ']"
+    },
+    {
+      "source": "රැ`ලෟ",
+      "replacement": "රැලෟ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:3578 ෟඊෟ:රැ  රැ`ලෟ,   ථ5 රැ']"
+    },
+    {
+      "source": "රැ`ෟ",
+      "replacement": "රැෟ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:2562 ෑ ,ක්\\u200d  රැ`ෟ0 ෑ6ල : න්\\u200d']"
+    },
+    {
+      "source": "ල`ගා",
+      "replacement": "ලඟා",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_7_11_oriental_music_teacher_guide.md:250 ඔවුන් ල`ගා කරගත් ප්\\u200dරවීණතා මට්ටම් නිශ්චය කරමින් හා විශ්ලේෂණය කරමින් ඇගයීම ක්\\u200dරියාත්මක', 'grade_8_music_teacher_guide.md:471 ඔවුන් ල`ගා කරගත් ප්\\u200dරවීණතා මට්ටම් නිශ්චය කරමින් හා විශ්ලේෂණය කරමින් ඇගයීම ක්\\u200dරියාත්මක']"
+    },
+    {
+      "source": "ලඊෟතු`ලෘ",
+      "replacement": "ලඊෟතුලෘ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:1175 ූ  ෟ`ලෟෟූු -ලඊෟතු`ලෘ']"
+    },
+    {
+      "source": "ව`දිමි",
+      "replacement": "වඳිමි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:1037 1.සදාකල් ව`දිමි මා පාද යුග']"
+    },
+    {
+      "source": "වි``දියි",
+      "replacement": "විඳියි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_10_western_music.md:441 ගීත රස වි``දියි.', 'western_music_syllabus.md:171 ගීත රස වි``දියි.']"
+    },
+    {
+      "source": "වි`දි",
+      "replacement": "විඳි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:2224 යානි සංගීත`ඥයාගේ නිර්මාණයන්හි තමන් රස වි`දි කොටස් පිළිබඳව•']"
+    },
+    {
+      "source": "වි`දිමින්",
+      "replacement": "විඳිමින්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 4. Contexts: ['grade_10_western_music.md:443 කරමින්  රස  වි`දිමින්  ගීතඇසුරින්)', 'grade_10_western_music.md:1513 ග්\\u200dරැමෆෝන් ගී රස වි`දිමින් අගය කරයි.•', 'grade_10_western_music.md:2914 කරමින්, රස වි`දිමින් ගීත ගායනයේ යෙදෙයි.']"
+    },
+    {
+      "source": "වි`දිමු",
+      "replacement": "විඳිමු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 5. Contexts: ['grade_10_western_music.md:970 1.  නිති වි`දිමු සුමධුර යමන රාග රස', 'grade_10_western_music.md:1092 නිති වි`දිමු. සුමධුර යමන් රාග රස ලක්ෂණ ගීය.•', 'grade_10_western_music.md:2911 ගයා වයා වි`දිමු හින්දි චිත්\\u200dරපට ගී']"
+    },
+    {
+      "source": "වි`දියා",
+      "replacement": "විදියා",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:521 වි`දියා']"
+    },
+    {
+      "source": "වි`දියි",
+      "replacement": "විඳියි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 12. Contexts: ['grade_10_western_music.md:2536 කරමින් ඔවුන්ගේ නිර්මාණ රස වි`දියි.', 'grade_11_music_textbook.md:1224 ගායනය කරයි රස වි`දියි.', 'grade_11_music_textbook.md:1763 කි්\\u200dරයාකාරකම   : රාගාශි්\\u200dරත සරල ගී රස වි`දියි.']"
+    },
+    {
+      "source": "වි`දීම",
+      "replacement": "විඳීම",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:2466 විදේශීය භාෂාවලින් ගැයෙන ගීත. රස වි`දීම හා ගායනය කිරීම මෙම']"
+    },
+    {
+      "source": "වි`දීමට",
+      "replacement": "විඳීමට",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_10_western_music.md:2920 රාගාශ්\\u200dරිත සිනමා ගී ගායන වාදන රස වි`දීමට පෙළඹෙයි.•', 'grade_11_music_textbook.md:2129 සංධ්වනිි ඇතුළත් තැටියක් සිසුන්ට ශ්\\u200dරවණය කර රස වි`දීමට අවස්ථාවCD']"
+    },
+    {
+      "source": "වෙද`ගිල්ල",
+      "replacement": "වෙදඟිල්ල",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:1041 දකුණතේ සුළැ`ගිල්ල, වෙද`ගිල්ල, මැදැ`ගිල්ල යන අනුපිළිවෙළට']"
+    },
+    {
+      "source": "වෙදැ`ගිල්ල",
+      "replacement": "වෙදැඟිල්ල",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 3. Contexts: ['grade_10_western_music.md:2394 වෙදැ`ගිල්ල  එකවර', 'grade_10_western_music.md:2502 මෙහි දී වෙදැ`ගිල්ල ස්\\u200dයාහි කොටසේ රඳවා තබා ගත යුතු ය.', 'grade_10_western_music.md:2504 උපදී. මෙහි දී ද වෙදැ`ගිල්ල ස්\\u200dයාහි කොටසේ රඳවා තබා ගත යුතු ය.']"
+    },
+    {
+      "source": "වොරැ`දී",
+      "replacement": "වොරැඳී",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:2243 දුල් නිමල් සිසි සේ- ඉයුජින්නන් සිරින් වොරැ`දී- මනමේ']"
+    },
+    {
+      "source": "ස`ගරා",
+      "replacement": "සඟරා",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 3. Contexts: ['grade_10_western_music.md:2700 ඇති ස`ගරා මගින් අන්තර්ජාලය තුළින්, විද්\\u200dයුත් එන්සයික්ලෝපීඩියා මගින්,', 'grade_6_music_teacher_guide.md:1153 පසු අභ්\\u200dයාස :පුවත් පත් ස`ගරා, ග්\\u200dරන්ථ ඇසුරින් සංගීත භාණ්ඩ පිළිබඳ අධ්\\u200dයයනයට', 'grade_6_music_teacher_guide.md:1987 x පොත් පත්, පුවත්පත්, ස`ගරා ආදියෙහි එන වාදන ඉරියව් සඳහන් ව ඇති']"
+    },
+    {
+      "source": "ස`ගරාව",
+      "replacement": "සඟරාව",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:2597 හඬ ගුවන් විදුලි ස`ගරාව - 2013 ජනවාරි මාර්තු කලාපය - පිටු අංක 154,•']"
+    },
+    {
+      "source": "ස`ගවා",
+      "replacement": "සඟවා",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:1625 මාගේ   හිසකේ  ගර්භයෙහී // ස`ගවා ගෙන ආ සාදරෙන්  -  ලෝනා මුනි.......']"
+    },
+    {
+      "source": "ස`ඳස්",
+      "replacement": "සඳස්",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:2828 ස`ඳස් මත් ගණන ගායනයේ දී වෙනස් විය හැකි බව පිළිගනියි.']"
+    },
+    {
+      "source": "සංගීත`ඥයා",
+      "replacement": "සංගීතඥයා",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:2180 යානි සංගීත`ඥයා']"
+    },
+    {
+      "source": "සංගීත`ඥයාගේ",
+      "replacement": "සංගීතඥයාගේ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_11_music_textbook.md:2224 යානි සංගීත`ඥයාගේ නිර්මාණයන්හි තමන් රස වි`දි කොටස් පිළිබඳව•', 'grade_11_music_textbook.md:2228 පැවරුමඅන්තර්ජාලය  මගින්  යානි  සංගීත`ඥයාගේ  වෙනත්  නිර්මාණ  හා  ඔහුගේ']"
+    },
+    {
+      "source": "සංගීත`ඥයින්",
+      "replacement": "සංගීතඥයින්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_11_music_textbook.md:2107 ගුණාත්මක යෙදවුම්  :මොසාර්ට්, බීතෝවන් යන සංගීත`ඥයින් පිළිබඳ තොරතුරු ඇතුළත්•', 'grade_11_music_textbook.md:2110 එම සංගීත`ඥයින් විසින් නිර්මාණය කරන ලද සංධ්වනි කිහිපයක •CD,']"
+    },
+    {
+      "source": "සංගීතකඳු`ඵ",
+      "replacement": "සංගීතකඳුළු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_10_western_music.md:445 5.2 ශ්\\u200dරී  ලංකාවේ  සරල  සංගීතකඳු`ඵ හෙලා නෑඹිලියට/ඉපදුනු දා2. ශී්\\u200dර ලංකාවේ සරල සංගීත ක්\\u200dෂේත්\\u200dරයේ මව්      03', 'western_music_syllabus.md:175 5.2 ශ්\\u200dරී  ලංකාවේ  සරල  සංගීතකඳු`ඵ හෙලා නෑඹිලියට/ඉපදුනු දා2. ශී්\\u200dර ලංකාවේ සරල සංගීත ක්\\u200dෂේත්\\u200dරයේ මව්      03']"
+    },
+    {
+      "source": "සංගීතාංගඑ`ඵවන්",
+      "replacement": "සංගීතාංගඑළුවන්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_6_music_teacher_guide.md:363 4.0 දේශීය ජන සංගීතාංගඑ`ඵවන් කෑමේ ක්\\u200dරීඩාවේ ගී', 'music_teacher_guide_part_2.md:79 4.0 දේශීය ජන සංගීතාංගඑ`ඵවන් කෑමේ ක්\\u200dරීඩාවේ ගී']"
+    },
+    {
+      "source": "සම`ග",
+      "replacement": "සමඟ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 70. Contexts: ['grade_10_western_music.md:145 පුරවැසියා කෙසේ විය යුතු ද යන්න  ගැඹුරින් විමසා  බැලීමත් සම`ග  මෙතෙක් පැවති සෞන්දර්ය', 'grade_10_western_music.md:3603 සම`ග යෙදෙන්න.', 'grade_10_western_music.md:3674 පියවර  01ලෝකයේ තොරතුරු ගවේෂණ මාධ්\\u200dයයන් පිළිබඳ සිසුන් සම`ග සාකච්ඡා•']"
+    },
+    {
+      "source": "සම`ගම",
+      "replacement": "සමඟම",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_8_music_teacher_guide.md:1305 ඇමුණුම 1 භාවිතයෙන් එහි කොටස් හඳුන්වා දෙන්න. ඒ සම`ගම ඇමුණුම', 'grade_8_music_teacher_guide.md:1395 ඇමුණුම 1 භාවිතයෙන් එහි කොටස් හඳුන්වා දෙන්න. ඒ සම`ගම ඇමුණුම']"
+    },
+    {
+      "source": "සම`ගයි",
+      "replacement": "සමඟයි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:3681 සම`ගයි. ආදී වශයෙන් විශාලPiano Refils, Sonc Refils, Hollwood drum groov Loops Refils']"
+    },
+    {
+      "source": "සර්ව`ඥ",
+      "replacement": "සර්වඥ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:1884 සර්ව`ඥ පණ්ඩිත']"
+    },
+    {
+      "source": "සහ`දියිංග",
+      "replacement": "සහදියිංග",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:510 සහ`දියිංග']"
+    },
+    {
+      "source": "සිතැ`ගි",
+      "replacement": "සිතැගි",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:1302 ශ්\\u200dරව්\\u200dය මාධ්\\u200dයගත ළමා ගී තුළින් සිය සිතැ`ගි  අනුව චිත්ත රූප මවා']"
+    },
+    {
+      "source": "සිය`ඵ",
+      "replacement": "සියඵ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_10_western_music.md:3602 පියවර 02හැඳින්වීමේ කොටසේ දී ඇති අංක 1 සිට සිය`ඵ ක්\\u200dරියාකාරකම්වල සිසුන්•']"
+    },
+    {
+      "source": "සිරි`ගර",
+      "replacement": "සිරිඟර",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:1146 7. ‘‘බැති සිරි`ගර රසපිරි’’ යනුවෙන් අදහස් කරන්නේ කුමක් ද?']"
+    },
+    {
+      "source": "සිරිස`ගබෝ",
+      "replacement": "සිරිසඟබෝ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 3. Contexts: ['grade_8_music_teacher_guide.md:3750 ‘‘සිරිස`ගබෝ’’ නූර්තියේ එන ‘‘සිරි සංඝබෝධි මාලිගාවේ දී දැන්’’ ගීතය', 'grade_8_music_teacher_guide.md:3755 පියවර 01පියවර 01පියවර 01පියවර 01පියවර 01‘‘සිරිස`ගබෝ ධර්මිෂ්ඨ රජකු බැවින් දීර්ඝායුෂ තිබේ. අන්ධ බමුණාගේ•', 'grade_8_music_teacher_guide.md:3811 සිරිස`ගබෝ නූර්තිය']"
+    },
+    {
+      "source": "සු`ඵ",
+      "replacement": "සුළු",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:3077 තනුව සරල හා සිත් ගන්නා සු`ඵ ආකාරයේ ගීයක් සිහියට නංවා ගැයීමට•']"
+    },
+    {
+      "source": "සුර`ගන",
+      "replacement": "සුරගන",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_10_western_music.md:1920 උදා: සුර රද සමන් සමගින් සුර`ගන එවර']"
+    },
+    {
+      "source": "සුළ`ග",
+      "replacement": "සුළඟ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 3. Contexts: ['grade_6_music_teacher_guide.md:589 ගොටු කොළයක් ගෙන දිවට සහ තල්ලට තබා තදකර ඒ අතරින් වැරෙන් සුළ`ග පිට කරන්න.', 'grade_6_music_teacher_guide.md:602 x සුළ`ග', 'grade_6_music_teacher_guide.md:1183 x  සුළ`ග යෙදීමේ ආකාරය අනුව හෑන්ඩ්බැලෝ - ෆුට් බැලෝ ලෙස ව්\\u200dයවහාර කෙරේ.']"
+    },
+    {
+      "source": "සුළැ`ගිල්ල",
+      "replacement": "සුළැගිල්ල",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:1041 දකුණතේ සුළැ`ගිල්ල, වෙද`ගිල්ල, මැදැ`ගිල්ල යන අනුපිළිවෙළට']"
+    },
+    {
+      "source": "සුළැ`ගිලි",
+      "replacement": "සුළැඟිලි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:1168 xදෑතෙහි, මාපටැ`ගිලි දෙකත් සුළැ`ගිලි 2ත් හැර ඉතිරි ඇ`ගිලි 6 වාදනයේ දී සිදුරු ඇරීම']"
+    },
+    {
+      "source": "සුළෙ`ග්",
+      "replacement": "සුළෙඟ්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 3. Contexts: ['grade_6_music_teacher_guide.md:1163 xමෙය සුළෙ`ග් ආධාරයෙන් නාදය උපදින එනම් සුෂිර වාද්\\u200dය භාණ්ඩ ගණයට අයත්', 'grade_6_music_teacher_guide.md:1180 x මෙය සුළෙ`ග් ආධාරයෙන් නාදය උපදින වාද්\\u200dය භාණ්ඩයකි. ස්වර පුවරු භාණ්ඩ වර්ගයට', 'grade_6_music_teacher_guide.md:2044 x සුළෙ`ග් පාලනය මගින් සුෂිර භාණ්ඩවල හඬ උපදවන ආකාරය  පිළිබඳ']"
+    },
+    {
+      "source": "සෙන`ග",
+      "replacement": "සෙනග",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:2153 බිම්බරක් සෙන`ග ගැවසුණ - රත්න ශ්\\u200dරී විජේසිංහ']"
+    },
+    {
+      "source": "සො`දින්",
+      "replacement": "සොඳින්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:2017 රෝසනෝනා   :සො`දින් මසන් ගස් හන්දියෙ නෙයින උන්නු ගෙයි විස්තර']"
+    },
+    {
+      "source": "හ`ඩින්",
+      "replacement": "හඩින්",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 3. Contexts: ['grade_10_western_music.md:1855 (මෙහි දී ස්වර ගායනා කිරීම නොව කතා කරන හ`ඩින් රිද්මයානුකූලව ස්වර කියවීම', 'grade_6_music_teacher_guide.md:348 3.1 ගීත රසාස්වාදයේ යෙදෙයි.•අභිමානාත්මක හ`ඩින්, හැ`ගීමෙන් හා1', 'music_teacher_guide_part_2.md:64 3.1 ගීත රසාස්වාදයේ යෙදෙයි.•අභිමානාත්මක හ`ඩින්, හැ`ගීමෙන් හා1']"
+    },
+    {
+      "source": "හැ`ගීම",
+      "replacement": "හැඟීම",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_7_11_oriental_music_teacher_guide.md:134 සාධාරණ යුක්තිය පිළිබඳ හැ`ගීම, සමාජ සම්බන්ධතා,', 'grade_8_music_teacher_guide.md:355 සාධාරණ යුක්තිය පිළිබඳ හැ`ගීම, සමාජ සම්බන්ධතා,']"
+    },
+    {
+      "source": "හැ`ගීමක්",
+      "replacement": "හැඟීමක්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:1468 පිළිබඳ හැ`ගීමක් හා අභිමානයක් ඇති කිරීම ඉතා වැදගත් ය.']"
+    },
+    {
+      "source": "හැ`ගීම්",
+      "replacement": "හැඟීම්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_10_western_music.md:2973 ගායනයෙන් තමා අත්වි`දි හැ`ගීම් අනුසාරයෙන්, නිදහස් අදහස් ප්\\u200dරකාශනයට•', 'grade_8_music_teacher_guide.md:3725 හැ`ගීම් ප්\\u200dරකාශ වන අයුරින් ගීතය ගායනය කරයි.']"
+    },
+    {
+      "source": "හැ`ගීම්බර",
+      "replacement": "හැඟීම්බර",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_6_music_teacher_guide.md:1541 x ගුරුවරයා වාද්\\u200dය භාණ්ඩය සමග ජාතික ගීය අභිමානවත් ව, හැ`ගීම්බර ව', 'grade_8_music_teacher_guide.md:2580 ඉගෙනුම් පල       :පිය ගුණ ගීයක් හැ`ගීම්බර ව ගායනය කරයි.•']"
+    },
+    {
+      "source": "හැ`ගීමෙන්",
+      "replacement": "හැඟීමෙන්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 5. Contexts: ['grade_6_music_teacher_guide.md:348 3.1 ගීත රසාස්වාදයේ යෙදෙයි.•අභිමානාත්මක හ`ඩින්, හැ`ගීමෙන් හා1', 'grade_6_music_teacher_guide.md:1496 x ඉතා නිවැරදි ව හා හැ`ගීමෙන් යුතු ඉරියව්වෙන් ගායනය කරන', 'grade_7_11_oriental_music_teacher_guide.md:124 නිරාකරණය කිරීම, විචාරශීලී හා විග්\\u200dරහාත්මක චින්තනය, කණ්ඩායම් හැ`ගීමෙන් කටයුතු']"
+    },
+    {
+      "source": "හැ`දිනගැනීමට",
+      "replacement": "හැදිනගැනීමට",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:1120 x අනෙකුත් වාද්\\u200dය භාණ්ඩ පිළිබඳ ව හැ`දිනගැනීමට ඇල්මක් දක්වයි.']"
+    },
+    {
+      "source": "හැ`දින්විය",
+      "replacement": "හැඳින්විය",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_10_western_music.md:1884 ගීත විශේෂයක් ලෙස සේ ගී හැ`දින්විය හැකි බවත්, උපමා, උපමේය ශබ්ද', 'grade_11_music_textbook.md:2478 අපේක්\\u200dෂිත ය. යනු සුසංගත වීම වශයෙන් හැ`දින්විය හැකි ය.Harmony']"
+    },
+    {
+      "source": "හැ`දින්වීම",
+      "replacement": "හැඳින්වීම",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 6. Contexts: ['grade_10_western_music.md:281 හැ`දින්වීමv-vi', 'grade_10_western_music.md:1279 (ගීතය පිහිටුවා ඇති ශ්\\u200dරැතිය හැ`දින්වීම සඳහා සටහන් කෙරේ.(viii)M', 'grade_10_western_music.md:1750 හැ`දින්වීම:ස්වර පුවරුවෙන් ස්වර ලිපි වාදනය කිරීමේ කුසලතාවය මේ වන විට ඔබ']"
+    },
+    {
+      "source": "හැ`දින්වීමක්",
+      "replacement": "හැඳින්වීමක්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 5. Contexts: ['grade_10_western_music.md:794 කෙටි හැ`දින්වීමක් කරන්න. භක්ති ගීත නිර්මාණයේ දී ෙභෙරවී රාගය වැඩි', 'grade_10_western_music.md:1046 රස භාවයන් පිළිබඳ ව කෙටි හැ`දින්වීමක් කරන්න. කරුණා රසය ඉස්මතු', 'grade_11_music_textbook.md:2199 සංගීතඥයා පිළිබඳ කෙටි හැ`දින්වීමක් ප්\\u200dරමාණවත් නොවන අතර නිදහස්']"
+    },
+    {
+      "source": "හැ`දින්වීම්",
+      "replacement": "හැඳින්වීම්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 5. Contexts: ['grade_6_music_teacher_guide.md:1121 ගුණාත්මක යෙදවුම්: x භාණ්ඩ පිළිබඳ පිටපත් කරගන්නා ලද හැ`දින්වීම් පත්\\u200dරිකා', 'grade_6_music_teacher_guide.md:1130 සියල්ලට පින්තූර සහිත ව කෙටි හැ`දින්වීම් පත්\\u200dරිකා ලබා දී ඒ තුළින් ස්වයං', 'grade_6_music_teacher_guide.md:1132 හැ`දින්වීම් පත්\\u200dරිකා සෑම දරුවකුට ම ලබා දීම අපේක්ෂා නොකෙරේ.     තමන්']"
+    },
+    {
+      "source": "හැ`දින්වීමේදී",
+      "replacement": "හැඳින්වීමේදී",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:3159 චරිත  හැ`දින්වීමේදී  කොළපතකින්  සාදා  ගත්  වෙස්  මුහුණද,  උපයෝගි•']"
+    },
+    {
+      "source": "හැ`දින්වීය",
+      "replacement": "හැඳින්වීය",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:1704 හැ`දින්වීය. වයලීනයෙන් කපිරි`ක්\\u200dද්`ක්\\u200dදා ගීතයක් වාදනය කර පෙන්වීම වඩාත්']"
+    },
+    {
+      "source": "හැ`දින්වෙයි",
+      "replacement": "හැඳින්වෙයි",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_10_western_music.md:707 ප්\\u200dරබන්ධ කර ඇති ගීත ශෛලිය ලක්ෂණ ගී නමින් හැ`දින්වෙයි. සෑම රාගයකට', 'grade_10_western_music.md:961 ප්\\u200dරබන්ධ කර ඇති ගීත ලක්ෂණ ගී නමින් හැ`දින්වෙයි. සෑම රාගයකට ම']"
+    },
+    {
+      "source": "හැ`දින්වේ",
+      "replacement": "හැඳින්වේ",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 5. Contexts: ['grade_10_western_music.md:2499 අනුව ‘‘ට’’ අක්ෂරයම ‘‘රි’’ අක්ෂරය ලෙස හැ`දින්වේ.', 'grade_11_music_textbook.md:2537 හැ`දින්වේ.)', 'grade_11_music_textbook.md:3676 සැකසීම  යනුවෙන් හැ`දින්වේ. සැබෑ සංගීත භාණ්ඩයෙන් නිකුත් වන හඬම නිසාSample sound fonts']"
+    },
+    {
+      "source": "හි`දිමිනේ",
+      "replacement": "හිදිමිනේ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_8_music_teacher_guide.md:1694 මන්මද රංගන මණ්ඩපයේ මෙම මන්ද බලා හි`දිමිනේ']"
+    },
+    {
+      "source": "හෙ`ඩ්",
+      "replacement": "හෙඩ්",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:1229 x මෙහි භාවිත වන අනුනාද (තරෆ්) තත් නිසා හෙ`ඩ් මිහිරි බව වැඩි ය.']"
+    },
+    {
+      "source": "හො`දින්",
+      "replacement": "හොඳින්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 8. Contexts: ['grade_10_western_music.md:1207 කරනු ලබන සංකේතයන් ය. එම තොරතුරු කියවා හො`දින් අවබෝධ කර ගන්න. ගැටලු ඇතොත්', 'grade_10_western_music.md:1314 සිසුනට ලබා දෙන්න. එහි දැක්වෙන එක් එක් කොටස් හො`දින් තහවුරු කරවන්න.', 'grade_10_western_music.md:1852 මෙසේ හො`දින්  පුහුණු වීමෙන් ප්\\u200dරස්තාරය තුළ ස්වර ගමන් කරනු ලබන රටාව වටහා']"
+    },
+    {
+      "source": "ළ``ගාකර",
+      "replacement": "ළඟාකර",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_7_11_oriental_music_teacher_guide.md:73 දුර්වලතා නිසා ධරණීය මානව සංවර්ධන සංකල්ප රාමුව ඇතුළත අධ්\\u200dයාපනය තුළින් ළ``ගාකර ගත', 'grade_8_music_teacher_guide.md:294 දුර්වලතා නිසා ධරණීය මානව සංවර්ධන සංකල්ප රාමුව ඇතුළත අධ්\\u200dයාපනය තුළින් ළ``ගාකර ගත']"
+    },
+    {
+      "source": "ළ`ගට",
+      "replacement": "ළඟට",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_6_music_teacher_guide.md:2164 ගුරුවරයා සතුවිය යුතු යි. සිසුන් ළ`ගට ගොස් ඔවුන් මෙම අභ්\\u200dයාසවල', 'grade_6_music_teacher_guide.md:2337 x මෙහි දී ගුරුවරයා සිසුන් ළ`ගට ගොස්  ඔවුන්ගේ හස්ත සාධනය']"
+    },
+    {
+      "source": "ළ`ගා",
+      "replacement": "ළඟා",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 22. Contexts: ['grade_10_western_music.md:362 තත්ත්වයන්  ළ`ගා  කර', 'grade_10_western_music.md:1462 ගුණාත්මක බවින් පිරුණු වාදනයක් ඉදිරිපත් කිරීමට අවශ්\\u200dය ශක්තිය ළ`ගා', 'grade_10_western_music.md:1505 ළ`ගා කර ගැනීමට හුරුවෙයි.']"
+    },
+    {
+      "source": "ළ`ගාකර",
+      "replacement": "ළඟාකර",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 3. Contexts: ['grade_10_western_music.md:3738 ළ`ගාකර ගැනීමට හුරුවෙයි.', 'grade_10_western_music.md:3802 ළ`ගාකර ගැනීමට හුරුවෙයි.', 'grade_10_western_music.md:3876 ළ`ගාකර ගැනීමට හුරුවෙයි.']"
+    },
+    {
+      "source": "ළ`ගාවන",
+      "replacement": "ළඟාවන",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_11_music_textbook.md:1309 විවිධ ශිල්ප ක්\\u200dරම යොදා ගනිමින් සම් එකට ළ`ගාවන අයුරු උදාහරණ\"\"']"
+    },
+    {
+      "source": "ළ`ගාවීම",
+      "replacement": "ළඟාවීම",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 2. Contexts: ['grade_7_11_oriental_music_teacher_guide.md:69 පුද්ගලයාට හා සමාජයට අදාළ වන ප්\\u200dරධාන ජාතික අරමුණු කර ළ`ගාවීම සඳහා පුද්ගලයින්ට', 'grade_8_music_teacher_guide.md:290 පුද්ගලයාට හා සමාජයට අදාළ වන ප්\\u200dරධාන ජාතික අරමුණු කර ළ`ගාවීම සඳහා පුද්ගලයින්ට']"
+    },
+    {
+      "source": "ළ`ගින්",
+      "replacement": "ළඟින්",
+      "reason": "Verified or strongly inferred Sinhala correction. Occurrences: 1. Contexts: ['grade_10_western_music.md:1281 තනි ඉංග්\\u200dරීසි අකුරින් එකත් සිම්පල් අකුර ඒ ළ`ගින් ම දකුණු පසින් යෙදීමෙන්Major Scalem']"
+    },
+    {
+      "source": "්ර`ග",
+      "replacement": "්රග",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['grade_6_music_teacher_guide.md:3841 ්ර`ග දැක්වීමට සුදුසු ගායන, වාදන, නාට්\\u200dය, අංග කණ්ඩායම් වශයෙන']"
+    },
+    {
+      "source": "ෑඹ`ල",
+      "replacement": "ෑඹල",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:2200 ෟ ෟරැ ෑඹ`ල']"
+    },
+    {
+      "source": "ූ`",
+      "replacement": "ූ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:4631 4ූ`)ෟරැි']"
+    },
+    {
+      "source": "ූල`ල",
+      "replacement": "ූලල",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:1177 ූල`ල ෟරැ ෟ ෟෟ ළෟ']"
+    },
+    {
+      "source": "ෟ`ල",
+      "replacement": "ෟල",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 5. Contexts: ['oriental_music_2018.md:1466 ෟ`ල-ල 8 ෟ-ෟු', 'oriental_music_2018.md:1468 ෟ්\\u200dර)ෟන්\\u200dෟ`ල  ,ෆූල-', 'oriental_music_2018.md:1497 භභ`ලධධ ,ෟ19)රැක්\\u200d ෟ`ල']"
+    },
+    {
+      "source": "ෟ`ලෟ",
+      "replacement": "ෟලෟ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:1486 ෟන්\\u200dෟ`ලෟ ,']"
+    },
+    {
+      "source": "ෟ`ලෟෟූු",
+      "replacement": "ෟලෟෟූු",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:1175 ූ  ෟ`ලෟෟූු -ලඊෟතු`ලෘ']"
+    },
+    {
+      "source": "ෟ`ෟු",
+      "replacement": "ෟෟු",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 2. Contexts: ['oriental_music_2018.md:3760 ,,ෟෟ1ෟ`ෟු  ු,ු', 'oriental_music_2018.md:3769 ක්\\u200d  ෟ.ෟථ,,ෟෟ1ෟ`ෟු  ු']"
+    },
+    {
+      "source": "ෟග`",
+      "replacement": "ෟග",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 6. Contexts: ['oriental_music_2018.md:1229 //්\\u200dර)’ු   ෟග`0', 'oriental_music_2018.md:1254 /්\\u200dරඵ  1ක්\\u200d ෟග`0*,ෆූල-රැ,1ූ', 'oriental_music_2018.md:2762 //්\\u200dර)6ඪු  ෟග`0']"
+    },
+    {
+      "source": "ෟෟ`ල",
+      "replacement": "ෟෟල",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:1460 ්\\u200dර)ෟෟ`ල']"
+    },
+    {
+      "source": "ෟෟ`ලෟ",
+      "replacement": "ෟෟලෟ",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:1462 ූ්\\u200dර)ෟෟ`ලෟ ,']"
+    },
+    {
+      "source": "ෟෟෟ`ල",
+      "replacement": "ෟෟෟල",
+      "reason": "Conservative fallback removed only the literal legacy marker from this exact source form; editorial review recommended. Occurrences: 1. Contexts: ['oriental_music_2018.md:1475 6ල ෟ ෟෟෟ`ල']"
+    }
+  ]
+}

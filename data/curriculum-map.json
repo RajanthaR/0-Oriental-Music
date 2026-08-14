@@ -1,0 +1,522 @@
+[
+  {
+    "id": "CURR-G06-COMP-1.1",
+    "grade": "6",
+    "competencyNumber": "1.0",
+    "competency_si": "සංගීතයේ මූලිකාංග, ශිල්පාංග සහ සිද්ධාන්ත හඳුනා ගනිමින් ගායන/වාදන ප්‍රායෝගික හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "1.1",
+    "competencyLevel_si": "ශබ්දය සහ සංගීත නාදය අතර වෙනස හඳුනා ගනිමින් මූලික ස්වර ගායනයට හුරු වෙයි.",
+    "learningOutcome_si": "ශබ්දය සහ නාදය අතර වෙනස දක්වයි; නාදයේ ලක්ෂණ 3 (උස්-මිටි බව, මහත්-කුඩා බව, නාද ගුණය) පැහැදිලි කරයි; ශුද්ධ සප්ත ස්වර (ස රි ග ම ප ධ නි) නිවැරදි තාරතාවයෙන් ගයයි.",
+    "sourceContentDescription": "නාදය හා සංගීතය හැඳින්වීම, සප්ත ස්වර පිහිටීම, මන්ද්‍ර-මධ්‍ය-තාර සප්තක හඳුනාගැනීම",
+    "sourceDocument": "SRC-NIE-G06-TG",
+    "pageRange": "පිටු 10-31",
+    "prerequisiteConcepts": [],
+    "canonicalConcepts": [
+      "term-nada",
+      "term-pitch",
+      "term-intensity",
+      "term-timbre",
+      "term-shuddha-swara",
+      "term-saptaka"
+    ],
+    "learningTrack": "ස්වර මඟ",
+    "suggestedActivity": "ස්වර යතුරුපුවරුවේ ස සිට ඉහළ ස̇ දක්වා තාරතා වෙනස අසමින් ස්වර ගායනා කිරීම",
+    "suggestedAssessment": "නාදයේ ලක්ෂණ හඳුනාගැනීමේ කෙටි බහුවරණ ප්‍රශ්නාවලිය සහ ස්වර අනුපිළිවෙළ පෙළගැස්වීම",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G06-COMP-1.2",
+    "grade": "6",
+    "competencyNumber": "1.0",
+    "competency_si": "සංගීතයේ මූලිකාංග, ශිල්පාංග සහ සිද්ධාන්ත හඳුනා ගනිමින් ගායන/වාදන ප්‍රායෝගික හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "1.2",
+    "competencyLevel_si": "සරල අලංකාර අභ්‍යාස ගායනය හා වාදනය කරයි.",
+    "learningOutcome_si": "ශුද්ධ ස්වර ඇසුරින් සරල අලංකාර රටා 7 ආරෝහණ හා අවරෝහණ අනුපිළිවෙළින් නියමිත ලයට ගයයි සහ වයයි.",
+    "sourceContentDescription": "සරල අලංකාර අභ්‍යාස 1 සිට 7 දක්වා",
+    "sourceDocument": "SRC-NIE-G06-TG",
+    "pageRange": "පිටු 32-38",
+    "prerequisiteConcepts": [
+      "term-shuddha-swara",
+      "term-saptaka"
+    ],
+    "canonicalConcepts": [
+      "term-alankara",
+      "term-arohana",
+      "term-avarohana",
+      "term-laya"
+    ],
+    "learningTrack": "ස්වර මඟ",
+    "suggestedActivity": "ස්වර යතුරුපුවරුව මඟින් සරල අලංකාර පියවරෙන් පියවර වාදනය කිරීම",
+    "suggestedAssessment": "අලංකාර ස්වර හිස්තැන් පිරවීම සහ අනුපිළිවෙළ සැකසීමේ අභ්‍යාසය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G06-COMP-1.3",
+    "grade": "6",
+    "competencyNumber": "1.0",
+    "competency_si": "සංගීතයේ මූලිකාංග, ශිල්පාංග සහ සිද්ධාන්ත හඳුනා ගනිමින් ගායන/වාදන ප්‍රායෝගික හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "1.3",
+    "competencyLevel_si": "මූලික ලය සහ තාල සංකල්ප හඳුනා ගනිමින් අත්පුඩි මඟින් තාල නිරූපණය කරයි.",
+    "learningOutcome_si": "ලය, මාත්‍රා, විභාග, සම, තාළි සහ ඛාලි තේරුම් ගනියි; කහර්වා සහ දාදරා තාල අතින් නිරූපණය කරයි.",
+    "sourceContentDescription": "ලය හා තාලය හැඳින්වීම, කහර්වා සහ දාදරා තාලවල මූලික අත්පුඩි ක්‍රම",
+    "sourceDocument": "SRC-NIE-G06-TG",
+    "pageRange": "පිටු 39-50",
+    "prerequisiteConcepts": [
+      "term-laya"
+    ],
+    "canonicalConcepts": [
+      "term-matra",
+      "term-tala",
+      "term-sam",
+      "term-tali",
+      "term-khali",
+      "term-theka"
+    ],
+    "learningTrack": "ලයයෙන් තාලයට",
+    "suggestedActivity": "තාල දෘශ්‍යකාරකය (Tala Visualizer) සමඟ ඨේකාවට අනුකූලව අත්පුඩි ගැසීම",
+    "suggestedAssessment": "තාල මාත්‍රා ගණන සහ තාළි/ඛාලි ස්ථාන හඳුනාගැනීමේ ප්‍රශ්නාවලිය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G06-COMP-4.1",
+    "grade": "6",
+    "competencyNumber": "4.0",
+    "competency_si": "දේශීය ජන සංගීතාංග පිළිබඳ ප්‍රායෝගික හැකියාව වර්ධනය කර ගනිමින් සංස්කෘතික උරුමයන් රැක ගනියි.",
+    "competencyLevelNumber": "4.1",
+    "competencyLevel_si": "දේශීය ජන ක්‍රීඩා හා බැඳි ගීත සහ ළමා ගීත ගායනය කරයි.",
+    "learningOutcome_si": "ඔලිඳ කෙළිය, එළුවන් කෑම, ඔන්චිලි වාරම් ආදී ජන ක්‍රීඩා ගීතවල තනුව හා රිද්මය හඳුනාගෙන සාමූහිකව ගායනා කරයි.",
+    "sourceContentDescription": "ජන ක්‍රීඩා ගී, ළමා ගීත සහ සාම්ප්‍රදායික රිද්ම",
+    "sourceDocument": "SRC-NIE-G06-TG",
+    "pageRange": "පිටු 51-65",
+    "prerequisiteConcepts": [
+      "term-laya"
+    ],
+    "canonicalConcepts": [
+      "term-pancha-turya"
+    ],
+    "learningTrack": "අපේ සංගීත උරුමය",
+    "suggestedActivity": "ජන ක්‍රීඩා ගීතවල තාල රටාවට අත්පුඩි ගසමින් ගායනා කිරීම",
+    "suggestedAssessment": "ජන ක්‍රීඩා ගීත පාද ගළපන ප්‍රශ්නාවලිය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G07-COMP-1.1",
+    "grade": "7",
+    "competencyNumber": "1.0",
+    "competency_si": "සංගීතයේ මූලිකාංග, ශිල්පාංග සහ සිද්ධාන්ත හඳුනා ගනිමින් ගායන/වාදන ප්‍රායෝගික හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "1.1",
+    "competencyLevel_si": "විකෘති ස්වර (කෝමල හා තීව්‍ර) හඳුනා ගනිමින් නිවැරදිව ගායනය හා වාදනය කරයි.",
+    "learningOutcome_si": "කෝමල ස්වර 4 (රි, ග, ධ, නි) සහ තීව්‍ර මධ්‍යම (ම) ස්වරය ශුද්ධ ස්වර හා සංසන්දනය කර හඳුනාගනියි; සප්තකයක මුළු ස්වර 12 නිවැරදිව ප්‍රස්තාරගත කරයි.",
+    "sourceContentDescription": "විකෘති ස්වර, කෝමල හා තීව්‍ර ස්වර හැඳින්වීම සහ ප්‍රස්තාර ලකුණු",
+    "sourceDocument": "SRC-NIE-G07-TG",
+    "pageRange": "පිටු 18-28",
+    "prerequisiteConcepts": [
+      "term-shuddha-swara",
+      "term-saptaka"
+    ],
+    "canonicalConcepts": [
+      "term-vikruta-swara",
+      "term-komala-swara",
+      "term-theevra-swara"
+    ],
+    "learningTrack": "ස්වර මඟ",
+    "suggestedActivity": "ස්වර යතුරුපුවරුවේ කළු සහ සුදු යතුරු මඟින් ශුද්ධ හා විකෘති ස්වර වාදනය කිරීම",
+    "suggestedAssessment": "කෝමල හා තීව්‍ර ස්වර සංකේත නිවැරදිව වෙන්කර හඳුනාගැනීම",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G07-COMP-1.2",
+    "grade": "7",
+    "competencyNumber": "1.0",
+    "competency_si": "සංගීතයේ මූලිකාංග, ශිල්පාංග සහ සිද්ධාන්ත හඳුනා ගනිමින් ගායන/වාදන ප්‍රායෝගික හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "1.2",
+    "competencyLevel_si": "දාද්‍රා සහ කෙහර්වා තාලවල ඨේකාව තබ්ලාවෙන් සහ අතින් නිරූපණය කරයි.",
+    "learningOutcome_si": "දාද්‍රා (මාත්‍රා 6) සහ කෙහර්වා (මාත්‍රා 8) තාලවල ඨේකාව, විභාග බෙදීම සහ තාළි/ඛාලි ස්ථාන පැහැදිලි කරයි; තබ්ලා අක්ෂර උච්චාරණය කරමින් තාල තබයි.",
+    "sourceContentDescription": "දාද්‍රා සහ කෙහර්වා තාල ගැඹුරු අධ්‍යයනය, තබ්ලා බෝල්",
+    "sourceDocument": "SRC-NIE-G07-TG",
+    "pageRange": "පිටු 32-40; tabla.md පිටු 1-15",
+    "prerequisiteConcepts": [
+      "term-matra",
+      "term-tala"
+    ],
+    "canonicalConcepts": [
+      "term-vibhaga",
+      "term-theka",
+      "term-tabla"
+    ],
+    "learningTrack": "ලයයෙන් තාලයට",
+    "suggestedActivity": "තාල දෘශ්‍යකාරකය මඟින් තාල ඨේකාවන්ගේ ඨාහ් සහ දුගුන් ලය පුහුණු වීම",
+    "suggestedAssessment": "තාල බෝල් අනුපිළිවෙළට පෙළගැස්වීමේ ප්‍රශ්නාවලිය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G07-COMP-2.1",
+    "grade": "7",
+    "competencyNumber": "2.0",
+    "competency_si": "වාද්‍ය භාණ්ඩයන්හි ස්වරූපය වටහා ගනිමින් වාදන හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "2.1",
+    "competencyLevel_si": "වයලීනය නිවැරදි ඉරියව්වෙන් යුතුව වාදනයට හුරු වෙයි.",
+    "learningOutcome_si": "වයලීනයේ සහ දුන්නේ (Bow) ප්‍රධාන කොටස් නම් කරයි; තත් සතර (G, D, A, E) සුසර ක්‍රම විස්තර කරයි; මූලික ස්වර වාදනය කරයි.",
+    "sourceContentDescription": "වයලීනයේ කොටස්, සුසර ක්‍රම, ධ්වනි ගුණය සහ ස්වර වාදනය",
+    "sourceDocument": "SRC-NIE-G07-TG",
+    "pageRange": "sg7_emus_chap2.1.2_violin.pdf පිටු 1-12",
+    "prerequisiteConcepts": [
+      "term-shuddha-swara"
+    ],
+    "canonicalConcepts": [
+      "term-timbre"
+    ],
+    "learningTrack": "ගයමු • වයමු",
+    "suggestedActivity": "වයලීන තත් 4 හි ස්වර සංඛ්‍යාත හා සුසර රටා අධ්‍යයනය කිරීම",
+    "suggestedAssessment": "වයලීනයේ කොටස් නම් කිරීමේ රූප සටහන් ප්‍රශ්නාවලිය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G08-COMP-1.1",
+    "grade": "8",
+    "competencyNumber": "1.0",
+    "competency_si": "සංගීතයේ මූලිකාංග, ශිල්පාංග සහ සිද්ධාන්ත හඳුනා ගනිමින් ගායන/වාදන ප්‍රායෝගික හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "1.1",
+    "competencyLevel_si": "බිලාවල් සහ භූපාලි රාග හඳුනාගනිමින් රාගධාරී සංගීතයේ ප්‍රායෝගික අධ්‍යයනයට එළඹෙයි.",
+    "learningOutcome_si": "බිලාවල් සහ භූපාලි රාගවල ආරෝහණ, අවරෝහණ, වාදී, සංවාදී, ජාතිය සහ මුඛ්‍යාංගය පැහැදිලි කරයි; ස්වර ස්ථාපන ගීත හා මධ්‍යලය ගීත ගයයි.",
+    "sourceContentDescription": "බිලාවල් රාගය (සියලු ශුද්ධ ස්වර) සහ භූපාලි රාගය (ඕඩව-ඕඩව, ම-නි වර්ජිත)",
+    "sourceDocument": "SRC-NIE-G08-TG",
+    "pageRange": "පිටු 35-48",
+    "prerequisiteConcepts": [
+      "term-shuddha-swara",
+      "term-thata"
+    ],
+    "canonicalConcepts": [
+      "term-raga",
+      "term-arohana",
+      "term-avarohana",
+      "term-vadi",
+      "term-samvadi",
+      "term-jati",
+      "term-pakad"
+    ],
+    "learningTrack": "ස්වරයෙන් රාගයට",
+    "suggestedActivity": "ස්වර යතුරුපුවරුවේ බිලාවල් සහ භූපාලි පරිමාණයන් වාදනය කරමින් සසඳා බැලීම",
+    "suggestedAssessment": "රාග දෙකෙහි වර්ජිත ස්වර සහ වාදී-සංවාදී සම්බන්ධතා පරීක්ෂා කිරීම",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G08-COMP-1.2",
+    "grade": "8",
+    "competencyNumber": "1.0",
+    "competency_si": "සංගීතයේ මූලිකාංග, ශිල්පාංග සහ සිද්ධාන්ත හඳුනා ගනිමින් ගායන/වාදන ප්‍රායෝගික හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "1.2",
+    "competencyLevel_si": "මිශ්‍ර මත්කැටි ඇති තාලපද (ත්‍රීතාල්) අධ්‍යයනය කරයි.",
+    "learningOutcome_si": "මාත්‍රා 16 කින් සහ විභාග 4 කින් යුත් ත්‍රීතාලය (තීන්තාල්) හඳුනාගනියි; තාළි 3 සහ ඛාලි 1 සහිත සම්පූර්ණ ඨේකාව අතින් හා තබ්ලාවෙන් නිරූපණය කරයි.",
+    "sourceContentDescription": "ත්‍රීතාල් තාලය, මාත්‍රා 16, විභාග 4, ඨේකාව සහ දුගුන් ලය",
+    "sourceDocument": "SRC-NIE-G08-TG",
+    "pageRange": "පිටු 42-47",
+    "prerequisiteConcepts": [
+      "term-matra",
+      "term-tala"
+    ],
+    "canonicalConcepts": [
+      "term-avarta",
+      "term-theka",
+      "term-sam"
+    ],
+    "learningTrack": "ලයයෙන් තාලයට",
+    "suggestedActivity": "තාල දෘශ්‍යකාරකයේ ත්‍රීතාල් චක්‍රය ධාවනය කරමින් 16 මාත්‍රා ගණනය කිරීම",
+    "suggestedAssessment": "ත්‍රීතාලයේ විභාග සහ තාළි-ඛාලි සංඥා නිවැරදිව සලකුණු කිරීම",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G08-COMP-6.1",
+    "grade": "8",
+    "competencyNumber": "6.0",
+    "competency_si": "රංග සම්ප්‍රදායයන්හි විශේෂතා අධ්‍යයනය කරමින් සංගීතමය ලක්ෂණ පිළිබඳ ප්‍රායෝගික අත්දැකීම් ලබයි.",
+    "competencyLevelNumber": "6.1",
+    "competencyLevel_si": "ශ්‍රී ලංකාවේ පැවති ප්‍රබල රංග සම්ප්‍රදායන් (නාඩගම් හා නූර්ති) හඳුනාගනිමින් අගය කරයි.",
+    "learningOutcome_si": "නාඩගම් සහ නූර්ති නාට්‍ය සම්ප්‍රදායන්හි ඉතිහාසය, සංගීත ලක්ෂණ, තාල (පසන් තාලය ආදී) සහ වාද්‍ය භාණ්ඩ (මද්දලය, හොරණෑව, හාමෝනියම්) විස්තර කරයි.",
+    "sourceContentDescription": "නාඩගම් හා නූර්ති නාට්‍ය කලාව, මනමේ, සිංහබාහු, සිරිසඟබෝ ආශ්‍රිත ගීත",
+    "sourceDocument": "SRC-NIE-G08-TG",
+    "pageRange": "පිටු 70-85",
+    "prerequisiteConcepts": [
+      "term-nada"
+    ],
+    "canonicalConcepts": [
+      "term-pancha-turya"
+    ],
+    "learningTrack": "රංගය, ගීතය හා රසවිඳීම",
+    "suggestedActivity": "නාඩගම් ගීතයක (පායාලා අඹරේ චන්ද්‍රයා) තාල රටාව ශ්‍රවණය කරමින් රසවිඳීම",
+    "suggestedAssessment": "නාඩගම් සහ නූර්ති අතර වෙනස්කම් වගුගත කිරීමේ ප්‍රශ්නාවලිය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G09-COMP-1.1",
+    "grade": "9",
+    "competencyNumber": "1.0",
+    "competency_si": "සංගීතයේ මූලිකාංග, ශිල්පාංග සහ සිද්ධාන්ත හඳුනා ගනිමින් ගායන/වාදන ප්‍රායෝගික හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "1.1",
+    "competencyLevel_si": "ඛමාජ්, කාෆි සහ භිම්පලාසි රාග අධ්‍යයනය කරයි.",
+    "learningOutcome_si": "ඛමාජ් (ද්වි නිෂාද), කාෆි (කෝමල ග, නි), සහ භිම්පලාසි (ඕඩව-සම්පූර්ණ, කෝමල ග, නි) රාගවල ලක්ෂණ, වාදී-සංවාදී හා මුඛ්‍යාංග පැහැදිලි කරයි; නිර්දේශිත ගීත ගයයි.",
+    "sourceContentDescription": "ඛමාජ්, කාෆි, භිම්පලාසි රාග ලක්ෂණ සහ ස්වර සංචාර",
+    "sourceDocument": "SRC-NIE-G09-TG",
+    "pageRange": "sg9_emus_raga.pdf පිටු 1-2; sg9_richmond_music.pdf",
+    "prerequisiteConcepts": [
+      "term-raga",
+      "term-komala-swara"
+    ],
+    "canonicalConcepts": [
+      "term-vadi",
+      "term-samvadi",
+      "term-jati",
+      "term-pakad",
+      "term-gana-samaya"
+    ],
+    "learningTrack": "ස්වරයෙන් රාගයට",
+    "suggestedActivity": "රාග 3 හි කෝමල ස්වර යෙදීම සංසන්දනය කරමින් ස්වර යතුරුපුවරුවේ වාදනය කිරීම",
+    "suggestedAssessment": "රාග ලක්ෂණ අනුව නිවැරදි රාගය තෝරාගැනීමේ හඳුනාගැනීමේ ප්‍රශ්නාවලිය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G09-COMP-2.1",
+    "grade": "9",
+    "competencyNumber": "2.0",
+    "competency_si": "වාද්‍ය භාණ්ඩයන්හි ස්වරූපය වටහා ගනිමින් වාදන හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "2.1",
+    "competencyLevel_si": "දේශීය සංගීත භාණ්ඩ පංචතූර්ය වර්ගීකරණයට අනුව හඳුනා ගනියි.",
+    "learningOutcome_si": "පංචතූර්ය භාණ්ඩ 5 (ආතත, විතත, විතතාතත, ඝන, සුෂිර) වර්ගීකරණ පදනම පැහැදිලි කරයි; දේශීය භාණ්ඩ 14 (ගැටබෙරය, යක්බෙරය, දවුල, තම්මැට්ටම, බුම්මැඩිය ආදිය) නිවැරදි කාණ්ඩයට අනුයුක්ත කරයි.",
+    "sourceContentDescription": "පංචතූර්ය වාද්‍ය භාණ්ඩ වර්ගීකරණය සහ දේශීය භාණ්ඩ 14",
+    "sourceDocument": "SRC-NIE-G09-TG",
+    "pageRange": "sg9_emus_music_instruments.pdf පිටු 1-5",
+    "prerequisiteConcepts": [
+      "term-nada"
+    ],
+    "canonicalConcepts": [
+      "term-pancha-turya",
+      "term-athatha",
+      "term-vithatha",
+      "term-vithathathatha",
+      "term-ghana",
+      "term-sushira"
+    ],
+    "learningTrack": "අපේ සංගීත උරුමය",
+    "suggestedActivity": "දේශීය භාණ්ඩ 14 හි ඡායාරූප පංචතූර්ය කාණ්ඩ 5 ට ඇද දැමීමේ අභ්‍යාසය",
+    "suggestedAssessment": "භාණ්ඩ වාදනය කරන ආකාරය (අතින්/කඩිප්පුවෙන්/වාතයෙන්) අනුව වර්ගීකරණ ප්‍රශ්නාවලිය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G09-COMP-6.1",
+    "grade": "9",
+    "competencyNumber": "6.0",
+    "competency_si": "රංග සම්ප්‍රදායයන්හි විශේෂතා අධ්‍යයනය කරමින් සංගීතමය ලක්ෂණ පිළිබඳ ප්‍රායෝගික අත්දැකීම් ලබයි.",
+    "competencyLevelNumber": "6.1",
+    "competencyLevel_si": "කෝලම් රංග සම්ප්‍රදාය සහ එහි සංගීතමය ලක්ෂණ විමසයි.",
+    "learningOutcome_si": "කෝලම් නාට්‍යයේ මූලාරම්භය, වෙස් මුහුණු, තානායම් පොළ රංග භූමිය, පහතරට බෙරය හා හොරණෑව භාවිතය, ජසයා සහ ලෙන්චිනා චරිත ගීත ගායනා කරයි.",
+    "sourceContentDescription": "කෝලම් රංග සම්ප්‍රදාය, වෙස් මුහුණු, සංගීතය සහ ගීත",
+    "sourceDocument": "SRC-NIE-G09-TG",
+    "pageRange": "sg9_emus__kolam.pdf පිටු 1-5",
+    "prerequisiteConcepts": [
+      "term-nada"
+    ],
+    "canonicalConcepts": [
+      "term-pancha-turya"
+    ],
+    "learningTrack": "රංගය, ගීතය හා රසවිඳීම",
+    "suggestedActivity": "ජසයා-ලෙන්චිනා සංවාද ගීතයේ තාලයට අත්පුඩි ගසමින් ගායනා කිරීම",
+    "suggestedAssessment": "කෝලම් නාට්‍යයේ සුවිශේෂී ලක්ෂණ පිළිබඳ බහුවරණ හා කෙටි පිළිතුරු පරීක්ෂණය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G10-COMP-1.1",
+    "grade": "10",
+    "competencyNumber": "1.0",
+    "competency_si": "සංගීතයේ මූලිකාංග, ශිල්පාංග සහ සිද්ධාන්ත හඳුනා ගනිමින් ගායන/වාදන ප්‍රායෝගික හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "1.1",
+    "competencyLevel_si": "භෛරව් සහ යමන් රාගවල පූර්ණ ශාස්ත්‍රීය ලක්ෂණ අධ්‍යයනය කරයි.",
+    "learningOutcome_si": "භෛරව් (කෝමල රි, ධ) සහ යමන් (තීව්‍ර ම) රාගවල වාදී, සංවාදී, ගාන සමය, මුඛ්‍යාංගය, ආන්දෝලිත ස්වර සහ ලක්ෂණ ගීත නිවැරදි ශ්‍රැති මත ගායනා කරයි.",
+    "sourceContentDescription": "භෛරව් හා යමන් රාග අධ්‍යයනය, සන්ධිප්‍රකාශ රාග සංකල්පය",
+    "sourceDocument": "SRC-NIE-G1011-TG",
+    "pageRange": "පිටු 50-62; sg11_emus_ chap3_raga_handunaganimu.pdf",
+    "prerequisiteConcepts": [
+      "term-raga",
+      "term-vikruta-swara"
+    ],
+    "canonicalConcepts": [
+      "term-vadi",
+      "term-samvadi",
+      "term-theevra-swara",
+      "term-komala-swara",
+      "term-gana-samaya"
+    ],
+    "learningTrack": "ස්වරයෙන් රාගයට",
+    "suggestedActivity": "භෛරව් රාගයේ කෝමල රි-ධ ආන්දෝලනය සහ යමන් රාගයේ තීව්‍ර මධ්‍යමය සංසන්දනය කිරීම",
+    "suggestedAssessment": "රාග ලක්ෂණ වගුව සම්පූර්ණ කිරීමේ ව්‍යුහගත ප්‍රශ්නාවලිය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G10-COMP-1.2",
+    "grade": "10",
+    "competencyNumber": "1.0",
+    "competency_si": "සංගීතයේ මූලිකාංග, ශිල්පාංග සහ සිද්ධාන්ත හඳුනා ගනිමින් ගායන/වාදන ප්‍රායෝගික හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "1.2",
+    "competencyLevel_si": "ජප්තාලය, දීප්චන්දි, රූපක්, ලාවනී සහ ඛෙම්ටා තාල සංසන්දනාත්මකව ප්‍රස්තාර කරයි.",
+    "learningOutcome_si": "දීප්චන්දි (මාත්‍රා 14), ජප්තාලය (මාත්‍රා 10), රූපක් (මාත්‍රා 7, ඛාලියෙන් ඇරඹෙන), ලාවනී (මාත්‍රා 8/4) සහ ඛෙම්ටා තාලවල මාත්‍රා, විභාග සහ ඨේකා ව්‍යුහය සංසන්දනය කරයි.",
+    "sourceContentDescription": "දීප්චන්දි, ජප්තාලය, රූපක්, ලාවනී, ඛෙම්ටා තාල ලක්ෂණ",
+    "sourceDocument": "SRC-NIE-G1011-TG",
+    "pageRange": "sg10_emus_chap1_mulikanga.pdf පිටු 1-7",
+    "prerequisiteConcepts": [
+      "term-matra",
+      "term-tala"
+    ],
+    "canonicalConcepts": [
+      "term-vibhaga",
+      "term-theka",
+      "term-sam",
+      "term-tali",
+      "term-khali"
+    ],
+    "learningTrack": "ලයයෙන් තාලයට",
+    "suggestedActivity": "තාල දෘශ්‍යකාරකයේ දීප්චන්දි සහ ජප්තාල චක්‍ර වාදනය කරමින් අතින් නිරූපණය කිරීම",
+    "suggestedAssessment": "තාලවල මාත්‍රා සහ විභාග ව්‍යුහය හඳුනාගැනීමේ ගැළපීමේ ප්‍රශ්නාවලිය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G10-COMP-4.1",
+    "grade": "10",
+    "competencyNumber": "4.0",
+    "competency_si": "දේශීය ජන සංගීතාංග පිළිබඳ ප්‍රායෝගික හැකියාව වර්ධනය කර ගනිමින් සංස්කෘතික උරුමයන් රැක ගනියි.",
+    "competencyLevelNumber": "4.1",
+    "competencyLevel_si": "ශ්‍රී ලාංකීය ජන ගී (ගැමි ගී හා කෙත ගී) විද්‍යාත්මකව වර්ගීකරණය කරයි.",
+    "learningOutcome_si": "ගැමි ගී සහ සේ ගී අතර වෙනස දක්වයි; ගොයම් ගී, කරත්ත ගී, පතල් ගී, පාරු ගී, නෙළුම් ගී, පැල් ගී නිර්මාණ පසුබිම හා සංගීත ලක්ෂණ විග්‍රහ කරයි.",
+    "sourceContentDescription": "ජන ගී වර්ගීකරණය, ගුත්තිල කාව්‍යයේ ගී, සන්දේශ කාව්‍ය ගී",
+    "sourceDocument": "SRC-NIE-G1011-TG",
+    "pageRange": "rg_sg10_emus_u4_ජන ගී වර්ගීකරණය_p1.pdf පිටු 1-5",
+    "prerequisiteConcepts": [
+      "term-laya"
+    ],
+    "canonicalConcepts": [
+      "term-nada"
+    ],
+    "learningTrack": "අපේ සංගීත උරුමය",
+    "suggestedActivity": "විවිධ ජන ගී ඛණ්ඩ ශ්‍රවණය කර අදාළ කර්මාන්තය/පරිසරය හඳුනාගැනීම",
+    "suggestedAssessment": "ජන ගී පාද සහ ගී වර්ගය ගළපන ප්‍රශ්නාවලිය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G10-COMP-9.1",
+    "grade": "10",
+    "competencyNumber": "9.0",
+    "competency_si": "සංගීතයේ භෞතික විද්‍යාත්මක හා තාක්ෂණික පදනම විමසමින් නවීන මෙවලම් භාවිත කරයි.",
+    "competencyLevelNumber": "9.1",
+    "competencyLevel_si": "නාදයේ භෞතික විද්‍යාත්මක ගුණ සහ ධ්වනි විද්‍යාව විග්‍රහ කරයි.",
+    "learningOutcome_si": "ශබ්ද තරංග, සංඛ්‍යාතය (Hz), විස්තාරය, අනුනාදය, සහ මිනිස් කටහඬේ හා සංගීත භාණ්ඩවල නාද නිෂ්පාදන මූලධර්ම භෞතික විද්‍යාත්මකව පැහැදිලි කරයි.",
+    "sourceContentDescription": "නාදය සහ ධ්වනි විද්‍යාව, තරංග ආයාමය, සංඛ්‍යාතය, අනුනාදය",
+    "sourceDocument": "SRC-NIE-G1011-TG",
+    "pageRange": "sg10_emus_chap8_nadaya.pdf පිටු 1-12; sg10_emus_chap8.1.1_nadaya.pdf පිටු 1-11",
+    "prerequisiteConcepts": [
+      "term-nada",
+      "term-pitch",
+      "term-intensity",
+      "term-timbre"
+    ],
+    "canonicalConcepts": [
+      "term-frequency"
+    ],
+    "learningTrack": "සංගීත විද්‍යාව හා තාක්ෂණය",
+    "suggestedActivity": "තාරතා මානය (Pitch Detector) මඟින් සජීවී කටහඬේ සංඛ්‍යාතය (Hz) නිරීක්ෂණය කිරීම",
+    "suggestedAssessment": "සංඛ්‍යාතය, විස්තාරය සහ නාද ගුණය පිළිබඳ විද්‍යාත්මක ගැටලු විසඳීම",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G11-COMP-1.1",
+    "grade": "11",
+    "competencyNumber": "1.0",
+    "competency_si": "සංගීතයේ මූලිකාංග, ශිල්පාංග සහ සිද්ධාන්ත හඳුනා ගනිමින් ගායන/වාදන ප්‍රායෝගික හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "1.1",
+    "competencyLevel_si": "හින්දුස්ථානි රාග 7 (බිලාවල්, භූපාලි, යමන්, ඛමාජ්, කාෆි, භිම්පලාසි, භෛරවී) පූර්ණ සංසන්දනය හා තානාලංකාර ප්‍රගුණ කරයි.",
+    "learningOutcome_si": "නිර්දේශිත රාග 7 හි ස්වර ව්‍යුහය, වාදී, සංවාදී, ජාතිය, ගාන සමය, මුඛ්‍යාංගය සහ රසාස්වාදය සම්පූර්ණයෙන් ප්‍රගුණ කර මධ්‍යලය ගීත හා තානාලංකාර ගයයි සහ වයයි.",
+    "sourceContentDescription": "රාග 7 පූර්ණ සමාලෝචනය, තානාලංකාර, මධ්‍යලය ගීත",
+    "sourceDocument": "SRC-EPD-TB-G11",
+    "pageRange": "grade_11_music_textbook.md පිටු 1-45; sg11_emus_ chap3_raga_handunaganimu.pdf",
+    "prerequisiteConcepts": [
+      "term-raga",
+      "term-vadi",
+      "term-samvadi",
+      "term-pakad"
+    ],
+    "canonicalConcepts": [
+      "term-thata",
+      "term-jati",
+      "term-gana-samaya"
+    ],
+    "learningTrack": "ස්වරයෙන් රාගයට",
+    "suggestedActivity": "ස්වර යතුරුපුවරුවේ රාග 7 හි පරිමාණයන් එකිනෙක මාරු කරමින් ස්වර රටා සසඳා බැලීම",
+    "suggestedAssessment": "රාග හඳුනාගැනීමේ O/L ආදර්ශ ප්‍රශ්න පත්‍ර අභ්‍යාසය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G11-COMP-1.2",
+    "grade": "11",
+    "competencyNumber": "1.0",
+    "competency_si": "සංගීතයේ මූලිකාංග, ශිල්පාංග සහ සිද්ධාන්ත හඳුනා ගනිමින් ගායන/වාදන ප්‍රායෝගික හැකියා ප්‍රදර්ශනය කරයි.",
+    "competencyLevelNumber": "1.2",
+    "competencyLevel_si": "නිර්දේශිත තාල පද ප්‍රස්තාර කිරීම සහ තබ්ලාවෙන් හඳුනාගැනීම.",
+    "learningOutcome_si": "දාදරා, කෙහර්වා, ත්‍රීතාල්, ජප්තාල්, දීප්චන්දි, ඛෙම්ටෝ, ලාවනී යන තාල පද ප්‍රස්තාරගත කරයි; තබ්ලාවෙන් වයන විට තාලය ක්ෂණිකව නම් කරයි.",
+    "sourceContentDescription": "තාල පද ප්‍රස්තාරකරණය, තබ්ලා අක්ෂර, ඨාහ්-දුගුන්-චෞගුන් ලය",
+    "sourceDocument": "SRC-EPD-TB-G11",
+    "pageRange": "grade_11_music_textbook.md පිටු 46-60",
+    "prerequisiteConcepts": [
+      "term-tala",
+      "term-theka"
+    ],
+    "canonicalConcepts": [
+      "term-vibhaga",
+      "term-avarta",
+      "term-tabla"
+    ],
+    "learningTrack": "ලයයෙන් තාලයට",
+    "suggestedActivity": "තාල ශ්‍රවණ පුහුණු මොඩියුලය (Ear Training) මඟින් තබ්ලා තාල හඳුනාගැනීම",
+    "suggestedAssessment": "තාල ප්‍රස්තාරගත කිරීමේ ව්‍යුහගත ලිඛිත ප්‍රශ්නාවලිය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  },
+  {
+    "id": "CURR-G11-COMP-9.1",
+    "grade": "11",
+    "competencyNumber": "9.0",
+    "competency_si": "සංගීතයේ භෞතික විද්‍යාත්මක හා තාක්ෂණික පදනම විමසමින් නවීන මෙවලම් භාවිත කරයි.",
+    "competencyLevelNumber": "9.1",
+    "competencyLevel_si": "පරිගණක සංගීතය, MIDI තාක්ෂණය සහ ධ්වනි පටිගත කිරීමේ මූලධර්ම හඳුනා ගනියි.",
+    "learningOutcome_si": "පරිගණක දෘඩාංග (CPU, Sound Card, Audio Interface, Microphone) සහ සංගීත මෘදුකාංග (DAW, Cubase, Audition, MIDI) භාවිතය පැහැදිලි කරයි.",
+    "sourceContentDescription": "පරිගණකය ඇසුරින් සංගීත නිර්මාණය, දෘඩාංග හා මෘදුකාංග, පටිගත කිරීම",
+    "sourceDocument": "SRC-EPD-TB-G11",
+    "pageRange": "computer_music.md පිටු 1-39; grade_11_music_textbook.md පිටු 75-85",
+    "prerequisiteConcepts": [
+      "term-nada",
+      "term-frequency"
+    ],
+    "canonicalConcepts": [
+      "term-frequency"
+    ],
+    "learningTrack": "සංගීත විද්‍යාව හා තාක්ෂණය",
+    "suggestedActivity": "ඩිජිටල් ඕඩියෝ පරාමිතීන් සහ MIDI සංඥා ගලායාම සටහන් කිරීම",
+    "suggestedAssessment": "පරිගණක සංගීත දෘඩාංග සහ මෘදුකාංග වර්ගීකරණ ප්‍රශ්නාවලිය",
+    "coverageStatus": "Covered",
+    "editorialStatus": "Published"
+  }
+]

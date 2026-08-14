@@ -25,7 +25,7 @@ export default function PrivacyAndChildSafetyPage() {
             <h2>1. මයික්‍රෆෝන භාවිතය සහ ශබ්ද විශ්ලේෂණය</h2>
           </div>
           <p>
-            ස්වර තාරතා පුහුණු මෙවලම (Pitch Practice) මඟින් ඔබේ මයික්‍රෆෝනය භාවිත කරන්නේ ඔබ සජීවීව 'අරඹන්න' ක්ලික් කළ විට පමණි. එම ශබ්ද සංඛ්‍යාතය (Hz) විශ්ලේෂණය වන්නේ ඔබගේ පරිගණකයේ හෝ දුරකථනයේ බ්‍රවුසරය තුළ පමණි (100% Client-Side Local Autocorrelation).
+            ස්වර තාරතා පුහුණු මෙවලම (Pitch Practice) මඟින් ඔබේ මයික්‍රෆෝනය භාවිත කරන්නේ ඔබ සජීවීව &apos;අරඹන්න&apos; ක්ලික් කළ විට පමණි. එම ශබ්ද සංඛ්‍යාතය (Hz) විශ්ලේෂණය වන්නේ ඔබගේ පරිගණකයේ හෝ දුරකථනයේ බ්‍රවුසරය තුළ පමණි (100% Client-Side Local Autocorrelation).
           </p>
           <div className="bg-green-50 p-4 rounded-2xl border border-green-200 text-green-950 font-bold flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-forest-green shrink-0" />

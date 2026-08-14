@@ -21,8 +21,15 @@
       }
     ],
     "socialContext_si": "ගැමි එකමුතුකම, ශ්‍රම විඩාව දුරු කර ගැනීම සහ කෙත් සරුසාර වීමට ආශිර්වාද ප්‍රාර්ථනා කිරීම.",
-    "gradeBands": ["6-7", "8-9", "10-11"],
-    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "ගැමි ගී අධ්‍යයනය - ගොයම් කවි" },
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-UVPA-FOLK",
+      "pageOrSection": "ගැමි ගී අධ්‍යයනය - ගොයම් කවි"
+    },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
@@ -55,8 +62,15 @@
       }
     ],
     "socialContext_si": "පැරණි ප්‍රවාහන දුෂ්කරතා, කරුණා රසය සහ සත්ත්ව-මිනිස් සබඳතාව විදහා දැක්වීම.",
-    "gradeBands": ["6-7", "8-9", "10-11"],
-    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "කරත්ත කවි විචාරය" },
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-UVPA-FOLK",
+      "pageOrSection": "කරත්ත කවි විචාරය"
+    },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
@@ -89,8 +103,15 @@
       }
     ],
     "socialContext_si": "ගංගාශ්‍රිත වෙළෙඳ ජීවිතය සහ ජන ආශ්‍රිත සුහදතාව.",
-    "gradeBands": ["6-7", "8-9", "10-11"],
-    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "පාරු කවි ලේඛනාගාරය" },
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-UVPA-FOLK",
+      "pageOrSection": "පාරු කවි ලේඛනාගාරය"
+    },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
@@ -123,8 +144,15 @@
       }
     ],
     "socialContext_si": "ගැමි කාන්තා සාමූහිකත්වය සහ ආගමික භක්තිය.",
-    "gradeBands": ["6-7", "8-9", "10-11"],
-    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "නෙළුම් කවි සංග්‍රහය" },
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-UVPA-FOLK",
+      "pageOrSection": "නෙළුම් කවි සංග්‍රහය"
+    },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
@@ -157,8 +185,15 @@
       }
     ],
     "socialContext_si": "ගමේ සාමය, ප්‍රීතිය, අලුත් අවුරුදු සැමරුම.",
-    "gradeBands": ["6-7", "8-9", "10-11"],
-    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 102 (රබන් පද)" },
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-EPD-TB-G10",
+      "pageOrSection": "පිටුව 102 (රබන් පද)"
+    },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
@@ -191,8 +226,14 @@
       }
     ],
     "socialContext_si": "මනෝවිද්‍යාත්මක සුවපත්භාවය, ග්‍රාමීය ආරක්ෂාව සහ සංස්කෘතික උරුමය.",
-    "gradeBands": ["8-9", "10-11", "12-13"],
-    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "ශාන්තිකර්ම නාද පර්යේෂණ" },
+    "gradeBands": [
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-UVPA-FOLK",
+      "pageOrSection": "ශාන්තිකර්ම නාද පර්යේෂණ"
+    },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
@@ -225,8 +266,14 @@
       }
     ],
     "socialContext_si": "ශ්‍රී ලංකාවේ මුල්ම මානව සංස්කෘතික නාද උරුමය සහ සොබාදහම් බැඳීම.",
-    "gradeBands": ["8-9", "10-11", "12-13"],
-    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "ආදිවාසී සංගීත විමර්ශන" },
+    "gradeBands": [
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-UVPA-FOLK",
+      "pageOrSection": "ආදිවාසී සංගීත විමර්ශන"
+    },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",

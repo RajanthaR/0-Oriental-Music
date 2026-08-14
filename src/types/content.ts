@@ -235,7 +235,7 @@ export interface GlossaryTerm {
   term_si: string;
   term_en: string;
   transliteration: string;
-  category_si: "ස්වර හා ශ්‍රැති" | "ලය හා තාල" | "රාග ශාස්ත්‍රය" | "වාද්‍ය භාණ්ඩ" | "දේශීය සංගීතය" | "නාට්‍ය සංගීතය" | "සාමාන්‍ය දැනුම";
+  category_si: "ස්වර හා ශ්‍රැති" | "ලය හා තාල" | "රාග ශාස්ත්‍රය" | "වාද්‍ය භාණ්ඩ" | "දේශීය සංගීතය" | "නාට්‍ය සංගීතය" | "ශබ්දය හා ධ්වනි විද්‍යාව" | "සාමාන්‍ය දැනුම";
   definition_si: string;
   detailedNotes_si?: string;
   relatedTermIds?: string[];

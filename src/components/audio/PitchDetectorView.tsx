@@ -177,7 +177,7 @@ export const PitchDetectorView: React.FC<PitchDetectorViewProps> = ({
                   <div className="text-center text-text-muted py-6">
                     <Mic className="w-8 h-8 mx-auto mb-2 text-accent animate-pulse" />
                     <p className="text-sm font-semibold">හඬට සවන් දෙමින් පවතී...</p>
-                    <p className="text-xs">කරුණාකර 'ස...' ස්වරය දිගු කර ගායනා කරන්න</p>
+                    <p className="text-xs">කරුණාකර &apos;ස...&apos; ස්වරය දිගු කර ගායනා කරන්න</p>
                   </div>
                 )}
               </div>

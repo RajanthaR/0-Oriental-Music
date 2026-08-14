@@ -8,13 +8,23 @@
     "summary_si": "ශබ්දය සහ සංගීත නාදය අතර වෙනස, නාදයේ ප්‍රධාන ලක්ෂණ 3 (උස්-මිටි බව, තීව්‍රතාව, නාද ගුණය) සරලව අවබෝධ කරගනිමු.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට ශබ්දය සහ සංගීත නාදය අතර වෙනස පැහැදිලි කිරීමටත්, නාදයක උස්-මිටි බව (Pitch), තීව්‍රතාව (Intensity), සහ නාද ගුණය (Timbre) නිවැරදිව හඳුනාගැනීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 12,
-    "gradeBands": ["6-7", "8-9"],
+    "gradeBands": [
+      "6-7",
+      "8-9"
+    ],
     "difficulty": "පහසු",
     "prerequisites": [],
-    "competencyIds": ["COMP-01-NADA"],
+    "competencyIds": [
+      "COMP-01-NADA"
+    ],
     "diagnosticQuestion": {
       "question_si": "කනට ප්‍රියජනක, ක්‍රමවත් කම්පන සහිත ශබ්දයක් හඳුන්වන්නේ කුමන නමකින්ද?",
-      "options_si": ["ඝෝෂාව", "නාදය", "ප්‍රතිරාවය", "අනුනාදය"],
+      "options_si": [
+        "ඝෝෂාව",
+        "නාදය",
+        "ප්‍රතිරාවය",
+        "අනුනාදය"
+      ],
       "correctIndex": 1,
       "explanation_si": "ක්‍රමවත් කම්පන සහිත කනට ප්‍රියජනක ශබ්ද 'නාදය' (Musical sound) ලෙස හැඳින්වේ."
     },
@@ -23,8 +33,16 @@
         "heading_si": "1. ශබ්දය සහ නාදය යනු කුමක්ද?",
         "content_si": "අප අවට පරිසරයේ විවිධ ශබ්ද ඇසේ. සුළඟ හමන හඬ, රථවාහන ශබ්ද, කුරුල්ලන්ගේ නාද ඒ අතර වේ. නමුත් සංගීතයේදී අප සලකන්නේ ක්‍රමවත් සංඛ්‍යාත සහිත, කනට ප්‍රිය උපදවන නාද (Musical Sound) පමණි.",
         "keyTerms": [
-          { "term_si": "නාදය", "meaning_si": "ක්‍රමවත් කම්පන සහිත කනට ප්‍රිය උපදවන ශබ්දය", "term_en": "Nada" },
-          { "term_si": "ආහත නාදය", "meaning_si": "භෞතික වස්තු ගැටීමෙන් උපදින නාදය", "term_en": "Ahata Nada" }
+          {
+            "term_si": "නාදය",
+            "meaning_si": "ක්‍රමවත් කම්පන සහිත කනට ප්‍රිය උපදවන ශබ්දය",
+            "term_en": "Nada"
+          },
+          {
+            "term_si": "ආහත නාදය",
+            "meaning_si": "භෞතික වස්තු ගැටීමෙන් උපදින නාදය",
+            "term_en": "Ahata Nada"
+          }
         ]
       },
       {
@@ -36,20 +54,38 @@
       "type": "swara-demo",
       "title_si": "නාදයේ තාරතා වෙනස අසමු",
       "instruction_si": "පහළ සිට ඉහළට ස්වර නාද වන ආකාරය සහ තාරතාව ඉහළ යන අයුරු සවන් දී සංසන්දනය කරන්න.",
-      "notes": ["S", "R", "G", "M", "P", "D", "N", "S'"],
+      "notes": [
+        "S",
+        "R",
+        "G",
+        "M",
+        "P",
+        "D",
+        "N",
+        "S'"
+      ],
       "description_si": "ස සිට ඉහළ ස̇ දක්වා තාරතාව (Pitch) ක්‍රමයෙන් වැඩි වේ."
     },
     "guidedPractice": {
       "title_si": "ස්වර තාරතාව අත්හදා බලමු",
       "instruction_si": "ස්වර යතුරුපුවරුවේ 'ස' සහ 'ප' ස්වර වාදනය කරමින් තාරතාවේ වෙනස අසන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "P", "S'"]
+      "targetSequence": [
+        "S",
+        "P",
+        "S'"
+      ]
     },
     "independentPractice": {
       "title_si": "ස්වර රටා අනුපිළිවෙළට වාදනය කරමු",
       "instruction_si": "ස - ග - ප - ස̇ ස්වර අනුපිළිවෙළට ස්වර යතුරුපුවරුවෙන් වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "G", "P", "S'"]
+      "targetSequence": [
+        "S",
+        "G",
+        "P",
+        "S'"
+      ]
     },
     "quizId": "quiz-les-intro-01",
     "recap_si": [
@@ -65,7 +101,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "NIE 6 ශ්‍රේණියේ 1 වන ඒකකයට අනුකූලව සම්පාදනය විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -82,13 +118,25 @@
     "summary_si": "පෙරදිග සංගීතයේ පදනම වන ස, රි, ග, ම, ප, ධ, නි සප්ත ස්වර, ඒවායේ සම්පූර්ණ නාම සහ ආරෝහණ/අවරෝහණ රටාව හඳුනාගනිමු.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට පෙරදිග සංගීතයේ මූලික සප්ත ස්වර 7 නිවැරදිව හඳුනාගැනීමටත්, ඒවායේ සම්පූර්ණ සංස්කෘත නාම ප්‍රකාශ කිරීමටත්, සරල ආරෝහණ හා අවරෝහණ රටාව ගායනා කිරීමට හෝ වාදනය කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 15,
-    "gradeBands": ["6-7", "8-9"],
+    "gradeBands": [
+      "6-7",
+      "8-9"
+    ],
     "difficulty": "පහසු",
-    "prerequisites": ["les-intro-01"],
-    "competencyIds": ["COMP-01-SWARA"],
+    "prerequisites": [
+      "les-intro-01"
+    ],
+    "competencyIds": [
+      "COMP-01-SWARA"
+    ],
     "diagnosticQuestion": {
       "question_si": "'ස' ස්වරයේ සම්පූර්ණ ශාස්ත්‍රීය නාමය කුමක්ද?",
-      "options_si": ["රිෂභ", "ෂඩ්ජ", "ගාන්ධාර", "පඤ්චම"],
+      "options_si": [
+        "රිෂභ",
+        "ෂඩ්ජ",
+        "ගාන්ධාර",
+        "පඤ්චම"
+      ],
       "correctIndex": 1,
       "explanation_si": "'ස' ස්වරයේ සම්පූර්ණ ශාස්ත්‍රීය නාමය 'ෂඩ්ජ' (Shadja) වේ."
     },
@@ -97,13 +145,41 @@
         "heading_si": "1. සප්ත ස්වර යනු කවරේද?",
         "content_si": "පෙරදිග සංගීතයේ සියලුම තනු සහ රාග නිර්මාණය වන්නේ ප්‍රධාන ස්වර හතක් (සප්ත ස්වර) ආශ්‍රයෙනි.",
         "keyTerms": [
-          { "term_si": "ස (ෂඩ්ජ)", "meaning_si": "පළමු මූලික ස්වරය", "term_en": "Shadja (Sa)" },
-          { "term_si": "රි (රිෂභ)", "meaning_si": "දෙවන ස්වරය", "term_en": "Rishabha (Re)" },
-          { "term_si": "ග (ගාන්ධාර)", "meaning_si": "තෙවන ස්වරය", "term_en": "Gandhara (Ga)" },
-          { "term_si": "ම (මධ්‍යම)", "meaning_si": "සිව්වන ස්වරය", "term_en": "Madhyama (Ma)" },
-          { "term_si": "ප (පඤ්චම)", "meaning_si": "පස්වන ස්වරය", "term_en": "Panchama (Pa)" },
-          { "term_si": "ධ (ධෛවත)", "meaning_si": "හයවන ස්වරය", "term_en": "Dhaivata (Dha)" },
-          { "term_si": "නි (නිෂාද)", "meaning_si": "හත්වන ස්වරය", "term_en": "Nishada (Ni)" }
+          {
+            "term_si": "ස (ෂඩ්ජ)",
+            "meaning_si": "පළමු මූලික ස්වරය",
+            "term_en": "Shadja (Sa)"
+          },
+          {
+            "term_si": "රි (රිෂභ)",
+            "meaning_si": "දෙවන ස්වරය",
+            "term_en": "Rishabha (Re)"
+          },
+          {
+            "term_si": "ග (ගාන්ධාර)",
+            "meaning_si": "තෙවන ස්වරය",
+            "term_en": "Gandhara (Ga)"
+          },
+          {
+            "term_si": "ම (මධ්‍යම)",
+            "meaning_si": "සිව්වන ස්වරය",
+            "term_en": "Madhyama (Ma)"
+          },
+          {
+            "term_si": "ප (පඤ්චම)",
+            "meaning_si": "පස්වන ස්වරය",
+            "term_en": "Panchama (Pa)"
+          },
+          {
+            "term_si": "ධ (ධෛවත)",
+            "meaning_si": "හයවන ස්වරය",
+            "term_en": "Dhaivata (Dha)"
+          },
+          {
+            "term_si": "නි (නිෂාද)",
+            "meaning_si": "හත්වන ස්වරය",
+            "term_en": "Nishada (Ni)"
+          }
         ]
       },
       {
@@ -115,19 +191,53 @@
       "type": "scale-play",
       "title_si": "සප්ත ස්වර ආරෝහණ හා අවරෝහණ ශ්‍රවණය",
       "instruction_si": "සප්ත ස්වර පිළිවෙළින් ආරෝහණය සහ අවරෝහණය වන අයුරු සවන් දී සිතින් මුමුනන්න.",
-      "notes": ["S", "R", "G", "M", "P", "D", "N", "S'", "N", "D", "P", "M", "G", "R", "S"]
+      "notes": [
+        "S",
+        "R",
+        "G",
+        "M",
+        "P",
+        "D",
+        "N",
+        "S'",
+        "N",
+        "D",
+        "P",
+        "M",
+        "G",
+        "R",
+        "S"
+      ]
     },
     "guidedPractice": {
       "title_si": "ස්වර යතුරුපුවරුවේ ආරෝහණය වාදනය කරමු",
       "instruction_si": "පහත දැක්වෙන සප්ත ස්වර ආරෝහණ පිළිවෙළට ස්වර යතුරුපුවරුවෙන් ඔබන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "R", "G", "M", "P", "D", "N", "S'"]
+      "targetSequence": [
+        "S",
+        "R",
+        "G",
+        "M",
+        "P",
+        "D",
+        "N",
+        "S'"
+      ]
     },
     "independentPractice": {
       "title_si": "ස්වර අවරෝහණය වාදනය කරමු",
       "instruction_si": "ඉහළ ස̇ සිට පහළ ස දක්වා අවරෝහණ පිළිවෙළට වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S'", "N", "D", "P", "M", "G", "R", "S"]
+      "targetSequence": [
+        "S'",
+        "N",
+        "D",
+        "P",
+        "M",
+        "G",
+        "R",
+        "S"
+      ]
     },
     "quizId": "quiz-les-swara-01",
     "recap_si": [
@@ -143,7 +253,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "සප්ත ස්වර ශාස්ත්‍රීය නාම සහ ආරෝහණ/අවරෝහණ අභ්‍යාස තහවුරු විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -160,13 +270,26 @@
     "summary_si": "ශුද්ධ ස්වර 7, කෝමල ස්වර 4, සහ තීව්‍ර ස්වර 1 ඇතුළු සප්තකයක අඩංගු මුළු ස්වර 12 හඳුනාගනිමු.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට ශුද්ධ, කෝමල සහ තීව්‍ර ස්වර අතර වෙනස හඳුනාගැනීමටත්, සප්තකයක පිහිටි ස්වර 12 හි නාද වෙනස ශ්‍රව්‍යයෙන් වෙන්කර ගැනීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 18,
-    "gradeBands": ["7", "8-9", "10-11"],
+    "gradeBands": [
+      "7",
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "මධ්‍යම",
-    "prerequisites": ["les-swara-01"],
-    "competencyIds": ["COMP-01-SWARA-VAR"],
+    "prerequisites": [
+      "les-swara-01"
+    ],
+    "competencyIds": [
+      "COMP-01-SWARA-VAR"
+    ],
     "diagnosticQuestion": {
       "question_si": "පෙරදිග සංගීතයේ තීව්‍ර (Teevra) තත්ත්වයට පත්විය හැකි එකම ස්වරය කුමක්ද?",
-      "options_si": ["රිෂභ (රි)", "ගාන්ධාර (ග)", "මධ්‍යම (ම)", "නිෂාද (නි)"],
+      "options_si": [
+        "රිෂභ (රි)",
+        "ගාන්ධාර (ග)",
+        "මධ්‍යම (ම)",
+        "නිෂාද (නි)"
+      ],
       "correctIndex": 2,
       "explanation_si": "තීව්‍ර තත්ත්වයට පත්වන්නේ 'මධ්‍යම (ම)' ස්වරය පමණි. (ම තීව්‍ර / m)."
     },
@@ -175,9 +298,21 @@
         "heading_si": "1. ස්වර 12 බෙදී යන ආකාරය",
         "content_si": "පෙරදිග සංගීතයේ සප්තකයක් තුළ මුළු ස්වර ස්ථාන 12 ක් පවතී:\n• අචල ස්වර 2: ස, ප (වෙනස් නොවේ)\n• කෝමල ස්වර 4: රි, ග, ධ, නි (ශුද්ධ ස්වරයට වඩා අර්ධ ස්වරයක් පහළින් ශබ්ද වේ)\n• තීව්‍ර ස්වර 1: ම (ශුද්ධ මධ්‍යමයට වඩා අර්ධ ස්වරයක් ඉහළින් ශබ්ද වේ)\n• ශුද්ධ ස්වර 7: ස, රි, ග, ම, ප, ධ, නි.",
         "keyTerms": [
-          { "term_si": "කෝමල ස්වර", "meaning_si": "ශුද්ධ ස්වරයට වඩා අඩ ස්වරයක් පහළින් පිහිටන ස්වර (රි, ග, ධ, නි)", "term_en": "Komal Swara" },
-          { "term_si": "තීව්‍ර ස්වරය", "meaning_si": "ශුද්ධ මධ්‍යමයට වඩා අඩ ස්වරයක් ඉහළින් පිහිටන 'ම' ස්වරය", "term_en": "Teevra Swara" },
-          { "term_si": "අචල ස්වර", "meaning_si": "ස්ථානය වෙනස් නොවන 'ස' සහ 'ප' ස්වර", "term_en": "Achala Swara" }
+          {
+            "term_si": "කෝමල ස්වර",
+            "meaning_si": "ශුද්ධ ස්වරයට වඩා අඩ ස්වරයක් පහළින් පිහිටන ස්වර (රි, ග, ධ, නි)",
+            "term_en": "Komal Swara"
+          },
+          {
+            "term_si": "තීව්‍ර ස්වරය",
+            "meaning_si": "ශුද්ධ මධ්‍යමයට වඩා අඩ ස්වරයක් ඉහළින් පිහිටන 'ම' ස්වරය",
+            "term_en": "Teevra Swara"
+          },
+          {
+            "term_si": "අචල ස්වර",
+            "meaning_si": "ස්ථානය වෙනස් නොවන 'ස' සහ 'ප' ස්වර",
+            "term_en": "Achala Swara"
+          }
         ]
       }
     ],
@@ -185,19 +320,45 @@
       "type": "swara-demo",
       "title_si": "ශුද්ධ සහ කෝමල ගාන්ධාර (ග) සසඳමු",
       "instruction_si": "ශුද්ධ ගාන්ධාර සහ කෝමල ගාන්ධාර ස්වර වල නාද වෙනස ශ්‍රවණය කරන්න.",
-      "notes": ["S", "R", "g", "G", "M", "m", "P", "d", "D", "n", "N", "S'"]
+      "notes": [
+        "S",
+        "R",
+        "g",
+        "G",
+        "M",
+        "m",
+        "P",
+        "d",
+        "D",
+        "n",
+        "N",
+        "S'"
+      ]
     },
     "guidedPractice": {
       "title_si": "කෝමල ස්වර යතුරුපුවරුවේ හඳුනාගනිමු",
       "instruction_si": "ස - රි(කෝ) - ග(කෝ) - ම - ප ස්වර පිළිවෙළට වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "r", "g", "M", "P"]
+      "targetSequence": [
+        "S",
+        "r",
+        "g",
+        "M",
+        "P"
+      ]
     },
     "independentPractice": {
       "title_si": "තීව්‍ර මධ්‍යම සහිත ස්වර රටාවක් වයමු",
       "instruction_si": "ස - ග - ම(තී) - ප - නි - ස̇ රටාව වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "G", "m", "P", "N", "S'"]
+      "targetSequence": [
+        "S",
+        "G",
+        "m",
+        "P",
+        "N",
+        "S'"
+      ]
     },
     "quizId": "quiz-les-swara-02",
     "recap_si": [
@@ -213,7 +374,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "කෝමල/තීව්‍ර ස්වර විවරණ සහ අභ්‍යාස නිවැරදිව තහවුරු විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -230,13 +391,25 @@
     "summary_si": "මිනිස් කටහඬ හා වාද්‍ය භාණ්ඩවල නාද පරාසය බෙදී යන මන්ද්‍ර (පහළ), මධ්‍ය (මැද), සහ තාර (ඉහළ) සප්තක ත්‍රිත්වය හඳුනාගනිමු.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට මන්ද්‍ර, මධ්‍ය සහ තාර සප්තක නිවැරදිව හඳුනාගැනීමටත්, ඒවා ප්‍රස්තාරගත කිරීමේදී තිත් (Dots) යොදන ක්‍රමවේදය අවබෝධ කරගැනීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 14,
-    "gradeBands": ["8-9", "10-11"],
+    "gradeBands": [
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "පහසු",
-    "prerequisites": ["les-swara-01"],
-    "competencyIds": ["COMP-01-SAPTAKA"],
+    "prerequisites": [
+      "les-swara-01"
+    ],
+    "competencyIds": [
+      "COMP-01-SAPTAKA"
+    ],
     "diagnosticQuestion": {
       "question_si": "මන්ද්‍ර සප්තකයේ ස්වරයක් ප්‍රස්තාරයේදී සටහන් කරන්නේ කෙසේද?",
-      "options_si": ["ස්වරයට ඉහළින් තිතක් තැබීමෙන්", "ස්වරයට යටින් තිතක් තැබීමෙන්", "ස්වරයට යටින් ඉරක් ඇඳීමෙන්", "තිත් නොතබා ලිවීමෙන්"],
+      "options_si": [
+        "ස්වරයට ඉහළින් තිතක් තැබීමෙන්",
+        "ස්වරයට යටින් තිතක් තැබීමෙන්",
+        "ස්වරයට යටින් ඉරක් ඇඳීමෙන්",
+        "තිත් නොතබා ලිවීමෙන්"
+      ],
       "correctIndex": 1,
       "explanation_si": "මන්ද්‍ර සප්තකයේ ස්වර ලියන්නේ ස්වරයට යටින් තිතක් (උදා: .ස හෝ ස̣) තැබීමෙනි."
     },
@@ -250,19 +423,35 @@
       "type": "swara-demo",
       "title_si": "මන්ද්‍ර ස, මධ්‍ය ස, සහ තාර ස ශ්‍රවණය",
       "instruction_si": "එකම 'ස' ස්වරය සප්තක තුනේදී නාද වන ආකාරය අසන්න.",
-      "notes": [".S", "S", "S'"]
+      "notes": [
+        ".S",
+        "S",
+        "S'"
+      ]
     },
     "guidedPractice": {
       "title_si": "සප්තක මාරුව පුහුණු වෙමු",
       "instruction_si": "මන්ද්‍ර ප̣ - මන්ද්‍ර නි̣ - මධ්‍ය ස - මධ්‍ය ග - තාර ස̇ වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": [".P", ".N", "S", "G", "S'"]
+      "targetSequence": [
+        ".P",
+        ".N",
+        "S",
+        "G",
+        "S'"
+      ]
     },
     "independentPractice": {
       "title_si": "තාර සප්තක ස්වර අභ්‍යාසය",
       "instruction_si": "මධ්‍ය ප - මධ්‍ය ධ - මධ්‍ය නි - තාර ස̇ - තාර රි̇ වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["P", "D", "N", "S'", "R'"]
+      "targetSequence": [
+        "P",
+        "D",
+        "N",
+        "S'",
+        "R'"
+      ]
     },
     "quizId": "quiz-les-saptaka-01",
     "recap_si": [
@@ -278,7 +467,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "සප්තක 3 ප්‍රස්තාර නීති හා සංඛ්‍යාත වෙනස්කම් සනාථ විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -295,13 +484,26 @@
     "summary_si": "කටහඬ සහ ඇඟිලි හුරු කරගැනීම සඳහා ගණිතමය ක්‍රමයට සකසන ලද මූලික අලංකාර 5ක් පුහුණු වෙමු.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට මූලික අලංකාර 5 ක් නිවැරදි ලයෙන් හා තාරතාවෙන් ගායනා කිරීමට හෝ වාදනය කිරීමට හැකිවනු ඇත.",
     "estimatedMinutes": 16,
-    "gradeBands": ["6-7", "8-9", "10-11"],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "පහසු",
-    "prerequisites": ["les-swara-01"],
-    "competencyIds": ["COMP-04-ALANKARA"],
+    "prerequisites": [
+      "les-swara-01"
+    ],
+    "competencyIds": [
+      "COMP-04-ALANKARA"
+    ],
     "diagnosticQuestion": {
       "question_si": "'ස රි ග , රි ග ම , ග ම ප...' යනුවෙන් ගලා යන ස්වර රටාව අයත් වන්නේ කුමන අලංකාර රටාවටද?",
-      "options_si": ["තනි ස්වර අලංකාරය", "ස්වර 3 බැගින් යුත් අලංකාරය", "ස්වර 4 බැගින් යුත් අලංකාරය", "ප්‍රතිලෝම අලංකාරය"],
+      "options_si": [
+        "තනි ස්වර අලංකාරය",
+        "ස්වර 3 බැගින් යුත් අලංකාරය",
+        "ස්වර 4 බැගින් යුත් අලංකාරය",
+        "ප්‍රතිලෝම අලංකාරය"
+      ],
       "correctIndex": 1,
       "explanation_si": "ස්වර තුන බැගින් ඉදිරියට ගමන් කරන අලංකාර රටාවකි."
     },
@@ -315,19 +517,60 @@
       "type": "scale-play",
       "title_si": "ස්වර යුගල අලංකාරය (සස රිරි ගග...)",
       "instruction_si": "එක් එක් ස්වරය දෙවරක් බැගින් ගැයෙන අලංකාර රටාවට සවන් දෙන්න.",
-      "notes": ["S", "S", "R", "R", "G", "G", "M", "M", "P", "P", "D", "D", "N", "N", "S'", "S'"]
+      "notes": [
+        "S",
+        "S",
+        "R",
+        "R",
+        "G",
+        "G",
+        "M",
+        "M",
+        "P",
+        "P",
+        "D",
+        "D",
+        "N",
+        "N",
+        "S'",
+        "S'"
+      ]
     },
     "guidedPractice": {
       "title_si": "යුගල අලංකාරය වාදනය කරමු",
       "instruction_si": "ස-ස, රි-රි, ග-ග, ම-ම, ප-ප පිළිවෙළින් ස්වර යතුරුපුවරුවෙන් වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "S", "R", "R", "G", "G", "M", "M", "P", "P"]
+      "targetSequence": [
+        "S",
+        "S",
+        "R",
+        "R",
+        "G",
+        "G",
+        "M",
+        "M",
+        "P",
+        "P"
+      ]
     },
     "independentPractice": {
       "title_si": "ස්වර 3 අලංකාරය වාදනය කරමු",
       "instruction_si": "ස-රි-ග, රි-ග-ම, ග-ම-ප, ම-ප-ධ වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "R", "G", "R", "G", "M", "G", "M", "P", "M", "P", "D"]
+      "targetSequence": [
+        "S",
+        "R",
+        "G",
+        "R",
+        "G",
+        "M",
+        "G",
+        "M",
+        "P",
+        "M",
+        "P",
+        "D"
+      ]
     },
     "quizId": "quiz-les-alankara-01",
     "recap_si": [
@@ -342,7 +585,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "අලංකාර රටා 5 සහ ශ්‍රව්‍ය ආදර්ශන තහවුරු විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -359,13 +602,24 @@
     "summary_si": "මාත්‍රාව, විභාගය, තාළි, ඛාලි, සම සහ ලය ප්‍රභේද 3 (විලම්බිත, මධ්‍ය, ද්‍රුත) සරලව අවබෝධ කරගනිමු.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට සංගීතයේ ලය සහ තාල අතර වෙනස හඳුනාගැනීමටත්, මාත්‍රා, විභාග, සම, තාළි සහ ඛාලි යන අංග නිවැරදිව පැහැදිලි කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 15,
-    "gradeBands": ["6-7", "8-9", "10-11"],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "පහසු",
     "prerequisites": [],
-    "competencyIds": ["COMP-02-TALA"],
+    "competencyIds": [
+      "COMP-02-TALA"
+    ],
     "diagnosticQuestion": {
       "question_si": "තාලයක පළමු වන මාත්‍රාව හඳුන්වන විශේෂ නාමය කුමක්ද?",
-      "options_si": ["ඛාලි", "සම", "විභාගය", "ආවර්තය"],
+      "options_si": [
+        "ඛාලි",
+        "සම",
+        "විභාගය",
+        "ආවර්තය"
+      ],
       "correctIndex": 1,
       "explanation_si": "තාලයක පළමුවන මාත්‍රාව 'සම' (Sam) නම් වේ."
     },
@@ -412,7 +666,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "තාල මූලධර්ම සහ ලය ප්‍රභේද සනාථ විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -429,13 +683,26 @@
     "summary_si": "මාත්‍රා 6ක්, විභාග 2ක් (3+3), තාළි 1ක් සහ ඛාලි 1ක් සහිත දාද්‍රා තාලයේ ථේකාව සහ අත්පුඩි ගැසීමේ නියම ක්‍රමය පුහුණු වෙමු.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට දාද්‍රා තාලයේ මාත්‍රා, විභාග, තාළි, ඛාලි විස්තර කිරීමටත්, 'ධා ධී නා | ධා තී නා' ථේකාව නිවැරදිව අත්පුඩි ගසමින් උච්චාරණය කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 15,
-    "gradeBands": ["6-7", "8-9", "10-11"],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "පහසු",
-    "prerequisites": ["les-tala-basics"],
-    "competencyIds": ["COMP-02-DADRA"],
+    "prerequisites": [
+      "les-tala-basics"
+    ],
+    "competencyIds": [
+      "COMP-02-DADRA"
+    ],
     "diagnosticQuestion": {
       "question_si": "දාද්‍රා තාලයේ මුළු මාත්‍රා ගණන කීයද?",
-      "options_si": ["4", "6", "8", "16"],
+      "options_si": [
+        "4",
+        "6",
+        "8",
+        "16"
+      ],
       "correctIndex": 1,
       "explanation_si": "දාද්‍රා තාලයේ මුළු මාත්‍රා 6 කි. (3 බැගින් වූ විභාග 2 කි)."
     },
@@ -444,9 +711,39 @@
         "heading_si": "1. දාද්‍රා තාලයේ ව්‍යුහය",
         "content_si": "• මුළු මාත්‍රා: 6 කි.\n• විභාග: 2 කි (මාත්‍රා 3 බැගින්).\n• තාළි: 1 වන මාත්‍රාවේ (සම).\n• ඛාලි: 4 වන මාත්‍රාවේ.\n• ථේකාව: ධා ධී නා | ධා තී නා",
         "notationTable": [
-          { "rowLabel_si": "මාත්‍රා", "notes": ["1", "2", "3", "4", "5", "6"] },
-          { "rowLabel_si": "බෝල්", "notes": ["ධා", "ධී", "නා", "ධා", "තී", "නා"] },
-          { "rowLabel_si": "ලකුණු", "notes": ["X (තාළි)", "2", "3", "0 (ඛාලි)", "2", "3"] }
+          {
+            "rowLabel_si": "මාත්‍රා",
+            "notes": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ]
+          },
+          {
+            "rowLabel_si": "බෝල්",
+            "notes": [
+              "ධා",
+              "ධී",
+              "නා",
+              "ධා",
+              "තී",
+              "නා"
+            ]
+          },
+          {
+            "rowLabel_si": "ලකුණු",
+            "notes": [
+              "X (තාළි)",
+              "2",
+              "3",
+              "0 (ඛාලි)",
+              "2",
+              "3"
+            ]
+          }
         ]
       }
     ],
@@ -484,7 +781,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "දාද්‍රා තාල ථේකාව හා අත් ක්‍රියාකාරකම් තහවුරු විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -501,13 +798,26 @@
     "summary_si": "මාත්‍රා 8ක්, විභාග 2ක් (4+4), තාළි 1ක් සහ ඛාලි 1ක් සහිත කෙහර්වා තාලයේ ථේකාව 'ධා ගේ නා තින් | නා කේ ධින් නා' ප්‍රගුණ කරමු.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට කෙහර්වා තාලයේ ලක්ෂණ පැහැදිලි කිරීමටත්, ථේකාව නිවැරදිව අත්පුඩි ගසමින් ගැයීමට හෝ තට්ටු කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 15,
-    "gradeBands": ["6-7", "8-9", "10-11"],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "පහසු",
-    "prerequisites": ["les-tala-basics"],
-    "competencyIds": ["COMP-02-KEHERWA"],
+    "prerequisites": [
+      "les-tala-basics"
+    ],
+    "competencyIds": [
+      "COMP-02-KEHERWA"
+    ],
     "diagnosticQuestion": {
       "question_si": "කෙහර්වා තාලයේ ඛාලි ලකුණ පිහිටන්නේ කීවන මාත්‍රාවේද?",
-      "options_si": ["3 වන මාත්‍රාවේ", "4 වන මාත්‍රාවේ", "5 වන මාත්‍රාවේ", "7 වන මාත්‍රාවේ"],
+      "options_si": [
+        "3 වන මාත්‍රාවේ",
+        "4 වන මාත්‍රාවේ",
+        "5 වන මාත්‍රාවේ",
+        "7 වන මාත්‍රාවේ"
+      ],
       "correctIndex": 2,
       "explanation_si": "කෙහර්වා තාලයේ ඛාලි ලකුණ පිහිටන්නේ 5 වන මාත්‍රාවේය."
     },
@@ -516,9 +826,45 @@
         "heading_si": "1. කෙහර්වා තාලයේ ව්‍යුහය",
         "content_si": "• මුළු මාත්‍රා: 8 කි.\n• විභාග: 2 කි (මාත්‍රා 4 බැගින්).\n• තාළි: 1 වන මාත්‍රාවේ (සම).\n• ඛාලි: 5 වන මාත්‍රාවේ.\n• ථේකාව: ධා ගේ නා තින් | නා කේ ධින් නා",
         "notationTable": [
-          { "rowLabel_si": "මාත්‍රා", "notes": ["1", "2", "3", "4", "5", "6", "7", "8"] },
-          { "rowLabel_si": "බෝල්", "notes": ["ධා", "ගේ", "නා", "තින්", "නා", "කේ", "ධින්", "නා"] },
-          { "rowLabel_si": "ලකුණු", "notes": ["X (සම)", "2", "3", "4", "0 (ඛාලි)", "2", "3", "4"] }
+          {
+            "rowLabel_si": "මාත්‍රා",
+            "notes": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ]
+          },
+          {
+            "rowLabel_si": "බෝල්",
+            "notes": [
+              "ධා",
+              "ගේ",
+              "නා",
+              "තින්",
+              "නා",
+              "කේ",
+              "ධින්",
+              "නා"
+            ]
+          },
+          {
+            "rowLabel_si": "ලකුණු",
+            "notes": [
+              "X (සම)",
+              "2",
+              "3",
+              "4",
+              "0 (ඛාලි)",
+              "2",
+              "3",
+              "4"
+            ]
+          }
         ]
       }
     ],
@@ -556,7 +902,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "මාත්‍රා 8 කෙහර්වා තාල ව්‍යුහය සනාථ විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -573,13 +919,25 @@
     "summary_si": "උත්තර භාරතීය සංගීතයේ ප්‍රමුඛතම තාලය වන ත්‍රීතාලයේ මාත්‍රා 16, විභාග 4 (4+4+4+4), තාළි 3, ඛාලි 1 සහ ථේකාව ප්‍රගුණ කරමු.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට ත්‍රීතාලයේ සම්පූර්ණ ථේකාව නිවැරදි අත්පුඩි හා ඛාලි සංඥා සහිතව වාදනය කිරීමට හෝ උච්චාරණය කිරීමට හැකිවනු ඇත.",
     "estimatedMinutes": 20,
-    "gradeBands": ["8-9", "10-11", "12-13"],
+    "gradeBands": [
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "මධ්‍යම",
-    "prerequisites": ["les-tala-basics"],
-    "competencyIds": ["COMP-02-TEENTAL"],
+    "prerequisites": [
+      "les-tala-basics"
+    ],
+    "competencyIds": [
+      "COMP-02-TEENTAL"
+    ],
     "diagnosticQuestion": {
       "question_si": "ත්‍රීතාලයේ තාළි ගසන මාත්‍රා අංක මොනවාද?",
-      "options_si": ["1, 5, 9", "1, 5, 13", "1, 9, 13", "1, 4, 8"],
+      "options_si": [
+        "1, 5, 9",
+        "1, 5, 13",
+        "1, 9, 13",
+        "1, 4, 8"
+      ],
       "correctIndex": 1,
       "explanation_si": "ත්‍රීතාලයේ තාළි ගසන්නේ 1, 5, සහ 13 වන මාත්‍රාවලදීය (9 වන මාත්‍රාව ඛාලියයි)."
     },
@@ -623,7 +981,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "මාත්‍රා 16 ත්‍රීතාල ලක්ෂණ තහවුරු විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -640,13 +998,24 @@
     "summary_si": "විෂ්ණු නාරායන භාත්ඛණ්ඩේ පඬිතුමා විසින් හඳුන්වා දුන් උත්තර භාරතීය ථාට 10 වර්ගීකරණය සහ ඒවායේ ස්වර සංයුතිය ඉගෙන ගනිමු.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට උත්තර භාරතීය සංගීතයේ ථාට 10 නම් කිරීමටත්, එක් එක් ථාටයේ ස්වර සංයුතිය (ශුද්ධ, කෝමල, තීව්‍ර) විස්තර කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 18,
-    "gradeBands": ["10-11", "12-13"],
+    "gradeBands": [
+      "10-11"
+    ],
     "difficulty": "මධ්‍යම",
-    "prerequisites": ["les-swara-02"],
-    "competencyIds": ["COMP-03-THATA"],
+    "prerequisites": [
+      "les-swara-02"
+    ],
+    "competencyIds": [
+      "COMP-03-THATA"
+    ],
     "diagnosticQuestion": {
       "question_si": "උත්තර භාරතීය සංගීතයේ ථාට 10 වර්ගීකරණය ඉදිරිපත් කළ සංගීතඥයා කවුද?",
-      "options_si": ["තාන්සේන් පඬිතුමා", "විෂ්ණු දිගම්බර් පලුස්කාර්", "විෂ්ණු නාරායන භාත්ඛණ්ඩේ", "අමීර් ඛුස්රෝ"],
+      "options_si": [
+        "තාන්සේන් පඬිතුමා",
+        "විෂ්ණු දිගම්බර් පලුස්කාර්",
+        "විෂ්ණු නාරායන භාත්ඛණ්ඩේ",
+        "අමීර් ඛුස්රෝ"
+      ],
       "correctIndex": 2,
       "explanation_si": "ථාට 10 වර්ගීකරණය ඉදිරිපත් කළේ පණ්ඩිත් විෂ්ණු නාරායන භාත්ඛණ්ඩේ තුමාය."
     },
@@ -664,19 +1033,46 @@
       "type": "scale-play",
       "title_si": "බිලාවල්, කල්‍යාන් සහ භෛරව් ථාට සසඳමු",
       "instruction_si": "විවිධ ථාටවල ස්වර නාද වන ආකාරය අසන්න.",
-      "notes": ["S", "R", "G", "M", "P", "D", "N", "S'"]
+      "notes": [
+        "S",
+        "R",
+        "G",
+        "M",
+        "P",
+        "D",
+        "N",
+        "S'"
+      ]
     },
     "guidedPractice": {
       "title_si": "භෛරව් ථාටයේ ස්වර වයමු",
       "instruction_si": "ස - රි(කෝ) - ග - ම - ප - ධ(කෝ) - නි - ස̇ වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "r", "G", "M", "P", "d", "N", "S'"]
+      "targetSequence": [
+        "S",
+        "r",
+        "G",
+        "M",
+        "P",
+        "d",
+        "N",
+        "S'"
+      ]
     },
     "independentPractice": {
       "title_si": "කල්‍යාන් ථාටයේ ස්වර වයමු",
       "instruction_si": "ස - රි - ග - ම(තී) - ප - ධ - නි - ස̇ වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "R", "G", "m", "P", "D", "N", "S'"]
+      "targetSequence": [
+        "S",
+        "R",
+        "G",
+        "m",
+        "P",
+        "D",
+        "N",
+        "S'"
+      ]
     },
     "quizId": "quiz-les-thata-basics",
     "recap_si": [
@@ -692,7 +1088,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "ථාට 10 නාම සහ ස්වර සංයුති සනාථ විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -709,13 +1105,24 @@
     "summary_si": "භෛරව් ථාටයේ ජනක රාගය වන භෛරව් රාගයේ ආරෝහණ, අවරෝහණ, වාදී (ධ), සංවාදී (රි), සහ පකඩ් ඛණ්ඩය සවිස්තරව ඉගෙන ගනිමු.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට භෛරව් රාගයේ ආරෝහණ, අවරෝහණ, වාදී, සංවාදී ස්වර හඳුනාගැනීමටත්, කෝමල රි සහ කෝමල ධ ස්වරවල ආන්දෝලිත නාදය නිවැරදිව ගායනා කිරීමට හෝ වාදනය කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 20,
-    "gradeBands": ["10-11", "12-13"],
+    "gradeBands": [
+      "10-11"
+    ],
     "difficulty": "මධ්‍යම",
-    "prerequisites": ["les-thata-basics"],
-    "competencyIds": ["COMP-03-BHAIRAV"],
+    "prerequisites": [
+      "les-thata-basics"
+    ],
+    "competencyIds": [
+      "COMP-03-BHAIRAV"
+    ],
     "diagnosticQuestion": {
       "question_si": "භෛරව් රාගයේ වාදී සහ සංවාදී ස්වර යුගලය කුමක්ද?",
-      "options_si": ["වාදී: ෂඩ්ජ (ස), සංවාදී: පඤ්චම (ප)", "වාදී: ධෛවත (ධ), සංවාදී: රිෂභ (රි)", "වාදී: ගාන්ධාර (ග), සංවාදී: නිෂාද (නි)", "වාදී: මධ්‍යම (ම), සංවාදී: ෂඩ්ජ (ස)"],
+      "options_si": [
+        "වාදී: ෂඩ්ජ (ස), සංවාදී: පඤ්චම (ප)",
+        "වාදී: ධෛවත (ධ), සංවාදී: රිෂභ (රි)",
+        "වාදී: ගාන්ධාර (ග), සංවාදී: නිෂාද (නි)",
+        "වාදී: මධ්‍යම (ම), සංවාදී: ෂඩ්ජ (ස)"
+      ],
       "correctIndex": 1,
       "explanation_si": "භෛරව් රාගයේ වාදී ස්වරය කෝමල ධෛවත (ධ) වන අතර සංවාදී ස්වරය කෝමල රිෂභ (රි) වේ."
     },
@@ -729,19 +1136,46 @@
       "type": "raga-phrase",
       "title_si": "භෛරව් රාගයේ පකඩ් ඛණ්ඩය අසමු",
       "instruction_si": "ග ම ධ - ප , ග ම රි - ස යන භෛරව් රාගයේ අනන්‍ය නාද රටාවට සවන් දෙන්න.",
-      "notes": ["G", "M", "d", "P", "G", "M", "r", "S"]
+      "notes": [
+        "G",
+        "M",
+        "d",
+        "P",
+        "G",
+        "M",
+        "r",
+        "S"
+      ]
     },
     "guidedPractice": {
       "title_si": "භෛරව් ආරෝහණය වාදනය කරමු",
       "instruction_si": "ස - රි(කෝ) - ග - ම - ප - ධ(කෝ) - නි - ස̇ වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "r", "G", "M", "P", "d", "N", "S'"]
+      "targetSequence": [
+        "S",
+        "r",
+        "G",
+        "M",
+        "P",
+        "d",
+        "N",
+        "S'"
+      ]
     },
     "independentPractice": {
       "title_si": "භෛරව් පකඩ් ඛණ්ඩය වාදනය කරමු",
       "instruction_si": "ග - ම - ධ(කෝ) - ප - ග - ම - රි(කෝ) - ස ස්වර අනුපිළිවෙළ වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["G", "M", "d", "P", "G", "M", "r", "S"]
+      "targetSequence": [
+        "G",
+        "M",
+        "d",
+        "P",
+        "G",
+        "M",
+        "r",
+        "S"
+      ]
     },
     "quizId": "quiz-les-raga-bhairav",
     "recap_si": [
@@ -757,7 +1191,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "භෛරව් රාග ලක්ෂණ හා ප්‍රායෝගික අභ්‍යාස තහවුරු විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -774,13 +1208,24 @@
     "summary_si": "කල්‍යාන් ථාටයේ ප්‍රමුඛතම රාගය වන යමන් රාගයේ ආරෝහණ, අවරෝහණ, තීව්‍ර මධ්‍යම භාවිතය සහ පකඩ් ඛණ්ඩය ඉගෙන ගනිමු.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට යමන් රාගයේ ආරෝහණ, අවරෝහණ, වාදී (ග), සංවාදී (නි) ස්වර හඳුනාගැනීමටත්, තීව්‍ර මධ්‍යම ස්වරයේ නාද සුන්දරත්වය ප්‍රායෝගිකව ගායනා කිරීමට හෝ වාදනය කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 20,
-    "gradeBands": ["10-11", "12-13"],
+    "gradeBands": [
+      "10-11"
+    ],
     "difficulty": "මධ්‍යම",
-    "prerequisites": ["les-thata-basics"],
-    "competencyIds": ["COMP-03-YAMAN"],
+    "prerequisites": [
+      "les-thata-basics"
+    ],
+    "competencyIds": [
+      "COMP-03-YAMAN"
+    ],
     "diagnosticQuestion": {
       "question_si": "යමන් රාගයේ යෙදෙන විකෘති ස්වරය කුමක්ද?",
-      "options_si": ["කෝමල රිෂභ", "කෝමල ගාන්ධාර", "තීව්‍ර මධ්‍යම", "කෝමල ධෛවත"],
+      "options_si": [
+        "කෝමල රිෂභ",
+        "කෝමල ගාන්ධාර",
+        "තීව්‍ර මධ්‍යම",
+        "කෝමල ධෛවත"
+      ],
       "correctIndex": 2,
       "explanation_si": "යමන් රාගයේ යෙදෙන එකම විකෘති ස්වරය 'තීව්‍ර මධ්‍යම (ම)' වේ."
     },
@@ -794,19 +1239,44 @@
       "type": "raga-phrase",
       "title_si": "යමන් රාගයේ ආරෝහණ හා පකඩ් ශ්‍රවණය",
       "instruction_si": "මන්ද්‍ර නිෂාදයෙන් (නි̣) ආරම්භ වන යමන් රාගයේ මියුරු නාද මාලාව අසන්න.",
-      "notes": ["N", "R", "G", "m", "D", "N", "S'"]
+      "notes": [
+        "N",
+        "R",
+        "G",
+        "m",
+        "D",
+        "N",
+        "S'"
+      ]
     },
     "guidedPractice": {
       "title_si": "යමන් රාග ආරෝහණය වාදනය කරමු",
       "instruction_si": "නි̣ - රි - ග - ම(තී) - ධ - නි - ස̇ වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["N", "R", "G", "m", "D", "N", "S'"]
+      "targetSequence": [
+        "N",
+        "R",
+        "G",
+        "m",
+        "D",
+        "N",
+        "S'"
+      ]
     },
     "independentPractice": {
       "title_si": "යමන් රාග අවරෝහණය වාදනය කරමු",
       "instruction_si": "ස̇ - නි - ධ - ප - ම(තී) - ග - රි - ස වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S'", "N", "D", "P", "m", "G", "R", "S"]
+      "targetSequence": [
+        "S'",
+        "N",
+        "D",
+        "P",
+        "m",
+        "G",
+        "R",
+        "S"
+      ]
     },
     "quizId": "quiz-les-raga-yaman",
     "recap_si": [
@@ -822,7 +1292,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "තීව්‍ර මධ්‍යම සංඛ්‍යාතය සහ වාදී-සංවාදී සනාථ විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -839,13 +1309,26 @@
     "summary_si": "ගායනය සඳහා නිවැරදි සිරුරු ඉරියව්, ප්‍රාණවායු (හුස්ම) පාලනය සහ ස්වර තාරතාවට (Pitch) කටහඬ සමමුහුර්ත කිරීමේ මූලික අභ්‍යාස.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට නිවැරදි ගායන ඉරියව් අනුගමනය කිරීමටත්, තාන්පුර ශ්‍රැතියට අනුව 'ස' ස්වරය නිවැරදි තාරතාවෙන් ගායනා කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 15,
-    "gradeBands": ["6-7", "8-9", "10-11", "12-13"],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "පහසු",
-    "prerequisites": ["les-swara-01"],
-    "competencyIds": ["COMP-04-VOCAL"],
+    "prerequisites": [
+      "les-swara-01"
+    ],
+    "competencyIds": [
+      "COMP-04-VOCAL"
+    ],
     "diagnosticQuestion": {
       "question_si": "ගායනයේදී හුස්ම ගැනීමේ වඩාත්ම සුදුසු ක්‍රමවේදය කුමක්ද?",
-      "options_si": ["උරහිස් ඉහළට ඔසවමින් පපුවෙන් හුස්ම ගැනීම", "මහා ප්‍රාචීරය (Diaphragm) පහළට කරමින් උදරයෙන් හුස්ම ගැනීම", "ඉතා වේගයෙන් කෙටි හුස්ම ගැනීම", "හුස්ම නොගෙන ගායනා කිරීම"],
+      "options_si": [
+        "උරහිස් ඉහළට ඔසවමින් පපුවෙන් හුස්ම ගැනීම",
+        "මහා ප්‍රාචීරය (Diaphragm) පහළට කරමින් උදරයෙන් හුස්ම ගැනීම",
+        "ඉතා වේගයෙන් කෙටි හුස්ම ගැනීම",
+        "හුස්ම නොගෙන ගායනා කිරීම"
+      ],
       "correctIndex": 1,
       "explanation_si": "ගායනයට වඩාත් සුදුසු වන්නේ මහා ප්‍රාචීරය (Diaphragm) භාවිතයෙන් උදරයෙන් හුස්ම පාලනය කිරීමයි."
     },
@@ -863,19 +1346,29 @@
       "type": "swara-demo",
       "title_si": "තාන්පුර ශ්‍රැතිය සහ 'ස' ස්වරය අසමු",
       "instruction_si": "තාන්පුර ශ්‍රැතියට සවන් දී ඒ සමඟම 'ස...' නාදය ගායනා කරන්න.",
-      "notes": ["S", "S", "S"]
+      "notes": [
+        "S",
+        "S",
+        "S"
+      ]
     },
     "guidedPractice": {
       "title_si": "දේශීය මයික්‍රෆෝන ස්වර පුහුණුව",
       "instruction_si": "මයික්‍රෆෝනය ක්‍රියාත්මක කර (හෝ යතුරුපුවරුව මඟින්) 'ස' ස්වරය නියම තාරතාවෙන් ගායනා කර බලන්න.",
       "interactiveTool": "pitch-detector",
-      "targetNotes": ["S"]
+      "targetNotes": [
+        "S"
+      ]
     },
     "independentPractice": {
       "title_si": "ස්වර 3ක් අඛණ්ඩව ගයමු",
       "instruction_si": "ස - රි - ග ස්වර තුන නිවැරදි තාරතාවෙන් තාන්පුරයට ගළපන්න.",
       "interactiveTool": "pitch-detector",
-      "targetNotes": ["S", "R", "G"]
+      "targetNotes": [
+        "S",
+        "R",
+        "G"
+      ]
     },
     "quizId": "quiz-les-vocal-posture",
     "recap_si": [
@@ -891,7 +1384,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "හඬ පුහුණු මූලධර්ම සහ දේශීය ශ්‍රැති අභ්‍යාස සනාථ විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -908,13 +1401,24 @@
     "summary_si": "භාරත මුනිවරයාගේ නාට්‍ය ශාස්ත්‍රයේ එන චතුර්විධ වාද්‍ය භාණ්ඩ වර්ගීකරණය: තත, අවනද්ධ, සුශිර, ඝන භාණ්ඩ හඳුනාගනිමු.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට පෙරදිග චතුර්විධ වාද්‍ය භාණ්ඩ වර්ගීකරණය (තත, අවනද්ධ, සුශිර, ඝන) නම් කිරීමටත්, එක් එක් කාණ්ඩයට අයත් වාද්‍ය භාණ්ඩ උදාහරණ සහිතව වර්ගීකරණය කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 16,
-    "gradeBands": ["6-7", "8-9", "10-11"],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "පහසු",
     "prerequisites": [],
-    "competencyIds": ["COMP-05-INST"],
+    "competencyIds": [
+      "COMP-05-INST"
+    ],
     "diagnosticQuestion": {
       "question_si": "හමකින් ආවරණය කර ශබ්දය උපදවන බෙර වර්ග අයත් වන්නේ කුමන වාද්‍ය භාණ්ඩ කාණ්ඩයටද?",
-      "options_si": ["තත (තත් භාණ්ඩ)", "සුශිර (සුළං භාණ්ඩ)", "අවනද්ධ භාණ්ඩ", "ඝන භාණ්ඩ"],
+      "options_si": [
+        "තත (තත් භාණ්ඩ)",
+        "සුශිර (සුළං භාණ්ඩ)",
+        "අවනද්ධ භාණ්ඩ",
+        "ඝන භාණ්ඩ"
+      ],
       "correctIndex": 2,
       "explanation_si": "සම් ආවරණය කර තනන ලද බෙර වර්ග 'අවනද්ධ භාණ්ඩ' (Membranophones) කාණ්ඩයට අයත් වේ."
     },
@@ -928,7 +1432,12 @@
       "type": "instrument-timbre",
       "title_si": "වාද්‍ය භාණ්ඩ නාද ගුණ සසඳමු",
       "instruction_si": "තත් භාණ්ඩ, සුශිර භාණ්ඩ සහ අවනද්ධ භාණ්ඩවල නාද විවිධත්වය අසන්න.",
-      "notes": ["S", "G", "P", "S'"]
+      "notes": [
+        "S",
+        "G",
+        "P",
+        "S'"
+      ]
     },
     "guidedPractice": {
       "title_si": "වාද්‍ය භාණ්ඩ ගැලපීමේ අභ්‍යාසය",
@@ -939,7 +1448,13 @@
       "title_si": "ස්වර යතුරුපුවරුවේ නාද ගුණ මාරු කරමු",
       "instruction_si": "හාමෝනියම් සහ බටනලා මාදිලි තෝරා එකම ස්වර පෙළ වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "R", "G", "M", "P"]
+      "targetSequence": [
+        "S",
+        "R",
+        "G",
+        "M",
+        "P"
+      ]
     },
     "quizId": "quiz-les-inst-overview",
     "recap_si": [
@@ -955,7 +1470,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "නාට්‍ය ශාස්ත්‍ර චතුර්විධ වර්ගීකරණය සනාථ විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -972,13 +1487,25 @@
     "summary_si": "ගැට බෙරය (උඩරට), යක් බෙරය (පහතරට), දවුල (සබරගමු), තම්මැට්ටම සහ රබාන යන දේශීය බෙර වර්ගවල ව්‍යුහය, හම් වර්ග සහ භාවිතය.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට ශ්‍රී ලංකාවේ ප්‍රධාන දේශීය බෙර වර්ග 5 නම් කිරීමටත්, ඒවායේ කඳ, හම් වර්ග සහ නර්තන සම්ප්‍රදායික භාවිතය නිවැරදිව පැහැදිලි කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 18,
-    "gradeBands": ["8-9", "10-11", "12-13"],
+    "gradeBands": [
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "මධ්‍යම",
-    "prerequisites": ["les-inst-overview"],
-    "competencyIds": ["COMP-05-DESI-DRUMS"],
+    "prerequisites": [
+      "les-inst-overview"
+    ],
+    "competencyIds": [
+      "COMP-05-DESI-DRUMS"
+    ],
     "diagnosticQuestion": {
       "question_si": "උඩරට සම්ප්‍රදායේ ප්‍රධාන වාද්‍ය භාණ්ඩය වන ගැට බෙරයේ දකුණු පස තට්ටුව බැඳීමට ගන්නා හම කුමක්ද?",
-      "options_si": ["ගව හම", "වඳුරු හම", "එළු හම", "මුව හම"],
+      "options_si": [
+        "ගව හම",
+        "වඳුරු හම",
+        "එළු හම",
+        "මුව හම"
+      ],
       "correctIndex": 1,
       "explanation_si": "ගැට බෙරයේ දකුණු පස (දකුණැස) වඳුරු හමෙන් බඳින අතර වම් පස (වමැස) ගව පටලයෙන් බඳිනු ලැබේ."
     },
@@ -992,7 +1519,11 @@
       "type": "instrument-timbre",
       "title_si": "ගැට බෙර සහ යක් බෙර නාද සසඳමු",
       "instruction_si": "උඩරට ගැට බෙරයේ 'තෙයි තත් ජිං' සහ පහතරට යක් බෙරයේ 'දොං ජිං තක' නාද රටා සසඳන්න.",
-      "notes": ["S", "P", "S"]
+      "notes": [
+        "S",
+        "P",
+        "S"
+      ]
     },
     "guidedPractice": {
       "title_si": "දේශීය බෙර හඳුනාගැනීමේ අභ්‍යාසය",
@@ -1005,8 +1536,18 @@
       "interactiveTool": "notation-arranger",
       "puzzleData": {
         "prompt_si": "ගැට බෙර ආරම්භක පදය පිළිවෙළට සකසන්න:",
-        "shuffledItems": ["තත්", "තෙයි", "තොං", "ජිං"],
-        "correctOrder": ["තෙයි", "තත්", "ජිං", "තොං"]
+        "shuffledItems": [
+          "තත්",
+          "තෙයි",
+          "තොං",
+          "ජිං"
+        ],
+        "correctOrder": [
+          "තෙයි",
+          "තත්",
+          "ජිං",
+          "තොං"
+        ]
       }
     },
     "quizId": "quiz-les-inst-desi-drums",
@@ -1023,7 +1564,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "දේශීය බෙර වර්ගීකරණය සහ ව්‍යුහාත්මක කරුණු සනාථ විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -1040,13 +1581,24 @@
     "summary_si": "ගැමි ජනතාවගේ දෛනික ශ්‍රමය, විඩාව නිවා ගැනීම සහ සාමූහිකත්වය විදහා දක්වන ගොයම්, කරත්ත සහ පාරු කවිවල නාද ලක්ෂණ සහ සාහිත්‍යමය අගය.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට ශ්‍රී ලාංකීය වැඩ ගීත ප්‍රභේද හඳුනාගැනීමටත්, ගොයම් කවි සහ කරත්ත කවිවල නාද රටා සහ ගායන විලාසය නිවැරදිව පැහැදිලි කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 16,
-    "gradeBands": ["6-7", "8-9", "10-11"],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "පහසු",
     "prerequisites": [],
-    "competencyIds": ["COMP-06-FOLK"],
+    "competencyIds": [
+      "COMP-06-FOLK"
+    ],
     "diagnosticQuestion": {
       "question_si": "'තණ්ඩලේ දෙන්න දෙපොලේ දක්කනවා...' යන පද්‍යය අයත් වන්නේ කුමන ගැමි ගීත විශේෂයටද?",
-      "options_si": ["ගොයම් කවි", "කරත්ත කවි", "පාරු කවි", "පතල් කවි"],
+      "options_si": [
+        "ගොයම් කවි",
+        "කරත්ත කවි",
+        "පාරු කවි",
+        "පතල් කවි"
+      ],
       "correctIndex": 1,
       "explanation_si": "'තණ්ඩලේ දෙන්න දෙපොලේ...' යනු ප්‍රකට කරත්ත කවියකි."
     },
@@ -1064,13 +1616,25 @@
       "type": "swara-demo",
       "title_si": "ගැමි කවියේ සරල ස්වර 3 නාද රටාව",
       "instruction_si": "ස - රි - ග ස්වර ආශ්‍රිතව ගැමි ගීත නාදය ගොඩනැගෙන ආකාරය අසන්න.",
-      "notes": ["S", "R", "G", "R", "S"]
+      "notes": [
+        "S",
+        "R",
+        "G",
+        "R",
+        "S"
+      ]
     },
     "guidedPractice": {
       "title_si": "ගැමි ස්වර රටාව වාදනය කරමු",
       "instruction_si": "ස - රි - ග - රි - ස ස්වර රටාව වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "R", "G", "R", "S"]
+      "targetSequence": [
+        "S",
+        "R",
+        "G",
+        "R",
+        "S"
+      ]
     },
     "independentPractice": {
       "title_si": "ගොයම් කවි පද පෙළගැස්ම",
@@ -1106,10 +1670,10 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "ජන ගී සාහිත්‍ය හා නාද ලක්ෂණ සනාථ විය.",
       "license": "Academic Heritage Reference",
-      "reuseStatus": "Verified Original"
+      "reuseStatus": "Curriculum Canonical"
     },
     "nextRecommendedLessonId": "les-theatre-nadagam",
     "published": true
@@ -1123,13 +1687,23 @@
     "summary_si": "තෙරුක්කුත්තු ආභාසයෙන් බිහිවූ නාඩගම් නාට්‍ය කලාව, පොතේගුරුගේ භූමිකාව, මද්දලය හා තාලම්පට භාවිතය සහ මනමේ නාට්‍යයේ නාඩගම් ආභාසය.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට නාඩගම් සංගීතයේ ඓතිහාසික පසුබිම, පොතේගුරුගේ කාර්යභාරය, සහ ප්‍රධාන වාද්‍ය භාණ්ඩ (මද්දලය, තාලම්පට) නිවැරදිව විස්තර කිරීමට හැකිවනු ඇත.",
     "estimatedMinutes": 18,
-    "gradeBands": ["8-9", "10-11", "12-13"],
+    "gradeBands": [
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "මධ්‍යම",
     "prerequisites": [],
-    "competencyIds": ["COMP-07-NADAGAM"],
+    "competencyIds": [
+      "COMP-07-NADAGAM"
+    ],
     "diagnosticQuestion": {
       "question_si": "නාඩගම් නාට්‍යයක කතාව ඉදිරියට ගෙන යන, ගායනයෙන් හා කථනයෙන් රංගය මෙහෙයවන ප්‍රධාන චරිතය කවුද?",
-      "options_si": ["විදානේ", "පොතේගුරු", "කෝන්ගි", "සොකරි"],
+      "options_si": [
+        "විදානේ",
+        "පොතේගුරු",
+        "කෝන්ගි",
+        "සොකරි"
+      ],
       "correctIndex": 1,
       "explanation_si": "නාඩගම් නාට්‍යයක ප්‍රධාන කථකයා හා ගායකයා 'පොතේගුරු' (Pothegura) වේ."
     },
@@ -1154,7 +1728,15 @@
       "title_si": "නාඩගම් තාල පද ස්වර වාදනය",
       "instruction_si": "ස - රි - ග - ම - ප - ධ - ස̇ ස්වර රටාව වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "R", "G", "M", "P", "D", "S'"]
+      "targetSequence": [
+        "S",
+        "R",
+        "G",
+        "M",
+        "P",
+        "D",
+        "S'"
+      ]
     },
     "independentPractice": {
       "title_si": "නාඩගම් ගීත ඛණ්ඩ ප්‍රහේලිකාව",
@@ -1162,8 +1744,18 @@
       "interactiveTool": "notation-arranger",
       "puzzleData": {
         "prompt_si": "පද පේළි පිළිවෙළට සකසන්න:",
-        "shuffledItems": ["සිත් ප්‍රබෝධිත වේ", "ප්‍රේමයෙන් මන", "රංජිත වේ", "සැප සිරිය ගෙනදේ"],
-        "correctOrder": ["ප්‍රේමයෙන් මන", "රංජිත වේ", "සිත් ප්‍රබෝධිත වේ", "සැප සිරිය ගෙනදේ"]
+        "shuffledItems": [
+          "සිත් ප්‍රබෝධිත වේ",
+          "ප්‍රේමයෙන් මන",
+          "රංජිත වේ",
+          "සැප සිරිය ගෙනදේ"
+        ],
+        "correctOrder": [
+          "ප්‍රේමයෙන් මන",
+          "රංජිත වේ",
+          "සිත් ප්‍රබෝධිත වේ",
+          "සැප සිරිය ගෙනදේ"
+        ]
       }
     },
     "quizId": "quiz-les-theatre-nadagam",
@@ -1180,7 +1772,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "නාඩගම් ඉතිහාසය හා සංගීත අංග තහවුරු විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -1197,13 +1789,23 @@
     "summary_si": "පාරසී නාට්‍ය ආභාසයෙන් මෙරට බිහිවූ නූර්ති නාට්‍ය කලාව, ජෝන් ද සිල්වා සූරීන්ගේ දායකත්වය, හාමෝනියම්-තබ්ලා භාවිතය සහ රාගධාරී තනු සම්ප්‍රදාය.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට නූර්ති සංගීතයේ සම්භවය, නීතිඥ ජෝන් ද සිල්වා මැතිතුමාගේ කාර්යභාරය, සහ 'දන්නෝ බුදුන්ගේ' වැනි රාගධාරී නූර්ති ගීතවල ලක්ෂණ විස්තර කිරීමට හැකිවනු ඇත.",
     "estimatedMinutes": 18,
-    "gradeBands": ["8-9", "10-11", "12-13"],
+    "gradeBands": [
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "මධ්‍යම",
     "prerequisites": [],
-    "competencyIds": ["COMP-07-NURTHI"],
+    "competencyIds": [
+      "COMP-07-NURTHI"
+    ],
     "diagnosticQuestion": {
       "question_si": "'දන්නෝ බුදුන්ගේ ශ්‍රී ධර්මස්කන්ධා' නූර්ති ගීතය ඇතුළත් වන්නේ කුමන ඓතිහාසික නාට්‍යයේද?",
-      "options_si": ["මනමේ", "සිංහබාහු", "සිරිසඟබෝ", "ඇහැලේපොළ"],
+      "options_si": [
+        "මනමේ",
+        "සිංහබාහු",
+        "සිරිසඟබෝ",
+        "ඇහැලේපොළ"
+      ],
       "correctIndex": 2,
       "explanation_si": "'දන්නෝ බුදුන්ගේ' ගීතය ජෝන් ද සිල්වා මැතිතුමාගේ 'සිරිසඟබෝ' නූර්ති නාට්‍යයට ඇතුළත් වේ."
     },
@@ -1221,13 +1823,32 @@
       "type": "scale-play",
       "title_si": "රාගධාරී නූර්ති තනු ස්වර රටාව",
       "instruction_si": "නූර්ති ගීතවල යෙදෙන ඛමාජ් ථාටාශ්‍රිත ස්වර රටාවට සවන් දෙන්න.",
-      "notes": ["S", "G", "M", "P", "D", "N", "S'", "n", "D", "P"]
+      "notes": [
+        "S",
+        "G",
+        "M",
+        "P",
+        "D",
+        "N",
+        "S'",
+        "n",
+        "D",
+        "P"
+      ]
     },
     "guidedPractice": {
       "title_si": "නූර්ති ස්වර පෙළක් වාදනය කරමු",
       "instruction_si": "ස - ග - ම - ප - ධ - නි - ස̇ වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "G", "M", "P", "D", "N", "S'"]
+      "targetSequence": [
+        "S",
+        "G",
+        "M",
+        "P",
+        "D",
+        "N",
+        "S'"
+      ]
     },
     "independentPractice": {
       "title_si": "නූර්ති ගීත පද සැකසීම",
@@ -1263,7 +1884,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "ජෝන් ද සිල්වා යුගය හා නූර්ති සංගීත ලක්ෂණ සනාථ විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -1280,13 +1901,22 @@
     "summary_si": "ගීතයක පද රචනය, තනුව, තාලය, ගායන ශෛලිය, සහ සංගීත සංයෝජනය (Orchestration) විචාරාත්මකව රසවිඳින ආකාරය.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට ගීතයක අඩංගු සංගීතමය අංග (තනුව, තාලය, භාවය, වාද්‍ය භාණ්ඩ සංකලනය) හඳුනාගැනීමටත්, කෙටි සංගීත රසවින්දන විචාරයක් ලිවීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 18,
-    "gradeBands": ["10-11", "12-13"],
+    "gradeBands": [
+      "10-11"
+    ],
     "difficulty": "මධ්‍යම",
     "prerequisites": [],
-    "competencyIds": ["COMP-08-APPREC"],
+    "competencyIds": [
+      "COMP-08-APPREC"
+    ],
     "diagnosticQuestion": {
       "question_si": "ගීතයක පදවල අර්ථය වඩාත් ප්‍රබලව ශ්‍රාවකයාට දැනවීමට උපකාරී වන ප්‍රධාන සංගීතමය සාධකය කුමක්ද?",
-      "options_si": ["තනුව සහ රාගාශ්‍රිත භාවය", "අධික ශබ්දය", "ඉතා වේගවත් ලය", "බොහෝ වාද්‍ය භාණ්ඩ එකවර වාදනය කිරීම"],
+      "options_si": [
+        "තනුව සහ රාගාශ්‍රිත භාවය",
+        "අධික ශබ්දය",
+        "ඉතා වේගවත් ලය",
+        "බොහෝ වාද්‍ය භාණ්ඩ එකවර වාදනය කිරීම"
+      ],
       "correctIndex": 0,
       "explanation_si": "පදවල අර්ථය ප්‍රබල කරන්නේ තනුව (Melody) සහ රාගාශ්‍රිත භාවය (Rasa) මඟිනි."
     },
@@ -1300,13 +1930,27 @@
       "type": "swara-demo",
       "title_si": "භාව ප්‍රකාශනය හා ස්වර සංයෝජනය",
       "instruction_si": "ශාන්ත හා ශෘංගාර රසයන් ස්වර මඟින් මැවෙන ආකාරය අසන්න.",
-      "notes": ["S", "G", "M", "P", "N", "S'"]
+      "notes": [
+        "S",
+        "G",
+        "M",
+        "P",
+        "N",
+        "S'"
+      ]
     },
     "guidedPractice": {
       "title_si": "ස්වර මඟින් මනෝභාවයක් මවමු",
       "instruction_si": "සන්සුන් ස්වර පෙළක් ස්වර යතුරුපුවරුවෙන් වාදනය කරන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "R", "G", "P", "D", "S'"]
+      "targetSequence": [
+        "S",
+        "R",
+        "G",
+        "P",
+        "D",
+        "S'"
+      ]
     },
     "independentPractice": {
       "title_si": "සංගීත විචාර අංග පෙළගැස්ම",
@@ -1314,8 +1958,18 @@
       "interactiveTool": "notation-arranger",
       "puzzleData": {
         "prompt_si": "විචාර පියවර පිළිවෙළට සකසන්න:",
-        "shuffledItems": ["සංගීත සංයෝජනය", "පද රචනය හා අරුත", "ගායන ශෛලිය", "තනුව හා තාලය"],
-        "correctOrder": ["පද රචනය හා අරුත", "තනුව හා තාලය", "ගායන ශෛලිය", "සංගීත සංයෝජනය"]
+        "shuffledItems": [
+          "සංගීත සංයෝජනය",
+          "පද රචනය හා අරුත",
+          "ගායන ශෛලිය",
+          "තනුව හා තාලය"
+        ],
+        "correctOrder": [
+          "පද රචනය හා අරුත",
+          "තනුව හා තාලය",
+          "ගායන ශෛලිය",
+          "සංගීත සංයෝජනය"
+        ]
       }
     },
     "quizId": "quiz-les-apprec-elements",
@@ -1331,7 +1985,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "ගීත විචාර නිර්ණායක සනාථ විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -1348,13 +2002,26 @@
     "summary_si": "ස්වයං නිර්මාණශීලීව සරල ස්වර රටා සකස් කිරීම, තාලානුකූල රිද්ම රටා නිර්මාණය සහ ඩිජිටල් සංගීත මෙවලම් භාවිතය.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට ස්වර 5ක් හෝ 7ක් භාවිතයෙන් ඔබේම සරල තනු ඛණ්ඩයක් නිර්මාණය කිරීමටත්, එය තාලයකට අනුකූලව සටහන් කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 16,
-    "gradeBands": ["8-9", "10-11", "12-13"],
+    "gradeBands": [
+      "8-9",
+      "10-11"
+    ],
     "difficulty": "මධ්‍යම",
-    "prerequisites": ["les-swara-01", "les-tala-basics"],
-    "competencyIds": ["COMP-09-CREATIVE"],
+    "prerequisites": [
+      "les-swara-01",
+      "les-tala-basics"
+    ],
+    "competencyIds": [
+      "COMP-09-CREATIVE"
+    ],
     "diagnosticQuestion": {
       "question_si": "ස්වර 5ක් පමණක් යොදාගෙන නිර්මාණය කරන තනුවක් අයත් වන රාග ජාතිය කුමක්ද?",
-      "options_si": ["සම්පූර්ණ", "ෂාඩව", "ඕඩව", "චතුර්ත"],
+      "options_si": [
+        "සම්පූර්ණ",
+        "ෂාඩව",
+        "ඕඩව",
+        "චතුර්ත"
+      ],
       "correctIndex": 2,
       "explanation_si": "ස්වර 5ක් පමණක් යොදාගන්නා නිර්මාණ 'ඕඩව' (Audav) ජාතියට අයත් වේ."
     },
@@ -1368,13 +2035,30 @@
       "type": "scale-play",
       "title_si": "ඕඩව තනු නිර්මාණ රටාවක් අසමු",
       "instruction_si": "ස - රි - ග - ප - ධ - ස̇ ස්වරවලින් සැදුණු නිර්මාණාත්මක තනු රටාව අසන්න.",
-      "notes": ["S", "R", "G", "P", "D", "S'", "D", "P", "G", "R", "S"]
+      "notes": [
+        "S",
+        "R",
+        "G",
+        "P",
+        "D",
+        "S'",
+        "D",
+        "P",
+        "G",
+        "R",
+        "S"
+      ]
     },
     "guidedPractice": {
       "title_si": "ඔබේම ස්වර රටාවක් වාදනය කරන්න",
       "instruction_si": "ස්වර යතුරුපුවරුවෙන් ඔබ කැමති ස්වර 4ක් තෝරාගෙන තනුවක් සාදන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["S", "G", "P", "S'"]
+      "targetSequence": [
+        "S",
+        "G",
+        "P",
+        "S'"
+      ]
     },
     "independentPractice": {
       "title_si": "රිද්ම රටා සකසනය",
@@ -1382,8 +2066,18 @@
       "interactiveTool": "notation-arranger",
       "puzzleData": {
         "prompt_si": "කෙහර්වා මුල් විභාගය සකසන්න:",
-        "shuffledItems": ["තින්", "ගේ", "ධා", "නා"],
-        "correctOrder": ["ධා", "ගේ", "නා", "තින්"]
+        "shuffledItems": [
+          "තින්",
+          "ගේ",
+          "ධා",
+          "නා"
+        ],
+        "correctOrder": [
+          "ධා",
+          "ගේ",
+          "නා",
+          "තින්"
+        ]
       }
     },
     "quizId": "quiz-les-creative-rhythm",
@@ -1399,7 +2093,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "නිර්මාණාත්මක සංගීත අභ්‍යාස තහවුරු විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
@@ -1416,13 +2110,22 @@
     "summary_si": "විභාග දෙපාර්තමේන්තු ඇගයීම් වාර්තා ඇසුරෙන් බහුවරණ, ව්‍යුහගත, ප්‍රස්තාර සහ විචාර ප්‍රශ්නවලට නිවැරදිව ලකුණු ලබාගැනීමේ ක්‍රමවේද.",
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට සාමාන්‍ය පෙළ සහ උසස් පෙළ පෙරදිග සංගීත විභාග ප්‍රශ්න පත්‍රවල ව්‍යුහය අවබෝධ කරගැනීමටත්, ලකුණු දීමේ පටිපාටියට අනුකූලව පිළිතුරු ලිවීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 20,
-    "gradeBands": ["10-11", "12-13"],
+    "gradeBands": [
+      "10-11"
+    ],
     "difficulty": "උසස්",
     "prerequisites": [],
-    "competencyIds": ["COMP-10-EXAM"],
+    "competencyIds": [
+      "COMP-10-EXAM"
+    ],
     "diagnosticQuestion": {
       "question_si": "රාග සංසන්දනාත්මක ප්‍රශ්නයකට පිළිතුරු ලිවීමේදී වඩාත්ම ලකුණු ලැබෙන අත්‍යවශ්‍ය කරුණු මොනවාද?",
-      "options_si": ["රාගවල ථාටය, ස්වර, ආරෝහණ/අවරෝහණ, වාදී/සංවාදී සහ ගායන වේලාව", "ගීත රචකයාගේ විස්තර පමණක්", "වාද්‍ය භාණ්ඩවල මිල ගණන්", "අලංකාර පින්තූර ඇඳීම"],
+      "options_si": [
+        "රාගවල ථාටය, ස්වර, ආරෝහණ/අවරෝහණ, වාදී/සංවාදී සහ ගායන වේලාව",
+        "ගීත රචකයාගේ විස්තර පමණක්",
+        "වාද්‍ය භාණ්ඩවල මිල ගණන්",
+        "අලංකාර පින්තූර ඇඳීම"
+      ],
       "correctIndex": 0,
       "explanation_si": "රාග විමර්ශනයකදී ථාට, ස්වර, ආරෝහණ/අවරෝහණ, වාදී/සංවාදී හා ගායන වේලාව අනිවාර්යයෙන් ඇතුළත් විය යුතුය."
     },
@@ -1440,13 +2143,31 @@
       "type": "scale-play",
       "title_si": "විභාග ප්‍රශ්න ආශ්‍රිත ශ්‍රව්‍ය හඳුනාගැනීම",
       "instruction_si": "රාග හඳුනාගැනීමේ ප්‍රශ්නයකට පෙරහුරුවක් ලෙස මෙම ස්වර ඛණ්ඩයට සවන් දෙන්න.",
-      "notes": ["G", "M", "d", "P", "G", "M", "r", "S"]
+      "notes": [
+        "G",
+        "M",
+        "d",
+        "P",
+        "G",
+        "M",
+        "r",
+        "S"
+      ]
     },
     "guidedPractice": {
       "title_si": "විභාග ප්‍රස්තාර අභ්‍යාසය",
       "instruction_si": "භෛරව් රාගයේ පකඩ් ඛණ්ඩය වාදනය කර ප්‍රස්තාරය සනාථ කරගන්න.",
       "interactiveTool": "swara-keyboard",
-      "targetSequence": ["G", "M", "d", "P", "G", "M", "r", "S"]
+      "targetSequence": [
+        "G",
+        "M",
+        "d",
+        "P",
+        "G",
+        "M",
+        "r",
+        "S"
+      ]
     },
     "independentPractice": {
       "title_si": "විභාග මාදිලි ප්‍රශ්න පුහුණුව",
@@ -1466,7 +2187,7 @@
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-15",
       "changeNotes": "විභාග නිර්ණායක හා ප්‍රශ්න රටා තහවුරු විය.",
       "license": "Educational Assessment Reference",
       "reuseStatus": "Curriculum Canonical"

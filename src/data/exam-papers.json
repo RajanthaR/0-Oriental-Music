@@ -13,122 +13,242 @@
       {
         "id": "ol-q-01",
         "type": "mcq",
-        "gradeBands": ["10-11"],
+        "gradeBands": [
+          "10-11"
+        ],
         "difficulty": "මධ්‍යම",
         "strandId": "strand-swara-shruti",
         "prompt_si": "පෙරදිග සංගීතයේ සප්තකයකට අයත් ශ්‍රැති සංඛ්‍යාව සහ ස්වර සංඛ්‍යාව පිළිවෙළින් දැක්වෙන පිළිතුර කුමක්ද?",
         "options_si": [
-          { "id": "opt-1", "text_si": "ශ්‍රැති 7, ස්වර 12" },
-          { "id": "opt-2", "text_si": "ශ්‍රැති 22, ස්වර 12", "isCorrect": true },
-          { "id": "opt-3", "text_si": "ශ්‍රැති 12, ස්වර 7" },
-          { "id": "opt-4", "text_si": "ශ්‍රැති 24, ස්වර 10" }
+          {
+            "id": "opt-1",
+            "text_si": "ශ්‍රැති 7, ස්වර 12"
+          },
+          {
+            "id": "opt-2",
+            "text_si": "ශ්‍රැති 22, ස්වර 12",
+            "isCorrect": true
+          },
+          {
+            "id": "opt-3",
+            "text_si": "ශ්‍රැති 12, ස්වර 7"
+          },
+          {
+            "id": "opt-4",
+            "text_si": "ශ්‍රැති 24, ස්වර 10"
+          }
         ],
-        "correctAnswerIds": ["opt-2"],
+        "correctAnswerIds": [
+          "opt-2"
+        ],
         "explanation_si": "සප්තකයක ශ්‍රැති 22 ක් සහ මුළු ස්වර (අචල, කෝමල, තීව්‍ර, ශුද්ධ) 12 ක් ඇත.",
-        "sourceReference": { "sourceId": "SRC-DOE-OL-EVAL", "pageOrSection": "ප්‍රශ්න පත්‍ර සාකච්ඡාව" }
+        "sourceReference": {
+          "sourceId": "SRC-DOE-OL-EVAL",
+          "pageOrSection": "ප්‍රශ්න පත්‍ර සාකච්ඡාව"
+        }
       },
       {
         "id": "ol-q-02",
         "type": "mcq",
-        "gradeBands": ["10-11"],
+        "gradeBands": [
+          "10-11"
+        ],
         "difficulty": "මධ්‍යම",
         "strandId": "strand-ragas",
         "prompt_si": "භෛරව් ථාටයට අයත් කෝමල ස්වර යුගලය කුමක්ද?",
         "options_si": [
-          { "id": "opt-1", "text_si": "ග සහ නි" },
-          { "id": "opt-2", "text_si": "රි සහ ධ", "isCorrect": true },
-          { "id": "opt-3", "text_si": "ම සහ ප" },
-          { "id": "opt-4", "text_si": "රි සහ ග" }
+          {
+            "id": "opt-1",
+            "text_si": "ග සහ නි"
+          },
+          {
+            "id": "opt-2",
+            "text_si": "රි සහ ධ",
+            "isCorrect": true
+          },
+          {
+            "id": "opt-3",
+            "text_si": "ම සහ ප"
+          },
+          {
+            "id": "opt-4",
+            "text_si": "රි සහ ග"
+          }
         ],
-        "correctAnswerIds": ["opt-2"],
+        "correctAnswerIds": [
+          "opt-2"
+        ],
         "explanation_si": "භෛරව් ථාටයේ කෝමල වන්නේ රිෂභ (රි) සහ ධෛවත (ධ) ස්වර වේ.",
-        "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 56" }
+        "sourceReference": {
+          "sourceId": "SRC-NIE-G1011-TG",
+          "pageOrSection": "පිටුව 56"
+        }
       },
       {
         "id": "ol-q-03",
         "type": "mcq",
-        "gradeBands": ["10-11"],
+        "gradeBands": [
+          "10-11"
+        ],
         "difficulty": "මධ්‍යම",
         "strandId": "strand-laya-tala",
         "prompt_si": "මාත්‍රා 16 කින් සහ විභාග 4 කින් සමන්විත ප්‍රධාන උත්තර භාරතීය තාලය කුමක්ද?",
         "options_si": [
-          { "id": "opt-1", "text_si": "කෙහර්වා තාලය" },
-          { "id": "opt-2", "text_si": "දාද්‍රා තාලය" },
-          { "id": "opt-3", "text_si": "ත්‍රීතාලය (තීන්තාල්)", "isCorrect": true },
-          { "id": "opt-4", "text_si": "රූපක් තාලය" }
+          {
+            "id": "opt-1",
+            "text_si": "කෙහර්වා තාලය"
+          },
+          {
+            "id": "opt-2",
+            "text_si": "දාද්‍රා තාලය"
+          },
+          {
+            "id": "opt-3",
+            "text_si": "ත්‍රීතාලය (තීන්තාල්)",
+            "isCorrect": true
+          },
+          {
+            "id": "opt-4",
+            "text_si": "රූපක් තාලය"
+          }
         ],
-        "correctAnswerIds": ["opt-3"],
+        "correctAnswerIds": [
+          "opt-3"
+        ],
         "explanation_si": "ත්‍රීතාලය මාත්‍රා 16 කින් (4+4+4+4) සමන්විතය.",
-        "sourceReference": { "sourceId": "SRC-NIE-G08-TG", "pageOrSection": "පිටුව 45" }
+        "sourceReference": {
+          "sourceId": "SRC-NIE-G08-TG",
+          "pageOrSection": "පිටුව 45"
+        }
       },
       {
         "id": "ol-q-04",
         "type": "mcq",
-        "gradeBands": ["10-11"],
+        "gradeBands": [
+          "10-11"
+        ],
         "difficulty": "මධ්‍යම",
         "strandId": "strand-theatre-music",
         "prompt_si": "නීතිඥ ජෝන් ද සිල්වා මහතාගේ 'සිරිසඟබෝ' නූර්ති නාට්‍යයේ එන ප්‍රකට ගීතය කුමක්ද?",
         "options_si": [
-          { "id": "opt-1", "text_si": "ප්‍රේමයෙන් මන රංජිත වේ" },
-          { "id": "opt-2", "text_si": "දන්නෝ බුදුන්ගේ ශ්‍රී ධර්මස්කන්ධා", "isCorrect": true },
-          { "id": "opt-3", "text_si": "ගලන ගඟකි ජීවිතේ" },
-          { "id": "opt-4", "text_si": "සුවඳ සබන් ඇඟ ගාලා" }
+          {
+            "id": "opt-1",
+            "text_si": "ප්‍රේමයෙන් මන රංජිත වේ"
+          },
+          {
+            "id": "opt-2",
+            "text_si": "දන්නෝ බුදුන්ගේ ශ්‍රී ධර්මස්කන්ධා",
+            "isCorrect": true
+          },
+          {
+            "id": "opt-3",
+            "text_si": "ගලන ගඟකි ජීවිතේ"
+          },
+          {
+            "id": "opt-4",
+            "text_si": "සුවඳ සබන් ඇඟ ගාලා"
+          }
         ],
-        "correctAnswerIds": ["opt-2"],
+        "correctAnswerIds": [
+          "opt-2"
+        ],
         "explanation_si": "'දන්නෝ බුදුන්ගේ' ගීතය සිරිසඟබෝ නූර්ති නාට්‍යයට අයත් වේ.",
-        "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 114" }
+        "sourceReference": {
+          "sourceId": "SRC-NIE-G1011-TG",
+          "pageOrSection": "පිටුව 114"
+        }
       },
       {
         "id": "ol-q-05",
         "type": "mcq",
-        "gradeBands": ["10-11"],
+        "gradeBands": [
+          "10-11"
+        ],
         "difficulty": "මධ්‍යම",
         "strandId": "strand-instruments",
         "prompt_si": "පහතරට ශාන්තිකර්ම සහ නාඩගම් සඳහා යොදාගන්නා ප්‍රධාන බෙරය කුමක්ද?",
         "options_si": [
-          { "id": "opt-1", "text_si": "ගැට බෙරය" },
-          { "id": "opt-2", "text_si": "යක් බෙරය (රුහුණු බෙරය)", "isCorrect": true },
-          { "id": "opt-3", "text_si": "දවුල" },
-          { "id": "opt-4", "text_si": "තම්මැට්ටම" }
+          {
+            "id": "opt-1",
+            "text_si": "ගැට බෙරය"
+          },
+          {
+            "id": "opt-2",
+            "text_si": "යක් බෙරය (රුහුණු බෙරය)",
+            "isCorrect": true
+          },
+          {
+            "id": "opt-3",
+            "text_si": "දවුල"
+          },
+          {
+            "id": "opt-4",
+            "text_si": "තම්මැට්ටම"
+          }
         ],
-        "correctAnswerIds": ["opt-2"],
+        "correctAnswerIds": [
+          "opt-2"
+        ],
         "explanation_si": "පහතරට සම්ප්‍රදායේ ප්‍රධාන වාද්‍ය භාණ්ඩය යක් බෙරයයි.",
-        "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 90" }
+        "sourceReference": {
+          "sourceId": "SRC-EPD-TB-G10",
+          "pageOrSection": "පිටුව 90"
+        }
       }
     ],
     "partB_Structured": [
       {
         "id": "ol-sq-01",
         "type": "short-answer",
-        "gradeBands": ["10-11"],
+        "gradeBands": [
+          "10-11"
+        ],
         "difficulty": "උසස්",
         "strandId": "strand-ragas",
         "prompt_si": "යමන් රාගයේ වාදී ස්වරය සහ සංවාදී ස්වරය ලියන්න.",
-        "correctShortAnswer_si": ["වාදී ග, සංවාදී නි", "ග සහ නි", "වාදී ගාන්ධාර, සංවාදී නිෂාද"],
+        "correctShortAnswer_si": [
+          "වාදී ග, සංවාදී නි",
+          "ග සහ නි",
+          "වාදී ගාන්ධාර, සංවාදී නිෂාද"
+        ],
         "explanation_si": "යමන් රාගයේ වාදී ස්වරය ගාන්ධාර (ග) වන අතර සංවාදී ස්වරය නිෂාද (නි) වේ.",
         "markingPoints_si": [
           "වාදී ස්වරය 'ග' ලෙස සඳහන් කිරීමට ලකුණු 1",
           "සංවාදී ස්වරය 'නි' ලෙස සඳහන් කිරීමට ලකුණු 1"
         ],
-        "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 58" }
+        "sourceReference": {
+          "sourceId": "SRC-NIE-G1011-TG",
+          "pageOrSection": "පිටුව 58"
+        }
       },
       {
         "id": "ol-sq-02",
         "type": "short-answer",
-        "gradeBands": ["10-11"],
+        "gradeBands": [
+          "10-11"
+        ],
         "difficulty": "උසස්",
         "strandId": "strand-laya-tala",
         "prompt_si": "රූපක් තාලයේ සම්පූර්ණ ථේකාව ලියන්න.",
-        "correctShortAnswer_si": ["තින් තින් නා ධී නා ධී නා", "තින් තින් නා | ධී නා | ධී නා"],
+        "correctShortAnswer_si": [
+          "තින් තින් නා ධී නා ධී නා",
+          "තින් තින් නා | ධී නා | ධී නා"
+        ],
         "explanation_si": "රූපක් තාලයේ ථේකාව: තින් තින් නා | ධී නා | ධී නා වේ.",
         "markingPoints_si": [
           "මාත්‍රා 7 ක බෝල් නිවැරදිව ලිවීමට ලකුණු 2",
           "විභාග සිරස් ඉරි (3|2|2) දැක්වීමට ලකුණු 1"
         ],
-        "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 65" }
+        "sourceReference": {
+          "sourceId": "SRC-NIE-G1011-TG",
+          "pageOrSection": "පිටුව 65"
+        }
       }
     ],
-    "sourceReference": { "sourceId": "SRC-DOE-OL-EVAL", "pageOrSection": "සා.පෙළ මාදිලි ප්‍රශ්නාවලිය" },
+    "sourceReference": {
+      "sourceId": "SRC-DOE-OL-EVAL",
+      "pageOrSection": "සා.පෙළ මාදිලි ප්‍රශ්නාවලිය"
+    },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
@@ -142,7 +262,7 @@
   {
     "id": "exam-al-model-01",
     "title_si": "අ.පො.ස. (උසස් පෙළ) පෙරදිග සංගීතය ආදර්ශ විභාග අභ්‍යාසය",
-    "gradeBand": "12-13",
+    "gradeBand": "10-11",
     "timeLimitMinutes": 75,
     "instructions_si": [
       "උසස් පෙළ ප්‍රශ්න පත්‍ර ආකෘතියට අනුව රාග ශාස්ත්‍රය, ශ්‍රැති වාදය සහ සංගීත ඉතිහාසය විමර්ශනය කරන්න.",
@@ -152,55 +272,107 @@
       {
         "id": "al-q-01",
         "type": "mcq",
-        "gradeBands": ["12-13"],
+        "gradeBands": [
+          "12-13"
+        ],
         "difficulty": "උසස්",
         "strandId": "strand-swara-shruti",
         "prompt_si": "භාරතීය ශ්‍රැති වාදයට අනුව 'ෂඩ්ජ (ස)' සහ 'මධ්‍යම (ම)' ස්වරවලට හිමි ශ්‍රැති සංඛ්‍යාව පිළිවෙළින් කොපමණද?",
         "options_si": [
-          { "id": "opt-1", "text_si": "4 සහ 3" },
-          { "id": "opt-2", "text_si": "4 සහ 4", "isCorrect": true },
-          { "id": "opt-3", "text_si": "3 සහ 2" },
-          { "id": "opt-4", "text_si": "2 සහ 4" }
+          {
+            "id": "opt-1",
+            "text_si": "4 සහ 3"
+          },
+          {
+            "id": "opt-2",
+            "text_si": "4 සහ 4",
+            "isCorrect": true
+          },
+          {
+            "id": "opt-3",
+            "text_si": "3 සහ 2"
+          },
+          {
+            "id": "opt-4",
+            "text_si": "2 සහ 4"
+          }
         ],
-        "correctAnswerIds": ["opt-2"],
+        "correctAnswerIds": [
+          "opt-2"
+        ],
         "explanation_si": "'චතුශ්චතුශ්චෛව ෂඩ්ජ මධ්‍යම පඤ්චමාඃ' නීතිය අනුව ස-4, ම-4, ප-4 බැගින් වේ.",
-        "sourceReference": { "sourceId": "SRC-NIE-G1213-SYL", "pageOrSection": "ශ්‍රැති වාදය ඒකකය" }
+        "sourceReference": {
+          "sourceId": "SRC-NIE-G1213-SYL",
+          "pageOrSection": "ශ්‍රැති වාදය ඒකකය"
+        }
       },
       {
         "id": "al-q-02",
         "type": "mcq",
-        "gradeBands": ["12-13"],
+        "gradeBands": [
+          "12-13"
+        ],
         "difficulty": "උසස්",
         "strandId": "strand-ragas",
         "prompt_si": "භූපාලි රාගයේ සහ දේශකාර් රාගයේ ආරෝහණ ස්වර එකම වුවද, ඒවා වෙන්කර හඳුනාගන්නා ප්‍රධාන සාධකය කුමක්ද?",
         "options_si": [
-          { "id": "opt-1", "text_si": "ස්වර ගණන වෙනස් වීම" },
-          { "id": "opt-2", "text_si": "වාදී-සංවාදී ස්වර, න්‍යාස ස්වර සහ අංග ප්‍රමුඛතාව (පූර්වාංග/උත්තරාංග)", "isCorrect": true },
-          { "id": "opt-3", "text_si": "භාණ්ඩ වෙනස් වීම" },
-          { "id": "opt-4", "text_si": "තාලය වෙනස් වීම" }
+          {
+            "id": "opt-1",
+            "text_si": "ස්වර ගණන වෙනස් වීම"
+          },
+          {
+            "id": "opt-2",
+            "text_si": "වාදී-සංවාදී ස්වර, න්‍යාස ස්වර සහ අංග ප්‍රමුඛතාව (පූර්වාංග/උත්තරාංග)",
+            "isCorrect": true
+          },
+          {
+            "id": "opt-3",
+            "text_si": "භාණ්ඩ වෙනස් වීම"
+          },
+          {
+            "id": "opt-4",
+            "text_si": "තාලය වෙනස් වීම"
+          }
         ],
-        "correctAnswerIds": ["opt-2"],
+        "correctAnswerIds": [
+          "opt-2"
+        ],
         "explanation_si": "භූපාලිහි වාදී ග (පූර්වාංග ප්‍රමුඛ) වන අතර දේශකාර්හි වාදී ධ (උත්තරාංග ප්‍රමුඛ) වේ.",
-        "sourceReference": { "sourceId": "SRC-UVPA-RAGA", "pageOrSection": "රාග සංසන්දන අධ්‍යයනය" }
+        "sourceReference": {
+          "sourceId": "SRC-UVPA-RAGA",
+          "pageOrSection": "රාග සංසන්දන අධ්‍යයනය"
+        }
       }
     ],
     "partB_Structured": [
       {
         "id": "al-sq-01",
         "type": "short-answer",
-        "gradeBands": ["12-13"],
+        "gradeBands": [
+          "12-13"
+        ],
         "difficulty": "උසස්",
         "strandId": "strand-swara-shruti",
         "prompt_si": "සප්ත ස්වරවලට ශ්‍රැති 22 බෙදී යන අනුපාතය (ස, රි, ග, ම, ප, ධ, නි පිළිවෙළින්) ලියන්න.",
-        "correctShortAnswer_si": ["4 3 2 4 4 3 2", "4, 3, 2, 4, 4, 3, 2", "4-3-2-4-4-3-2"],
+        "correctShortAnswer_si": [
+          "4 3 2 4 4 3 2",
+          "4, 3, 2, 4, 4, 3, 2",
+          "4-3-2-4-4-3-2"
+        ],
         "explanation_si": "ස-4, රි-3, ග-2, ම-4, ප-4, ධ-3, නි-2 ලෙස ශ්‍රැති 22 බෙදී යයි.",
         "markingPoints_si": [
           "ස(4), රි(3), ග(2), ම(4), ප(4), ධ(3), නි(2) නිවැරදිව දැක්වීමට ලකුණු 3"
         ],
-        "sourceReference": { "sourceId": "SRC-NIE-G1213-SYL", "pageOrSection": "ශ්‍රැති බෙදීම් වගුව" }
+        "sourceReference": {
+          "sourceId": "SRC-NIE-G1213-SYL",
+          "pageOrSection": "ශ්‍රැති බෙදීම් වගුව"
+        }
       }
     ],
-    "sourceReference": { "sourceId": "SRC-DOE-AL-EVAL", "pageOrSection": "උ.පෙළ මාදිලි ප්‍රශ්නාවලිය" },
+    "sourceReference": {
+      "sourceId": "SRC-DOE-OL-EVAL",
+      "pageOrSection": "උ.පෙළ මාදිලි ප්‍රශ්නාවලිය"
+    },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",

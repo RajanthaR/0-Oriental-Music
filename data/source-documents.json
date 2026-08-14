@@ -1,0 +1,435 @@
+[
+  {
+    "id": "DOC-CHILDREN_SONGS",
+    "slug": "children_songs",
+    "title": "ළමා ගීත",
+    "originalFilename": "ළමා ගීත.pdf",
+    "statedGrade": "6-11",
+    "pageCount": 17,
+    "extractionMethod": "No embedded text layer recovered; image-only source preserved as a reference",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 0,
+    "topicsDetected": [],
+    "reviewStatus": "Image Only / Gaps"
+  },
+  {
+    "id": "DOC-COMPUTER_MUSIC",
+    "slug": "computer_music",
+    "title": "computer music",
+    "originalFilename": "computer music.pdf",
+    "statedGrade": "6-11",
+    "pageCount": 39,
+    "extractionMethod": "Legacy Sinhala font mapping with UCSC improved mapping; page-level text extraction",
+    "legacyFontsDetected": true,
+    "sinhalaCharCount": 877,
+    "topicsDetected": [
+      "පරිගණක සංගීතය සහ තාක්ෂණය (Computer music & technology)"
+    ],
+    "reviewStatus": "Review Required"
+  },
+  {
+    "id": "DOC-GRADE_10_AGHATATHMAKA_AND_ANAGHATATHMAKA_PADI",
+    "slug": "grade_10_aghatathmaka_and_anaghatathmaka_padi",
+    "title": "rg_sg10_emus_u4_ආඝාතාත්මක හා අනාඝාතාත්මක පැදි_p1",
+    "originalFilename": "rg_sg10_emus_u4_ආඝාතාත්මක හා අනාඝාතාත්මක පැදි_p1.pdf",
+    "statedGrade": "10",
+    "pageCount": 1,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 275,
+    "topicsDetected": [],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-GRADE_10_FOLK_SONG_CLASSIFICATION",
+    "slug": "grade_10_folk_song_classification",
+    "title": "rg_sg10_emus_u4_ජන ගී වර්ගීකරණය_p1",
+    "originalFilename": "rg_sg10_emus_u4_ජන ගී වර්ගීකරණය_p1.pdf",
+    "statedGrade": "10",
+    "pageCount": 5,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 1876,
+    "topicsDetected": [
+      "ශ්‍රී ලාංකීය ජන ගී වර්ගීකරණය (Folk song classification)"
+    ],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-GRADE_10_MUSICAL_FUNDAMENTALS",
+    "slug": "grade_10_musical_fundamentals",
+    "title": "sg10_emus_chap1_mulikanga",
+    "originalFilename": "sg10_emus_chap1_mulikanga.pdf",
+    "statedGrade": "10",
+    "pageCount": 7,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 1691,
+    "topicsDetected": [
+      "සංගීතයේ මූලිකාංග සහ තාල (Fundamentals & Talas)"
+    ],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-GRADE_10_NADAYA",
+    "slug": "grade_10_nadaya",
+    "title": "sg10_emus_chap8_nadaya",
+    "originalFilename": "sg10_emus_chap8_nadaya.pdf",
+    "statedGrade": "10",
+    "pageCount": 12,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 3260,
+    "topicsDetected": [
+      "නාදය සහ ධ්වනි විද්‍යාව (Sound physics & acoustics)"
+    ],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-GRADE_10_NADAYA_SECTION_8_1_1",
+    "slug": "grade_10_nadaya_section_8_1_1",
+    "title": "sg10_emus_chap8.1.1_nadaya",
+    "originalFilename": "sg10_emus_chap8.1.1_nadaya.pdf",
+    "statedGrade": "10",
+    "pageCount": 11,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 3956,
+    "topicsDetected": [
+      "නාදය සහ ධ්වනි විද්‍යාව (Sound physics & acoustics)"
+    ],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-GRADE_10_WESTERN_MUSIC",
+    "slug": "grade_10_western_music",
+    "title": "estern music g10",
+    "originalFilename": "estern music g10.pdf",
+    "statedGrade": "10",
+    "pageCount": 114,
+    "extractionMethod": "Legacy Sinhala font mapping with UCSC improved mapping; page-level text extraction",
+    "legacyFontsDetected": true,
+    "sinhalaCharCount": 113520,
+    "topicsDetected": [
+      "බටහිර සංගීත සංකල්ප (Western music notation & comparisons)"
+    ],
+    "reviewStatus": "Review Required"
+  },
+  {
+    "id": "DOC-GRADE_11_MUSIC_TEXTBOOK",
+    "slug": "grade_11_music_textbook",
+    "title": "s11tim173",
+    "originalFilename": "s11tim173.pdf",
+    "statedGrade": "11",
+    "pageCount": 92,
+    "extractionMethod": "Legacy Sinhala font mapping with UCSC improved mapping; page-level text extraction",
+    "legacyFontsDetected": true,
+    "sinhalaCharCount": 82046,
+    "topicsDetected": [
+      "පෙළපොත් විෂය ඒකක (Textbook curriculum units)"
+    ],
+    "reviewStatus": "Review Required"
+  },
+  {
+    "id": "DOC-GRADE_11_RAGA_IDENTIFICATION",
+    "slug": "grade_11_raga_identification",
+    "title": "sg11_emus_ chap3_raga_handunaganimu",
+    "originalFilename": "sg11_emus_ chap3_raga_handunaganimu.pdf",
+    "statedGrade": "11",
+    "pageCount": 2,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 1923,
+    "topicsDetected": [
+      "රාග ශාස්ත්‍රය (Raga theory & identification)"
+    ],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-GRADE_6_MUSIC_TEACHER_GUIDE",
+    "slug": "grade_6_music_teacher_guide",
+    "title": "SG06_emus_tim",
+    "originalFilename": "SG06_emus_tim.pdf",
+    "statedGrade": "06",
+    "pageCount": 108,
+    "extractionMethod": "Legacy Sinhala font mapping with UCSC improved mapping; page-level text extraction",
+    "legacyFontsDetected": true,
+    "sinhalaCharCount": 103140,
+    "topicsDetected": [
+      "ගුරු මාර්ගෝපදේශ නිපුණතා (Teacher guide competencies & outcomes)"
+    ],
+    "reviewStatus": "Review Required"
+  },
+  {
+    "id": "DOC-GRADE_7_11_ORIENTAL_MUSIC_TEACHER_GUIDE",
+    "slug": "grade_7_11_oriental_music_teacher_guide",
+    "title": "Music sd",
+    "originalFilename": "Music sd.pdf",
+    "statedGrade": "7-11",
+    "pageCount": 15,
+    "extractionMethod": "Legacy Sinhala font mapping with UCSC improved mapping; page-level text extraction",
+    "legacyFontsDetected": true,
+    "sinhalaCharCount": 14615,
+    "topicsDetected": [
+      "ගුරු මාර්ගෝපදේශ නිපුණතා (Teacher guide competencies & outcomes)"
+    ],
+    "reviewStatus": "Review Required"
+  },
+  {
+    "id": "DOC-GRADE_7_MUSIC",
+    "slug": "grade_7_music",
+    "title": "g7 music",
+    "originalFilename": "g7 music.pdf",
+    "statedGrade": "7",
+    "pageCount": 161,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 0,
+    "topicsDetected": [],
+    "reviewStatus": "Image Only / Gaps"
+  },
+  {
+    "id": "DOC-GRADE_7_VIOLIN",
+    "slug": "grade_7_violin",
+    "title": "sg7_emus_chap2.1.2_violin",
+    "originalFilename": "sg7_emus_chap2.1.2_violin.pdf",
+    "statedGrade": "7",
+    "pageCount": 12,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 1061,
+    "topicsDetected": [
+      "වයලීන වාදනය සහ සුසර ක්‍රම (Violin technique & tunings)"
+    ],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-GRADE_8_MUSIC_ACTIVITY_1",
+    "slug": "grade_8_music_activity_1",
+    "title": "sg8_emu_activity1",
+    "originalFilename": "sg8_emu_activity1.pdf",
+    "statedGrade": "8",
+    "pageCount": 1,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 321,
+    "topicsDetected": [],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-GRADE_8_MUSIC_ACTIVITY_2",
+    "slug": "grade_8_music_activity_2",
+    "title": "sg8_emu_activity2",
+    "originalFilename": "sg8_emu_activity2.pdf",
+    "statedGrade": "8",
+    "pageCount": 2,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 451,
+    "topicsDetected": [],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-GRADE_8_MUSIC_ACTIVITY_3",
+    "slug": "grade_8_music_activity_3",
+    "title": "sg8_emu_activity3",
+    "originalFilename": "sg8_emu_activity3.pdf",
+    "statedGrade": "8",
+    "pageCount": 2,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 469,
+    "topicsDetected": [],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-GRADE_8_MUSIC_TEACHER_GUIDE",
+    "slug": "grade_8_music_teacher_guide",
+    "title": "Sg8_Tim_Wmusi",
+    "originalFilename": "Sg8_Tim_Wmusi.pdf",
+    "statedGrade": "8",
+    "pageCount": 123,
+    "extractionMethod": "Legacy Sinhala font mapping with UCSC improved mapping; page-level text extraction",
+    "legacyFontsDetected": true,
+    "sinhalaCharCount": 113799,
+    "topicsDetected": [
+      "ගුරු මාර්ගෝපදේශ නිපුණතා (Teacher guide competencies & outcomes)"
+    ],
+    "reviewStatus": "Review Required"
+  },
+  {
+    "id": "DOC-GRADE_9_KOLAM",
+    "slug": "grade_9_kolam",
+    "title": "sg9_emus__kolam",
+    "originalFilename": "sg9_emus__kolam.pdf",
+    "statedGrade": "9",
+    "pageCount": 5,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 1021,
+    "topicsDetected": [
+      "කෝලම් රංග සම්ප්‍රදාය (Kolam theatre tradition)"
+    ],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-GRADE_9_MUSIC_INSTRUMENTS",
+    "slug": "grade_9_music_instruments",
+    "title": "sg9_emus_music_instruments",
+    "originalFilename": "sg9_emus_music_instruments.pdf",
+    "statedGrade": "9",
+    "pageCount": 5,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 857,
+    "topicsDetected": [
+      "දේශීය සහ උත්තර භාරතීය වාද්‍ය භාණ්ඩ (Pancha Turya & Musical instruments)"
+    ],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-GRADE_9_ORIENTAL_MUSIC_TEACHER_GUIDE",
+    "slug": "grade_9_oriental_music_teacher_guide",
+    "title": "sGr09TG OrienMusic sd",
+    "originalFilename": "sGr09TG OrienMusic sd.pdf",
+    "statedGrade": "09",
+    "pageCount": 8,
+    "extractionMethod": "Legacy Sinhala font mapping with UCSC improved mapping; page-level text extraction",
+    "legacyFontsDetected": true,
+    "sinhalaCharCount": 1446,
+    "topicsDetected": [
+      "ගුරු මාර්ගෝපදේශ නිපුණතා (Teacher guide competencies & outcomes)"
+    ],
+    "reviewStatus": "Review Required"
+  },
+  {
+    "id": "DOC-GRADE_9_RAGA",
+    "slug": "grade_9_raga",
+    "title": "sg9_emus_raga",
+    "originalFilename": "sg9_emus_raga.pdf",
+    "statedGrade": "9",
+    "pageCount": 2,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 735,
+    "topicsDetected": [
+      "රාග ශාස්ත්‍රය (Raga theory & identification)"
+    ],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-GRADE_9_RICHMOND_MUSIC",
+    "slug": "grade_9_richmond_music",
+    "title": "Richmond_G9_Emusi",
+    "originalFilename": "Richmond_G9_Emusi.pdf",
+    "statedGrade": "9",
+    "pageCount": 5,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 2542,
+    "topicsDetected": [],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-MUSIC_TEACHER_GUIDE_PART_2",
+    "slug": "music_teacher_guide_part_2",
+    "title": "music sd_2",
+    "originalFilename": "music sd_2.pdf",
+    "statedGrade": "6-11",
+    "pageCount": 7,
+    "extractionMethod": "Legacy Sinhala font mapping with UCSC improved mapping; page-level text extraction",
+    "legacyFontsDetected": true,
+    "sinhalaCharCount": 3517,
+    "topicsDetected": [
+      "ගුරු මාර්ගෝපදේශ නිපුණතා (Teacher guide competencies & outcomes)"
+    ],
+    "reviewStatus": "Review Required"
+  },
+  {
+    "id": "DOC-ORIENTAL_MUSIC_2018",
+    "slug": "oriental_music_2018",
+    "title": "පෙරදිග-සංගීතය-2018",
+    "originalFilename": "පෙරදිග-සංගීතය-2018.pdf",
+    "statedGrade": "6-11",
+    "pageCount": 145,
+    "extractionMethod": "Legacy Sinhala font mapping with UCSC improved mapping; page-level text extraction",
+    "legacyFontsDetected": true,
+    "sinhalaCharCount": 18997,
+    "topicsDetected": [],
+    "reviewStatus": "Review Required"
+  },
+  {
+    "id": "DOC-SWARA_ESTABLISHMENT_SONGS",
+    "slug": "swara_establishment_songs",
+    "title": "ස්වර ස්ථාපන ගීත",
+    "originalFilename": "ස්වර ස්ථාපන ගීත.pdf",
+    "statedGrade": "6-11",
+    "pageCount": 34,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 1189,
+    "topicsDetected": [
+      "ස්වර ස්ථාපන ගීත (Swara establishment songs)"
+    ],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-SWARA_KEYBOARD_INSTRUMENTS",
+    "slug": "swara_keyboard_instruments",
+    "title": "ස්වර පුවරු සංගීත භාණ්ඩ",
+    "originalFilename": "ස්වර පුවරු සංගීත භාණ්ඩ.pdf",
+    "statedGrade": "6-11",
+    "pageCount": 30,
+    "extractionMethod": "pdftotext -layout native text extraction; page-level output",
+    "legacyFontsDetected": false,
+    "sinhalaCharCount": 413,
+    "topicsDetected": [
+      "දේශීය සහ උත්තර භාරතීය වාද්‍ය භාණ්ඩ (Pancha Turya & Musical instruments)",
+      "ස්වර පුවරු සංගීත භාණ්ඩ (Swara keyboard instruments)"
+    ],
+    "reviewStatus": "Source Triaged"
+  },
+  {
+    "id": "DOC-SYMPHONY",
+    "slug": "symphony",
+    "title": "සංධ්වනි",
+    "originalFilename": "සංධ්වනි.pdf",
+    "statedGrade": "6-11",
+    "pageCount": 29,
+    "extractionMethod": "Legacy Sinhala font mapping with UCSC improved mapping; page-level text extraction",
+    "legacyFontsDetected": true,
+    "sinhalaCharCount": 1777,
+    "topicsDetected": [],
+    "reviewStatus": "Review Required"
+  },
+  {
+    "id": "DOC-TABLA",
+    "slug": "tabla",
+    "title": "තබ්ලාව",
+    "originalFilename": "තබ්ලාව.pdf",
+    "statedGrade": "6-11",
+    "pageCount": 23,
+    "extractionMethod": "Legacy Sinhala font mapping with UCSC improved mapping; page-level text extraction",
+    "legacyFontsDetected": true,
+    "sinhalaCharCount": 2805,
+    "topicsDetected": [
+      "තබ්ලා වාද්‍ය ශිල්පය (Tabla technique & thekas)"
+    ],
+    "reviewStatus": "Review Required"
+  },
+  {
+    "id": "DOC-WESTERN_MUSIC_SYLLABUS",
+    "slug": "western_music_syllabus",
+    "title": "estern music syl",
+    "originalFilename": "estern music syl.pdf",
+    "statedGrade": "6-11",
+    "pageCount": 6,
+    "extractionMethod": "Legacy Sinhala font mapping with UCSC improved mapping; page-level text extraction",
+    "legacyFontsDetected": true,
+    "sinhalaCharCount": 5555,
+    "topicsDetected": [
+      "බටහිර සංගීත සංකල්ප (Western music notation & comparisons)"
+    ],
+    "reviewStatus": "Review Required"
+  }
+]

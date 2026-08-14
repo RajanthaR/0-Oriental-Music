@@ -2,8 +2,11 @@
   {
     "id": "SRC-NIE-G06-TG",
     "title": "පෙරදිග සංගීතය ගුරු මාර්ගෝපදේශය 6 ශ්‍රේණිය",
+    "originalFilename": "SG06_emus_tim.pdf",
     "publisher": "ජාතික අධ්‍යාපන ආයතනය (NIE Sri Lanka)",
-    "grades": ["6"],
+    "grades": [
+      "6"
+    ],
     "year": 2015,
     "language": "si",
     "tier": "Tier 1 - Canonical School Source",
@@ -15,8 +18,11 @@
   {
     "id": "SRC-NIE-G07-TG",
     "title": "පෙරදිග සංගීතය ගුරු මාර්ගෝපදේශය 7 ශ්‍රේණිය",
+    "originalFilename": "Music sd.pdf",
     "publisher": "ජාතික අධ්‍යාපන ආයතනය (NIE Sri Lanka)",
-    "grades": ["7"],
+    "grades": [
+      "7"
+    ],
     "year": 2016,
     "language": "si",
     "tier": "Tier 1 - Canonical School Source",
@@ -28,8 +34,11 @@
   {
     "id": "SRC-NIE-G08-TG",
     "title": "පෙරදිග සංගීතය ගුරු මාර්ගෝපදේශය 8 ශ්‍රේණිය",
+    "originalFilename": "Sg8_Tim_Wmusi.pdf",
     "publisher": "ජාතික අධ්‍යාපන ආයතනය (NIE Sri Lanka)",
-    "grades": ["8"],
+    "grades": [
+      "8"
+    ],
     "year": 2017,
     "language": "si",
     "tier": "Tier 1 - Canonical School Source",
@@ -41,22 +50,12 @@
   {
     "id": "SRC-NIE-G09-TG",
     "title": "පෙරදිග සංගීතය ගුරු මාර්ගෝපදේශය 9 ශ්‍රේණිය",
+    "originalFilename": "sGr09TG OrienMusic sd.pdf",
     "publisher": "ජාතික අධ්‍යාපන ආයතනය (NIE Sri Lanka)",
-    "grades": ["9"],
+    "grades": [
+      "9"
+    ],
     "year": 2018,
-    "language": "si",
-    "tier": "Tier 1 - Canonical School Source",
-    "location": "Maharagama, Sri Lanka",
-    "status": "Verified",
-    "license": "Educational Reference / NIE Copyright Preserved",
-    "url": "http://www.nie.lk"
-  },
-  {
-    "id": "SRC-NIE-G1011-SYL",
-    "title": "පෙරදිග සංගීතය විෂය නිර්දේශය (10-11 ශ්‍රේණි)",
-    "publisher": "ජාතික අධ්‍යාපන ආයතනය (NIE Sri Lanka)",
-    "grades": ["10", "11"],
-    "year": 2015,
     "language": "si",
     "tier": "Tier 1 - Canonical School Source",
     "location": "Maharagama, Sri Lanka",
@@ -67,22 +66,13 @@
   {
     "id": "SRC-NIE-G1011-TG",
     "title": "පෙරදිග සංගීතය ගුරු මාර්ගෝපදේශය (10-11 ශ්‍රේණි)",
+    "originalFilename": "Music sd.pdf",
     "publisher": "ජාතික අධ්‍යාපන ආයතනය (NIE Sri Lanka)",
-    "grades": ["10", "11"],
+    "grades": [
+      "10",
+      "11"
+    ],
     "year": 2016,
-    "language": "si",
-    "tier": "Tier 1 - Canonical School Source",
-    "location": "Maharagama, Sri Lanka",
-    "status": "Verified",
-    "license": "Educational Reference / NIE Copyright Preserved",
-    "url": "http://www.nie.lk"
-  },
-  {
-    "id": "SRC-NIE-G1213-SYL",
-    "title": "පෙරදිග සංගීතය විෂය නිර්දේශය (12-13 ශ්‍රේණි)",
-    "publisher": "ජාතික අධ්‍යාපන ආයතනය (NIE Sri Lanka)",
-    "grades": ["12", "13"],
-    "year": 2017,
     "language": "si",
     "tier": "Tier 1 - Canonical School Source",
     "location": "Maharagama, Sri Lanka",
@@ -93,8 +83,11 @@
   {
     "id": "SRC-EPD-TB-G10",
     "title": "පෙරදිග සංගීතය 10 ශ්‍රේණිය පෙළපොත",
+    "originalFilename": "sg10_emus_chap1_mulikanga.pdf",
     "publisher": "අධ්‍යාපන ප්‍රකාශන දෙපාර්තමේන්තුව",
-    "grades": ["10"],
+    "grades": [
+      "10"
+    ],
     "year": 2019,
     "language": "si",
     "tier": "Tier 1 - Canonical School Source",
@@ -106,8 +99,11 @@
   {
     "id": "SRC-EPD-TB-G11",
     "title": "පෙරදිග සංගීතය 11 ශ්‍රේණිය පෙළපොත",
+    "originalFilename": "s11tim173.pdf",
     "publisher": "අධ්‍යාපන ප්‍රකාශන දෙපාර්තමේන්තුව",
-    "grades": ["11"],
+    "grades": [
+      "11"
+    ],
     "year": 2020,
     "language": "si",
     "tier": "Tier 1 - Canonical School Source",
@@ -117,10 +113,199 @@
     "url": "http://www.edupub.gov.lk"
   },
   {
+    "id": "SRC-G10-NADA",
+    "title": "නාදය සහ ධ්වනි විද්‍යාව (10 ශ්‍රේණිය ඒකක 8)",
+    "originalFilename": "sg10_emus_chap8_nadaya.pdf",
+    "publisher": "අධ්‍යාපන අමාත්‍යාංශය / කලාප අධ්‍යාපන කාර්යාලය හෝමාගම",
+    "grades": [
+      "10"
+    ],
+    "year": 2020,
+    "language": "si",
+    "tier": "Tier 1 - Canonical School Source",
+    "location": "Homagama, Sri Lanka",
+    "status": "Verified",
+    "license": "Educational Learning Module",
+    "url": "http://www.e-thaksalawa.moe.gov.lk"
+  },
+  {
+    "id": "SRC-G10-FOLK",
+    "title": "ජන ගී වර්ගීකරණය (10 ශ්‍රේණිය ඒකක 4)",
+    "originalFilename": "rg_sg10_emus_u4_ජන ගී වර්ගීකරණය_p1.pdf",
+    "publisher": "රුහුණු ගුරු ගෙදර / දකුණු පළාත් අධ්‍යාපන දෙපාර්තමේන්තුව",
+    "grades": [
+      "10"
+    ],
+    "year": 2020,
+    "language": "si",
+    "tier": "Tier 1 - Canonical School Source",
+    "location": "Galle, Sri Lanka",
+    "status": "Verified",
+    "license": "Educational Open Access",
+    "url": "http://www.e-thaksalawa.moe.gov.lk"
+  },
+  {
+    "id": "SRC-G11-RAGA-ID",
+    "title": "රාග හඳුනාගනිමු (11 ශ්‍රේණිය ඒකක 3)",
+    "originalFilename": "sg11_emus_ chap3_raga_handunaganimu.pdf",
+    "publisher": "හෝමාගම අධ්‍යාපන කලාපය",
+    "grades": [
+      "11"
+    ],
+    "year": 2020,
+    "language": "si",
+    "tier": "Tier 1 - Canonical School Source",
+    "location": "Homagama, Sri Lanka",
+    "status": "Verified",
+    "license": "Educational Open Access",
+    "url": "http://www.nie.lk"
+  },
+  {
+    "id": "SRC-G09-KOLAM",
+    "title": "කෝලම් රංග සම්ප්‍රදාය (9 ශ්‍රේණිය)",
+    "originalFilename": "sg9_emus__kolam.pdf",
+    "publisher": "හෝමාගම අධ්‍යාපන කලාපය",
+    "grades": [
+      "9"
+    ],
+    "year": 2020,
+    "language": "si",
+    "tier": "Tier 1 - Canonical School Source",
+    "location": "Homagama, Sri Lanka",
+    "status": "Verified",
+    "license": "Educational Open Access",
+    "url": "http://www.e-thaksalawa.moe.gov.lk"
+  },
+  {
+    "id": "SRC-G09-INST",
+    "title": "දේශීය සංගීත භාණ්ඩ වර්ගීකරණය (9 ශ්‍රේණිය)",
+    "originalFilename": "sg9_emus_music_instruments.pdf",
+    "publisher": "හෝමාගම අධ්‍යාපන කලාපය",
+    "grades": [
+      "9"
+    ],
+    "year": 2020,
+    "language": "si",
+    "tier": "Tier 1 - Canonical School Source",
+    "location": "Homagama, Sri Lanka",
+    "status": "Verified",
+    "license": "Educational Open Access",
+    "url": "http://www.e-thaksalawa.moe.gov.lk"
+  },
+  {
+    "id": "SRC-G09-RAGA",
+    "title": "9 ශ්‍රේණිය රාග (භිම්පලාසි හා යමන්)",
+    "originalFilename": "sg9_emus_raga.pdf",
+    "publisher": "හෝමාගම අධ්‍යාපන කලාපය",
+    "grades": [
+      "9"
+    ],
+    "year": 2020,
+    "language": "si",
+    "tier": "Tier 1 - Canonical School Source",
+    "location": "Homagama, Sri Lanka",
+    "status": "Verified",
+    "license": "Educational Open Access",
+    "url": "http://www.e-thaksalawa.moe.gov.lk"
+  },
+  {
+    "id": "SRC-G07-VIOLIN",
+    "title": "වයලීනයේ ස්වභාවය සහ වාදනය (7 ශ්‍රේණිය)",
+    "originalFilename": "sg7_emus_chap2.1.2_violin.pdf",
+    "publisher": "පිළියන්දල අධ්‍යාපන කලාපය",
+    "grades": [
+      "7"
+    ],
+    "year": 2020,
+    "language": "si",
+    "tier": "Tier 1 - Canonical School Source",
+    "location": "Piliyandala, Sri Lanka",
+    "status": "Verified",
+    "license": "Educational Open Access",
+    "url": "http://www.e-thaksalawa.moe.gov.lk"
+  },
+  {
+    "id": "SRC-TABLA-MANUAL",
+    "title": "තබ්ලාව පිළිබඳව හැඳින ගනිමු",
+    "originalFilename": "තබ්ලාව.pdf",
+    "publisher": "පාසල් පෙරදිග සංගීත ගුරු සම්පත් මණ්ඩලය",
+    "grades": [
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "year": 2019,
+    "language": "si",
+    "tier": "Tier 1 - Canonical School Source",
+    "location": "Colombo, Sri Lanka",
+    "status": "Verified",
+    "license": "Educational Open Access",
+    "url": "http://www.e-thaksalawa.moe.gov.lk"
+  },
+  {
+    "id": "SRC-SWARA-STHAPANA",
+    "title": "ශුද්ධ ස්වර ස්ථාපන ගීත සංග්‍රහය",
+    "originalFilename": "ස්වර ස්ථාපන ගීත.pdf",
+    "publisher": "සෞන්දර්ය අධ්‍යාපන දෙපාර්තමේන්තුව - NIE",
+    "grades": [
+      "6",
+      "7",
+      "8"
+    ],
+    "year": 2018,
+    "language": "si",
+    "tier": "Tier 1 - Canonical School Source",
+    "location": "Maharagama, Sri Lanka",
+    "status": "Verified",
+    "license": "Educational Reference / NIE",
+    "url": "http://www.nie.lk"
+  },
+  {
+    "id": "SRC-COMP-MUSIC",
+    "title": "පරිගණකය ඇසුරින් සංගීත නිර්මාණය",
+    "originalFilename": "computer music.pdf",
+    "publisher": "පාසල් පෙරදිග සංගීත තාක්ෂණ ඒකකය",
+    "grades": [
+      "10",
+      "11"
+    ],
+    "year": 2020,
+    "language": "si",
+    "tier": "Tier 1 - Canonical School Source",
+    "location": "Colombo, Sri Lanka",
+    "status": "Verified",
+    "license": "Educational Open Access",
+    "url": "http://www.e-thaksalawa.moe.gov.lk"
+  },
+  {
+    "id": "SRC-SWARA-KEYBOARDS",
+    "title": "ස්වර පුවරු සංගීත භාණ්ඩ",
+    "originalFilename": "ස්වර පුවරු සංගීත භාණ්ඩ.pdf",
+    "publisher": "පාසල් වාද්‍ය භාණ්ඩ උපදේශක මණ්ඩලය",
+    "grades": [
+      "6",
+      "7",
+      "8"
+    ],
+    "year": 2019,
+    "language": "si",
+    "tier": "Tier 1 - Canonical School Source",
+    "location": "Colombo, Sri Lanka",
+    "status": "Verified",
+    "license": "Educational Open Access",
+    "url": "http://www.nie.lk"
+  },
+  {
     "id": "SRC-DOE-OL-EVAL",
     "title": "අ.පො.ස. (සා.පෙළ) ඇගයීම් වාර්තාව - පෙරදිග සංගීතය",
+    "originalFilename": "DOE_OL_Evaluation_Report.pdf",
     "publisher": "ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තුව",
-    "grades": ["10", "11"],
+    "grades": [
+      "10",
+      "11"
+    ],
     "year": 2023,
     "language": "si",
     "tier": "Tier 1 - Canonical School Source",
@@ -128,38 +313,16 @@
     "status": "Verified",
     "license": "Educational Assessment Reference",
     "url": "http://www.doenets.lk"
-  },
-  {
-    "id": "SRC-DOE-AL-EVAL",
-    "title": "අ.පො.ස. (උ.පෙළ) ඇගයීම් වාර්තාව - පෙරදිග සංගීතය",
-    "publisher": "ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තුව",
-    "grades": ["12", "13"],
-    "year": 2023,
-    "language": "si",
-    "tier": "Tier 1 - Canonical School Source",
-    "location": "Pelawatta, Battaramulla, Sri Lanka",
-    "status": "Verified",
-    "license": "Educational Assessment Reference",
-    "url": "http://www.doenets.lk"
-  },
-  {
-    "id": "SRC-ETHAK-OM",
-    "title": "ඊ-තක්ෂලාව පෙරදිග සංගීතය විද්‍යුත් ඉගෙනුම් ඒකක",
-    "publisher": "අධ්‍යාපන අමාත්‍යාංශය (Ministry of Education)",
-    "grades": ["6", "7", "8", "9", "10", "11"],
-    "year": 2022,
-    "language": "si",
-    "tier": "Tier 1 - Canonical School Source",
-    "location": "Battaramulla, Sri Lanka",
-    "status": "Verified",
-    "license": "Open Educational Portal",
-    "url": "http://www.e-thaksalawa.moe.gov.lk"
   },
   {
     "id": "SRC-UVPA-FOLK",
     "title": "ශ්‍රී ලාංකීය ගැමි නාද රටා හා වාද්‍ය සම්ප්‍රදාය",
+    "originalFilename": "UVPA_Folk_Musicology.pdf",
     "publisher": "සෞන්දර්ය කලා විශ්වවිද්‍යාලය (UVPA)",
-    "grades": ["10", "11", "12", "13"],
+    "grades": [
+      "10",
+      "11"
+    ],
     "year": 2018,
     "language": "si",
     "tier": "Tier 2 - Academic Heritage Source",
@@ -171,8 +334,12 @@
   {
     "id": "SRC-UVPA-RAGA",
     "title": "උත්තර භාරතීය රාග සංගීත විමර්ශනය",
+    "originalFilename": "UVPA_North_Indian_Raga.pdf",
     "publisher": "සෞන්දර්ය කලා විශ්වවිද්‍යාලය (UVPA)",
-    "grades": ["10", "11", "12", "13"],
+    "grades": [
+      "10",
+      "11"
+    ],
     "year": 2019,
     "language": "si",
     "tier": "Tier 2 - Academic Heritage Source",

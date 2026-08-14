@@ -96,7 +96,7 @@ export default function ExamPaperTakePage() {
         <div className="space-y-6">
           <div className="bg-amber-50/70 p-4 rounded-2xl border border-accent/40 text-xs text-amber-950">
             <span className="font-bold block mb-1">මාදිලි පිළිතුරු සහ ලකුණු දීමේ පටිපාටිය:</span>
-            පහත ව්‍යුහගත ප්‍රශ්නවලට ඔබේ පිළිතුරු සිතා බලා, 'ලකුණු දීමේ පටිපාටිය' මත ක්ලික් කර නිවැරදි කරුණු පරික්ෂා කරගන්න.
+            පහත ව්‍යුහගත ප්‍රශ්නවලට ඔබේ පිළිතුරු සිතා බලා, &apos;ලකුණු දීමේ පටිපාටිය&apos; මත ක්ලික් කර නිවැරදි කරුණු පරික්ෂා කරගන්න.
           </div>
 
           {paper.partB_Structured.map((q, idx) => (

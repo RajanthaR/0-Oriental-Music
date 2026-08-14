@@ -1,96 +1,300 @@
 [
   {
-    "id": "inst-sitar",
-    "name_si": "සිතාරය",
-    "name_en": "Sitar",
-    "category_si": "තත් භාණ්ඩ (Chordophone)",
-    "origin_si": "උත්තර භාරතීය",
-    "construction_si": "වියළන ලද ලබු ගෙඩියකින් (තුම්බා) සහ තේක්ක හෝ තුන් ලීයෙන් කළ දිගටි දණ්ඩකින් සමන්විතය. චලනය කළ හැකි වක්‍ර පිත්තල පර්දා (Frets) 17-20 ක් සහ තත් 18-20 ක් පමණ අඩංගුය.",
-    "soundProduction_si": "දකුණු අතේ දබරැඟිල්ලට පළඳින ලෝහ මිස්රාබය (Mizrab) මඟින් තත් පීඩනය කරමින් හා වාමඟිලි පර්දා මත ලිස්සවමින් නාදය උපදවයි. තාරෆ් (අනුනාදක) තත් මඟින් ගැඹුරු අනුනාදයක් ලැබේ.",
-    "playingPosition_si": "බිම එරමිණියා ගොතා වාඩි වී වම් පාදයේ විලුඹ මත තුම්බාව රඳවා, දකුණු අතින් දණ්ඩ ආනතව අල්ලා වාදනය කෙරේ.",
-    "musicalRole_si": "උත්තර භාරතීය ශාස්ත්‍රීය සංගීතයේ ප්‍රමුඛතම ඒකල (Solo) වාද්‍ය භාණ්ඩයකි. රාග ආලාප්, ජෝඩ්, ඣාලා සහ ගත වාදනය සඳහා යොදාගැනේ.",
-    "tuningAndSwaras_si": "ප්‍රධාන වාදන තන්තුව මන්ද්‍ර මධ්‍යම (ම̣) හෝ ෂඩ්ජ (ස̣) ස්වරයට සුසර කෙරේ.",
-    "maintenanceAndSafety_si": "තෙතමනයෙන් හා අධික උෂ්ණත්වයෙන් ආරක්ෂා කළ යුතුය. පර්දා බැඳ ඇති සේද නූල් කැඩී යා නොදී පරිස්සම් කළ යුතුය.",
-    "gradeBands": ["8-9", "10-11", "12-13"],
-    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 76 (තත් භාණ්ඩ පරිච්ඡේදය)" },
+    "id": "inst-gatabera",
+    "name_si": "ගැටබෙරය (උඩරට බෙරය)",
+    "name_en": "Geta Beraya (Kandyan Drum)",
+    "category_si": "අවනද්ධ භාණ්ඩ (Membranophone)",
+    "origin_si": "දේශීය / ශ්‍රී ලාංකීය",
+    "construction_si": "ඇහැළ, කොහොඹ හෝ මිල්ල ලීයෙන් කුහරය හාරා, මැද මහත දෙකෙළවර සිහින් බඳකින් යුක්තව සාදනු ලැබේ. වම් ඇසට ගව හම (ගොන් හම) ද, දකුණු ඇසට වඳුරු හෝ තලගොයි හම ද යොදයි. වරපටින් තද කර සුසර කෙරේ.",
+    "soundProduction_si": "දෙකෙළවර අත්ලෙන් සහ ඇඟිලිවලින් පහර දීමෙන් නාදය උපදවයි (පංචතූර්යයේ ආතත/විතතාතත මූලධර්මය).",
+    "playingPosition_si": "ඉණෙහි බැඳ සිටගෙන හෝ හිඳගෙන දෙඅත් නිදහසේ චලනය කරමින් වාදනය කරයි.",
+    "musicalRole_si": "උඩරට නර්තනය, පෙරහැර මංගල්‍යයන්, ආගමික උත්සව සහ වන්නම් ගායනා සඳහා ප්‍රමුඛතම තාල වාද්‍ය භාණ්ඩය වේ.",
+    "tuningAndSwaras_si": "දකුණු ඇස ඉහළ තාරතාවයකින්ද (තෙයි, ජිත්), වම් ඇස මන්ද්‍ර ගැඹුරු නාදයකින්ද (ගජ්, දොං) නාද වන සේ සුසර කරයි.",
+    "maintenanceAndSafety_si": "තෙතමනයෙන් ආරක්ෂා කළ යුතු අතර වාදනයට පෙර හිරු එළියෙන් හෝ රස්නයෙන් ඇස් පදම් කර ගනී.",
+    "imageUrl": "/images/instruments/gatabera.svg",
+    "sampleAudioPattern": [
+      "Dha",
+      "Dhin",
+      "Ta",
+      "Ge"
+    ],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 58; sg9_emus_music_instruments.pdf පිටුව 5"
+    },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
-      "changeNotes": "සිතාරයේ ව්‍යුහය, මිස්රාබය හා තාරෆ් තත් ලක්ෂණ සනාථ විය.",
+      "reviewDate": "2026-08-15",
+      "lastVerifiedDate": "2026-08-15",
+      "changeNotes": "පංචතූර්ය භාණ්ඩ 14 වර්ගීකරණයට අනුව තහවුරු විය.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "inst-yakbera",
+    "name_si": "පහතරට බෙරය (යක් බෙරය / රුහුණු බෙරය)",
+    "name_en": "Yak Beraya (Low Country Drum)",
+    "category_si": "අවනද්ධ භාණ්ඩ (Membranophone)",
+    "origin_si": "දේශීය / ශ්‍රී ලාංකීය",
+    "construction_si": "රුක්අත්තන හෝ පොල් ලීයෙන් සාදන ඒකාකාර සිලින්ඩරාකාර දිගටි බඳකින් යුක්තය. ඇස් දෙකටම ගව උදර හම් (බඩවැල් පටල හෝ තුනී හම්) යොදයි.",
+    "soundProduction_si": "දෙකෙළවර අත්ලෙන් පහර දී ගැඹුරු ඝෝෂාකාරී රිද්ම නාදයක් උපදවයි.",
+    "playingPosition_si": "ඉණෙහි බැඳ පහතරට නැටුම් ශිල්පියා සමඟ කරණම් ගසමින් හා රිද්මයානුකූලව පාද චලනය කරමින් වාදනය කරයි.",
+    "musicalRole_si": "පහතරට ශාන්තිකර්ම (ගම්මඩු, දෙවොල් මඩු, තොවිල්), කෝලම් නාට්‍ය සහ පහතරට නර්තනය සඳහා අත්‍යවශ්‍ය වේ.",
+    "tuningAndSwaras_si": "දිගු වරපට ඇදීමෙන් තාරතාව සකසයි; 'තෙයි', 'තොං', 'නං' ආදී අක්ෂර ජනනය වේ.",
+    "maintenanceAndSafety_si": "තුනී හම් භාවිත වන බැවින් තෙතමනයෙන් හා අධික පීඩනයෙන් ආරක්ෂා කළ යුතුය.",
+    "imageUrl": "/images/instruments/yakbera.svg",
+    "sampleAudioPattern": [
+      "Dha",
+      "Ta",
+      "Ge",
+      "Na"
+    ],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 5; sg9_emus__kolam.pdf"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-15",
+      "lastVerifiedDate": "2026-08-15",
+      "changeNotes": "කෝලම් හා පහතරට ශාන්තිකර්ම භාවිතය තහවුරු විය.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "inst-daula",
+    "name_si": "දවුල",
+    "name_en": "Daula (Sabaragamuwa Drum)",
+    "category_si": "අවනද්ධ භාණ්ඩ (Membranophone)",
+    "origin_si": "දේශීය / ශ්‍රී ලාංකීය",
+    "construction_si": "කඳ කෙටි මහත සිලින්ඩරාකාර ලී කඳකින් යුක්තය. පිත්තල හෝ රිදී පටිවලින් අලංකාර කර ඇත. එක් ඇසක් අතින්ද අනෙක් ඇස කඩිප්පුවකින්ද (වක් වූ කෝටුව) වාදනය කෙරේ.",
+    "soundProduction_si": "පංචතූර්ය වර්ගීකරණයට අනුව 'විතතාතත' (අත සහ කඩිප්පුව) ආකාරයෙන් නාදය උපදවයි.",
+    "playingPosition_si": "ඉණෙහි බැඳගෙන හේවිසි පූජාවලදී සහ සබරගමු නර්තනයේදී වාදනය කරයි.",
+    "musicalRole_si": "සබරගමු නැටුම්, බෞද්ධ විහාරස්ථානවල හේවිසි සහ තේවාවන් සඳහා ප්‍රධාන වේ.",
+    "tuningAndSwaras_si": "කඩිප්පු ඇස තියුණු නාදයක්ද අත් ඇස ගැඹුරු නාදයක්ද උපදවයි.",
+    "maintenanceAndSafety_si": "කඩිප්පුවේ කෙළවර මෘදු ලෙදර් හෝ නූල් ඔතා හම ආරක්ෂා කරගත යුතුය.",
+    "imageUrl": "/images/instruments/daula.svg",
+    "sampleAudioPattern": [
+      "Dha",
+      "Dhin",
+      "Ta"
+    ],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G09-TG",
+      "pageOrSection": "sg9_emus_music_instruments.pdf පිටු 4-5"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-15",
+      "lastVerifiedDate": "2026-08-15",
+      "changeNotes": "විතතාතත කාණ්ඩයේ නිල වර්ගීකරණය තහවුරු විය.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "inst-thammattama",
+    "name_si": "තම්මැට්ටම (පොකුරු බෙරය)",
+    "name_en": "Thammattama (Twin Kettle Drum)",
+    "category_si": "අවනද්ධ භාණ්ඩ (Membranophone)",
+    "origin_si": "දේශීය / ශ්‍රී ලාංකීය",
+    "construction_si": "එකිනෙකට යා කළ කුඩා අර්ධ ගෝලාකාර ලී බඳුන් දෙකකි. එක් බඳුනකට වඩා අනෙක මඳක් විශාලය. ගව හම් ඇටවා ඇත.",
+    "soundProduction_si": "කඩිප්පු දෙකකින් (කොහොඹ හෝ වේවැල් කෝටු) පහර දීමෙන් පමණක් නාදය උපදවන බැවින් 'විතත' කාණ්ඩයට අයත් වේ.",
+    "playingPosition_si": "ඉණෙහි බැඳගෙන සිටගෙන කඩිප්පු දෙක දෙඅතින් ගෙන වේගයෙන් වාදනය කරයි.",
+    "musicalRole_si": "හේවිසි වාදනයේදී ප්‍රධාන රිද්ම ඛණ්ඩ හා මුර පද වැයීම සඳහා යොදා ගනී.",
+    "tuningAndSwaras_si": "කුඩා ඇස (මන්දම) තීව්‍ර නාදයක්ද, විශාල ඇස ගැඹුරු නාදයක්ද නිකුත් කරයි.",
+    "maintenanceAndSafety_si": "කඩිප්පු පහර අධික නොවන පරිදි පාලනය කර වාදනය කළ යුතුය.",
+    "imageUrl": "/images/instruments/thammattama.svg",
+    "sampleAudioPattern": [
+      "Ta",
+      "Ki",
+      "Ta"
+    ],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G09-TG",
+      "pageOrSection": "sg9_emus_music_instruments.pdf පිටු 4-5"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-15",
+      "lastVerifiedDate": "2026-08-15",
+      "changeNotes": "විතත කාණ්ඩය තහවුරු විය.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "inst-bummadiya",
+    "name_si": "බුම්මැඩිය (කලගෙඩි බෙරය)",
+    "name_en": "Bummadiya (Clay Pot Drum)",
+    "category_si": "අවනද්ධ භාණ්ඩ (Membranophone)",
+    "origin_si": "දේශීය / ශ්‍රී ලාංකීය",
+    "construction_si": "මැටියෙන් පුළුස්සා සකස් කළ කලයක හැඩැති බඳෙහි කටට තලගොයි හෝ කබරගොයි හමක් අලවා සාදනු ලැබේ.",
+    "soundProduction_si": "අතින් පමණක් තට්ටු කරමින් වාදනය කරන බැවින් 'ආතත' භාණ්ඩයකි. අතින් කට වැසීමෙන් හා විවෘත කිරීමෙන් ගුම් නාදය පාලනය කරයි.",
+    "playingPosition_si": "අතින් හෝ කරේ එල්ලාගෙන ගොයම් කෙතේදී ගොවියන් එක්ව වට වී වාදනය කරයි.",
+    "musicalRole_si": "ගොයම් කැපීම, පැල් රැකීම හා කළගෙඩි නැටුම් ආශ්‍රිත ජන ගායනා සඳහා සහායක රිද්මය සපයයි.",
+    "tuningAndSwaras_si": "මඳක් රත් කිරීමෙන් හමේ තාරතාව ඉහළ නැංවිය හැක.",
+    "maintenanceAndSafety_si": "මැටි බඳුනක් බැවින් බිඳී යාමෙන් ආරක්ෂා කරගත යුතුය.",
+    "imageUrl": "/images/instruments/bummadiya.svg",
+    "sampleAudioPattern": [
+      "Bum",
+      "Bum",
+      "Ta"
+    ],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G09-TG",
+      "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 5"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-15",
+      "lastVerifiedDate": "2026-08-15",
+      "changeNotes": "කෙත හා බැඳි ආතත භාණ්ඩය තහවුරු විය.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "inst-thalampata",
+    "name_si": "තාලම්පට (කයිතාලම)",
+    "name_en": "Thalampata (Traditional Cymbals)",
+    "category_si": "ඝන භාණ්ඩ (Idiophone)",
+    "origin_si": "දේශීය / ශ්‍රී ලාංකීය",
+    "construction_si": "ලෝකඩ, පිත්තල හෝ ලෝහ මිශ්‍රණයකින් සාදන කුඩා ඝන තැටි යුගලයකි. නූලකින් එකිනෙක සම්බන්ධ කර ඇත.",
+    "soundProduction_si": "තැටි දෙක එකිනෙක ගැටීමෙන් තියුණු ස්ථාවර රිද්ම නාදයක් උපදවයි (ඝන භාණ්ඩ).",
+    "playingPosition_si": "දෙඅතැඟිලිවල රඳවාගෙන තාලයට අනුව සියුම්ව ගැටීම සිදු කරයි.",
+    "musicalRole_si": "නාඩගම් ගීත, උඩරට වන්නම්, තේවා හා ශාන්තිකර්මවල තාලය නොකඩවා පවත්වා ගැනීමට යොදා ගනී.",
+    "tuningAndSwaras_si": "ලෝහයේ ඝනකම අනුව ස්ථාවර තාරතාවක් ඇත.",
+    "maintenanceAndSafety_si": "ලෝහ මලකඩ නොබැඳෙන පරිදි පිරිසිදුව තබාගත යුතුය.",
+    "imageUrl": "/images/instruments/thalampata.svg",
+    "sampleAudioPattern": [
+      "Tin",
+      "Tin"
+    ],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G09-TG",
+      "pageOrSection": "sg9_emus_music_instruments.pdf පිටු 4-5"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-15",
+      "lastVerifiedDate": "2026-08-15",
+      "changeNotes": "ඝන භාණ්ඩ වර්ගීකරණය තහවුරු විය.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "inst-horanawa",
+    "name_si": "හොරණෑව",
+    "name_en": "Horanawa (Traditional Oboe)",
+    "category_si": "සුෂිර භාණ්ඩ (Aerophone)",
+    "origin_si": "දේශීය / ශ්‍රී ලාංකීය",
+    "construction_si": "ලී, ඇත්දළ හෝ ලෝහයෙන් සාදන ලද නළයකි. පිඹින කෙළවර තල්පතින් සැකසූ කුඩා තාලි (Reed) දෙකක් ඇත. ස්වර සිදුරු 7 කින් යුක්තය.",
+    "soundProduction_si": "මුඛයෙන් පිඹින වාතය තල්පත් තල කම්පනය කිරීමෙන් තියුණු උස් නාදයක් උපදවයි (සුෂිර භාණ්ඩ).",
+    "playingPosition_si": "නළය දෙඅතින් අල්ලාගෙන මුඛයේ තබාගෙන අඛණ්ඩ ශ්වසන ක්‍රමයෙන් (Circular Breathing) වාදනය කරයි.",
+    "musicalRole_si": "පෙරහැර, විහාරස්ථාන තේවාවන්, හේවිසි සහ කෝලම් නාට්‍යවල ප්‍රධාන තනු වාදනය සපයයි.",
+    "tuningAndSwaras_si": "ස්වර සිදුරු විවෘත කිරීමෙන් සහ වැසීමෙන් ස්වර නිපදවයි.",
+    "maintenanceAndSafety_si": "තල්පත් තාලි භාවිතයෙන් පසු වියළා පිරිසිදුව තැබිය යුතුය.",
+    "imageUrl": "/images/instruments/horanawa.svg",
+    "sampleAudioPattern": [
+      "S",
+      "R",
+      "G",
+      "M",
+      "P"
+    ],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G09-TG",
+      "pageOrSection": "sg9_emus_music_instruments.pdf පිටු 4-5"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-15",
+      "lastVerifiedDate": "2026-08-15",
+      "changeNotes": "සුෂිර භාණ්ඩය තහවුරු විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
     }
   },
   {
     "id": "inst-tabla",
-    "name_si": "තබ්ලාව",
-    "name_en": "Tabla",
+    "name_si": "තබ්ලාව (දායාන් සහ බායාන්)",
+    "name_en": "Tabla (Dayan and Bayan)",
     "category_si": "අවනද්ධ භාණ්ඩ (Membranophone)",
     "origin_si": "උත්තර භාරතීය",
-    "construction_si": "දායාන් (දකුණු බෙරය - ශීෂම් හෝ මහෝගනී ලීයෙන් තැනූ) සහ බායාන් (වම් බෙරය - තඹ, පිත්තල හෝ මැටියෙන් තැනූ ඩග්ගාව) යන බෙර යුගලයකින් සමන්විතය. බෙර ඇස මත කළු පැහැ සියහි (स्याही) අලවා ඇත.",
-    "soundProduction_si": "දායාන් මත ඇඟිලි තුඩුවලින් තට්ටු කිරීමෙන් සහ බායාන් මත අල්ලේ මුල පීඩනය කරමින් සරල හා මන්ද්‍ර ගාම්භීර බෝල් නාද උපදවයි.",
-    "playingPosition_si": "බිම තබා ඇති බිරා (කුෂන්) දෙකක් මත තබ්ලා යුගලය ඉදිරියෙන් තබා වාඩි වී වාදනය කරනු ලැබේ.",
-    "musicalRole_si": "උත්තර භාරතීය ගායන, වාදන සහ කථක් නර්තන සඳහා ප්‍රධානතම රිද්ම සහායක හා ඒකල වාද්‍ය භාණ්ඩයයි.",
-    "tuningAndSwaras_si": "දායාන් බෙරය ගායකයාගේ හෝ ප්‍රධාන වාදකයාගේ මූලික ෂඩ්ජ (ස) ස්වරයට ගට්ටා මිටියෙන් තට්ටු කර සුසර කෙරේ.",
-    "maintenanceAndSafety_si": "සියහි කොටසට ජලය හෝ තෙතමනය නොවැටිය යුතුය. වාදනයෙන් පසු ආවරණ (කුෂන් කවර) දැමිය යුතුය.",
-    "gradeBands": ["6-7", "8-9", "10-11", "12-13"],
-    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 82 (අවනද්ධ භාණ්ඩ)" },
+    "construction_si": "දකුණු බෙරය (දායාන්) සිසූ ලීයෙන් සාදා කළු මැද (ෂ්‍යාහි), මෛදාන්, චාන්ටි සහ ගට්ටාවලින් සමන්විතය. වම් බෙරය (බායාන්) ලෝහ හෝ මැටියෙන් සාදා ඇත.",
+    "soundProduction_si": "දායාන් කොටසින් තනි ශුද්ධ අක්ෂර (තා, තින්, තුං) ද, බායාන් කොටසින් (ගේ, කේ) ද, දෙකම එකවර ගැසීමෙන් මිශ්‍ර අක්ෂර (ධා, ධින්) ද උපදවයි.",
+    "playingPosition_si": "බිම හිඳගෙන කුණ්ඩලී මත බෙර දෙක තබා ඉදිරියට නම්‍යශීලීව ඇඟිලි හා අත්ල හසුරුවයි.",
+    "musicalRole_si": "හින්දුස්ථානි රාගධාරී සංගීතයේ, සරල ගීත හා නූර්ති නාට්‍යවල ප්‍රමුඛතම තාල සහායක භාණ්ඩයයි.",
+    "tuningAndSwaras_si": "දායාන් බෙරය රාගයේ ෂඩ්ජ (ස) හෝ පංචම (ප) ස්වරයට සුසර මිටියකින් ගට්ටාවලට තට්ටු කර සුසර කරයි.",
+    "maintenanceAndSafety_si": "ෂ්‍යාහි කොටසට තෙතමනය හා දූවිලි නොවදින සේ ආවරණ යෙදිය යුතුය.",
+    "imageUrl": "/images/instruments/tabla.svg",
+    "sampleAudioPattern": [
+      "Dha",
+      "Dhin",
+      "Ge",
+      "Na"
+    ],
+    "gradeBands": [
+      "7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-TABLA-MANUAL",
+      "pageOrSection": "තබ්ලාව.pdf පිටු 1-23"
+    },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
-      "changeNotes": "දායාන්-බායාන් බෙදීම, සියහි සහ සුසර කිරීමේ ක්‍රමවේදය සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
-    }
-  },
-  {
-    "id": "inst-flute",
-    "name_si": "බටනලාව (වේණුව / පුල්ලන්කුලල්)",
-    "name_en": "Bansuri / Flute",
-    "category_si": "සුශිර භාණ්ඩ (Aerophone)",
-    "origin_si": "උත්තර භාරතීය",
-    "construction_si": "ස්වභාවික උණ බටයකින් (Bamboo) සකසන ලද, පිඹින සිදුරක් සහ ස්වර සිදුරු 6ක් හෝ 7ක් සහිත නළාවකි.",
-    "soundProduction_si": "පිඹින සිදුර වෙත තොල් තබා වාත ධාරාව කැපී යන පරිදි පිඹීමෙන් සහ ඇඟිලි තුඩු මඟින් සිදුරු වසා/විවෘත කරමින් විවිධ ස්වර උපදවයි. අර්ධ සිදුරු විවෘත කිරීමෙන් කෝමල හා තීව්‍ර ස්වර නිකුත් කෙරේ.",
-    "playingPosition_si": "දෑතින් නළාව හරස් අතට (Transverse) ඔසවා තොල් වෙත තබා වාදනය කරනු ලැබේ.",
-    "musicalRole_si": "ඒකල ශාස්ත්‍රීය වාදනය, පසුබිම් සංගීතය සහ ගැමි තනු සඳහා බහුලව භාවිත වේ.",
-    "tuningAndSwaras_si": "නළාවේ දිග සහ අභ්‍යන්තර විෂ්කම්භය අනුව මූලික ස්වරය (E, C, G ආදී) තීරණය වේ.",
-    "maintenanceAndSafety_si": "උණ බටය ඉරිතලා යා නොදී නඩත්තු කිරීම සඳහා අභ්‍යන්තරයේ විටින් විට අබ තෙල් හෝ ඛනිජ තෙල් ආලේප කළ යුතුය.",
-    "gradeBands": ["6-7", "8-9", "10-11", "12-13"],
-    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 86 (සුශිර භාණ්ඩ)" },
-    "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
-      "changeNotes": "සුශිර නාද උත්පාදන මූලධර්මය සහ අර්ධ සිදුරු ස්වර ක්‍රමය තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
-    }
-  },
-  {
-    "id": "inst-harmonium",
-    "name_si": "හාමෝනියම",
-    "name_en": "Harmonium",
-    "category_si": "සුශිර භාණ්ඩ (Aerophone)",
-    "origin_si": "බටහිර / පෙරදිග ආභාසය",
-    "construction_si": "ලී පෙට්ටියක් තුළ පිහිටි සුළං මලාව (Bellows), පිත්තල රීඩ් (Brass Reeds), සහ යතුරු පුවරුවකින් සමන්විතය.",
-    "soundProduction_si": "එක් අතකින් සුළං මලාව පොම්ප කරමින් වාතය ඇතුළට ගෙන, අනෙක් අතින් යතුරු එබීමෙන් රීඩ් කම්පනය කර ස්වර නිකුත් කෙරේ.",
-    "playingPosition_si": "බිම වාඩි වී ඉදිරියෙන් හාමෝනියම තබා වමතින් සුළං මලාවද දකුණතින් යතුරුපුවරුවද හසුරුවයි.",
-    "musicalRole_si": "පාසල් සංගීත ඉගැන්වීමේදී, ගීත හා භජන් ගායන පුහුණුවේදී ප්‍රධානතම ශ්‍රැති හා ස්වර සහායක භාණ්ඩයයි.",
-    "tuningAndSwaras_si": "සමකාලීන සමශ්‍රැතික ස්වර (Equal Temperament) ක්‍රමයට කර්මාන්තශාලාවේදී රීඩ් සුසර කර ඇත.",
-    "maintenanceAndSafety_si": "සුළං මලාව ප්‍රවේශමෙන් ක්‍රියා කළ යුතු අතර, තෙතමනයෙන් ලී කොටස් ආරක්ෂා කරගත යුතුය.",
-    "gradeBands": ["6-7", "8-9", "10-11"],
-    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 87" },
-    "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
-      "changeNotes": "හාමෝනියමේ ව්‍යුහය සහ ශ්‍රී ලාංකීය පාසල් ගායන සහායක භූමිකාව සනාථ විය.",
+      "reviewDate": "2026-08-15",
+      "lastVerifiedDate": "2026-08-15",
+      "changeNotes": "තබ්ලා මැනුවල් හා විෂය නිර්දේශ කොටස් තහවුරු විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
     }
@@ -101,164 +305,77 @@
     "name_en": "Violin",
     "category_si": "තත් භාණ්ඩ (Chordophone)",
     "origin_si": "බටහිර / පෙරදිග ආභාසය",
-    "construction_si": "මේපල් සහ ස්පෲස් ලීයෙන් කළ ශබ්ද පෙට්ටියක්, ඇඟිලි පුවරුවක් (Fingerboard), තත් 4ක් සහ දුන්නකින් (Bow) සමන්විතය. පර්දා නොමැත.",
-    "soundProduction_si": "රෝසින් ගෑ අශ්ව ලොම් දුන්න තත් මත පිරිමැදීමෙන් සහ වමතින් තත් පුවරුව මත තද කරමින් මීඩ් (ග්ලයිඩ්) සහිත සන්තතික නාද උපදවයි.",
-    "playingPosition_si": "පෙරදිග ශෛලියේදී බිම වාඩි වී වයලීනයේ මුල උරහිස හෝ පපුව මත තබා, අග්‍රය දකුණු පාදයේ විලුඹ මත රඳවා පහසුවෙන් ග්ලයිඩ් වාදනය කෙරේ.",
-    "musicalRole_si": "පෙරදිග හා දකුණු ඉන්දීය ශාස්ත්‍රීය සංගීතයේ මෙන්ම නූර්ති හා නාඩගම් නාට්‍ය සංගීතයේද අතිශය ප්‍රමුඛ සහායක භාණ්ඩයකි.",
-    "tuningAndSwaras_si": "පෙරදිග ක්‍රමයට: ප̣ - ස - ප - ස̇ හෝ ම̣ - ස - ප - ස̇ ලෙස තත් 4 සුසර කරනු ලැබේ.",
-    "maintenanceAndSafety_si": "දුන්නේ ලොම් අතින් නොඇල්ලිය යුතු අතර භාවිතයෙන් පසු දුන්න ලිහිල් කළ යුතුය.",
-    "gradeBands": ["8-9", "10-11", "12-13"],
-    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 78" },
+    "construction_si": "ස්පෲස් සහ මේපල් ලීයෙන් නිමවූ ධ්වනි පෙට්ටියකින්, ගෙල (Neck), ඇඟිලි පුවරුව (Fingerboard), සුසර ඇණ (Pegs), පාලම (Bridge) සහ තත් 4 කින් සමන්විතය. දුන්න (Bow) අශ්ව ලොම්වලින් සාදා ඇත.",
+    "soundProduction_si": "රෝසින් ගල්වන ලද දුන්නේ ලොම් තත් මත පිරිමැදීමෙන් (Friction) තත් කම්පනය කර ධ්වනි පෙට්ටිය තුළින් මිහිරි නාදයක් උපදවයි.",
+    "playingPosition_si": "පෙරදිග සංගීතයේදී බිම හිඳගෙන, වයලීනයේ අග කොටස දකුණු පය මත තබා, වම් අතින් තත් ස්පර්ශ කරමින් වාදනය කරයි.",
+    "musicalRole_si": "හින්දුස්ථානි, කර්නාටක, සරල ගී සහ වාද්‍ය වෘන්දවල ප්‍රමුඛතම තනු හා ආලාප වාද්‍ය භාණ්ඩයකි.",
+    "tuningAndSwaras_si": "හින්දුස්ථානි ශාස්ත්‍රීය සංගීතයේදී: මන්ද්‍ර පංචම (ප̣), මධ්‍ය ෂඩ්ජ (ස), මධ්‍ය පංචම (ප), තාර ෂඩ්ජ (ස̇) ලෙස සුසර කරයි.",
+    "maintenanceAndSafety_si": "වාදනයෙන් පසු දුන්නේ ඇබය ලිහිල් කර තත් පිසදමා ආරක්ෂිත පෙට්ටියක තැන්පත් කළ යුතුය.",
+    "imageUrl": "/images/instruments/violin.svg",
+    "sampleAudioPattern": [
+      "S",
+      "R",
+      "G",
+      "M",
+      "P",
+      "D",
+      "N",
+      "S'"
+    ],
+    "gradeBands": [
+      "7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-G07-VIOLIN",
+      "pageOrSection": "sg7_emus_chap2.1.2_violin.pdf පිටු 1-12"
+    },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
-      "changeNotes": "පෙරදිග වාදන ඉරියව්ව සහ පෙරදිග සුසර කිරීමේ පටිපාටිය තහවුරු විය.",
+      "reviewDate": "2026-08-15",
+      "lastVerifiedDate": "2026-08-15",
+      "changeNotes": "7 ශ්‍රේණි වයලීන ඒකකය සහ සුසර ක්‍රම තහවුරු විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
     }
   },
   {
-    "id": "inst-esraj",
-    "name_si": "එස්රාජය (දිල්රුබා)",
-    "name_en": "Esraj / Dilruba",
-    "category_si": "තත් භාණ්ඩ (Chordophone)",
-    "origin_si": "උත්තර භාරතීය",
-    "construction_si": "සිතාරයක මෙන් පර්දා සහිත දිගු දණ්ඩක් සහ සාරංගියක මෙන් සම් කවරයකින් වැසුණු කුඩා ශබ්ද පෙට්ටියකින් සමන්විතය. ප්‍රධාන තත් 4ක් සහ අනුනාදක තත් 15ක් පමණ අඩංගුය.",
-    "soundProduction_si": "වයලීන දුන්නක් වැනි දුන්නකින් (Gaj) තත් පිරිමැදීමෙන් සහ පර්දා මත වමතින් තද කරමින් මිනිස් හඬට බෙහෙවින් සමාන ගායනාත්මක නාදයක් උපදවයි.",
-    "playingPosition_si": "බිම වාඩි වී වම් උරහිස මත දණ්ඩ රඳවා තිරස්ව/ආනතව අල්ලා වාදනය කෙරේ.",
-    "musicalRole_si": "රබීන්ද්‍ර සංගීතයේ සහ ශාන්තිනිකේතන සම්ප්‍රදායේ ප්‍රධානතම ගායන සහායක භාණ්ඩයකි.",
-    "tuningAndSwaras_si": "ප්‍රධාන තත් සතර ස̣ - ස - ප - ම̣ ලෙස හෝ සමාන ස්වර පද්ධතියකට සුසර කෙරේ.",
-    "maintenanceAndSafety_si": "ශබ්ද කුටීරයේ සම් පටලය තෙතමනයෙන් ආරක්ෂා කරගත යුතුය.",
-    "gradeBands": ["10-11", "12-13"],
-    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 80" },
+    "id": "inst-harmonium",
+    "name_si": "හාමෝනියම් (ස්වර පුවරුව)",
+    "name_en": "Harmonium",
+    "category_si": "සුෂිර භාණ්ඩ (Aerophone)",
+    "origin_si": "බටහිර / පෙරදිග ආභාසය",
+    "construction_si": "මූලික ලී පෙට්ටියක්, මුවහම් (Bellows), වායු කුටීරය (Air Chamber), කළු-සුදු යතුරු පුවරුව (Keyboard) සහ පිත්තල තල (Reeds) වලින් සමන්විතය.",
+    "soundProduction_si": "මුවහම් මඟින් වායු කුටීරයට පොම්ප කරන වාතය අදාළ යතුර එබූ විට පිත්තල තලය කම්පනය කර ස්වර නාදය නිකුත් කරයි.",
+    "playingPosition_si": "බිම හිඳගෙන වම් අතින් මුවහම ක්‍රියාත්මක කරමින් දකුණු අතින් යතුරු වාදනය කරයි.",
+    "musicalRole_si": "ගායන අභ්‍යාස, ස්වර ස්ථාපනය, රාග පුහුණුව සහ නූර්ති ගීත සඳහා මූලික සහායක භාණ්ඩය වේ.",
+    "tuningAndSwaras_si": "සප්තක 3 ක ස්වර 36 කින් සමන්විත ස්ථාවර සුසර පුවරුවකි.",
+    "maintenanceAndSafety_si": "වාදනයෙන් පසු අමතර වාතය මුදාහැර මුවහම අගුළු ලා තැබිය යුතුය.",
+    "imageUrl": "/images/instruments/harmonium.svg",
+    "sampleAudioPattern": [
+      "S",
+      "R",
+      "G",
+      "M",
+      "P"
+    ],
+    "gradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-SWARA-KEYBOARDS",
+      "pageOrSection": "ස්වර පුවරු සංගීත භාණ්ඩ.pdf පිටු 1-30"
+    },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
-      "changeNotes": "රබීන්ද්‍ර සංගීත භාවිතය හා සම් කුටීර ව්‍යුහය සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
-    }
-  },
-  {
-    "id": "inst-geta-beraya",
-    "name_si": "ගැට බෙරය (උඩරට බෙරය)",
-    "name_en": "Geta Beraya",
-    "category_si": "අවනද්ධ භාණ්ඩ (Membranophone)",
-    "origin_si": "දේශීය / ශ්‍රී ලාංකීය",
-    "construction_si": "ඇහැළ, කොහොඹ, මාර හෝ කොස් ලීයෙන් මැද මහත දෙකෙළවර සිහින් වන සේ ලියවා ඇත. දිග වියත් 2ක් සහ අඟල් 4ක් (අඟල් 28ක් පමණ) වේ. දකුණු පස වඳුරු හමෙන්ද (දකුණැස/තත්තිකය) වම් පස ගව පටලයෙන්ද (වමැස/හුඹ් හෝ ධිත්ත) බඳිනු ලැබේ.",
-    "soundProduction_si": "දෑතින්ම වාදනය කරනු ලැබේ. දකුණැසින් 'තෙයි, තත්, ජිං' වැනි තීව්‍ර ශබ්දද, වමැසින් 'තොං, ජෙං, කුකුද' වැනි ගුම් නාදද උපදවයි.",
-    "playingPosition_si": "ඉණ වටා ලණු පටියකින් ගැටගසා ඉදිරියෙන් එල්ලාගෙන සිටගෙන හෝ අඩදණියෙන් සිට නර්තනය සමඟ වාදනය කරයි.",
-    "musicalRole_si": "උඩරට නර්තන සම්ප්‍රදායේ (වණ්ණම්, කොහොඹා කන්කාරිය, පෙරහැර) ප්‍රධානතම සහ අත්‍යවශ්‍ය වාද්‍ය භාණ්ඩයයි.",
-    "tuningAndSwaras_si": "වරපට (සම් පටි) අදිමින් හා ලිහිල් කරමින් නාද පරාසය සකසනු ලැබේ.",
-    "maintenanceAndSafety_si": "බෙර තට්ටුවලට තෙතමනය වැළැක්වීමට අළුයම අව්වේ තබා රත් කිරීම සිරිතයි.",
-    "gradeBands": ["6-7", "8-9", "10-11", "12-13"],
-    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 88 (දේශීය වාද්‍ය භාණ්ඩ)" },
-    "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
-      "changeNotes": "උඩරට බෙරයේ ව්‍යුහය, වඳුරු හම හා ගව පටල භාවිතය තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
-    }
-  },
-  {
-    "id": "inst-yak-beraya",
-    "name_si": "යක් බෙරය (පහතරට / රුහුණු බෙරය / දේව බෙරය)",
-    "name_en": "Yak Beraya",
-    "category_si": "අවනද්ධ භාණ්ඩ (Membranophone)",
-    "origin_si": "දේශීය / ශ්‍රී ලාංකීය",
-    "construction_si": "කඳ සිලින්ඩරාකාර ඍජු හැඩයක් ගනී. කිතුල්, පොල් හෝ ඇහැළ ලීයෙන් තනයි. දෙපසම ගව ආමාශ පටලයෙන් (වකුටු පට්ටා) ආවරණය කර ඇත.",
-    "soundProduction_si": "දෑතින්ම වාදනය කෙරේ. තීව්‍ර, රිද්මයානුකූල ශබ්ද රටා උපදවයි ('දොං, ජිං, තක, තිරිකිට').",
-    "playingPosition_si": "ඉණෙහි බැඳ ඉදිරියෙන් එල්ලාගෙන සිටගෙන හෝ නර්තන චලන සමඟ වාදනය කෙරේ.",
-    "musicalRole_si": "පහතරට ශාන්තිකර්ම (ගම්මඩු, දෙවොල් මඩු, දහඅට සන්නිය) සහ නාඩගම් නාට්‍ය සඳහා ප්‍රධාන වාද්‍ය භාණ්ඩයයි.",
-    "tuningAndSwaras_si": "වරපට ඇදීමෙන් තද බව හා නාදය සකසයි.",
-    "maintenanceAndSafety_si": "වකුටු පටලය සියුම් බැවින් දැඩි උෂ්ණත්වයට සෘජුව නිරාවරණය නොකළ යුතුය.",
-    "gradeBands": ["8-9", "10-11", "12-13"],
-    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 90" },
-    "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
-      "changeNotes": "පහතරට ශාන්තිකර්ම භාවිතය සහ සිලින්ඩරාකාර කඳ ලක්ෂණ සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
-    }
-  },
-  {
-    "id": "inst-dawula",
-    "name_si": "දවුල (සබරගමු බෙරය)",
-    "name_en": "Dawula",
-    "category_si": "අවනද්ධ භාණ්ඩ (Membranophone)",
-    "origin_si": "දේශීය / ශ්‍රී ලාංකීය",
-    "construction_si": "කඳ සිලින්ඩරාකාර වන අතර පිත්තල හෝ රිදී තහඩු වලින් කැටයම් කර අලංකාර කර ඇත. දෙපසම ගව හමෙන් බඳිනු ලැබේ.",
-    "soundProduction_si": "දකුණු පස කඩිප්පුව (වක්‍ර ලී කෝටුව) මඟින්ද, වම් පස අතින්ද වාදනය කරනු ලැබේ.",
-    "playingPosition_si": "ඉණෙහි බැඳගෙන සිටගෙන වාදනය කෙරේ.",
-    "musicalRole_si": "සබරගමු ශාන්තිකර්ම, බෞද්ධ පන්සල්වල තේවාව සහ හේවීසි පූජාවන්හි අනිවාර්ය වාද්‍ය භාණ්ඩයයි.",
-    "tuningAndSwaras_si": "වරපට සහ මුදු මඟින් සුසර කරනු ලැබේ.",
-    "maintenanceAndSafety_si": "කඩිප්පුව කැඩී යාම වැළැක්වීම සහ බෙර මුහුණත වියළිව තබාගැනීම වැදගත් වේ.",
-    "gradeBands": ["8-9", "10-11", "12-13"],
-    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 92" },
-    "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
-      "changeNotes": "කඩිප්පු භාවිතය, සබරගමු සම්ප්‍රදාය හා තේවා වාද්‍ය භූමිකාව සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
-    }
-  },
-  {
-    "id": "inst-tammattama",
-    "name_si": "තම්මැට්ටම (පොකුරු බෙරය)",
-    "name_en": "Tammattama",
-    "category_si": "අවනද්ධ භාණ්ඩ (Membranophone)",
-    "origin_si": "දේශීය / ශ්‍රී ලාංකීය",
-    "construction_si": "එකිනෙකට යාබදව බැඳ ඇති කුඩා බෙර මුහුණත් දෙකකි. එක් බෙරයක් මහත (මන්ද්‍ර) වන අතර අනෙක සිහින්ය (තාර).",
-    "soundProduction_si": "කඩිප්පු ජෝඩුවක් (වක් වූ කෝටු දෙකක්) ආධාරයෙන් බෙර මුහුණත් දෙකට මාරුවෙන් මාරුවට තට්ටු කරමින් වාදනය කරයි.",
-    "playingPosition_si": "ඉණෙහි ඉදිරියෙන් රඳවාගෙන සිටගෙන හෝ ආධාරකයක් මත තබා වාදනය කරනු ලැබේ.",
-    "musicalRole_si": "පන්සල් තේවාව, පෙරහැර සහ රාජකීය ආඥා ප්‍රකාශ කිරීමේදී (ආණබෙර) යොදාගැනේ.",
-    "tuningAndSwaras_si": "දෙපස නාද පරතරය මඟින් රිද්ම විවිධත්වය මවයි.",
-    "maintenanceAndSafety_si": "කඩිප්පු සුරක්ෂිතව තබාගැනීම.",
-    "gradeBands": ["6-7", "8-9", "10-11"],
-    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 94" },
-    "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
-      "changeNotes": "තම්මැට්ටම් මුහුණත් දෙක සහ කඩිප්පු වාදන විලාසය තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
-    }
-  },
-  {
-    "id": "inst-rabana",
-    "name_si": "රබාන (බංකු රබාන / අත් රබාන)",
-    "name_en": "Rabana",
-    "category_si": "අවනද්ධ භාණ්ඩ (Membranophone)",
-    "origin_si": "දේශීය / ශ්‍රී ලාංකීය",
-    "construction_si": "තනි මුහුණතක් සහිත වෘත්තාකාර ලී රාමුවක් මත එළු හෝ ගව හමක් ඇද තනා ඇත. විශාල බංකු රබාන සහ අතින් කරකවන අත් රබාන ලෙස වර්ග දෙකකි.",
-    "soundProduction_si": "දෑතින් හෝ ඇඟිලි තුඩුවලින් රිද්මයානුකූලව තට්ටු කරමින් 'රබන් පද' වයනු ලැබේ.",
-    "playingPosition_si": "බංකු රබාන වටා කිහිප දෙනෙකු වාඩි වී වාදනය කරන අතර, අත් රබාන තනිව එක් අතකින් අල්ලා අනෙක් අතින් වයයි.",
-    "musicalRole_si": "සිංහල අලුත් අවුරුදු උත්සව, මංගල උත්සව සහ ජන ක්‍රීඩා සඳහා සුවිශේෂී ප්‍රීතිජනක නාදය සපයයි.",
-    "tuningAndSwaras_si": "රබාන යටින් ගිනි අඟුරු තබා රත් කිරීමෙන් (රබන් රත් කිරීම) තත්ත්වය තීව්‍ර කරගනී.",
-    "maintenanceAndSafety_si": "අධිකව රත් කිරීමෙන් හම පිපිරී යා හැකි බැවින් මධ්‍යස්ථ තාපයක් ලබාදිය යුතුය.",
-    "gradeBands": ["6-7", "8-9", "10-11"],
-    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 96" },
-    "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
-      "changeNotes": "බංකු රබාන සහ අත් රබාන සංස්කෘතික භූමිකාව තහවුරු විය.",
+      "reviewDate": "2026-08-15",
+      "lastVerifiedDate": "2026-08-15",
+      "changeNotes": "ස්වර පුවරු භාවිතය තහවුරු විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
     }

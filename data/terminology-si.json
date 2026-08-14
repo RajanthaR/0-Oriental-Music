@@ -1,0 +1,1432 @@
+[
+  {
+    "id": "term-nada",
+    "term_si": "නාදය",
+    "term_en": "Musical Sound (Nada)",
+    "transliteration": "Nādaya",
+    "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
+    "definition_si": "ක්‍රමවත් කම්පන සහිත, කනට ප්‍රිය උපදවන සුසර ශබ්දය නාදය නම් වේ. සංගීතයේ මූලික පදනම නාදයයි.",
+    "knownVariants": [
+      "නාදය",
+      "නාද",
+      "Nada"
+    ],
+    "prerequisites": [
+      "term-sound"
+    ],
+    "relatedTerms": [
+      "term-ahata-nada",
+      "term-anahata-nada",
+      "term-pitch",
+      "term-intensity",
+      "term-timbre"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටු 10-14 (නාදය සහ සංගීතය)"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-sound",
+    "term_si": "ශබ්දය",
+    "term_en": "Sound / Acoustic Noise",
+    "transliteration": "Śabdaya",
+    "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
+    "definition_si": "ඕනෑම වස්තුවක කම්පනයෙන් උපදින, කනට ඇසෙන සියලුම ශ්‍රව්‍ය සංවේදනයන් ශබ්දය නම් වේ. ක්‍රමවත් ශබ්ද නාද වන අතර අක්‍රමවත් ශබ්ද ඝෝෂා වේ.",
+    "knownVariants": [
+      "ශබ්දය",
+      "ශබ්ද"
+    ],
+    "prerequisites": [],
+    "relatedTerms": [
+      "term-nada"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 10"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-ahata-nada",
+    "term_si": "ආහත නාදය",
+    "term_en": "Ahata Nada (Struck Sound)",
+    "transliteration": "Āhata Nādaya",
+    "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
+    "definition_si": "භෞතික වස්තූන් දෙකක් එකිනෙක ගැටීමෙන්, පිරිමැදීමෙන් හෝ වාතය පිඹීමෙන් උපදින, මිනිස් කනට ඇසෙන ප්‍රායෝගික සංගීත නාදයයි.",
+    "knownVariants": [
+      "ආහත නාදය",
+      "ආහත"
+    ],
+    "prerequisites": [
+      "term-nada"
+    ],
+    "relatedTerms": [
+      "term-anahata-nada"
+    ],
+    "relevantGrades": [
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G1011-TG",
+      "pageOrSection": "පිටුව 12 (නාද ප්‍රභේද)"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-anahata-nada",
+    "term_si": "අනාහත නාදය",
+    "term_en": "Anahata Nada (Unstruck / Cosmic Sound)",
+    "transliteration": "Anāhata Nādaya",
+    "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
+    "definition_si": "භෞතික ගැටීමකින් තොරව විශ්වයේ හෝ භාවනාවෙන් හදවත තුළ අත්විඳින අධ්‍යාත්මික නාදයයි. එය ප්‍රායෝගික ගායන වාදනයට යොදා නොගනී.",
+    "knownVariants": [
+      "අනාහත නාදය"
+    ],
+    "prerequisites": [
+      "term-nada"
+    ],
+    "relatedTerms": [
+      "term-ahata-nada"
+    ],
+    "relevantGrades": [
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G1011-TG",
+      "pageOrSection": "පිටුව 12"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-pitch",
+    "term_si": "තාරතාවය (උස්-මිටි බව)",
+    "term_en": "Pitch",
+    "transliteration": "Tāratāvaya",
+    "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
+    "definition_si": "නාදයක සිහින් (උස්) හෝ ගොරෝසු (මිටි) ස්වභාවයයි. එය තීරණය වන්නේ කම්පන සංඛ්‍යාතය (Frequency) මතය.",
+    "knownVariants": [
+      "තාරතාවය",
+      "තාරතාව",
+      "උස් මිටි බව"
+    ],
+    "prerequisites": [
+      "term-nada"
+    ],
+    "relatedTerms": [
+      "term-intensity",
+      "term-timbre",
+      "term-frequency"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 12 (නාදයේ ලක්ෂණ)"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-intensity",
+    "term_si": "විපුලතාවය (තීව්‍රතාවය / මහත්-කුඩා බව)",
+    "term_en": "Intensity / Volume",
+    "transliteration": "Vipulatāvaya",
+    "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
+    "definition_si": "නාදයක ප්‍රබල හඬ (හයිය) හෝ මෘදු බවයි. එය තීරණය වන්නේ කම්පන විස්තාරය (Amplitude) මතය.",
+    "knownVariants": [
+      "විපුලතාවය",
+      "තීව්‍රතාවය",
+      "මහත් කුඩා බව"
+    ],
+    "prerequisites": [
+      "term-nada"
+    ],
+    "relatedTerms": [
+      "term-pitch",
+      "term-timbre"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 13"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-timbre",
+    "term_si": "ධ්වනි ගුණය (නාද ජාතිය)",
+    "term_en": "Timbre / Quality",
+    "transliteration": "Dhwani Guṇaya",
+    "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
+    "definition_si": "එකම තාරතාවයෙන් හා තීව්‍රතාවයෙන් යුත් නාද දෙකක් වෙන්කොට හඳුනාගැනීමට උපකාරී වන නාදයේ සුවිශේෂී වර්ණය හෝ මාධ්‍ය ලක්ෂණයයි (උදා: වයලීන හා බටනලා හඬ වෙන්කර හඳුනාගැනීම).",
+    "knownVariants": [
+      "ධ්වනි ගුණය",
+      "නාද ගුණය",
+      "නාද ජාතිය"
+    ],
+    "prerequisites": [
+      "term-nada"
+    ],
+    "relatedTerms": [
+      "term-pitch",
+      "term-intensity"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 14"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-frequency",
+    "term_si": "සංඛ්‍යාතය",
+    "term_en": "Frequency",
+    "transliteration": "Saṅkhyātaya",
+    "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
+    "definition_si": "තත්පරයක් තුළ සිදුවන පූර්ණ කම්පන වාර ගණනයි. එය මනිනු ලබන්නේ හර්ට්ස් (Hz) ඒකක වලිනි.",
+    "knownVariants": [
+      "සංඛ්‍යාතය",
+      "Frequency"
+    ],
+    "prerequisites": [
+      "term-pitch"
+    ],
+    "relatedTerms": [
+      "term-pitch",
+      "term-nada"
+    ],
+    "relevantGrades": [
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G1011-TG",
+      "pageOrSection": "පිටුව 88 (සංගීත භෞතික විද්‍යාව)"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-swara",
+    "term_si": "ස්වරය",
+    "term_en": "Swara (Musical Note)",
+    "transliteration": "Swaraya",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "ශ්‍රවණය කළ සැණින් සිත ප්‍රමෝදයට පත්කරන, නිශ්චිත තාරතාවක් සහිත සංගීත නාදය ස්වරය නම් වේ.",
+    "knownVariants": [
+      "ස්වරය",
+      "ස්වර",
+      "Swara"
+    ],
+    "prerequisites": [
+      "term-nada"
+    ],
+    "relatedTerms": [
+      "term-shuddha-swara",
+      "term-vikruta-swara",
+      "term-saptaka",
+      "term-shruti"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 20 (සප්ත ස්වර හැඳින්වීම)"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-shuddha-swara",
+    "term_si": "ශුද්ධ ස්වර",
+    "term_en": "Shuddha Swaras (Natural Notes)",
+    "transliteration": "Śuddha Swara",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "තමන්ට නියමිත ස්වභාවික ස්ථානයෙහි පිහිටි මූලික ස්වර 7 ශුද්ධ ස්වර වේ: ෂඩ්ජ (ස), රිෂභ (රි), ගාන්ධාර (ග), මධ්‍යම (ම), පංචම (ප), ධෛවත (ධ), නිෂාද (නි).",
+    "knownVariants": [
+      "ශුද්ධ ස්වර",
+      "ශුද්ධ"
+    ],
+    "prerequisites": [
+      "term-swara"
+    ],
+    "relatedTerms": [
+      "term-vikruta-swara",
+      "term-saptaka"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටු 22-25"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-vikruta-swara",
+    "term_si": "විකෘති ස්වර",
+    "term_en": "Vikruta Swaras (Altered Notes)",
+    "transliteration": "Vikṛta Swara",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "ශුද්ධ ස්ථානයෙන් මඳක් පහළට හෝ ඉහළට විතැන් වූ ස්වර විකෘති ස්වර නම් වේ. ඒවා කෝමල (පහත්) සහ තීව්‍ර (උස්) ලෙස කොටස් දෙකකි.",
+    "knownVariants": [
+      "විකෘති ස්වර",
+      "විකෘති"
+    ],
+    "prerequisites": [
+      "term-shuddha-swara"
+    ],
+    "relatedTerms": [
+      "term-komala-swara",
+      "term-theevra-swara"
+    ],
+    "relevantGrades": [
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G07-TG",
+      "pageOrSection": "පිටුව 18 (විකෘති ස්වර හඳුනාගැනීම)"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-komala-swara",
+    "term_si": "කෝමල ස්වර",
+    "term_en": "Komala Swaras (Flat Notes)",
+    "transliteration": "Kōmala Swara",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "ශුද්ධ ස්ථානයට වඩා අඩස්වරයක් (ශ්‍රැති 1-2 ක්) පහතින් ශබ්ද වන ස්වර 4 කි: කෝමල රි (r), කෝමල ග (g), කෝමල ධ (d), කෝමල නි (n).",
+    "knownVariants": [
+      "කෝමල ස්වර",
+      "කෝමල",
+      "කෝමළ"
+    ],
+    "prerequisites": [
+      "term-vikruta-swara"
+    ],
+    "relatedTerms": [
+      "term-theevra-swara",
+      "term-shuddha-swara"
+    ],
+    "relevantGrades": [
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G07-TG",
+      "pageOrSection": "පිටුව 20"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-theevra-swara",
+    "term_si": "තීව්‍ර ස්වර",
+    "term_en": "Theevra Swara (Sharp Note)",
+    "transliteration": "Tīvra Swara",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "ශුද්ධ ස්ථානයට වඩා අඩස්වරයක් ඉහළින් ශබ්ද වන මධ්‍යම (ම) ස්වරය තීව්‍ර මධ්‍යම (m) නම් වේ. හින්දුස්ථානි සංගීතයේ ඇති එකම තීව්‍ර ස්වරය මෙයයි.",
+    "knownVariants": [
+      "තීව්‍ර ස්වර",
+      "තීව්‍ර මධ්‍යම",
+      "තීව්ර"
+    ],
+    "prerequisites": [
+      "term-vikruta-swara"
+    ],
+    "relatedTerms": [
+      "term-komala-swara",
+      "term-shuddha-swara"
+    ],
+    "relevantGrades": [
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G07-TG",
+      "pageOrSection": "පිටුව 21"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-saptaka",
+    "term_si": "සප්තකය",
+    "term_en": "Saptaka (Seven-note Scale / Octave)",
+    "transliteration": "Saptakaya",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "අනුපිළිවෙළින් පිහිටි ශුද්ධ ස්වර 7 ක සහ විකෘති ස්වර 5 ක (මුළු ස්වර 12 ක) සමූහය සප්තකයක් නම් වේ. ප්‍රධාන සප්තක 3 කි: මන්ද්‍ර (පහළ), මධ්‍ය (සාමාන්‍ය), තාර (ඉහළ).",
+    "knownVariants": [
+      "සප්තකය",
+      "සප්තක",
+      "Saptaka"
+    ],
+    "prerequisites": [
+      "term-swara"
+    ],
+    "relatedTerms": [
+      "term-mandra-saptaka",
+      "term-madhya-saptaka",
+      "term-tara-saptaka"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටු 28-31 (සප්තක 3 හඳුනාගැනීම)"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-mandra-saptaka",
+    "term_si": "මන්ද්‍ර සප්තකය",
+    "term_en": "Mandra Saptaka (Lower Octave)",
+    "transliteration": "Mandra Saptakaya",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "මධ්‍ය සප්තකයට වඩා අඩක් පහළ තාරතාවයකින් පිහිටි සප්තකයයි. ප්‍රස්තාරයේදී ස්වරයට යටින් තිතක් ( . ) තබා සටහන් කරයි (උදා: නි̣ , ධ̣).",
+    "knownVariants": [
+      "මන්ද්‍ර සප්තකය",
+      "මන්ද්‍ර"
+    ],
+    "prerequisites": [
+      "term-saptaka"
+    ],
+    "relatedTerms": [
+      "term-madhya-saptaka",
+      "term-tara-saptaka"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 29"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-madhya-saptaka",
+    "term_si": "මධ්‍ය සප්තකය",
+    "term_en": "Madhya Saptaka (Middle Octave)",
+    "transliteration": "Madhya Saptakaya",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "සාමාන්‍ය කටහඬින් පහසුවෙන් ගායනා කළ හැකි මධ්‍යම තාරතා පරාසයයි. මෙහි ස්වර සඳහා ඉහළ හෝ පහළ තිත් නොයොදයි (උදා: ස , රි , ග).",
+    "knownVariants": [
+      "මධ්‍ය සප්තකය",
+      "මධ්‍ය"
+    ],
+    "prerequisites": [
+      "term-saptaka"
+    ],
+    "relatedTerms": [
+      "term-mandra-saptaka",
+      "term-tara-saptaka"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 29"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-tara-saptaka",
+    "term_si": "තාර සප්තකය",
+    "term_en": "Tara Saptaka (Higher Octave)",
+    "transliteration": "Tāra Saptakaya",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "මධ්‍ය සප්තකයට වඩා දෙගුණයක තාරතාවයකින් පිහිටි ඉහළ සප්තකයයි. ප්‍රස්තාරයේදී ස්වරයට ඉහළින් තිතක් තබා සටහන් කරයි (උදා: ස̇ , රි̇).",
+    "knownVariants": [
+      "තාර සප්තකය",
+      "තාර"
+    ],
+    "prerequisites": [
+      "term-saptaka"
+    ],
+    "relatedTerms": [
+      "term-mandra-saptaka",
+      "term-madhya-saptaka"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 30"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-alankara",
+    "term_si": "අලංකාර (සරල අලංකාර)",
+    "term_en": "Alankara (Ornamental Swara Exercises)",
+    "transliteration": "Alaṅkāra",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "ක්‍රමවත් නීතියකට අනුව සකස් කරන ලද ස්වර රටා සමූහයකි. හඬ පුහුණුවට හා ඇඟිලි හුරුවට (හස්ත සාධනය) අලංකාර අභ්‍යාස අත්‍යවශ්‍ය වේ.",
+    "knownVariants": [
+      "අලංකාර",
+      "සරල අලංකාර",
+      "පල්ටා"
+    ],
+    "prerequisites": [
+      "term-shuddha-swara"
+    ],
+    "relatedTerms": [
+      "term-swara",
+      "term-raga"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටු 32-38 (සරල අලංකාර 7)"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-thata",
+    "term_si": "ථාටය (මේලය)",
+    "term_en": "Thata / Mela (Parent Scale)",
+    "transliteration": "Thāṭaya / Mēlaya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "රාග බිහිකිරීමේ හැකියාව ඇති, ස්වර 7 ක් අනුපිළිවෙළින් පිහිටි මූලික ස්වර ව්‍යුහය ථාටය හෙවත් මේලය නම් වේ. විෂ්ණු නාරායන භාත්ඛණ්ඩේ පඬිතුමා හින්දුස්ථානි සංගීතය සඳහා ප්‍රධාන ථාට 10 ක් වර්ගීකරණය කළේය.",
+    "knownVariants": [
+      "ථාටය",
+      "මේලය",
+      "ථාට"
+    ],
+    "prerequisites": [
+      "term-swara",
+      "term-saptaka"
+    ],
+    "relatedTerms": [
+      "term-raga",
+      "term-bilawal-thata",
+      "term-kalyan-thata",
+      "term-kafi-thata",
+      "term-khamaj-thata",
+      "term-bhairav-thata",
+      "term-bhairavi-thata"
+    ],
+    "relevantGrades": [
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G08-TG",
+      "pageOrSection": "පිටුව 35 (ථාට පද්ධතිය)"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-laya",
+    "term_si": "ලය (ලයමානය)",
+    "term_en": "Laya (Tempo / Speed of Beats)",
+    "transliteration": "Laya",
+    "category_si": "ලය හා තාල",
+    "definition_si": "සංගීතයේ හෝ නැටුමේ කාලය ගලායාමේ වේගය හෙවත් ස්පන්දන අතර සමාන කාල ප්‍රමාණය ලය නම් වේ. ප්‍රධාන ලය 3 කි: විලම්බිත (මන්දගාමී), මධ්‍ය (සාමාන්‍ය), දෘත (වේගවත්).",
+    "knownVariants": [
+      "ලය",
+      "ලයමානය",
+      "Laya"
+    ],
+    "prerequisites": [],
+    "relatedTerms": [
+      "term-matra",
+      "term-tala",
+      "term-vilambita-laya",
+      "term-madhya-laya",
+      "term-druta-laya"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 40 (ලය සහ තාලය)"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-matra",
+    "term_si": "මාත්‍රාව",
+    "term_en": "Matra (Beat / Time Unit)",
+    "transliteration": "Mātrāva",
+    "category_si": "ලය හා තාල",
+    "definition_si": "තාලයක කාලය මනින කුඩාම මූලික ඒකකය මාත්‍රාවයි. තාලයක මුළු කාලය සමාන මාත්‍රා ගණනාවකට බෙදා දක්වයි.",
+    "knownVariants": [
+      "මාත්‍රාව",
+      "මාත්‍රා",
+      "Matra"
+    ],
+    "prerequisites": [
+      "term-laya"
+    ],
+    "relatedTerms": [
+      "term-vibhaga",
+      "term-tala",
+      "term-avarta"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 42"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-vibhaga",
+    "term_si": "විභාගය",
+    "term_en": "Vibhaga (Measure / Section of Tala)",
+    "transliteration": "Vibhāgaya",
+    "category_si": "ලය හා තාල",
+    "definition_si": "තාලයක මාත්‍රා කිහිපයක් එක්වීමෙන් සෑදෙන කොටස හෙවත් ඛණ්ඩය විභාගයක් නම් වේ. ප්‍රස්තාරයේදී විභාග වෙන්කරන්නේ සිරස් ඉරක් ( | ) මඟිනි.",
+    "knownVariants": [
+      "විභාගය",
+      "විභාග"
+    ],
+    "prerequisites": [
+      "term-matra"
+    ],
+    "relatedTerms": [
+      "term-tala",
+      "term-tali",
+      "term-khali"
+    ],
+    "relevantGrades": [
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G07-TG",
+      "pageOrSection": "පිටුව 32 (තාල ලක්ෂණ)"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-tala",
+    "term_si": "තාලය",
+    "term_en": "Tala (Rhythmic Cycle)",
+    "transliteration": "Tālaya",
+    "category_si": "ලය හා තාල",
+    "definition_si": "ගායන, වාදන හා නර්තන කටයුතු ක්‍රමවත්ව මැනීමට යොදාගන්නා චක්‍රීය කාල රාමුව තාලය නම් වේ.",
+    "knownVariants": [
+      "තාලය",
+      "තාල",
+      "Tala"
+    ],
+    "prerequisites": [
+      "term-laya",
+      "term-matra"
+    ],
+    "relatedTerms": [
+      "term-sam",
+      "term-tali",
+      "term-khali",
+      "term-theka",
+      "term-avarta"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 40"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-sam",
+    "term_si": "සම (සම්)",
+    "term_en": "Sam (First Beat of Tala Cycle)",
+    "transliteration": "Sama / Sam",
+    "category_si": "ලය හා තාල",
+    "definition_si": "තාලයක පළමු වන මාත්‍රාව හෙවත් තාල චක්‍රයේ ප්‍රධාන ආරම්භක ස්ථානය 'සම' නම් වේ. එය ( x ) ලකුණින් ප්‍රස්තාරයේ සටහන් කරයි.",
+    "knownVariants": [
+      "සම",
+      "සම්",
+      "Sam"
+    ],
+    "prerequisites": [
+      "term-tala"
+    ],
+    "relatedTerms": [
+      "term-tali",
+      "term-khali"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 43"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-tali",
+    "term_si": "තාළි (අත්පුඩි)",
+    "term_en": "Tali (Clap Beat)",
+    "transliteration": "Tāḷi",
+    "category_si": "ලය හා තාල",
+    "definition_si": "තාලයක් අතින් නිරූපණය කිරීමේදී අත්පුඩි ගැසීමෙන් පෙන්වන ප්‍රබල මාත්‍රා ස්ථාන තාළි නම් වේ. ඒවා x, 2, 3, 4 ආදී අංක මඟින් දක්වයි.",
+    "knownVariants": [
+      "තාළි",
+      "තාලි",
+      "තාළිය"
+    ],
+    "prerequisites": [
+      "term-tala"
+    ],
+    "relatedTerms": [
+      "term-khali",
+      "term-sam"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 43"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-khali",
+    "term_si": "ඛාලි (හිස් තාලය / වැනීම)",
+    "term_en": "Khali (Wave / Unaccented Section)",
+    "transliteration": "Khāli",
+    "category_si": "ලය හා තාල",
+    "definition_si": "තාලයේ අත්පුඩි නොගසා අත පැත්තකට වැනීමෙන් (නිහඬව) පෙන්වන අවප්‍රහාර මාත්‍රා ස්ථානය ඛාලියයි. එය ( 0 ) සංකේතයෙන් සටහන් කරයි.",
+    "knownVariants": [
+      "ඛාලි",
+      "ඛාලිය",
+      "කාලි"
+    ],
+    "prerequisites": [
+      "term-tala"
+    ],
+    "relatedTerms": [
+      "term-tali",
+      "term-sam"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටුව 44"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-theka",
+    "term_si": "ඨේකාව (තාල පදය)",
+    "term_en": "Theka (Tala Stroke Pattern)",
+    "transliteration": "Ṭhēkāva",
+    "category_si": "ලය හා තාල",
+    "definition_si": "යම් තාලයකට අනන්‍ය වූ තබ්ලා හෝ මද්දල අක්ෂර (බෝල්) පෙළගැස්ම ඨේකාව නම් වේ (උදා: දාදරා තාලයේ ඨේකාව: ධා ධී නා | ධා තී නා).",
+    "knownVariants": [
+      "ඨේකාව",
+      "තේකාව",
+      "තාල පදය"
+    ],
+    "prerequisites": [
+      "term-tala"
+    ],
+    "relatedTerms": [
+      "term-tala-bol",
+      "term-tabla"
+    ],
+    "relevantGrades": [
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G07-TG",
+      "pageOrSection": "පිටුව 34"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-avarta",
+    "term_si": "ආවර්තය (ආවර්ත)",
+    "term_en": "Avarta (Full Cycle of Tala)",
+    "transliteration": "Āvartaya",
+    "category_si": "ලය හා තාල",
+    "definition_si": "තාලයක පළමු මාත්‍රාවේ (සම) සිට අවසන් මාත්‍රාව දක්වා ගොස් නැවත සම වෙත පැමිණෙන එක් සම්පූර්ණ තාල වටය ආවර්තයක් නම් වේ.",
+    "knownVariants": [
+      "ආවර්තය",
+      "ආවර්ත",
+      "ආවර්ථ"
+    ],
+    "prerequisites": [
+      "term-tala",
+      "term-sam"
+    ],
+    "relatedTerms": [
+      "term-matra",
+      "term-vibhaga"
+    ],
+    "relevantGrades": [
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G08-TG",
+      "pageOrSection": "පිටුව 42"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-raga",
+    "term_si": "රාගය",
+    "term_en": "Raga (Melodic Framework)",
+    "transliteration": "Rāgaya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "ස්වර, වර්ණ සහ ධ්වනි විලාසයන්ගෙන් සමන්විත වූ, රසික සිත් සතුටු කරන නීතිගත මධුර ස්වර රටාව රාගය නම් වේ.",
+    "knownVariants": [
+      "රාගය",
+      "රාග",
+      "Raga"
+    ],
+    "prerequisites": [
+      "term-swara",
+      "term-thata"
+    ],
+    "relatedTerms": [
+      "term-arohana",
+      "term-avarohana",
+      "term-vadi",
+      "term-samvadi",
+      "term-jati",
+      "term-pakad"
+    ],
+    "relevantGrades": [
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G08-TG",
+      "pageOrSection": "පිටු 36-39"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-arohana",
+    "term_si": "ආරෝහණය",
+    "term_en": "Arohana (Ascending Scale)",
+    "transliteration": "Ārōhaṇaya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "රාගයක ස්වර පහළ සිට ඉහළ තාරතාවයට (ස සිට තාර ස̇ දක්වා) ක්‍රමයෙන් ගායනා හෝ වාදනය කිරීම ආරෝහණයයි.",
+    "knownVariants": [
+      "ආරෝහණය",
+      "ආරෝහණ"
+    ],
+    "prerequisites": [
+      "term-raga"
+    ],
+    "relatedTerms": [
+      "term-avarohana",
+      "term-swara"
+    ],
+    "relevantGrades": [
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G08-TG",
+      "pageOrSection": "පිටුව 37"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-avarohana",
+    "term_si": "අවරෝහණය",
+    "term_en": "Avarohana (Descending Scale)",
+    "transliteration": "Avarōhaṇaya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "රාගයක ස්වර ඉහළ තාරතාවයේ සිට පහළට (තාර ස̇ සිට ස දක්වා) ක්‍රමයෙන් ගායනා හෝ වාදනය කිරීම අවරෝහණයයි.",
+    "knownVariants": [
+      "අවරෝහණය",
+      "අවරෝහණ"
+    ],
+    "prerequisites": [
+      "term-raga"
+    ],
+    "relatedTerms": [
+      "term-arohana",
+      "term-swara"
+    ],
+    "relevantGrades": [
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G08-TG",
+      "pageOrSection": "පිටුව 37"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-vadi",
+    "term_si": "වාදී ස්වරය",
+    "term_en": "Vadi (Dominant / King Note of Raga)",
+    "transliteration": "Vādī Swaraya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "රාගයක වඩාත්ම වැදගත්, වැඩිම වාර ගණනක් ප්‍රයෝග වන ප්‍රධානතම ස්වරයයි. එය රාගයේ 'රජු' බඳු ස්වරය ලෙස හැඳින්වේ.",
+    "knownVariants": [
+      "වාදී ස්වරය",
+      "වාදී"
+    ],
+    "prerequisites": [
+      "term-raga"
+    ],
+    "relatedTerms": [
+      "term-samvadi",
+      "term-anuvadi",
+      "term-vivadi"
+    ],
+    "relevantGrades": [
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G08-TG",
+      "pageOrSection": "පිටුව 38"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-samvadi",
+    "term_si": "සංවාදී ස්වරය",
+    "term_en": "Samvadi (Sub-dominant / Minister Note)",
+    "transliteration": "Saṁvādī Swaraya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "වාදී ස්වරයට පසුව රාගයක දෙවනුවට වැදගත්ම ස්වරයයි. සාමාන්‍යයෙන් වාදී ස්වරයේ සිට 4 වන හෝ 5 වන ස්වරය (ශ්‍රැති 9 හෝ 13 පරතරය) සංවාදී වේ. එය 'ඇමති' බඳු ස්වරයයි.",
+    "knownVariants": [
+      "සංවාදී ස්වරය",
+      "සංවාදී"
+    ],
+    "prerequisites": [
+      "term-vadi"
+    ],
+    "relatedTerms": [
+      "term-vadi",
+      "term-anuvadi"
+    ],
+    "relevantGrades": [
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G08-TG",
+      "pageOrSection": "පිටුව 38"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-jati",
+    "term_si": "ජාතිය (රාග ජාතිය)",
+    "term_en": "Jati (Raga Classification by Note Count)",
+    "transliteration": "Jātiya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "රාගයක ආරෝහණයේ සහ අවරෝහණයේ යෙදෙන ස්වර සංඛ්‍යාව අනුව කෙරෙන වර්ගීකරණයයි: ඕඩව (ස්වර 5), ෂාඩව (ස්වර 6), සම්පූර්ණ (ස්වර 7).",
+    "knownVariants": [
+      "ජාතිය",
+      "රාග ජාති",
+      "ඖඩව",
+      "ඕඩව",
+      "ෂාඩව",
+      "සම්පූර්ණ"
+    ],
+    "prerequisites": [
+      "term-raga"
+    ],
+    "relatedTerms": [
+      "term-arohana",
+      "term-avarohana"
+    ],
+    "relevantGrades": [
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G08-TG",
+      "pageOrSection": "පිටුව 39"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-pakad",
+    "term_si": "මුඛ්‍යාංගය (පකඩ්)",
+    "term_en": "Pakad / Mukhyanga (Characteristic Phrase)",
+    "transliteration": "Mukhyāṅgaya / Pakaḍ",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "රාගයක සුවිශේෂී අනන්‍යතාව හා ස්වරූපය ක්ෂණිකව ප්‍රකට කරවන කෙටි සුවිශේෂී ස්වර ඛණ්ඩය මුඛ්‍යාංගය හෙවත් පකඩ් නම් වේ.",
+    "knownVariants": [
+      "මුඛ්‍යාංගය",
+      "පකඩ්",
+      "මුඛ්යාංගය"
+    ],
+    "prerequisites": [
+      "term-raga"
+    ],
+    "relatedTerms": [
+      "term-vadi",
+      "term-samvadi"
+    ],
+    "relevantGrades": [
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G09-TG",
+      "pageOrSection": "පිටුව 48"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-gana-samaya",
+    "term_si": "ගාන සමය (ගායන වේලාව)",
+    "term_en": "Gana Samaya (Time of Singing)",
+    "transliteration": "Gāna Samaya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "රාගයේ රසය සහ ස්වභාවය උපරිමයෙන් ජනනය වන පරිදි නියම කර ඇති දවසේ පැය 3 බැගින් වූ ප්‍රහාර 8 න් එකකට අදාළ කාල සීමාවයි (උදා: ප්‍රාතඃ කාලය, සන්ධ්‍යා කාලය).",
+    "knownVariants": [
+      "ගාන සමය",
+      "ගායන කාලය"
+    ],
+    "prerequisites": [
+      "term-raga"
+    ],
+    "relatedTerms": [
+      "term-rasa",
+      "term-raga"
+    ],
+    "relevantGrades": [
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G1011-TG",
+      "pageOrSection": "පිටුව 52"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-pancha-turya",
+    "term_si": "පංචතූර්ය නාදය",
+    "term_en": "Pancha Turya (Five-fold Traditional Sri Lankan Instruments)",
+    "transliteration": "Pañcaturya Nādaya",
+    "category_si": "වාද්‍ය භාණ්ඩ",
+    "definition_si": "දේශීය සංගීත සම්ප්‍රදායේ එන සම්භාව්‍ය වාද්‍ය භාණ්ඩ වර්ගීකරණ පංචකයයි: 1. ආතත, 2. විතත, 3. විතතාතත, 4. ඝන, 5. සුෂිර.",
+    "knownVariants": [
+      "පංචතූර්ය",
+      "පංච තූර්ය භාණ්ඩ"
+    ],
+    "prerequisites": [
+      "term-nada"
+    ],
+    "relatedTerms": [
+      "term-athatha",
+      "term-vithatha",
+      "term-vithathathatha",
+      "term-ghana",
+      "term-sushira"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G06-TG",
+      "pageOrSection": "පිටු 55-60; sg9_emus_music_instruments.pdf පිටු 1-5"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-athatha",
+    "term_si": "ආතත භාණ්ඩ",
+    "term_en": "Athatha (Hand-struck Membranophones)",
+    "transliteration": "Ātata Bhāṇḍa",
+    "category_si": "වාද්‍ය භාණ්ඩ",
+    "definition_si": "හම් ඇටවූ මුහුණත අතින් පමණක් තට්ටු කරමින් වාදනය කරන බෙර භාණ්ඩයි (උදා: අත් රබාන, බුම්මැඩිය, ගැටබෙරයේ වම් මුහුණත).",
+    "knownVariants": [
+      "ආතත",
+      "ආතත භාණ්ඩ"
+    ],
+    "prerequisites": [
+      "term-pancha-turya"
+    ],
+    "relatedTerms": [
+      "term-vithatha",
+      "term-vithathathatha"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G09-TG",
+      "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-vithatha",
+    "term_si": "විතත භාණ්ඩ",
+    "term_en": "Vithatha (Stick-struck Membranophones)",
+    "transliteration": "Vitata Bhāṇḍa",
+    "category_si": "වාද්‍ය භාණ්ඩ",
+    "definition_si": "කඩිප්පුවක් හෙවත් කෝටුවක් භාවිතයෙන් පමණක් පහර දී වාදනය කරන අවනද්ධ භාණ්ඩයි (උදා: තම්මැට්ටම).",
+    "knownVariants": [
+      "විතත",
+      "විතත භාණ්ඩ"
+    ],
+    "prerequisites": [
+      "term-pancha-turya"
+    ],
+    "relatedTerms": [
+      "term-athatha",
+      "term-vithathathatha"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G09-TG",
+      "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-vithathathatha",
+    "term_si": "විතතාතත භාණ්ඩ",
+    "term_en": "Vithathathatha (Hand-and-Stick Struck Membranophones)",
+    "transliteration": "Vitatātata Bhāṇḍa",
+    "category_si": "වාද්‍ය භාණ්ඩ",
+    "definition_si": "එක් පසක් අතින්ද අනෙක් පස කඩිප්පුවකින්ද (කෝටුවකින්) පහර දී එකවර වාදනය කරන බෙර භාණ්ඩයි (උදා: දවුල, උඩැක්කිය).",
+    "knownVariants": [
+      "විතතාතත",
+      "විතතාතත භාණ්ඩ"
+    ],
+    "prerequisites": [
+      "term-pancha-turya"
+    ],
+    "relatedTerms": [
+      "term-athatha",
+      "term-vithatha"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G09-TG",
+      "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-ghana",
+    "term_si": "ඝන භාණ්ඩ",
+    "term_en": "Ghana (Idiophones / Metallic Struck Instruments)",
+    "transliteration": "Ghana Bhāṇḍa",
+    "category_si": "වාද්‍ය භාණ්ඩ",
+    "definition_si": "ලෝහ හෝ ලී වැනි ඝන ද්‍රව්‍ය එකිනෙක ගැටීමෙන් ස්වභාවික නාදය උපදවන භාණ්ඩයි (උදා: තාලම්පට, පන්තේරුව, තලිය, කයිතාලම, හක්ගෙඩිය).",
+    "knownVariants": [
+      "ඝන",
+      "ඝන භාණ්ඩ"
+    ],
+    "prerequisites": [
+      "term-pancha-turya"
+    ],
+    "relatedTerms": [
+      "term-sushira"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G09-TG",
+      "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-sushira",
+    "term_si": "සුෂිර භාණ්ඩ",
+    "term_en": "Sushira (Aerophones / Wind Instruments)",
+    "transliteration": "Suṣira Bhāṇḍa",
+    "category_si": "වාද්‍ය භාණ්ඩ",
+    "definition_si": "මුඛයෙන් වාතය පිඹීමෙන් වාත කඳ කම්පනය කර නාදය උපදවන සුළං වාද්‍ය භාණ්ඩයි (උදා: හොරණෑව, බටනලාව, කොම්බුව, නාදස්වරම්).",
+    "knownVariants": [
+      "සුෂිර",
+      "සුෂිර භාණ්ඩ",
+      "සුසිර"
+    ],
+    "prerequisites": [
+      "term-pancha-turya"
+    ],
+    "relatedTerms": [
+      "term-ghana"
+    ],
+    "relevantGrades": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G09-TG",
+      "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  },
+  {
+    "id": "term-tabla",
+    "term_si": "තබ්ලාව",
+    "term_en": "Tabla (North Indian Twin Drum)",
+    "transliteration": "Tablāva",
+    "category_si": "වාද්‍ය භාණ්ඩ",
+    "definition_si": "හින්දුස්ථානි සංගීතයේ ප්‍රධානතම තාල වාද්‍ය භාණ්ඩය වන දායාන් (දකුණු ලී බෙරය) සහ බායාන් (වම් ලෝහ/මැටි බෙරය) යන යුගල බෙරයයි.",
+    "knownVariants": [
+      "තබ්ලාව",
+      "තබ්ලා",
+      "Tabla"
+    ],
+    "prerequisites": [
+      "term-tala"
+    ],
+    "relatedTerms": [
+      "term-theka",
+      "term-tala"
+    ],
+    "relevantGrades": [
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G07-TG",
+      "pageOrSection": "tabla.md පිටු 1-23"
+    },
+    "confidence": "Verified",
+    "reviewStatus": "Published"
+  }
+]
