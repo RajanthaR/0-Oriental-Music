@@ -11,10 +11,7 @@ export type PublicGradeBand = (typeof PUBLIC_GRADE_BANDS)[number];
 export type PublicationState = "public" | "quarantined" | "needs-review";
 export type EvidenceQuality = "A" | "B" | "C" | "D" | "mixed" | "missing";
 
-export type PublicationReasonCode =
-  | "unsupported-grade"
-  | "known-forensic-issue"
-  | "missing-grade-scope"
+export type SourceEvidenceFailureCode =
   | "missing-source-reference"
   | "unknown-source"
   | "ambiguous-source-document"
@@ -23,15 +20,13 @@ export type PublicationReasonCode =
   | "page-out-of-range"
   | "low-quality-page-evidence";
 
-export type SourceEvidenceReasonCode =
-  | "missing-source-reference"
-  | "unknown-source"
-  | "ambiguous-source-document"
-  | "source-document-needs-review"
-  | "missing-page-evidence"
-  | "page-out-of-range"
-  | "low-quality-page-evidence"
-  | "supportable";
+export type PublicationReasonCode =
+  | "unsupported-grade"
+  | "known-forensic-issue"
+  | "missing-grade-scope"
+  | SourceEvidenceFailureCode;
+
+export type SourceEvidenceReasonCode = SourceEvidenceFailureCode | "supportable";
 
 export interface SourceEvidenceDecision {
   sourceId?: string;
@@ -114,7 +109,7 @@ type PublicationRecordShape = {
   sourceReference?: unknown;
 };
 
-export interface PublicationInput {
+interface PublicationInput {
   id: string;
   gradeBands: string[];
   sourceReference?: SourceReference;
