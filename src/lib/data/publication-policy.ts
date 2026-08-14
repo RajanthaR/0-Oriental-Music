@@ -79,13 +79,15 @@ export const KNOWN_QUARANTINED_ENTITY_IDS = new Set([
   "path-exam-prep",
 ]);
 
-const sourceDocuments = sourceDocumentsData as Array<{
+type SourceDocumentRecord = {
   id: string;
   slug: string;
   originalFilename: string;
   pageCount: number;
   reviewStatus: string;
-}>;
+};
+
+const sourceDocuments = sourceDocumentsData as SourceDocumentRecord[];
 
 const sourcePageQuality = sourcePageQualityData as Array<{
   documentSlug: string;
@@ -94,11 +96,13 @@ const sourcePageQuality = sourcePageQualityData as Array<{
   hasSinhalaText: boolean;
 }>;
 
-const sourceRecords = sourcesData as Array<{
+type SourceRecord = {
   id: string;
   originalFilename: string;
   grades: string[];
-}>;
+};
+
+const sourceRecords = sourcesData as SourceRecord[];
 
 type PublicationRecordShape = {
   id?: unknown;
@@ -109,10 +113,28 @@ type PublicationRecordShape = {
   sourceReference?: unknown;
 };
 
-interface PublicationInput {
+export interface PublicationInput {
   id: string;
   gradeBands: string[];
   sourceReference?: SourceReference;
+}
+
+type SourceResolution =
+  | { status: "missing-source"; sourceId: string }
+  | { status: "missing-document"; source: SourceRecord }
+  | { status: "ambiguous-document"; source: SourceRecord; matches: SourceDocumentRecord[] }
+  | { status: "found"; source: SourceRecord; document: SourceDocumentRecord };
+
+function resolveSourceDocument(sourceId: string): SourceResolution {
+  const source = sourceRecords.find((record) => record.id === sourceId);
+  if (!source) return { status: "missing-source", sourceId };
+
+  const matches = sourceDocuments.filter(
+    (document) => document.originalFilename === source.originalFilename
+  );
+  if (matches.length === 0) return { status: "missing-document", source };
+  if (matches.length > 1) return { status: "ambiguous-document", source, matches };
+  return { status: "found", source, document: matches[0] };
 }
 
 function numericPageReferences(pageOrSection: string): number[] {
@@ -144,27 +166,26 @@ function hasReadablePage(documentSlug: string, pageNumbers: number[]): boolean {
 }
 
 export function getSourceDocumentSummary(sourceId: string): SourceDocumentSummary {
-  const source = sourceRecords.find((record) => record.id === sourceId);
-  if (!source) {
+  const resolution = resolveSourceDocument(sourceId);
+  if (resolution.status === "missing-source") {
     return {
       reviewStatus: "No matching source record",
       pageCount: 0,
       evidenceQuality: "missing",
     };
   }
-
-  const matches = sourceDocuments.filter(
-    (document) => document.originalFilename === source.originalFilename
-  );
-  if (matches.length !== 1) {
+  if (resolution.status !== "found") {
     return {
-      reviewStatus: matches.length === 0 ? "No matching extracted document" : "Ambiguous extracted document mapping",
+      reviewStatus:
+        resolution.status === "missing-document"
+          ? "No matching extracted document"
+          : "Ambiguous extracted document mapping",
       pageCount: 0,
       evidenceQuality: "missing",
     };
   }
 
-  const document = matches[0];
+  const document = resolution.document;
   const pages = sourcePageQuality.filter((page) => page.documentSlug === document.slug);
   const quality = pages.length === 0
     ? "missing"
@@ -211,36 +232,25 @@ export function evaluateSourceReference(
     };
   }
 
-  const source = sourceRecords.find((record) => record.id === reference.sourceId);
-  if (!source) {
+  const resolution = resolveSourceDocument(reference.sourceId);
+  if (resolution.status !== "found") {
+    const isAmbiguous = resolution.status === "ambiguous-document";
     return {
       sourceId: reference.sourceId,
       pageNumbers: [],
       quality: "missing",
       supportable: false,
-      reasonCode: "unknown-source",
-      reason: "The source ID is not present in the canonical source catalog.",
-    };
-  }
-
-  const matches = sourceDocuments.filter(
-    (document) => document.originalFilename === source.originalFilename
-  );
-  if (matches.length !== 1) {
-    return {
-      sourceId: reference.sourceId,
-      pageNumbers: [],
-      quality: "missing",
-      supportable: false,
-      reasonCode: matches.length === 0 ? "unknown-source" : "ambiguous-source-document",
+      reasonCode: isAmbiguous ? "ambiguous-source-document" : "unknown-source",
       reason:
-        matches.length === 0
+        resolution.status === "missing-source"
+          ? "The source ID is not present in the canonical source catalog."
+          : resolution.status === "missing-document"
           ? "The supplied source catalog has no matching extracted document."
           : "The source filename maps to more than one extracted document.",
     };
   }
 
-  const document = matches[0];
+  const document = resolution.document;
   const pageNumbers = numericPageReferences(reference.pageOrSection);
   const inRangePages = pageNumbers.filter((page) => page <= document.pageCount);
   const quality = qualityForPages(document.slug, inRangePages);
@@ -319,7 +329,7 @@ function isSourceReference(value: unknown): value is SourceReference {
   return typeof reference.sourceId === "string" && typeof reference.pageOrSection === "string";
 }
 
-function getPublicationInput(record: unknown): PublicationInput {
+export function toPublicationInput(record: unknown): PublicationInput {
   const value = getRecordShape(record);
   return {
     id: typeof value.id === "string" ? value.id : "",
@@ -367,7 +377,7 @@ function getGradeBands(value: PublicationRecordShape): string[] {
 }
 
 export function getRecordGradeBands(record: unknown): string[] {
-  return getGradeBands(getRecordShape(record));
+  return toPublicationInput(record).gradeBands;
 }
 
 function hasUnsupportedGrade(gradeBands: string[]): boolean {
@@ -378,8 +388,7 @@ function hasPublicGrade(gradeBands: string[]): boolean {
   return gradeBands.some((band) => PUBLIC_GRADE_BANDS.includes(band as PublicGradeBand) || band === "7");
 }
 
-export function getPublicationDecision(record: unknown): PublicationDecision {
-  const input = getPublicationInput(record);
+export function getPublicationDecision(input: PublicationInput): PublicationDecision {
   const { id, gradeBands, sourceReference } = input;
   const sourceEvidence = evaluateSourceReference(sourceReference);
   const reasonCodes: PublicationReasonCode[] = [];
@@ -407,7 +416,11 @@ export function getPublicationDecision(record: unknown): PublicationDecision {
   };
 }
 
-export function sanitizeReviewMetadata(metadata: ReviewMetadata | undefined): ReviewMetadata {
+export function getRecordPublicationDecision(record: unknown): PublicationDecision {
+  return getPublicationDecision(toPublicationInput(record));
+}
+
+export function createUnverifiedReviewMetadata(): ReviewMetadata {
   return {
     status: "Needs Revision",
     reviewer: UNKNOWN_PROVENANCE,
@@ -424,7 +437,7 @@ export function sanitizePublicRecord<T>(record: T): T {
   if (!record || typeof record !== "object") return record;
   const value = { ...(record as Record<string, unknown>) };
   if ("reviewMetadata" in value) {
-    value.reviewMetadata = sanitizeReviewMetadata(value.reviewMetadata as ReviewMetadata | undefined);
+    value.reviewMetadata = createUnverifiedReviewMetadata();
   }
   if ("published" in value) value.published = false;
   return value as T;

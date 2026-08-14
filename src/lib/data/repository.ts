@@ -27,12 +27,11 @@ import quizzesData from "@/data/quizzes.json";
 import examPapersData from "@/data/exam-papers.json";
 import { searchFilter } from "@/lib/search/search-engine";
 import {
-  getPublicationDecision,
-  getRecordGradeBands,
+  getRecordPublicationDecision,
   getSourceDocumentSummary,
+  UNKNOWN_PROVENANCE,
   PUBLIC_GRADE_BANDS,
   sanitizePublicRecord,
-  type PublicationDecision,
   type SourceDocumentSummary,
 } from "@/lib/data/publication-policy";
 
@@ -68,11 +67,6 @@ export interface PublicationCollectionSummary {
   quarantined: number;
   needsReview: number;
 }
-
-export type ReviewRecord<T> = {
-  item: T;
-  publication: PublicationDecision;
-};
 
 export type LessonVisibility = "public" | "review";
 
@@ -182,7 +176,7 @@ class ContentRepository {
 
   private selectPublic<T extends { id: string }>(items: T[]): T[] {
     return items
-      .filter((item) => getPublicationDecision(item).isPublic)
+      .filter((item) => getRecordPublicationDecision(item).isPublic)
       .map((item) => sanitizePublicRecord(item));
   }
 
@@ -191,7 +185,7 @@ class ContentRepository {
   }
 
   private summarize<T extends { id: string }>(items: T[]): PublicationCollectionSummary {
-    const decisions = items.map((item) => getPublicationDecision(item));
+    const decisions = items.map((item) => getRecordPublicationDecision(item));
     return {
       raw: items.length,
       public: decisions.filter((decision) => decision.state === "public").length,
@@ -209,14 +203,14 @@ class ContentRepository {
         id: source.id,
         title: source.title,
         originalFilename: source.originalFilename,
-        publisher: "නොදනී / සනාථ වී නැත",
+        publisher: UNKNOWN_PROVENANCE,
         grades: source.grades,
-        year: "නොදනී / සනාථ වී නැත",
+        year: UNKNOWN_PROVENANCE,
         language: source.language,
         tier: "මූලාශ්‍ර වාර්තාව (සනාථ නොකළ)",
-        location: "නොදනී / සනාථ වී නැත",
+        location: UNKNOWN_PROVENANCE,
         status: "Unverified / source review pending",
-        license: "නොදනී / සනාථ වී නැත",
+        license: UNKNOWN_PROVENANCE,
         url: source.url,
         evidenceState: document.reviewStatus,
         evidenceQuality: document.evidenceQuality,
@@ -275,13 +269,6 @@ class ContentRepository {
 
   public getLessonById(id: string): Lesson | undefined {
     return this.getLessons().find((lesson) => lesson.id === id || lesson.slug === id);
-  }
-
-  public getLessonReviewRecords(): ReviewRecord<Lesson>[] {
-    return this.lessons.map((lesson) => ({
-      item: sanitizePublicRecord(lesson),
-      publication: getPublicationDecision(lesson),
-    }));
   }
 
   // Ragas

@@ -16,8 +16,7 @@ import reconciliationData from "../../../data/content-reconciliation.json";
 import forensicLedgerData from "../../../data/forensic-ledger.json";
 import coverageData from "../../../data/content-coverage.json";
 import {
-  getPublicationDecision,
-  getRecordGradeBands,
+  getRecordPublicationDecision,
   UNKNOWN_PROVENANCE,
 } from "@/lib/data/publication-policy";
 
@@ -76,8 +75,8 @@ export function validatePublicCollection(
   records.forEach((record, index) => {
     const value = (record || {}) as Record<string, unknown>;
     const id = typeof value.id === "string" ? value.id : `${entityType}-${index}`;
-    const decision = getPublicationDecision(record);
-    const gradeBands = getRecordGradeBands(record);
+    const decision = getRecordPublicationDecision(record);
+    const gradeBands = decision.gradeBands;
 
     if (!decision.isPublic) {
       issues.push(

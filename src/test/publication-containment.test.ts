@@ -3,7 +3,7 @@ import coverageData from "../../data/content-coverage.json";
 import ragasData from "@/data/ragas.json";
 import { repository } from "@/lib/data/repository";
 import {
-  getPublicationDecision,
+  getRecordPublicationDecision,
   getSourceCorpusInventory,
   KNOWN_QUARANTINED_ENTITY_IDS,
   UNKNOWN_PROVENANCE,
@@ -28,8 +28,8 @@ describe("Prompt 1 publication containment", () => {
     ];
 
     publicCollections.forEach((record) => {
-      expect(getPublicationDecision(record).isPublic).toBe(true);
-      expect(getPublicationDecision(record).gradeBands).not.toContain("12-13");
+      expect(getRecordPublicationDecision(record).isPublic).toBe(true);
+      expect(getRecordPublicationDecision(record).gradeBands).not.toContain("12-13");
       expect(KNOWN_QUARANTINED_ENTITY_IDS.has(record.id)).toBe(false);
     });
   });
