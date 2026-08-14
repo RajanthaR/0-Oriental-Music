@@ -74,6 +74,8 @@ export type ReviewRecord<T> = {
   publication: PublicationDecision;
 };
 
+export type LessonVisibility = "public" | "review";
+
 export const CURRICULUM_STRANDS: StrandInfo[] = [
   {
     id: "strand-fundamentals",
@@ -248,16 +250,12 @@ class ContentRepository {
   public getLessons(filters?: {
     gradeBand?: GradeBandType;
     strandId?: string;
-    publishedOnly?: boolean;
-    publicOnly?: boolean;
+    visibility?: LessonVisibility;
     query?: string;
   }): Lesson[] {
-    let list = filters?.publicOnly === false
+    let list = filters?.visibility === "review"
       ? this.selectForReview(this.lessons)
       : this.selectPublic(this.lessons);
-    if (filters?.publishedOnly !== false && filters?.publicOnly === false) {
-      list = list.filter((lesson) => lesson.published);
-    }
     if (filters?.gradeBand) {
       list = list.filter((lesson) => lesson.gradeBands.includes(filters.gradeBand!));
     }

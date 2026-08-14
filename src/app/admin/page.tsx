@@ -31,7 +31,7 @@ export default function AdminReviewDashboardPage() {
   const [updatedSuccessMsg, setUpdatedSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    const all = repository.getLessons({ publicOnly: false, publishedOnly: false });
+    const all = repository.getLessons({ visibility: "review" });
     setLessons(all);
     const contentReport = validateContent(
       repository.getLessons(),
@@ -72,7 +72,7 @@ export default function AdminReviewDashboardPage() {
   const handleUpdateStatus = (lessonId: string, newStatus: ContentReviewStatus) => {
     const isPublished = newStatus === "Published";
     repository.updateLessonReviewStatus(lessonId, newStatus, isPublished);
-    setLessons(repository.getLessons({ publicOnly: false, publishedOnly: false }));
+    setLessons(repository.getLessons({ visibility: "review" }));
     setUpdatedSuccessMsg(
       `පාඩම් අංක ${lessonId} සමාලෝචන පාරදත්ත '${newStatus}' ලෙස සටහන් විය. ප්‍රකාශන සීමා ප්‍රතිපත්තිය තවදුරටත් බලපැවැත්වේ.`
     );

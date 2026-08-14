@@ -23,6 +23,16 @@ export type PublicationReasonCode =
   | "page-out-of-range"
   | "low-quality-page-evidence";
 
+export type SourceEvidenceReasonCode =
+  | "missing-source-reference"
+  | "unknown-source"
+  | "ambiguous-source-document"
+  | "source-document-needs-review"
+  | "missing-page-evidence"
+  | "page-out-of-range"
+  | "low-quality-page-evidence"
+  | "supportable";
+
 export interface SourceEvidenceDecision {
   sourceId?: string;
   documentId?: string;
@@ -30,6 +40,7 @@ export interface SourceEvidenceDecision {
   pageNumbers: number[];
   quality: EvidenceQuality;
   supportable: boolean;
+  reasonCode: SourceEvidenceReasonCode;
   reason: string;
 }
 
@@ -93,6 +104,21 @@ const sourceRecords = sourcesData as Array<{
   originalFilename: string;
   grades: string[];
 }>;
+
+type PublicationRecordShape = {
+  id?: unknown;
+  gradeBand?: unknown;
+  gradeBands?: unknown;
+  partA_MCQ?: unknown;
+  partB_Structured?: unknown;
+  sourceReference?: unknown;
+};
+
+export interface PublicationInput {
+  id: string;
+  gradeBands: string[];
+  sourceReference?: SourceReference;
+}
 
 function numericPageReferences(pageOrSection: string): number[] {
   return Array.from(new Set((pageOrSection.match(/\d+/g) || []).map(Number))).filter(
@@ -185,6 +211,7 @@ export function evaluateSourceReference(
       pageNumbers: [],
       quality: "missing",
       supportable: false,
+      reasonCode: "missing-source-reference",
       reason: "Claim-level source ID and exact page/section evidence are required.",
     };
   }
@@ -196,6 +223,7 @@ export function evaluateSourceReference(
       pageNumbers: [],
       quality: "missing",
       supportable: false,
+      reasonCode: "unknown-source",
       reason: "The source ID is not present in the canonical source catalog.",
     };
   }
@@ -209,6 +237,7 @@ export function evaluateSourceReference(
       pageNumbers: [],
       quality: "missing",
       supportable: false,
+      reasonCode: matches.length === 0 ? "unknown-source" : "ambiguous-source-document",
       reason:
         matches.length === 0
           ? "The supplied source catalog has no matching extracted document."
@@ -229,6 +258,7 @@ export function evaluateSourceReference(
       pageNumbers: inRangePages,
       quality,
       supportable: false,
+      reasonCode: "source-document-needs-review",
       reason: `The extracted document is ${document.reviewStatus}; source triage is not complete.`,
     };
   }
@@ -241,6 +271,7 @@ export function evaluateSourceReference(
       pageNumbers: [],
       quality: "missing",
       supportable: false,
+      reasonCode: "missing-page-evidence",
       reason: "No exact numeric page evidence was supplied.",
     };
   }
@@ -253,6 +284,7 @@ export function evaluateSourceReference(
       pageNumbers: [],
       quality: "missing",
       supportable: false,
+      reasonCode: "page-out-of-range",
       reason: "All cited page numbers fall outside the extracted document page range.",
     };
   }
@@ -265,6 +297,7 @@ export function evaluateSourceReference(
       pageNumbers: inRangePages,
       quality,
       supportable: false,
+      reasonCode: "low-quality-page-evidence",
       reason: "The cited pages do not contain an A/B readable Sinhala evidence page.",
     };
   }
@@ -276,13 +309,31 @@ export function evaluateSourceReference(
     pageNumbers: inRangePages,
     quality,
     supportable: true,
+    reasonCode: "supportable",
     reason: "The source ID, extracted document, page range, and readable page evidence agree.",
   };
 }
 
-function getGradeBands(record: unknown): string[] {
-  if (!record || typeof record !== "object") return [];
-  const value = record as Record<string, unknown>;
+function getRecordShape(record: unknown): PublicationRecordShape {
+  return record && typeof record === "object" ? (record as PublicationRecordShape) : {};
+}
+
+function isSourceReference(value: unknown): value is SourceReference {
+  if (!value || typeof value !== "object") return false;
+  const reference = value as Record<string, unknown>;
+  return typeof reference.sourceId === "string" && typeof reference.pageOrSection === "string";
+}
+
+function getPublicationInput(record: unknown): PublicationInput {
+  const value = getRecordShape(record);
+  return {
+    id: typeof value.id === "string" ? value.id : "",
+    gradeBands: getGradeBands(value),
+    sourceReference: isSourceReference(value.sourceReference) ? value.sourceReference : undefined,
+  };
+}
+
+function getGradeBands(value: PublicationRecordShape): string[] {
   const bands = new Set<string>();
 
   if (typeof value.gradeBand === "string") bands.add(value.gradeBand);
@@ -292,7 +343,8 @@ function getGradeBands(record: unknown): string[] {
     });
   }
 
-  ["partA_MCQ", "partB_Structured"].forEach((field) => {
+  const questionFields: Array<"partA_MCQ" | "partB_Structured"> = ["partA_MCQ", "partB_Structured"];
+  questionFields.forEach((field) => {
     const questions = value[field];
     if (!Array.isArray(questions)) return;
     questions.forEach((question) => {
@@ -320,7 +372,7 @@ function getGradeBands(record: unknown): string[] {
 }
 
 export function getRecordGradeBands(record: unknown): string[] {
-  return getGradeBands(record);
+  return getGradeBands(getRecordShape(record));
 }
 
 function hasUnsupportedGrade(gradeBands: string[]): boolean {
@@ -332,24 +384,15 @@ function hasPublicGrade(gradeBands: string[]): boolean {
 }
 
 export function getPublicationDecision(record: unknown): PublicationDecision {
-  const value = (record || {}) as Record<string, unknown>;
-  const id = typeof value.id === "string" ? value.id : "";
-  const gradeBands = getGradeBands(record);
-  const sourceReference = value.sourceReference as SourceReference | undefined;
+  const input = getPublicationInput(record);
+  const { id, gradeBands, sourceReference } = input;
   const sourceEvidence = evaluateSourceReference(sourceReference);
   const reasonCodes: PublicationReasonCode[] = [];
 
   if (hasUnsupportedGrade(gradeBands)) reasonCodes.push("unsupported-grade");
   if (KNOWN_QUARANTINED_ENTITY_IDS.has(id)) reasonCodes.push("known-forensic-issue");
   if (gradeBands.length === 0) reasonCodes.push("missing-grade-scope");
-  if (!sourceReference) reasonCodes.push("missing-source-reference");
-  if (sourceReference && !sourceEvidence.sourceId) reasonCodes.push("unknown-source");
-  if (sourceEvidence.reason.includes("more than one")) reasonCodes.push("ambiguous-source-document");
-  if (sourceEvidence.reason.includes("no matching extracted document")) reasonCodes.push("unknown-source");
-  if (sourceEvidence.reason.includes("page evidence")) reasonCodes.push("missing-page-evidence");
-  if (sourceEvidence.reason.includes("outside")) reasonCodes.push("page-out-of-range");
-  if (sourceEvidence.reason.includes("readable Sinhala")) reasonCodes.push("low-quality-page-evidence");
-  if (sourceEvidence.reason.includes("source triage")) reasonCodes.push("source-document-needs-review");
+  if (sourceEvidence.reasonCode !== "supportable") reasonCodes.push(sourceEvidence.reasonCode);
 
   const quarantined = hasUnsupportedGrade(gradeBands) || KNOWN_QUARANTINED_ENTITY_IDS.has(id);
   const publicByEvidence = hasPublicGrade(gradeBands) && sourceEvidence.supportable;
