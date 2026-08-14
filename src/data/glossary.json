@@ -1,0 +1,382 @@
+[
+  {
+    "id": "glo-nada",
+    "term_si": "නාදය",
+    "term_en": "Nada (Musical Sound)",
+    "transliteration": "Nādaya",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "කනට ප්‍රියජනක, ක්‍රමවත් සංඛ්‍යාත සහිත කම්පනයෙන් උපදින ඕනෑම සංගීතමය ශබ්දයක් නාදය නම් වේ.",
+    "detailedNotes_si": "නාදය ආහත නාදය (වස්තුවක් ගැටීමෙන් උපදින) සහ අනාහත නාදය (ස්වභාවික යෝගී නාදය) ලෙස කොටස් දෙකකි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 12" }
+  },
+  {
+    "id": "glo-shruti",
+    "term_si": "ශ්‍රැතිය",
+    "term_en": "Shruti (Microtone)",
+    "transliteration": "Śruthiya",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "මිනිස් කනට එකිනෙකින් වෙන්කොට හඳුනාගත හැකි සියුම්ම ශබ්ද ඒකකය ශ්‍රැතියයි. පෙරදිග සංගීතයේ සප්තකයකට ශ්‍රැති 22 කි.",
+    "detailedNotes_si": "චතුශ්චතුශ්චෛව ෂඩ්ජ මධ්‍යම පඤ්චමාඃ ශ්ලෝකයට අනුව ස-4, රි-3, ග-2, ම-4, ප-4, ධ-3, නි-2 ලෙස ශ්‍රැති බෙදී පවතී.",
+    "sourceReference": { "sourceId": "SRC-NIE-G1213-SYL", "pageOrSection": "ශ්‍රැති වාදය ඒකකය" }
+  },
+  {
+    "id": "glo-swara",
+    "term_si": "ස්වරය",
+    "term_en": "Swara (Musical Note)",
+    "transliteration": "Swaraya",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "ශ්‍රැති සමූහයක් එක්වීමෙන් සිතට ප්‍රමෝදය ගෙන දෙන නියත තාරතාවක් සහිත නාද ස්ථානයකි. ප්‍රධාන සප්ත ස්වර 7 කි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 18" }
+  },
+  {
+    "id": "glo-shuddha-swara",
+    "term_si": "ශුද්ධ ස්වර",
+    "term_en": "Shuddha Swaras (Natural Notes)",
+    "transliteration": "Śuddha Swara",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "තමන්ට නියමිත නිවැරදි නාද ස්ථානයේ පිහිටි ස්වර ශුද්ධ ස්වර නම් වේ. (ස, රි, ග, ම, ප, ධ, නි).",
+    "sourceReference": { "sourceId": "SRC-NIE-G07-TG", "pageOrSection": "පිටුව 14" }
+  },
+  {
+    "id": "glo-komal-swara",
+    "term_si": "කෝමල ස්වර",
+    "term_en": "Komal Swaras (Flat Notes)",
+    "transliteration": "Kōmala Swara",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "ශුද්ධ ස්වර ස්ථානයෙන් අඩ ස්වරයක් (අර්ධ ස්වරයක්) පහතට බැස ශබ්ද වන ස්වර වේ. (රි, ග, ධ, නි).",
+    "sourceReference": { "sourceId": "SRC-NIE-G07-TG", "pageOrSection": "පිටුව 16" }
+  },
+  {
+    "id": "glo-teevra-swara",
+    "term_si": "තීව්‍ර ස්වර",
+    "term_en": "Teevra Swara (Sharp Note)",
+    "transliteration": "Tīvra Swara",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "ශුද්ධ ස්වර ස්ථානයෙන් අඩ ස්වරයක් ඉහළට ගොස් ශබ්ද වන ස්වරයයි. උත්තර භාරතීය සංගීතයේ තීව්‍ර වන්නේ 'ම' ස්වරය පමණි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G07-TG", "pageOrSection": "පිටුව 17" }
+  },
+  {
+    "id": "glo-achala-swara",
+    "term_si": "අචල ස්වර",
+    "term_en": "Achala Swaras (Fixed Notes)",
+    "transliteration": "Achala Swara",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "ස්වකීය ස්ථානයෙන් වෙනස් නොවන 'ස' සහ 'ප' ස්වර දෙක අචල ස්වර නම් වේ.",
+    "sourceReference": { "sourceId": "SRC-NIE-G07-TG", "pageOrSection": "පිටුව 15" }
+  },
+  {
+    "id": "glo-chala-swara",
+    "term_si": "චල ස්වර",
+    "term_en": "Chala Swaras (Movable Notes)",
+    "transliteration": "Chala Swara",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "ශුද්ධ ස්වර ස්ථානයෙන් කෝමල හෝ තීව්‍ර බවට පත්විය හැකි ස්වර 5 (රි, ග, ම, ධ, නි) චල ස්වර නම් වේ.",
+    "sourceReference": { "sourceId": "SRC-NIE-G07-TG", "pageOrSection": "පිටුව 15" }
+  },
+  {
+    "id": "glo-saptaka",
+    "term_si": "සප්තකය",
+    "term_en": "Saptaka (Octave Spectrum)",
+    "transliteration": "Saptakaya",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "ස සිට නි දක්වා පිළිවෙළින් පිහිටි ස්වර හතක සමූහය සප්තකයක් නම් වේ.",
+    "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 24" }
+  },
+  {
+    "id": "glo-mandra-saptaka",
+    "term_si": "මන්ද්‍ර සප්තකය",
+    "term_en": "Mandra Saptaka (Lower Octave)",
+    "transliteration": "Mandra Saptakaya",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "මධ්‍ය සප්තකයට වඩා අඩක් තාරතාව අඩු ගොරෝසු නාද සහිත පහළ සප්තකයයි. ස්වරයට යටින් තිතක් (.ස හෝ ස̣) යොදයි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G08-TG", "pageOrSection": "පිටුව 20" }
+  },
+  {
+    "id": "glo-madhya-saptaka",
+    "term_si": "මධ්‍ය සප්තකය",
+    "term_en": "Madhya Saptaka (Middle Octave)",
+    "transliteration": "Madhya Saptakaya",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "සාමාන්‍ය කතා කරන හඬට සමාන මැද පිහිටි සප්තකයයි. කිසිදු ලකුණක් නොමැතිව ලියයි (ස රි ග ම ප ධ නි).",
+    "sourceReference": { "sourceId": "SRC-NIE-G08-TG", "pageOrSection": "පිටුව 20" }
+  },
+  {
+    "id": "glo-tara-saptaka",
+    "term_si": "තාර සප්තකය",
+    "term_en": "Tara Saptaka (Higher Octave)",
+    "transliteration": "Tāra Saptakaya",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "මධ්‍ය සප්තකයට වඩා දෙගුණයක් තාරතාවෙන් ඉහළ සිහින් සප්තකයයි. ස්වරයට ඉහළින් තිතක් (ස̇ හෝ S') යොදයි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G08-TG", "pageOrSection": "පිටුව 20" }
+  },
+  {
+    "id": "glo-thata",
+    "term_si": "ථාටය (මේලය)",
+    "term_en": "Thata (Parent Scale)",
+    "transliteration": "Thātaya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "රාග බිහි කිරීමට සමත් සප්ත ස්වර සමූහයක ව්‍යුහය ථාටයක් නම් වේ. භාත්ඛණ්ඩේ පඬිතුමා විසින් ථාට 10 ක් හඳුන්වා දී ඇත.",
+    "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 45" }
+  },
+  {
+    "id": "glo-raga",
+    "term_si": "රාගය",
+    "term_en": "Raga (Melodic Framework)",
+    "transliteration": "Rāgaya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "ස්වර හා වර්ණ වලින් සැරසුණු, සිතට ප්‍රමෝදය ගෙන දෙන නියමිත නීතිරීති සහිත තනු ආකෘතිය රාගයයි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G08-TG", "pageOrSection": "පිටුව 35" }
+  },
+  {
+    "id": "glo-arohana",
+    "term_si": "ආරෝහණය",
+    "term_en": "Arohana (Ascending Scale)",
+    "transliteration": "Ārōhaṇaya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "පහළ ස්වරයේ සිට ඉහළ ස්වරය දක්වා අනුක්‍රමයෙන් ගමන් කිරීම ආරෝහණයයි (ස රි ග ම ප ධ නි ස̇).",
+    "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 28" }
+  },
+  {
+    "id": "glo-avarohana",
+    "term_si": "අවරෝහණය",
+    "term_en": "Avarohana (Descending Scale)",
+    "transliteration": "Avarōhaṇaya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "ඉහළ ස්වරයේ සිට පහළ ස්වරය දක්වා අනුක්‍රමයෙන් බැස ඒම අවරෝහණයයි (ස̇ නි ධ ප ම ග රි ස).",
+    "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 28" }
+  },
+  {
+    "id": "glo-vadi",
+    "term_si": "වාදී ස්වරය",
+    "term_en": "Vadi Swara (Sonant / King Note)",
+    "transliteration": "Vādī Swaraya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "රාගයක වැඩිම වාර ගණනක් යෙදෙන, රාගයේ ප්‍රධානතම ස්වරයයි (රජු වැනි ස්වරය).",
+    "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 52" }
+  },
+  {
+    "id": "glo-samvadi",
+    "term_si": "සංවාදී ස්වරය",
+    "term_en": "Samvadi Swara (Consonant / Queen Note)",
+    "transliteration": "Samvādī Swaraya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "වාදී ස්වරයට පමණක් දෙවැනි වන, රාගයේ දෙවන වැදගත්ම ස්වරයයි (ඇමති වැනි ස්වරය).",
+    "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 52" }
+  },
+  {
+    "id": "glo-anuvadi",
+    "term_si": "අනුවාදී ස්වරය",
+    "term_en": "Anuvadi Swara (Assonant Note)",
+    "transliteration": "Anuvādī Swaraya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "රාගයක වාදී හා සංවාදී හැර භාවිතා වන අනෙකුත් සියලු ස්වර අනුවාදී ස්වර නම් වේ (වැසියන් බඳුය).",
+    "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 52" }
+  },
+  {
+    "id": "glo-vivadi",
+    "term_si": "විවාදී ස්වරය",
+    "term_en": "Vivadi Swara (Dissonant / Enemy Note)",
+    "transliteration": "Vivādī Swaraya",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "රාගයට අයිති නැති නමුත් රාගයේ අලංකාරය පිණිස පමණක් ඉතා සියුම්ව යොදන ස්වරයයි (සතුරා බඳුය).",
+    "sourceReference": { "sourceId": "SRC-NIE-G1213-SYL", "pageOrSection": "රාග ශාස්ත්‍රය ඒකකය" }
+  },
+  {
+    "id": "glo-pakad",
+    "term_si": "පකඩ් (මුඛ්‍යාංගය)",
+    "term_en": "Pakad (Catch Phrase)",
+    "transliteration": "Pakaḍ",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "රාගයක ස්වරූපය ක්ෂණිකව ප්‍රකාශ කෙරෙන විශේෂිත කෙටි ස්වර ඛණ්ඩය පකඩ් නම් වේ.",
+    "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 53" }
+  },
+  {
+    "id": "glo-jati",
+    "term_si": "ජාති (රාග ජාති)",
+    "term_en": "Jati (Raga Class based on notes)",
+    "transliteration": "Jāti",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "රාගයක ආරෝහණ හා අවරෝහණයේ අඩංගු ස්වර සංඛ්‍යාව අනුව වර්ගීකරණය: ඕඩව (5), ෂාඩව (6), සම්පූර්ණ (7).",
+    "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 54" }
+  },
+  {
+    "id": "glo-alankara",
+    "term_si": "අලංකාර (සරලතා)",
+    "term_en": "Alankara (Ornamented Patterns)",
+    "transliteration": "Alaṅkāra",
+    "category_si": "ස්වර හා ශ්‍රැති",
+    "definition_si": "නියමිත ගණිතමය හෝ සංගීතමය ක්‍රමවේදයකට අනුව ස්වර ගලපා සකස් කරන ලද ගායන/වාදන අභ්‍යාස රටාය.",
+    "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 30" }
+  },
+  {
+    "id": "glo-alap",
+    "term_si": "ආලාප්",
+    "term_en": "Alap (Free-rhythm Improvisation)",
+    "transliteration": "Ālāp",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "තාලයකට නොබැඳී විලම්බිත ලයෙන් රාගයේ ස්වර හා භාවය විදහා දක්වමින් සිදු කරන මන්දගාමී ගායනය හෝ වාදනයයි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 60" }
+  },
+  {
+    "id": "glo-taan",
+    "term_si": "තාන",
+    "term_en": "Taan (Fast Melodic Runs)",
+    "transliteration": "Tāna",
+    "category_si": "රාග ශාස්ත්‍රය",
+    "definition_si": "ද්‍රුත ලයෙන් (ඉතා වේගයෙන්) රාග නීතිවලට අනුකූලව ස්වර ගලපමින් ගයන හෝ වයන වේගවත් ස්වර රටාය.",
+    "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 61" }
+  },
+  {
+    "id": "glo-laya",
+    "term_si": "ලය",
+    "term_en": "Laya (Tempo / Speed of Pulse)",
+    "transliteration": "Laya",
+    "category_si": "ලය හා තාල",
+    "definition_si": "සංගීත ක්‍රියාවලියක කාල ඒකක අතර පවතින නියත වේගය ලය නම් වේ. විලම්බිත (මන්දගාමී), මධ්‍ය (සාමාන්‍ය), ද්‍රුත (වේගවත්) ලෙස ප්‍රධාන කොටස් 3 කි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G07-TG", "pageOrSection": "පිටුව 32" }
+  },
+  {
+    "id": "glo-matra",
+    "term_si": "මාත්‍රාව",
+    "term_en": "Matra (Beat Unit)",
+    "transliteration": "Mātrāva",
+    "category_si": "ලය හා තාල",
+    "definition_si": "තාලයක් මැනීමේ කුඩාම කාල ඒකකය මාත්‍රාවයි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 35" }
+  },
+  {
+    "id": "glo-tala",
+    "term_si": "තාලය",
+    "term_en": "Tala (Rhythmic Cycle)",
+    "transliteration": "Tālaya",
+    "category_si": "ලය හා තාල",
+    "definition_si": "නියමිත මාත්‍රා, විභාග, තාළි සහ ඛාලි සහිතව චක්‍රාකාරව පුනරාවර්තනය වන රිද්ම කාල ව්‍යුහය තාලයයි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 36" }
+  },
+  {
+    "id": "glo-vibhag",
+    "term_si": "විභාගය (ඛණ්ඩය)",
+    "term_en": "Vibhag (Bar / Section of Tala)",
+    "transliteration": "Vibhāgaya",
+    "category_si": "ලය හා තාල",
+    "definition_si": "තාලයක මාත්‍රා කිහිපයක් එකතු වී සෑදෙන බෙදීමක් විභාගයක් නම් වේ. ප්‍රස්තාරයේදී සිරස් ඉරකින් (|) වෙන් කරයි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G08-TG", "pageOrSection": "පිටුව 40" }
+  },
+  {
+    "id": "glo-sam",
+    "term_si": "සම (සම ස්ථානය)",
+    "term_en": "Sam (First & Primary Accent Beat)",
+    "transliteration": "Sama",
+    "category_si": "ලය හා තාල",
+    "definition_si": "තාලයක පළමු වන මාත්‍රාව සම නම් වේ. භාත්ඛණ්ඩේ ක්‍රමයේදී 'X' ලකුණින් දක්වයි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G08-TG", "pageOrSection": "පිටුව 41" }
+  },
+  {
+    "id": "glo-tali",
+    "term_si": "තාළි (අත්පුඩි ලකුණ)",
+    "term_en": "Tali (Clapped Beat)",
+    "transliteration": "Tāḷi",
+    "category_si": "ලය හා තාල",
+    "definition_si": "තාල විභාගයක ආරම්භක මාත්‍රාවේදී අත්පුඩි ගසා ශබ්ද නඟා පෙන්වන ස්ථානයයි. අංක වලින් (1, 2, 3...) දක්වයි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G08-TG", "pageOrSection": "පිටුව 42" }
+  },
+  {
+    "id": "glo-khali",
+    "term_si": "ඛාලි (හිස් ලකුණ)",
+    "term_en": "Khali (Unstressed Wave Beat)",
+    "transliteration": "Khāli",
+    "category_si": "ලය හා තාල",
+    "definition_si": "අත්පුඩි නොගසා අත පැත්තට වැනීමෙන් නිහඬව පෙන්වන ස්ථානයයි. '0' (බිංදුව) ලකුණින් දක්වයි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G08-TG", "pageOrSection": "පිටුව 42" }
+  },
+  {
+    "id": "glo-theka",
+    "term_si": "ථේකාව",
+    "term_en": "Theka (Canonical Rhythm Pattern)",
+    "transliteration": "Ṭhēkāva",
+    "category_si": "ලය හා තාල",
+    "definition_si": "තාලයක නියමිත මාත්‍රා අනුව තබ්ලාව හෝ මද්දලය මත වාදනය වන මූලික බෝල් පෙළගැස්ම ථේකාවයි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G08-TG", "pageOrSection": "පිටුව 44" }
+  },
+  {
+    "id": "glo-avartan",
+    "term_si": "ආවර්තය",
+    "term_en": "Avartan (Complete Cycle)",
+    "transliteration": "Āvartanaya",
+    "category_si": "ලය හා තාල",
+    "definition_si": "තාලයක සමේ සිට ආරම්භ වී සම්පූර්ණ මාත්‍රා ප්‍රමාණය ගෙවා නැවත සමට පැමිණෙන එක් සම්පූර්ණ වටය ආවර්තයකි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 70" }
+  },
+  {
+    "id": "glo-layakari",
+    "term_si": "ලයකාරී (තාහ්, දුගුන්, චෞගුන්)",
+    "term_en": "Layakari (Rhythmic Variations)",
+    "transliteration": "Layakārī",
+    "category_si": "ලය හා තාල",
+    "definition_si": "එක් මාත්‍රාවක් තුළ බෝල් 1ක් (තාහ්/ඒක්ගුන්), බෝල් 2ක් (දුගුන්), බෝල් 4ක් (චෞගුන්) ලෙස වේගය දෙගුණ තෙගුණ කරමින් වාදනය කිරීමයි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 72" }
+  },
+  {
+    "id": "glo-geta-beraya",
+    "term_si": "ගැට බෙරය (උඩරට බෙරය)",
+    "term_en": "Geta Beraya (Kandyan Drum)",
+    "transliteration": "Gæṭa Beraya",
+    "category_si": "වාද්‍ය භාණ්ඩ",
+    "definition_si": "මැද මහත දෙකෙළවර සිහින්, ඇහැළ/කොහොඹ ලීයෙන් තනන ලද උඩරට සම්ප්‍රදායික ප්‍රධාන අවනද්ධ වාද්‍ය භාණ්ඩයයි.",
+    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 88" }
+  },
+  {
+    "id": "glo-yak-beraya",
+    "term_si": "යක් බෙරය (පහතරට බෙරය / රුහුණු බෙරය)",
+    "term_en": "Yak Beraya (Low-Country Drum)",
+    "transliteration": "Yak Beraya",
+    "category_si": "වාද්‍ය භාණ්ඩ",
+    "definition_si": "සිලින්ඩරාකාර දිගටි හැඩයකින් යුත්, දෙපසම ගව ආමාශ පටලයෙන් (වකුටු පට්ටා) බඳින ලද පහතරට ශාන්තිකර්ම හා නාඩගම් සඳහා යොදාගන්නා බෙරයයි.",
+    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 90" }
+  },
+  {
+    "id": "glo-dawula",
+    "term_si": "දවුල (සබරගමු බෙරය)",
+    "term_en": "Dawula (Sabaragamuwa Drum)",
+    "transliteration": "Davula",
+    "category_si": "වාද්‍ය භාණ්ඩ",
+    "definition_si": "එක් පසක් කඩිප්පුවකින්ද අනෙක් පස අතින්ද වාදනය කරන, පිත්තල හෝ රිදී පටිවලින් අලංකාර කරන ලද සබරගමු සම්ප්‍රදායේ ප්‍රධාන බෙරයයි.",
+    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 92" }
+  },
+  {
+    "id": "glo-nadagam",
+    "term_si": "නාඩගම් සංගීතය",
+    "term_en": "Nadagam Music",
+    "transliteration": "Nāḍagam Saṅgīthaya",
+    "category_si": "නාට්‍ය සංගීතය",
+    "definition_si": "දකුණු ඉන්දීය තෙරුක්කුත්තු ආභාසයෙන් බිහිවූ, මද්දලය හා තාලම්පට මූලික කරගත්, පොතේගුරුගේ කථනයෙන් ගලායන ශ්‍රී ලාංකීය පැරණි ගීත නාට්‍ය විශේෂයකි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 110" }
+  },
+  {
+    "id": "glo-nurthi",
+    "term_si": "නූර්ති සංගීතය",
+    "term_en": "Nurthi Music",
+    "transliteration": "Nūrti Saṅgīthaya",
+    "category_si": "නාට්‍ය සංගීතය",
+    "definition_si": "භාරතීය පාරසී නාට්‍ය ආභාසයෙන් ජෝන් ද සිල්වා මැතිතුමා ඇතුළු පුරෝගාමීන් විසින් උත්තර භාරතීය රාගධාරී තනු ඇසුරෙන් දියුණු කළ නාට්‍ය සංගීත සම්ප්‍රදායකි.",
+    "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 114" }
+  },
+  {
+    "id": "glo-goyam-kavi",
+    "term_si": "ගොයම් කවි",
+    "term_en": "Goyam Kavi (Paddy Field Work Songs)",
+    "transliteration": "Goyam Kavi",
+    "category_si": "දේශීය සංගීතය",
+    "definition_si": "ශ්‍රී ලාංකීය ගොවි ජනතාව කුඹුරු වැඩ කිරීමේදී විඩාව නිවා ගැනීමට සහ සමගිය වර්ධනය කර ගැනීමට සාමූහිකව ගැයූ පැරණි ජන කවි විශේෂයකි.",
+    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "ගැමි ගී පරිච්ඡේදය" }
+  },
+  {
+    "id": "glo-shanthikarma",
+    "term_si": "ශාන්තිකර්ම",
+    "term_en": "Shanthikarma (Ritual Healing Ceremonies)",
+    "transliteration": "Śānthikarma",
+    "category_si": "දේශීය සංගීතය",
+    "definition_si": "ග්‍රහ අපල, ලෙඩ රෝග දුරු කර සෙත ශාන්තිය පතා උඩරට (කොහොඹා කන්කාරිය), පහතරට (දහඅට සන්නිය/ගම්මඩුව) සහ සබරගමු (මහසොහොන් සමයම) සම්ප්‍රදායන්හි පැවැත්වෙන නාද හා නර්තන පූජා විධි.",
+    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "ශාන්තිකර්ම නාද මාලා" }
+  }
+]

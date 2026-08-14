@@ -1,0 +1,394 @@
+[
+  {
+    "id": "quiz-les-intro-01",
+    "title_si": "නාදය සහ සංගීත නාදය කුඩා ප්‍රශ්නාවලිය",
+    "lessonId": "les-intro-01",
+    "passingScorePercent": 75,
+    "questions": [
+      {
+        "id": "q-intro-01",
+        "type": "mcq",
+        "gradeBands": ["6-7", "8-9"],
+        "difficulty": "පහසු",
+        "strandId": "strand-fundamentals",
+        "prompt_si": "සංගීතයේදී භාවිතා වන ක්‍රමවත් කම්පන සහිත කනට ප්‍රිය උපදවන ශබ්ද හඳුන්වන්නේ කෙසේද?",
+        "options_si": [
+          { "id": "opt-1", "text_si": "ඝෝෂාව" },
+          { "id": "opt-2", "text_si": "නාදය", "isCorrect": true },
+          { "id": "opt-3", "text_si": "ප්‍රතිරාවය" },
+          { "id": "opt-4", "text_si": "සංඥාව" }
+        ],
+        "correctAnswerIds": ["opt-2"],
+        "explanation_si": "ක්‍රමවත් කම්පන සහිත ප්‍රියජනක ශබ්දය සංගීතයේදී 'නාදය' (Nada) නම් වේ.",
+        "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 12" }
+      },
+      {
+        "id": "q-intro-02",
+        "type": "multi-select",
+        "gradeBands": ["6-7", "8-9"],
+        "difficulty": "පහසු",
+        "strandId": "strand-fundamentals",
+        "prompt_si": "නාදයක ප්‍රධාන ලක්ෂණ 3 වන්නේ පහත සඳහන් කවරේද? (නිවැරදි සියල්ල තෝරන්න)",
+        "options_si": [
+          { "id": "opt-1", "text_si": "නාදයේ උස්-මිටි බව (Pitch)", "isCorrect": true },
+          { "id": "opt-2", "text_si": "නාදයේ මහත්-කුඩා බව (Intensity)", "isCorrect": true },
+          { "id": "opt-3", "text_si": "නාදයේ ජාතිය හෙවත් ගුණය (Timbre)", "isCorrect": true },
+          { "id": "opt-4", "text_si": "නාදයේ මිල ගණන්" }
+        ],
+        "correctAnswerIds": ["opt-1", "opt-2", "opt-3"],
+        "explanation_si": "නාදයේ ලක්ෂණ 3 කි: උස්-මිටි බව, මහත්-කුඩා බව, සහ නාද ගුණය.",
+        "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 14" }
+      },
+      {
+        "id": "q-intro-03",
+        "type": "true-false",
+        "gradeBands": ["6-7", "8-9"],
+        "difficulty": "පහසු",
+        "strandId": "strand-fundamentals",
+        "prompt_si": "වස්තූන් දෙකක් එකිනෙක ගැටීමෙන් උපදින නාදය 'ආහත නාදය' නම් වේ.",
+        "options_si": [
+          { "id": "opt-1", "text_si": "සත්‍යයි", "isCorrect": true },
+          { "id": "opt-2", "text_si": "අසත්‍යයි" }
+        ],
+        "correctAnswerIds": ["opt-1"],
+        "explanation_si": "භෞතික වස්තු ගැටීමෙන් උපදින නාදය ආහත නාදයයි.",
+        "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 13" }
+      }
+    ]
+  },
+  {
+    "id": "quiz-les-swara-01",
+    "title_si": "සප්ත ස්වර කුඩා ප්‍රශ්නාවලිය",
+    "lessonId": "les-swara-01",
+    "passingScorePercent": 75,
+    "questions": [
+      {
+        "id": "q-swara-01",
+        "type": "ordering",
+        "gradeBands": ["6-7", "8-9"],
+        "difficulty": "පහසු",
+        "strandId": "strand-swara-shruti",
+        "prompt_si": "පහත සප්ත ස්වර නිවැරදි ආරෝහණ අනුපිළිවෙළට සකසන්න:",
+        "orderingItems": [
+          { "id": "sw-1", "text_si": "ස (ෂඩ්ජ)", "correctIndex": 0 },
+          { "id": "sw-2", "text_si": "රි (රිෂභ)", "correctIndex": 1 },
+          { "id": "sw-3", "text_si": "ග (ගාන්ධාර)", "correctIndex": 2 },
+          { "id": "sw-4", "text_si": "ම (මධ්‍යම)", "correctIndex": 3 },
+          { "id": "sw-5", "text_si": "ප (පඤ්චම)", "correctIndex": 4 },
+          { "id": "sw-6", "text_si": "ධ (ධෛවත)", "correctIndex": 5 },
+          { "id": "sw-7", "text_si": "නි (නිෂාද)", "correctIndex": 6 }
+        ],
+        "explanation_si": "නිවැරදි සප්ත ස්වර ආරෝහණ පිළිවෙළ: ස, රි, ග, ම, ප, ධ, නි.",
+        "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 20" }
+      },
+      {
+        "id": "q-swara-02",
+        "type": "matching",
+        "gradeBands": ["6-7", "8-9"],
+        "difficulty": "පහසු",
+        "strandId": "strand-swara-shruti",
+        "prompt_si": "කෙටි ස්වර නාමය හා එහි සම්පූර්ණ ශාස්ත්‍රීය නාමය නිවැරදිව ගළපන්න:",
+        "matchingPairs": [
+          { "left_si": "ස", "right_si": "ෂඩ්ජ" },
+          { "left_si": "ග", "right_si": "ගාන්ධාර" },
+          { "left_si": "ප", "right_si": "පඤ්චම" },
+          { "left_si": "නි", "right_si": "නිෂාද" }
+        ],
+        "explanation_si": "ස=ෂඩ්ජ, ග=ගාන්ධාර, ප=පඤ්චම, නි=නිෂාද වේ.",
+        "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 19" }
+      },
+      {
+        "id": "q-swara-03",
+        "type": "short-answer",
+        "gradeBands": ["6-7", "8-9"],
+        "difficulty": "පහසු",
+        "strandId": "strand-swara-shruti",
+        "prompt_si": "ස්වර ඉහළ සිට පහළට අනුක්‍රමයෙන් බැස ඒමේ ක්‍රියාවලිය හඳුන්වන්නේ කෙසේද?",
+        "correctShortAnswer_si": ["අවරෝහණය", "අවරෝහණ"],
+        "explanation_si": "ඉහළ සිට පහළට ස්වර බැස ඒම 'අවරෝහණය' (Avarohana) නම් වේ.",
+        "sourceReference": { "sourceId": "SRC-NIE-G06-TG", "pageOrSection": "පිටුව 22" }
+      }
+    ]
+  },
+  {
+    "id": "quiz-les-swara-02",
+    "title_si": "ස්වර ප්‍රභේද ප්‍රශ්නාවලිය",
+    "lessonId": "les-swara-02",
+    "passingScorePercent": 75,
+    "questions": [
+      {
+        "id": "q-swara-var-01",
+        "type": "mcq",
+        "gradeBands": ["7", "8-9", "10-11"],
+        "difficulty": "මධ්‍යම",
+        "strandId": "strand-swara-shruti",
+        "prompt_si": "සප්තකයක් තුළ පිහිටන මුළු ස්වර ප්‍රමාණය කීයද?",
+        "options_si": [
+          { "id": "opt-1", "text_si": "7 කි" },
+          { "id": "opt-2", "text_si": "10 කි" },
+          { "id": "opt-3", "text_si": "12 කි", "isCorrect": true },
+          { "id": "opt-4", "text_si": "22 කි" }
+        ],
+        "correctAnswerIds": ["opt-3"],
+        "explanation_si": "සප්තකයකට අචල 2, කෝමල 4, තීව්‍ර 1, සහ ශුද්ධ 5 ඇතුළු මුළු ස්වර 12 කි.",
+        "sourceReference": { "sourceId": "SRC-NIE-G07-TG", "pageOrSection": "පිටුව 15" }
+      },
+      {
+        "id": "q-swara-var-02",
+        "type": "multi-select",
+        "gradeBands": ["7", "8-9", "10-11"],
+        "difficulty": "මධ්‍යම",
+        "strandId": "strand-swara-shruti",
+        "prompt_si": "කෝමල (Komal) තත්ත්වයට පත්විය හැකි ස්වර 4 තෝරන්න:",
+        "options_si": [
+          { "id": "opt-1", "text_si": "රි (රිෂභ)", "isCorrect": true },
+          { "id": "opt-2", "text_si": "ග (ගාන්ධාර)", "isCorrect": true },
+          { "id": "opt-3", "text_si": "ම (මධ්‍යම)" },
+          { "id": "opt-4", "text_si": "ධ (ධෛවත)", "isCorrect": true },
+          { "id": "opt-5", "text_si": "නි (නිෂාද)", "isCorrect": true }
+        ],
+        "correctAnswerIds": ["opt-1", "opt-2", "opt-4", "opt-5"],
+        "explanation_si": "කෝමල වන්නේ රි, ග, ධ, නි යන ස්වර 4 පමණි.",
+        "sourceReference": { "sourceId": "SRC-NIE-G07-TG", "pageOrSection": "පිටුව 16" }
+      },
+      {
+        "id": "q-swara-var-03",
+        "type": "mcq",
+        "gradeBands": ["7", "8-9", "10-11"],
+        "difficulty": "මධ්‍යම",
+        "strandId": "strand-swara-shruti",
+        "prompt_si": "ස්වකීය ස්ථානයෙන් වෙනස් නොවන 'අචල ස්වර' යුගලය කුමක්ද?",
+        "options_si": [
+          { "id": "opt-1", "text_si": "ස සහ ප", "isCorrect": true },
+          { "id": "opt-2", "text_si": "රි සහ ග" },
+          { "id": "opt-3", "text_si": "ම සහ ධ" },
+          { "id": "opt-4", "text_si": "ධ සහ නි" }
+        ],
+        "correctAnswerIds": ["opt-1"],
+        "explanation_si": "'ස' සහ 'ප' ස්වර දෙක අචල ස්වර වේ.",
+        "sourceReference": { "sourceId": "SRC-NIE-G07-TG", "pageOrSection": "පිටුව 15" }
+      }
+    ]
+  },
+  {
+    "id": "quiz-les-tala-dadra",
+    "title_si": "දාද්‍රා තාල ප්‍රශ්නාවලිය",
+    "lessonId": "les-tala-dadra",
+    "passingScorePercent": 75,
+    "questions": [
+      {
+        "id": "q-tala-dadra-01",
+        "type": "mcq",
+        "gradeBands": ["6-7", "8-9", "10-11"],
+        "difficulty": "පහසු",
+        "strandId": "strand-laya-tala",
+        "prompt_si": "දාද්‍රා තාලයේ විභාග ව්‍යුහය කුමක්ද?",
+        "options_si": [
+          { "id": "opt-1", "text_si": "4 + 4" },
+          { "id": "opt-2", "text_si": "3 + 3", "isCorrect": true },
+          { "id": "opt-3", "text_si": "2 + 2 + 2" },
+          { "id": "opt-4", "text_si": "4 + 2" }
+        ],
+        "correctAnswerIds": ["opt-2"],
+        "explanation_si": "දාද්‍රා තාලය මාත්‍රා 3 බැගින් වූ විභාග 2 කින් (3+3) සමන්විතය.",
+        "sourceReference": { "sourceId": "SRC-NIE-G07-TG", "pageOrSection": "පිටුව 34" }
+      },
+      {
+        "id": "q-tala-dadra-02",
+        "type": "ordering",
+        "gradeBands": ["6-7", "8-9", "10-11"],
+        "difficulty": "පහසු",
+        "strandId": "strand-laya-tala",
+        "prompt_si": "දාද්‍රා තාලයේ ථේකාවේ බෝල් නිවැරදි අනුපිළිවෙළට සකසන්න:",
+        "orderingItems": [
+          { "id": "bol-1", "text_si": "ධා", "correctIndex": 0 },
+          { "id": "bol-2", "text_si": "ධී", "correctIndex": 1 },
+          { "id": "bol-3", "text_si": "නා", "correctIndex": 2 },
+          { "id": "bol-4", "text_si": "ධා", "correctIndex": 3 },
+          { "id": "bol-5", "text_si": "තී", "correctIndex": 4 },
+          { "id": "bol-6", "text_si": "නා", "correctIndex": 5 }
+        ],
+        "explanation_si": "දාද්‍රා ථේකාව: ධා ධී නා | ධා තී නා.",
+        "sourceReference": { "sourceId": "SRC-NIE-G07-TG", "pageOrSection": "පිටුව 34" }
+      },
+      {
+        "id": "q-tala-dadra-03",
+        "type": "mcq",
+        "gradeBands": ["6-7", "8-9", "10-11"],
+        "difficulty": "පහසු",
+        "strandId": "strand-laya-tala",
+        "prompt_si": "දාද්‍රා තාලයේ ඛාලි ලකුණ යෙදෙන්නේ කීවන මාත්‍රාවේද?",
+        "options_si": [
+          { "id": "opt-1", "text_si": "1 වන මාත්‍රාවේ" },
+          { "id": "opt-2", "text_si": "3 වන මාත්‍රාවේ" },
+          { "id": "opt-3", "text_si": "4 වන මාත්‍රාවේ", "isCorrect": true },
+          { "id": "opt-4", "text_si": "6 වන මාත්‍රාවේ" }
+        ],
+        "correctAnswerIds": ["opt-3"],
+        "explanation_si": "දාද්‍රා තාලයේ 4 වන මාත්‍රාව ඛාලියයි ('0').",
+        "sourceReference": { "sourceId": "SRC-NIE-G07-TG", "pageOrSection": "පිටුව 34" }
+      }
+    ]
+  },
+  {
+    "id": "quiz-les-raga-bhairav",
+    "title_si": "භෛරව් රාග ප්‍රශ්නාවලිය",
+    "lessonId": "les-raga-bhairav",
+    "passingScorePercent": 75,
+    "questions": [
+      {
+        "id": "q-bhairav-01",
+        "type": "mcq",
+        "gradeBands": ["10-11", "12-13"],
+        "difficulty": "මධ්‍යම",
+        "strandId": "strand-ragas",
+        "prompt_si": "භෛරව් රාගයේ වාදී ස්වරය කුමක්ද?",
+        "options_si": [
+          { "id": "opt-1", "text_si": "රිෂභ (රි)" },
+          { "id": "opt-2", "text_si": "ගාන්ධාර (ග)" },
+          { "id": "opt-3", "text_si": "ධෛවත (ධ)", "isCorrect": true },
+          { "id": "opt-4", "text_si": "පඤ්චම (ප)" }
+        ],
+        "correctAnswerIds": ["opt-3"],
+        "explanation_si": "භෛරව් රාගයේ වාදී ස්වරය කෝමල ධෛවත (ධ) වේ.",
+        "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 56" }
+      },
+      {
+        "id": "q-bhairav-02",
+        "type": "multi-select",
+        "gradeBands": ["10-11", "12-13"],
+        "difficulty": "මධ්‍යම",
+        "strandId": "strand-ragas",
+        "prompt_si": "භෛරව් රාගයේ නිවැරදි ලක්ෂණ 2ක් තෝරන්න:",
+        "options_si": [
+          { "id": "opt-1", "text_si": "ජාතිය සම්පූර්ණ - සම්පූර්ණ වේ", "isCorrect": true },
+          { "id": "opt-2", "text_si": "රාත්‍රී දෙවන ප්‍රහාරයේ ගයයි" },
+          { "id": "opt-3", "text_si": "රි සහ ධ ස්වර කෝමල වේ", "isCorrect": true },
+          { "id": "opt-4", "text_si": "තීව්‍ර මධ්‍යම ස්වරය යෙදේ" }
+        ],
+        "correctAnswerIds": ["opt-1", "opt-3"],
+        "explanation_si": "භෛරව් රාගය සම්පූර්ණ-සම්පූර්ණ ජාතියේ, කෝමල රි-ධ සහිත උදෑසන ගයන රාගයකි.",
+        "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 56" }
+      },
+      {
+        "id": "q-bhairav-03",
+        "type": "short-answer",
+        "gradeBands": ["10-11", "12-13"],
+        "difficulty": "මධ්‍යම",
+        "strandId": "strand-ragas",
+        "prompt_si": "භෛරව් රාගයේ ගායන කාලය කුමක්ද?",
+        "correctShortAnswer_si": ["ප්‍රාතඃ කාලය", "උදෑසන", "පාන්දර", "ප්‍රාතහ් කාලය"],
+        "explanation_si": "භෛරව් රාගය උදෑසන (ප්‍රාතඃ කාලයේ) ගායනා කෙරේ.",
+        "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 56" }
+      }
+    ]
+  },
+  {
+    "id": "quiz-les-inst-desi-drums",
+    "title_si": "දේශීය බෙර වර්ග ප්‍රශ්නාවලිය",
+    "lessonId": "les-inst-desi-drums",
+    "passingScorePercent": 75,
+    "questions": [
+      {
+        "id": "q-desi-drums-01",
+        "type": "matching",
+        "gradeBands": ["8-9", "10-11", "12-13"],
+        "difficulty": "මධ්‍යම",
+        "strandId": "strand-instruments",
+        "prompt_si": "දේශීය බෙර වර්ගය සහ ඊට අදාළ නර්තන සම්ප්‍රදාය නිවැරදිව ගළපන්න:",
+        "matchingPairs": [
+          { "left_si": "ගැට බෙරය", "right_si": "උඩරට සම්ප්‍රදාය" },
+          { "left_si": "යක් බෙරය", "right_si": "පහතරට සම්ප්‍රදාය" },
+          { "left_si": "දවුල", "right_si": "සබරගමු සම්ප්‍රදාය" }
+        ],
+        "explanation_si": "ගැට බෙරය=උඩරට, යක් බෙරය=පහතරට, දවුල=සබරගමුව වේ.",
+        "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටු 88-92" }
+      },
+      {
+        "id": "q-desi-drums-02",
+        "type": "mcq",
+        "gradeBands": ["8-9", "10-11", "12-13"],
+        "difficulty": "මධ්‍යම",
+        "strandId": "strand-instruments",
+        "prompt_si": "දවුල වාදනය කිරීම සඳහා යොදාගන්නා විශේෂිත වක්‍ර ලී කෝටුව හඳුන්වන්නේ කුමන නමින්ද?",
+        "options_si": [
+          { "id": "opt-1", "text_si": "මිස්රාබය" },
+          { "id": "opt-2", "text_si": "කඩිප්පුව", "isCorrect": true },
+          { "id": "opt-3", "text_si": "ගජය" },
+          { "id": "opt-4", "text_si": "බිරාව" }
+        ],
+        "correctAnswerIds": ["opt-2"],
+        "explanation_si": "දවුල් වාදනයේදී එක් පසකට තට්ටු කරන්නේ 'කඩිප්පුව' මඟිනි.",
+        "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 92" }
+      },
+      {
+        "id": "q-desi-drums-03",
+        "type": "true-false",
+        "gradeBands": ["8-9", "10-11", "12-13"],
+        "difficulty": "පහසු",
+        "strandId": "strand-instruments",
+        "prompt_si": "ගැට බෙරය සකස් කිරීම සඳහා කොහොඹ, ඇහැළ හෝ ගංසූරිය ලී භාවිතා කරයි.",
+        "options_si": [
+          { "id": "opt-1", "text_si": "සත්‍යයි", "isCorrect": true },
+          { "id": "opt-2", "text_si": "අසත්‍යයි" }
+        ],
+        "correctAnswerIds": ["opt-1"],
+        "explanation_si": "ගැට බෙර කඳ සෑදීමට ඇහැළ, කොහොඹ, කොස් වැනි ශක්තිමත් දැව යොදා ගැනේ.",
+        "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 89" }
+      }
+    ]
+  },
+  {
+    "id": "quiz-les-theatre-nadagam",
+    "title_si": "නාඩගම් නාට්‍ය සංගීත ප්‍රශ්නාවලිය",
+    "lessonId": "les-theatre-nadagam",
+    "passingScorePercent": 75,
+    "questions": [
+      {
+        "id": "q-nadagam-01",
+        "type": "mcq",
+        "gradeBands": ["8-9", "10-11", "12-13"],
+        "difficulty": "මධ්‍යම",
+        "strandId": "strand-theatre-music",
+        "prompt_si": "මුල්ම සිංහල නාඩගම් රචකයා ලෙස සැලකෙන්නේ කවුද?",
+        "options_si": [
+          { "id": "opt-1", "text_si": "නීතිඥ ජෝන් ද සිල්වා" },
+          { "id": "opt-2", "text_si": "පිලිප්පු සිඤ්ඤෝ", "isCorrect": true },
+          { "id": "opt-3", "text_si": "එදිරිවීර සරච්චන්ද්‍ර" },
+          { "id": "opt-4", "text_si": "චාර්ල්ස් ඩයස්" }
+        ],
+        "correctAnswerIds": ["opt-2"],
+        "explanation_si": "මුල්ම සිංහල නාඩගම් රචකයා පිලිප්පු සිඤ්ඤෝ මහතාය.",
+        "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 110" }
+      },
+      {
+        "id": "q-nadagam-02",
+        "type": "mcq",
+        "gradeBands": ["8-9", "10-11", "12-13"],
+        "difficulty": "මධ්‍යම",
+        "strandId": "strand-theatre-music",
+        "prompt_si": "නාඩගම් නාට්‍ය සංගීතයේ ප්‍රමුඛතම වාද්‍ය භාණ්ඩය කුමක්ද?",
+        "options_si": [
+          { "id": "opt-1", "text_si": "හාමෝනියම" },
+          { "id": "opt-2", "text_si": "මද්දලය", "isCorrect": true },
+          { "id": "opt-3", "text_si": "සිතාරය" },
+          { "id": "opt-4", "text_si": "තබ්ලාව" }
+        ],
+        "correctAnswerIds": ["opt-2"],
+        "explanation_si": "නාඩගම් සංගීතයේ ප්‍රධාන වාද්‍ය භාණ්ඩය මද්දලය වේ.",
+        "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 110" }
+      },
+      {
+        "id": "q-nadagam-03",
+        "type": "short-answer",
+        "gradeBands": ["8-9", "10-11", "12-13"],
+        "difficulty": "මධ්‍යම",
+        "strandId": "strand-theatre-music",
+        "prompt_si": "නාඩගම් නාට්‍ය ආරම්භයේදී රංගභූමියට පැමිණ චරිත හා කතාව හඳුන්වා දෙන ප්‍රධාන චරිතය කුමක්ද?",
+        "correctShortAnswer_si": ["පොතේගුරු", "පොතේ ගුරු"],
+        "explanation_si": "නාඩගමේ කතාව ගයමින් විස්තර කරන්නේ 'පොතේගුරු' විසිනි.",
+        "sourceReference": { "sourceId": "SRC-NIE-G1011-TG", "pageOrSection": "පිටුව 110" }
+      }
+    ]
+  }
+]

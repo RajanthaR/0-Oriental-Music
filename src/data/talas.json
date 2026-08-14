@@ -1,0 +1,204 @@
+[
+  {
+    "id": "tala-dadra",
+    "name_si": "දාද්‍රා තාලය",
+    "name_en": "Dadra Tala",
+    "matras": 6,
+    "vibhagCount": 2,
+    "vibhagStructure": [3, 3],
+    "taliKhali_si": ["1 වන මාත්‍රාව: තාළි (සම)", "4 වන මාත්‍රාව: ඛාලි"],
+    "theka_si": "ධා ධී නා | ධා තී නා",
+    "bols": [
+      { "matra": 1, "bol_si": "ධා", "vibhagIndex": 0, "isSam": true, "isTali": true, "isKhali": false, "action_si": "අත්පුඩි (1)" },
+      { "matra": 2, "bol_si": "ධී", "vibhagIndex": 0, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 3, "bol_si": "නා", "vibhagIndex": 0, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (3)" },
+      { "matra": 4, "bol_si": "ධා", "vibhagIndex": 1, "isSam": false, "isTali": false, "isKhali": true, "action_si": "වැනීම (0)" },
+      { "matra": 5, "bol_si": "තී", "vibhagIndex": 1, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 6, "bol_si": "නා", "vibhagIndex": 1, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (3)" }
+    ],
+    "layaVariants": {
+      "thah_bpm": 80,
+      "dugun_bpm": 160,
+      "chaugun_bpm": 320
+    },
+    "gradeBands": ["6-7", "8-9", "10-11"],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G07-TG",
+      "pageOrSection": "පිටුව 34 (දාද්‍රා තාලය)"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "මාත්‍රා 6, විභාග 2 (3/3) සහ ථේකාව විෂය නිර්දේශයට අනුව සනාථ විය.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "tala-keherwa",
+    "name_si": "කෙහර්වා තාලය (කහර්වා)",
+    "name_en": "Keherwa Tala",
+    "matras": 8,
+    "vibhagCount": 2,
+    "vibhagStructure": [4, 4],
+    "taliKhali_si": ["1 වන මාත්‍රාව: තාළි (සම)", "5 වන මාත්‍රාව: ඛාලි"],
+    "theka_si": "ධා ගේ නා තින් | නා කේ ධින් නා",
+    "bols": [
+      { "matra": 1, "bol_si": "ධා", "vibhagIndex": 0, "isSam": true, "isTali": true, "isKhali": false, "action_si": "අත්පුඩි (1)" },
+      { "matra": 2, "bol_si": "ගේ", "vibhagIndex": 0, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 3, "bol_si": "නා", "vibhagIndex": 0, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (3)" },
+      { "matra": 4, "bol_si": "තින්", "vibhagIndex": 0, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (4)" },
+      { "matra": 5, "bol_si": "නා", "vibhagIndex": 1, "isSam": false, "isTali": false, "isKhali": true, "action_si": "වැනීම (0)" },
+      { "matra": 6, "bol_si": "කේ", "vibhagIndex": 1, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 7, "bol_si": "ධින්", "vibhagIndex": 1, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (3)" },
+      { "matra": 8, "bol_si": "නා", "vibhagIndex": 1, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (4)" }
+    ],
+    "layaVariants": {
+      "thah_bpm": 90,
+      "dugun_bpm": 180,
+      "chaugun_bpm": 360
+    },
+    "gradeBands": ["6-7", "8-9", "10-11"],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G07-TG",
+      "pageOrSection": "පිටුව 36 (කෙහර්වා තාලය)"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "මාත්‍රා 8, විභාග 2 (4/4) සහ බෝල් පෙළගැස්ම තහවුරු විය.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "tala-teental",
+    "name_si": "ත්‍රීතාලය (තීන්තාල්)",
+    "name_en": "Teental (Tritala)",
+    "matras": 16,
+    "vibhagCount": 4,
+    "vibhagStructure": [4, 4, 4, 4],
+    "taliKhali_si": ["1 වන මාත්‍රාව: තාළි 1 (සම)", "5 වන මාත්‍රාව: තාළි 2", "9 වන මාත්‍රාව: ඛාලි (0)", "13 වන මාත්‍රාව: තාළි 3"],
+    "theka_si": "ධා ධින් ධින් ධා | ධා ධින් ධින් ධා | ධා තින් තින් තා | තා ධින් ධින් ධා",
+    "bols": [
+      { "matra": 1, "bol_si": "ධා", "vibhagIndex": 0, "isSam": true, "isTali": true, "isKhali": false, "action_si": "අත්පුඩි (1)" },
+      { "matra": 2, "bol_si": "ධින්", "vibhagIndex": 0, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 3, "bol_si": "ධින්", "vibhagIndex": 0, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (3)" },
+      { "matra": 4, "bol_si": "ධා", "vibhagIndex": 0, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (4)" },
+      { "matra": 5, "bol_si": "ධා", "vibhagIndex": 1, "isSam": false, "isTali": true, "isKhali": false, "action_si": "අත්පුඩි (2)" },
+      { "matra": 6, "bol_si": "ධින්", "vibhagIndex": 1, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 7, "bol_si": "ධින්", "vibhagIndex": 1, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (3)" },
+      { "matra": 8, "bol_si": "ධා", "vibhagIndex": 1, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (4)" },
+      { "matra": 9, "bol_si": "ධා", "vibhagIndex": 2, "isSam": false, "isTali": false, "isKhali": true, "action_si": "වැනීම (0)" },
+      { "matra": 10, "bol_si": "තින්", "vibhagIndex": 2, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 11, "bol_si": "තින්", "vibhagIndex": 2, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (3)" },
+      { "matra": 12, "bol_si": "තා", "vibhagIndex": 2, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (4)" },
+      { "matra": 13, "bol_si": "තා", "vibhagIndex": 3, "isSam": false, "isTali": true, "isKhali": false, "action_si": "අත්පුඩි (3)" },
+      { "matra": 14, "bol_si": "ධින්", "vibhagIndex": 3, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 15, "bol_si": "ධින්", "vibhagIndex": 3, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (3)" },
+      { "matra": 16, "bol_si": "ධා", "vibhagIndex": 3, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (4)" }
+    ],
+    "layaVariants": {
+      "thah_bpm": 60,
+      "dugun_bpm": 120,
+      "chaugun_bpm": 240
+    },
+    "gradeBands": ["8-9", "10-11", "12-13"],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G08-TG",
+      "pageOrSection": "පිටුව 45 (ත්‍රීතාලය)"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "මාත්‍රා 16, විභාග 4, තාළි 3, ඛාලි 1 සහ සම්පූර්ණ ථේකාව තහවුරු විය.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "tala-roopak",
+    "name_si": "රූපක් තාලය",
+    "name_en": "Roopak Tala",
+    "matras": 7,
+    "vibhagCount": 3,
+    "vibhagStructure": [3, 2, 2],
+    "taliKhali_si": ["1 වන මාත්‍රාව: ඛාලි (සම)", "4 වන මාත්‍රාව: තාළි 1 (2)", "6 වන මාත්‍රාව: තාළි 2 (3)"],
+    "theka_si": "තින් තින් නා | ධී නා | ධී නා",
+    "bols": [
+      { "matra": 1, "bol_si": "තින්", "vibhagIndex": 0, "isSam": true, "isTali": false, "isKhali": true, "action_si": "වැනීම/ඛාලි (0/සම)" },
+      { "matra": 2, "bol_si": "තින්", "vibhagIndex": 0, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 3, "bol_si": "නා", "vibhagIndex": 0, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (3)" },
+      { "matra": 4, "bol_si": "ධී", "vibhagIndex": 1, "isSam": false, "isTali": true, "isKhali": false, "action_si": "අත්පුඩි (2)" },
+      { "matra": 5, "bol_si": "නා", "vibhagIndex": 1, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 6, "bol_si": "ධී", "vibhagIndex": 2, "isSam": false, "isTali": true, "isKhali": false, "action_si": "අත්පුඩි (3)" },
+      { "matra": 7, "bol_si": "නා", "vibhagIndex": 2, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" }
+    ],
+    "layaVariants": {
+      "thah_bpm": 70,
+      "dugun_bpm": 140,
+      "chaugun_bpm": 280
+    },
+    "gradeBands": ["10-11", "12-13"],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G1011-TG",
+      "pageOrSection": "පිටුව 65 (රූපක් තාලය)"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "සම ස්ථානය ඛාලියෙන් ආරම්භ වන සුවිශේෂී මාත්‍රා 7 තාල ව්‍යුහය සනාථ කෙරිණි.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "tala-jhaptal",
+    "name_si": "ජප්තාලය",
+    "name_en": "Jhaptal",
+    "matras": 10,
+    "vibhagCount": 4,
+    "vibhagStructure": [2, 3, 2, 3],
+    "taliKhali_si": ["1 වන මාත්‍රාව: තාළි 1 (සම)", "3 වන මාත්‍රාව: තාළි 2", "6 වන මාත්‍රාව: ඛාලි (0)", "8 වන මාත්‍රාව: තාළි 3"],
+    "theka_si": "ධී නා | ධී ධී නා | තී නා | ධී ධී නා",
+    "bols": [
+      { "matra": 1, "bol_si": "ධී", "vibhagIndex": 0, "isSam": true, "isTali": true, "isKhali": false, "action_si": "අත්පුඩි (1)" },
+      { "matra": 2, "bol_si": "නා", "vibhagIndex": 0, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 3, "bol_si": "ධී", "vibhagIndex": 1, "isSam": false, "isTali": true, "isKhali": false, "action_si": "අත්පුඩි (2)" },
+      { "matra": 4, "bol_si": "ධී", "vibhagIndex": 1, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 5, "bol_si": "නා", "vibhagIndex": 1, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (3)" },
+      { "matra": 6, "bol_si": "තී", "vibhagIndex": 2, "isSam": false, "isTali": false, "isKhali": true, "action_si": "වැනීම (0)" },
+      { "matra": 7, "bol_si": "නා", "vibhagIndex": 2, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 8, "bol_si": "ධී", "vibhagIndex": 3, "isSam": false, "isTali": true, "isKhali": false, "action_si": "අත්පුඩි (3)" },
+      { "matra": 9, "bol_si": "ධී", "vibhagIndex": 3, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (2)" },
+      { "matra": 10, "bol_si": "නා", "vibhagIndex": 3, "isSam": false, "isTali": false, "isKhali": false, "action_si": "ඇඟිලි (3)" }
+    ],
+    "layaVariants": {
+      "thah_bpm": 65,
+      "dugun_bpm": 130,
+      "chaugun_bpm": 260
+    },
+    "gradeBands": ["10-11", "12-13"],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G1011-TG",
+      "pageOrSection": "පිටුව 68 (ජප්තාලය)"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "මාත්‍රා 10, විභාග 4 (2/3/2/3) ව්‍යුහය තහවුරු විය.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  }
+]

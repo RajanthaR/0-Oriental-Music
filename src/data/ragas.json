@@ -1,0 +1,223 @@
+[
+  {
+    "id": "raga-bilawal",
+    "name_si": "බිලාවල් රාගය (අල්හයියා බිලාවල්)",
+    "name_en": "Raga Bilawal",
+    "thata_si": "බිලාවල් ථාටය",
+    "arohana_si": "ස , රි , ග , ප , ධ , නි , ස̇",
+    "avarohana_si": "ස̇ , නි , ධ , ප , ම , ග , රි , ස",
+    "arohana_swaras": ["S", "R", "G", "P", "D", "N", "S'"],
+    "avarohana_swaras": ["S'", "N", "D", "P", "M", "G", "R", "S"],
+    "vadi_si": "ධෛවත (ධ)",
+    "samvadi_si": "ගාන්ධාර (ග)",
+    "jati_si": "ෂාඩව - සම්පූර්ණ",
+    "time_si": "ප්‍රාතඃ කාලය (උදෑසන පළමු ප්‍රහාරය)",
+    "rasa_si": "ශාන්ත, ප්‍රීති, භක්ති",
+    "pakad_si": "ග රි , ග ප , ධ , නි ස̇",
+    "characteristics_si": [
+      "සියලුම ස්වර ශුද්ධ ස්වර වන මූලික ථාට රාගයයි.",
+      "ආරෝහණයේදී මධ්‍යම (ම) ස්වරය වර්ජිත වන බැවින් ෂාඩව-සම්පූර්ණ ජාතියට අයත් වේ.",
+      "උදෑසන ගායනා කරන ප්‍රමුඛතම ශාන්ත රාගයකි."
+    ],
+    "samplePhrases": [
+      {
+        "name_si": "මුඛ්‍යාංගය (පකඩ්)",
+        "swaras": ["G", "R", "G", "P", "D", "N", "S'"]
+      },
+      {
+        "name_si": "සරල ආලාප රටාව",
+        "swaras": ["S", "R", "G", "R", "S", "D", "N", "S"]
+      }
+    ],
+    "gradeBands": ["6-7", "8-9", "10-11"],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G1011-TG",
+      "pageOrSection": "පිටුව 48 (බිලාවල් රාග අධ්‍යයනය)"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "NIE විෂය නිර්දේශයට අනුව පූර්ණ රාග ලක්ෂණ තහවුරු කරන ලදී.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "raga-bhairav",
+    "name_si": "භෛරව් රාගය",
+    "name_en": "Raga Bhairav",
+    "thata_si": "භෛරව් ථාටය",
+    "arohana_si": "ස , රි(කෝ) , ග , ම , ප , ධ(කෝ) , නි , ස̇",
+    "avarohana_si": "ස̇ , නි , ධ(කෝ) , ප , ම , ග , රි(කෝ) , ස",
+    "arohana_swaras": ["S", "r", "G", "M", "P", "d", "N", "S'"],
+    "avarohana_swaras": ["S'", "N", "d", "P", "M", "G", "r", "S"],
+    "vadi_si": "ධෛවත - කෝමල (ධ)",
+    "samvadi_si": "රිෂභ - කෝමල (රි)",
+    "jati_si": "සම්පූර්ණ - සම්පූර්ණ",
+    "time_si": "ප්‍රාතඃ කාලය (පාන්දර/උදෑසන සන්ධිප්‍රකාශ කාලය)",
+    "rasa_si": "ගාම්භීර, ශාන්ත, භක්ති",
+    "pakad_si": "ග , ම , ධ(කෝ) - ප , ග , ම , රි(කෝ) - ස",
+    "characteristics_si": [
+      "රිෂභ (රි) සහ ධෛවත (ධ) ස්වර දෙක කෝමල වේ; අනෙකුත් සියලු ස්වර ශුද්ධ වේ.",
+      "රි සහ ධ ස්වර මත ඇඳෙන සියුම් ආන්දෝලනය (කම්පනය) රාගයේ සුවිශේෂී ලක්ෂණයකි.",
+      "උදෑසන හිරු උදාවන මොහොතේ ගයන සන්ධිප්‍රකාශ රාගයකි."
+    ],
+    "samplePhrases": [
+      {
+        "name_si": "මුඛ්‍යාංගය (පකඩ්)",
+        "swaras": ["G", "M", "d", "P", "G", "M", "r", "S"]
+      },
+      {
+        "name_si": "මන්ද්‍ර සප්තක ආලාපය",
+        "swaras": ["S", "r", "S", "d", "N", "S"]
+      }
+    ],
+    "gradeBands": ["10-11", "12-13"],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G1011-TG",
+      "pageOrSection": "පිටුව 56 (භෛරව් රාග ඒකකය)"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "ආන්දෝලිත කෝමල රි-ධ ස්වර සහ වාදී-සංවාදී සම්බන්ධතා සනාථ කෙරිණි.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "raga-yaman",
+    "name_si": "යමන් රාගය (කල්‍යාන්)",
+    "name_en": "Raga Yaman (Kalyan)",
+    "thata_si": "කල්‍යාන් ථාටය",
+    "arohana_si": "නි̣ , රි , ග , ම(තී) , ධ , නි , ස̇",
+    "avarohana_si": "ස̇ , නි , ධ , ප , ම(තී) , ග , රි , ස",
+    "arohana_swaras": ["N", "R", "G", "m", "D", "N", "S'"],
+    "avarohana_swaras": ["S'", "N", "D", "P", "m", "G", "R", "S"],
+    "vadi_si": "ගාන්ධාර (ග)",
+    "samvadi_si": "නිෂාද (නි)",
+    "jati_si": "ෂාඩව - සම්පූර්ණ (ආරෝහණයේ ස වර්ජිතව නි̣ වෙතින් ඇරඹෙයි)",
+    "time_si": "රාත්‍රී ප්‍රථම ප්‍රහාරය (සන්ධ්‍යා කාලය)",
+    "rasa_si": "ශෘංගාර, භක්ති, ප්‍රීති",
+    "pakad_si": "නි̣ රි ග , ම(තී) ධ නි ස̇ , නි ධ ප ම(තී) ග රි ස",
+    "characteristics_si": [
+      "මධ්‍යම (ම) ස්වරය තීව්‍ර වන අතර අනෙක් සියලු ස්වර ශුද්ධ වේ.",
+      "ආරෝහණයේදී සෘජුව 'ස' ස්වරය නොගෙන මන්ද්‍ර නිෂාදයෙන් (නි̣) ආරම්භ කිරීම සුලබ සම්ප්‍රදායයි.",
+      "සන්ධ්‍යා කාලයේ සිත පහන් කරවන සුන්දර මියුරු රාගයකි."
+    ],
+    "samplePhrases": [
+      {
+        "name_si": "මුඛ්‍යාංගය (පකඩ්)",
+        "swaras": ["N", "R", "G", "m", "D", "P", "m", "G", "R", "S"]
+      },
+      {
+        "name_si": "තාර සප්තක සංචාරය",
+        "swaras": ["m", "D", "N", "S'", "R", "S'", "N", "D", "P"]
+      }
+    ],
+    "gradeBands": ["10-11", "12-13"],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G1011-TG",
+      "pageOrSection": "පිටුව 58 (යමන් රාගය)"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "තීව්‍ර මධ්‍යම ස්වරයේ සංඛ්‍යාතය සහ පකඩ් රූපය පරීක්ෂා කරන ලදී.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "raga-khamaj",
+    "name_si": "ඛමාජ් රාගය",
+    "name_en": "Raga Khamaj",
+    "thata_si": "ඛමාජ් ථාටය",
+    "arohana_si": "ස , ග , ම , ප , ධ , නි , ස̇",
+    "avarohana_si": "ස̇ , නි(කෝ) , ධ , ප , ම , ග , රි , ස",
+    "arohana_swaras": ["S", "G", "M", "P", "D", "N", "S'"],
+    "avarohana_swaras": ["S'", "n", "D", "P", "M", "G", "R", "S"],
+    "vadi_si": "ගාන්ධාර (ග)",
+    "samvadi_si": "නිෂාද (නි)",
+    "jati_si": "ෂාඩව - සම්පූර්ණ",
+    "time_si": "රාත්‍රී ද්විතීය ප්‍රහාරය",
+    "rasa_si": "ශෘංගාර, චංචල, ආදරණීය",
+    "pakad_si": "නි(කෝ) ධ - ප ම ග , ම ග රි ස",
+    "characteristics_si": [
+      "ආරෝහණයේදී ශුද්ධ නිෂාද (නි) ද, අවරෝහණයේදී කෝමල නිෂාද (නි) ද යෙදේ.",
+      "ආරෝහණයේදී රිෂභ (රි) ස්වරය වර්ජිතය.",
+      "තුම්රි, ගසල් සහ නූර්ති ගීත සඳහා බෙහෙවින් භාවිත වන ප්‍රචලිත රාගයකි."
+    ],
+    "samplePhrases": [
+      {
+        "name_si": "මුඛ්‍යාංගය (පකඩ්)",
+        "swaras": ["n", "D", "P", "M", "G", "M", "G", "R", "S"]
+      },
+      {
+        "name_si": "සරල තනු සංචාරය",
+        "swaras": ["S", "G", "M", "P", "D", "N", "S'", "n", "D", "P"]
+      }
+    ],
+    "gradeBands": ["8-9", "10-11", "12-13"],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G09-TG",
+      "pageOrSection": "පිටුව 50 (ඛමාජ් රාගය)"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "ආරෝහණයේ ශුද්ධ නි සහ අවරෝහණයේ කෝමල නි ස්වර භාවිතය නිවැරදිව තහවුරු විය.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "raga-bhupali",
+    "name_si": "භූපාලි රාගය",
+    "name_en": "Raga Bhupali",
+    "thata_si": "කල්‍යාන් ථාටය (බිලාවල් ථාටාශ්‍රිතවද සැලකේ)",
+    "arohana_si": "ස , රි , ග , ප , ධ , ස̇",
+    "avarohana_si": "ස̇ , ධ , ප , ග , රි , ස",
+    "arohana_swaras": ["S", "R", "G", "P", "D", "S'"],
+    "avarohana_swaras": ["S'", "D", "P", "G", "R", "S"],
+    "vadi_si": "ගාන්ධාර (ග)",
+    "samvadi_si": "ධෛවත (ධ)",
+    "jati_si": "ඕඩව - ඕඩව (ස්වර 5)",
+    "time_si": "රාත්‍රී ප්‍රථම ප්‍රහාරය",
+    "rasa_si": "ශාන්ත, භක්ති, ප්‍රසන්න",
+    "pakad_si": "ග රි ස ධ̣ , ස රි ග , ප ග , ධ ප ග රි ස",
+    "characteristics_si": [
+      "මධ්‍යම (ම) සහ නිෂාද (නි) ස්වර දෙකම ආරෝහණ හා අවරෝහණ දෙකෙහිම වර්ජිතය.",
+      "ස්වර 5 ක් පමණක් යෙදෙන ඕඩව-ඕඩව ජාතියේ මූලික රාගයකි.",
+      "පාසල් ආරම්භක සිසුන්ට උගන්වන ප්‍රථම රාගයන්ගෙන් එකකි."
+    ],
+    "samplePhrases": [
+      {
+        "name_si": "මුඛ්‍යාංගය (පකඩ්)",
+        "swaras": ["G", "R", "S", "D", "S", "R", "G", "P", "G", "R", "S"]
+      }
+    ],
+    "gradeBands": ["8-9", "10-11"],
+    "sourceReference": {
+      "sourceId": "SRC-NIE-G08-TG",
+      "pageOrSection": "පිටුව 38 (භූපාලි රාගය)"
+    },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "ඕඩව-ඕඩව ජාතිය සහ ම-නි වර්ජිත බව තහවුරු විය.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  }
+]

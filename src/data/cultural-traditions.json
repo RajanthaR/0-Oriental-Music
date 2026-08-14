@@ -1,0 +1,240 @@
+[
+  {
+    "id": "cult-goyam-kavi",
+    "title_si": "ගොයම් කවි (කුඹුරු කවි)",
+    "title_en": "Goyam Kavi (Paddy Field Harvesting Songs)",
+    "category_si": "ගැමි ගීත (Folk Songs)",
+    "description_si": "වී ගොවිතැන ආශ්‍රිතව ගොයම් කැපීම, පැළ සිටුවීම සහ පාගන අවස්ථාවලදී ගොවි ජනතාව විසින් සාමූහිකව ගැයූ පැරණි ජන කවි විශේෂයකි.",
+    "musicalStyle_si": "සරල ස්වර 3ක් හෝ 4ක් (සාමාන්‍යයෙන් ස, රි, ග ආශ්‍රිත) අතර දෝලනය වන, දිගු ඇදීම් සහිත, සාමූහික ප්‍රතිචාර (Call and Response) ශෛලියකි.",
+    "instrumentsUsed_si": "සාමාන්‍යයෙන් කිසිදු භාණ්ඩයක් භාවිත නොවේ; කුඹුරු පරිසරයේ ස්වභාවික දෝංකාරය සමඟ ගැයේ.",
+    "verseExamples_si": [
+      {
+        "verseTitle_si": "ගොයම් කැපීමේ ආරම්භක කවිය",
+        "lyrics_si": [
+          "සිරස නමා මුනි සිරිපා වඳි   මිනී",
+          "දෙදණ නමා සදහම් සඟ වඳි   මිනී",
+          "මෙලෙස නමා ගොයමට බැස කප   මිනී",
+          "අපෙ දෙවියන් බුදු බව ලැබ ගනි   මිනී"
+        ],
+        "meaning_si": "බුදුන්, දහම්, සඟුන් වැඳ දෙවියන්ට පිං දෙමින් ගොයම් කැපීම ආරම්භ කිරීම.",
+        "talaPattern_si": "තාලයකට වඩා දිගු ඇදීම් සහිත ලය විලාසය"
+      }
+    ],
+    "socialContext_si": "ගැමි එකමුතුකම, ශ්‍රම විඩාව දුරු කර ගැනීම සහ කෙත් සරුසාර වීමට ආශිර්වාද ප්‍රාර්ථනා කිරීම.",
+    "gradeBands": ["6-7", "8-9", "10-11"],
+    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "ගැමි ගී අධ්‍යයනය - ගොයම් කවි" },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "සාම්ප්‍රදායික ගොයම් කවි පද සහ සමාජීය පසුබිම සනාථ විය.",
+      "license": "Academic Heritage Reference",
+      "reuseStatus": "Verified Original"
+    }
+  },
+  {
+    "id": "cult-karaththa-kavi",
+    "title_si": "කරත්ත කවි (ගැලකරුවන්ගේ ගී)",
+    "title_en": "Karaththa Kavi (Cartmen Songs)",
+    "category_si": "ගැමි ගීත (Folk Songs)",
+    "description_si": "ඈත අතීතයේ ගැල් පදවාගෙන දුෂ්කර කඳුකර සහ වනාන්තර මාර්ග ඔස්සේ බඩු ප්‍රවාහනය කළ කරත්තකරුවන් නිදිමත හා බිය දුරු කර ගැනීමට ගැයූ කවිය.",
+    "musicalStyle_si": "උස් හඬින්, කඳුහෙල් සිසාරා රැව්දෙන අයුරින් දිගු 'හා...' නාද ඇදීමෙන් ගැයෙන විලාප ස්වරූපී ගායන රටාවකි.",
+    "instrumentsUsed_si": "කරත්තයේ ගෙජ්ජි වැලේ නාදය සහ ගොනුන්ගේ කුර හඬ ස්වභාවික රිද්මය සපයයි.",
+    "verseExamples_si": [
+      {
+        "verseTitle_si": "තණ්ඩලේ දෙන්න දෙපොලේ",
+        "lyrics_si": [
+          "තණ්ඩලේ දෙන්න දෙපොලේ දක්කන     වා",
+          "කටුකැලේ ගාලේ නොලිහා වද දෙන     වා",
+          "හපුතලේ කන්ද දැකලා බඩ දන     වා",
+          "පව්කළ ගොනෝ ඇදපන් හපුතල් යන     වා"
+        ],
+        "meaning_si": "හපුතලේ දුෂ්කර කන්ද නගින ගොනුන්ගේ දුක සහ ගැල්කරුවාගේ ජීවිත අරගලය.",
+        "talaPattern_si": "නිදහස් ලය (Free rhythm) දිගු අනුනාද සහිතව"
+      }
+    ],
+    "socialContext_si": "පැරණි ප්‍රවාහන දුෂ්කරතා, කරුණා රසය සහ සත්ත්ව-මිනිස් සබඳතාව විදහා දැක්වීම.",
+    "gradeBands": ["6-7", "8-9", "10-11"],
+    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "කරත්ත කවි විචාරය" },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "කරුණා රසය හා සාම්ප්‍රදායික ගායන විලාසය සනාථ විය.",
+      "license": "Academic Heritage Reference",
+      "reuseStatus": "Verified Original"
+    }
+  },
+  {
+    "id": "cult-paruwa-kavi",
+    "title_si": "පාරු කවි (ගංගාශ්‍රිත ගී)",
+    "title_en": "Paruwa Kavi (River Boat Songs)",
+    "category_si": "ගැමි ගීත (Folk Songs)",
+    "description_si": "කළු ගඟ, කැලණි ගඟ ආදී ගංගා ඔස්සේ භාණ්ඩ පටවාගෙන පාරු පදවමින් ගිය පාරුකරුවන් ගංගා නිම්නයේ ගැයූ කවි විශේෂයකි.",
+    "musicalStyle_si": "ජල තරංගවල රිද්මයට අනුකූල මන්දගාමී තාල රටාවක් සහ ජලයේ දෝංකාර දෙන සන්සුන් ස්වර රටාවක් ගනී.",
+    "instrumentsUsed_si": "හබල දිය මත ගැටෙන හඬ සහ ජල තරංග ශබ්දය.",
+    "verseExamples_si": [
+      {
+        "verseTitle_si": "කළු ගඟේ පාරු පැදීම",
+        "lyrics_si": [
+          "ඔන්න මලේ ඔය නාමල නෙළා ව   රෙන්",
+          "මෙන්න මලේ පාරුව පැද එහා ව   රෙන්",
+          "ගං ඉවුරේ පිපි මල් දැක බලා ව   රෙන්",
+          "කළු ගඟ බඩින් අපෙ පාරුව පැද ව   රෙන්"
+        ],
+        "meaning_si": "ගංගාධාරයේ සුන්දරත්වය හා පාරු යාත්‍රාවේ අත්දැකීම.",
+        "talaPattern_si": "සන්සුන් මධ්‍ය ලය"
+      }
+    ],
+    "socialContext_si": "ගංගාශ්‍රිත වෙළෙඳ ජීවිතය සහ ජන ආශ්‍රිත සුහදතාව.",
+    "gradeBands": ["6-7", "8-9", "10-11"],
+    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "පාරු කවි ලේඛනාගාරය" },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "පාරු කවි නාද රටාව සහ පද පේළි තහවුරු විය.",
+      "license": "Academic Heritage Reference",
+      "reuseStatus": "Verified Original"
+    }
+  },
+  {
+    "id": "cult-nelum-kavi",
+    "title_si": "නෙළුම් කවි (නෙළුම් මල් නෙළීමේ හා පැළ සිටුවීමේ ගී)",
+    "title_en": "Nelum Kavi",
+    "category_si": "ගැමි ගීත (Folk Songs)",
+    "description_si": "වැව් ආශ්‍රිතව නෙළුම් මල් නෙළීමේදී සහ කුඹුරුවල කාන්තාවන් විසින් ගොයම් පැළ සිටුවීමේදී (නෙළුම් සාමූහික කටයුත්තේදී) ගයන ලද මියුරු ගීත වේ.",
+    "musicalStyle_si": "කාන්තා කටහඬට උචිත මධුර, සෞම්‍ය ස්වර රටා සහ කෙටි රිද්මයානුකූල අත්වැල් ගායන විලාසය.",
+    "instrumentsUsed_si": "ස්වභාවික අත්වැල් සහ කටහඬ පමණි.",
+    "verseExamples_si": [
+      {
+        "verseTitle_si": "නෙළුම් නෙළන ලඳඟනන්ගේ කවිය",
+        "lyrics_si": [
+          "කලක් ගොසින් වැව් ඉවුරට බැසපු ල   ඳූ",
+          "නෙළුම් මලක් දැක අත දිගු කළ ල   ඳූ",
+          "සුවඳ හමන රත් නෙළුමකි සොඳුරු ල   ඳූ",
+          "මුනිඳු පුදට ගෙන යමු මේ නෙළුම් ල   ඳූ"
+        ],
+        "meaning_si": "බුදු පුදට නෙළුම් මල් නෙළන කාන්තාවන්ගේ භක්තිමත් ප්‍රීතිය.",
+        "talaPattern_si": "මධ්‍ය ලය"
+      }
+    ],
+    "socialContext_si": "ගැමි කාන්තා සාමූහිකත්වය සහ ආගමික භක්තිය.",
+    "gradeBands": ["6-7", "8-9", "10-11"],
+    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "නෙළුම් කවි සංග්‍රහය" },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "නෙළුම් කවියේ ස්වරූපය සනාථ විය.",
+      "license": "Academic Heritage Reference",
+      "reuseStatus": "Verified Original"
+    }
+  },
+  {
+    "id": "cult-raban-pada",
+    "title_si": "රබන් පද (අවුරුදු රබන් වාදන සම්ප්‍රදාය)",
+    "title_en": "Raban Pada",
+    "category_si": "රබන් පද (Raban Traditions)",
+    "description_si": "සිංහල අලුත් අවුරුදු සමයේදී බංකු රබාන වටා එකතු වී කාන්තාවන් විසින් ගයමින් වයන රිද්මයානුකූල පද්‍ය හා වාදන රටාය.",
+    "musicalStyle_si": "කෙටි පද පේළි, ප්‍රීතිජනක වේගවත් තාල, බෝල් සහ ගීතය එකවර මිශ්‍ර වන සජීවී වාදන විලාසය.",
+    "instrumentsUsed_si": "බංකු රබාන, අත් රබාන.",
+    "verseExamples_si": [
+      {
+        "verseTitle_si": "උඩින් උඩින් වර පෙත්තප්පූ",
+        "lyrics_si": [
+          "උඩින් උඩින් වර පෙත්තප්     පූ",
+          "බිමින් බිමින් වර පෙත්තප්     පූ",
+          "කැවුම් කන්න වර පෙත්තප්     පූ",
+          "පැණි බිබී වර පෙත්තප්     පූ"
+        ],
+        "meaning_si": "අවුරුදු කැවිලි කෑමට ගිරවා කැඳවන ළමා හා කාන්තා හාස්‍ය පදය.",
+        "talaPattern_si": "දොං තා දොං තා - රිද්මයානුකූල රබන් වැයුම"
+      }
+    ],
+    "socialContext_si": "ගමේ සාමය, ප්‍රීතිය, අලුත් අවුරුදු සැමරුම.",
+    "gradeBands": ["6-7", "8-9", "10-11"],
+    "sourceReference": { "sourceId": "SRC-EPD-TB-G10", "pageOrSection": "පිටුව 102 (රබන් පද)" },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "රබන් පද සාම්ප්‍රදායික රිද්මය තහවුරු විය.",
+      "license": "Educational Open Access",
+      "reuseStatus": "Curriculum Canonical"
+    }
+  },
+  {
+    "id": "cult-shanthikarma",
+    "title_si": "ශාන්තිකර්ම නාද මාලා (උඩරට, පහතරට, සබරගමු)",
+    "title_en": "Shanthikarma Ritual Music",
+    "category_si": "ශාන්තිකර්ම (Ritual Music)",
+    "description_si": "ලක්දිව ප්‍රධාන සම්ප්‍රදායන් ත්‍රිත්වය (උඩරට කොහොඹා කන්කාරිය, පහතරට දහඅට සන්නිය/ගම්මඩුව, සබරගමු මහසොහොන් සමයම) කේන්ද්‍ර කරගත් නාද පූජා සම්ප්‍රදාය.",
+    "musicalStyle_si": "බෙර පද, මන්ත්‍ර ගායනා, යදින්න, සන්නි නාද සහ ආශිර්වාදාත්මක සෙත් ශාන්ති ගායනා.",
+    "instrumentsUsed_si": "ගැට බෙරය, යක් බෙරය, දවුල, තාලම්පට, හොරණෑව.",
+    "verseExamples_si": [
+      {
+        "verseTitle_si": "සෙත් ශාන්ති ආශිර්වාද කවිය",
+        "lyrics_si": [
+          "සිරිමත් බුදු සිරිපාදේ වඳි      මින්",
+          "දෙවි රැකවල් ලැබ සෙතක් සලස      මින්",
+          "ග්‍රහ දොස හැර සුවපත් බව දෙ      මින්",
+          "තුන් ලොව සෙත් ශාන්තිය සලස      මින්"
+        ],
+        "meaning_si": "රෝග බිය දුරු වී නිරෝගී සුවය ප්‍රාර්ථනා කිරීම.",
+        "talaPattern_si": "තාලම්පට හා බෙර පද මිශ්‍ර මධ්‍ය ලය"
+      }
+    ],
+    "socialContext_si": "මනෝවිද්‍යාත්මක සුවපත්භාවය, ග්‍රාමීය ආරක්ෂාව සහ සංස්කෘතික උරුමය.",
+    "gradeBands": ["8-9", "10-11", "12-13"],
+    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "ශාන්තිකර්ම නාද පර්යේෂණ" },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "ත්‍රෛවිධ සම්ප්‍රදායික ශාන්තිකර්ම නාද ලක්ෂණ ගෞරවනීයව සනාථ විය.",
+      "license": "Academic Heritage Reference",
+      "reuseStatus": "Verified Original"
+    }
+  },
+  {
+    "id": "cult-veddah-songs",
+    "title_si": "වැදි ගීත (ආදිවාසී සංගීත සම්ප්‍රදාය)",
+    "title_en": "Indigenous Veddah Songs",
+    "category_si": "වැදි ගීත (Veddah Traditions)",
+    "description_si": "ශ්‍රී ලංකාවේ ආදිවාසී (වැදි) ජනතාවගේ දඩයම්, මී කැඩීම, යකුන් පිදීම සහ දරු නැළවිලි ආශ්‍රිත ආවේණික ස්වර රටා සහිත ගීත.",
+    "musicalStyle_si": "ස්වර 2ක් හෝ 3ක් පමණක් ඉතා සරල පරතරයකින් යුතුව පුනරාවර්තනය වන ප්‍රාථමික නාද ව්‍යුහයකි.",
+    "instrumentsUsed_si": "ශරීරයේ අත්පුඩි, පය පාගා ශබ්ද කිරීම සහ ස්වභාවික ශබ්ද.",
+    "verseExamples_si": [
+      {
+        "verseTitle_si": "දරු නැළවිලි වැදි ගීය",
+        "lyrics_si": [
+          "තෙන තෙඳිනා තෙන තෙඳිනා     නේ",
+          "තෙන තෙඳිනා තෙන තෙඳිනා     නේ",
+          "බට කොළ ඇඳි කුඩා ළප     ටී",
+          "නැළවියන් මා රත්තර     නේ"
+        ],
+        "meaning_si": "වනපෙතේ ස්වභාවධර්මයේ රැකවරණය පතා දරුවා නැළවීම.",
+        "talaPattern_si": "සරල තට්ටු කිරීම් රිද්මය"
+      }
+    ],
+    "socialContext_si": "ශ්‍රී ලංකාවේ මුල්ම මානව සංස්කෘතික නාද උරුමය සහ සොබාදහම් බැඳීම.",
+    "gradeBands": ["8-9", "10-11", "12-13"],
+    "sourceReference": { "sourceId": "SRC-UVPA-FOLK", "pageOrSection": "ආදිවාසී සංගීත විමර්ශන" },
+    "reviewMetadata": {
+      "status": "Published",
+      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
+      "reviewDate": "2026-08-14",
+      "lastVerifiedDate": "2026-08-14",
+      "changeNotes": "ආදිවාසී සංස්කෘතික ගෞරවය සුරකිමින් පද සනාථ කරන ලදී.",
+      "license": "Academic Heritage Reference",
+      "reuseStatus": "Verified Original"
+    }
+  }
+]
