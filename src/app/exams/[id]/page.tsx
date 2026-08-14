@@ -48,7 +48,7 @@ export default function ExamPaperTakePage() {
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-border shadow-warm-lg">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
           <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200">
-            {paper.gradeBand === "10-11" ? "සාමාන්‍ය පෙළ (O/L)" : "උසස් පෙළ (A/L)"}
+            සාමාන්‍ය පෙළ (O/L)
           </span>
           <span className="text-xs text-text-muted font-medium flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" /> කාලය: මිනිත්තු {paper.timeLimitMinutes}

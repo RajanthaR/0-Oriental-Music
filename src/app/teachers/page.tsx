@@ -106,7 +106,6 @@ export default function TeacherWorkspacePage() {
                   <option value="6-7">6–7 ශ්‍රේණි (ආරම්භක)</option>
                   <option value="8-9">8–9 ශ්‍රේණි (මධ්‍යම)</option>
                   <option value="10-11">10–11 ශ්‍රේණි (සාමාන්‍ය පෙළ)</option>
-                  <option value="12-13">12–13 ශ්‍රේණි (උසස් පෙළ)</option>
                 </select>
               </div>
 

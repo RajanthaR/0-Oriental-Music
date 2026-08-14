@@ -65,7 +65,7 @@ export default function LessonsDirectoryPage() {
         {/* Grade Band Filter */}
         <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-border-light text-xs">
           <span className="font-bold text-text-secondary mr-2">ශ්‍රේණිය:</span>
-          {(["all", "6-7", "8-9", "10-11", "12-13"] as const).map((grade) => (
+          {(["all", "6-7", "8-9", "10-11"] as const).map((grade) => (
             <button
               key={grade}
               type="button"

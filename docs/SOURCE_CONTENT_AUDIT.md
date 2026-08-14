@@ -1,8 +1,8 @@
-# SOURCE_CONTENT_AUDIT.md — Canonical Source Corpus Audit
+# SOURCE_CONTENT_AUDIT.md — Extracted source corpus inventory (unverified claim boundary)
 
-This document records the exhaustive provenance and quality audit of the 30 official Sri Lankan School Oriental Music (පෙරදිග සංගීතය) source documents located in `oriental_music_markdown/by-source/`.
+> **Prompt 1 correction:** This document inventories extracted Markdown and page-quality signals. It does not establish that every application claim is true, official, licensed, reviewed, or published. The current publication boundary is [`docs/FORENSIC_PUBLICATION_BASELINE.md`](FORENSIC_PUBLICATION_BASELINE.md), with issue-level evidence in [`data/forensic-ledger.json`](../data/forensic-ledger.json).
 
-Every curriculum claim, lesson, raga, tala, instrument, and tradition published on **ස්වර මඟ (Swara Maga)** derives strictly from this corpus.
+This document records the current inventory of 30 source-document records located in `oriental_music_markdown/by-source/`. The checkout contains no original PDF files. A source page heading or extracted paragraph is not a substitute for original-PDF/manual comparison.
 
 ---
 
@@ -10,23 +10,19 @@ Every curriculum claim, lesson, raga, tala, instrument, and tradition published 
 
 - **Total Source Documents**: 30
 - **Total Extracted PDF Pages**: 1,023
-- **Primary Grade Bands Covered**: Grades 6–11 (O/L Curriculum)
-- **Official Publishers Represented**:
-  - ජාතික අධ්‍යාපන ආයතනය (National Institute of Education - NIE Sri Lanka)
-  - අධ්‍යාපන ප්‍රකාශන දෙපාර්තමේන්තුව (Department of Educational Publications)
-  - ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තුව (Department of Examinations)
-  - අධ්‍යාපන අමාත්‍යාංශය (Ministry of Education) / කලාප අධ්‍යාපන කාර්යාල
+- **Observed grade scope in the supplied source-document inventory**: Grades 6–11 and mixed/unspecified records; no supplied Grade 12–13 source set was verified.
+- **Publisher metadata**: retained as unverified until a source record or original publication establishes it. The public Sources view therefore renders publisher, year, location, licence, and status as unknown/unverified.
 
 ---
 
 ## 2. Source-Page Confidence Classification System
 
-Every source page across all 1,023 pages is assigned one of four confidence ratings:
+Every source page across all 1,023 extracted pages is assigned one of four confidence ratings:
 
 | Level | Classification | Criteria & Usage Policy |
 |---|---|---|
-| **A** | **Verified Readable** | Coherent Sinhala Unicode text with clear terminology, headings, and musical facts. Ready for pedagogical rewriting. |
-| **B** | **Readable with Normalization** | Meaning is intact, but contains minor extraction artefacts (spacing errors, line breaks, or UCSC-mapped FM font remnants). Normalized against canonical terminology. |
+| **A** | **Readable extraction** | Coherent extracted Sinhala text. It is eligible for claim comparison, not automatically verified. |
+| **B** | **Readable with normalization** | Extracted meaning may be usable after comparison; spacing, line-break, or mapped-font artefacts remain possible. |
 | **C** | **Review Required** | Incomplete tables, short fragments, or partial exercises requiring cross-checking with parallel teacher guides. |
 | **D** | **Unusable Without Visual/Expert Review** | Image-only pages (0 text recovered), corrupted font encoding, or missing notation diagrams. **Never guessed or inferred.** Maintained as review placeholders. |
 
@@ -73,10 +69,10 @@ Every source page across all 1,023 pages is assigned one of four confidence rati
 
 1. **`children_songs.md` & `grade_7_music.md` (Image-Only)**:
    - *Issue*: pdftotext could not recover embedded text from image scans.
-   - *Mitigation*: Curriculum requirements for Grade 6–8 children's songs and Grade 7 swaras/instruments are fully populated from `grade_6_music_teacher_guide.md`, `grade_8_music_teacher_guide.md`, and `grade_7_11_oriental_music_teacher_guide.md`.
+   - *Containment*: These pages are retained as review placeholders. Parallel documents may be candidate evidence, but they do not silently promote the image-only claims.
 2. **`oriental_music_2018.md` (Corrupted Glyphs)**:
    - *Issue*: Non-standard FM font mapping produced unmapped conjuncts.
-   - *Mitigation*: Treated strictly as Grade D; no facts are derived solely from this file. Parallel uncorrupted pages in `grade_11_music_textbook.md` and `grade_10_nadaya.md` provide authoritative verified text.
+   - *Containment*: Treated strictly as Grade D; no facts are derived solely from this file. Parallel pages are candidate evidence only and still require claim-level comparison.
 3. **Advanced Grades 12–13 Scope**:
    - *Issue*: The supplied 30-document corpus covers Grades 6 through 11.
-   - *Mitigation*: All published lessons and curriculum mapping reflect exact grades 6, 7, 8, 9, 10, and 11. Grade 12–13 items are flagged as supplementary pending official A/L source document addition.
+   - *Containment*: Public selectors and routes are limited to Grades 6–11. Grade 12–13/A/L records remain quarantined pending an official supplied source set.

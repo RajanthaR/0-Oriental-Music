@@ -13,7 +13,12 @@ import {
   Sparkles,
 } from "lucide-react";
 import { repository } from "@/lib/data/repository";
-import { validateContent, ValidationIssue } from "@/lib/validation/content-validator";
+import {
+  validateContent,
+  validateForensicInventory,
+  validatePublicBoundary,
+  ValidationIssue,
+} from "@/lib/validation/content-validator";
 import { ContentReviewStatus, Lesson } from "@/types/content";
 
 export default function AdminReviewDashboardPage() {
@@ -26,24 +31,51 @@ export default function AdminReviewDashboardPage() {
   const [updatedSuccessMsg, setUpdatedSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    const all = repository.getLessons();
+    const all = repository.getLessons({ publicOnly: false, publishedOnly: false });
     setLessons(all);
-    const report = validateContent(
-      all,
+    const contentReport = validateContent(
+      repository.getLessons(),
       repository.getRagas(),
       repository.getTalas(),
       repository.getInstruments(),
       repository.getCulturalTraditions(),
       repository.getTheatreTraditions()
     );
-    setValidationReport(report);
+    const baselineReport = validateForensicInventory();
+    const boundaryReport = validatePublicBoundary({
+      lessons: repository.getLessons(),
+      ragas: repository.getRagas(),
+      talas: repository.getTalas(),
+      instruments: repository.getInstruments(),
+      culturalTraditions: repository.getCulturalTraditions(),
+      theatreTraditions: repository.getTheatreTraditions(),
+      learningPaths: repository.getLearningPaths(),
+      exams: repository.getExamPapers(),
+    });
+    setValidationReport({
+      isValid: contentReport.isValid && baselineReport.isValid && boundaryReport.isValid,
+      issues: [
+        {
+          entityType: "Publication",
+          entityId: "P01",
+          field: "reviewState",
+          message: "ප්‍රකාශන සීමාව පරීක්ෂා කර ඇත; සම්පූර්ණ මූලාශ්‍ර හා විෂය සමාලෝචනය තවම අවසන් නැත.",
+          severity: "warning",
+        },
+        ...contentReport.issues,
+        ...baselineReport.issues,
+        ...boundaryReport.issues,
+      ],
+    });
   }, []);
 
   const handleUpdateStatus = (lessonId: string, newStatus: ContentReviewStatus) => {
     const isPublished = newStatus === "Published";
     repository.updateLessonReviewStatus(lessonId, newStatus, isPublished);
-    setLessons(repository.getLessons());
-    setUpdatedSuccessMsg(`පාඩම් අංක ${lessonId} තත්ත්වය '${newStatus}' ලෙස යාවත්කාලීන විය.`);
+    setLessons(repository.getLessons({ publicOnly: false, publishedOnly: false }));
+    setUpdatedSuccessMsg(
+      `පාඩම් අංක ${lessonId} සමාලෝචන පාරදත්ත '${newStatus}' ලෙස සටහන් විය. ප්‍රකාශන සීමා ප්‍රතිපත්තිය තවදුරටත් බලපැවැත්වේ.`
+    );
     setTimeout(() => setUpdatedSuccessMsg(null), 3000);
   };
 
@@ -106,9 +138,7 @@ export default function AdminReviewDashboardPage() {
                 ස්වයංක්‍රීය මූලාශ්‍ර හා පාරදත්ත සත්‍යාපන වාර්තාව
               </h2>
               <span className="text-xs text-text-muted">
-                {validationReport.isValid
-                  ? "සියලුම පාඩම්, රාග, තාල හා මූලාශ්‍ර 100% ක් නිවැරදිව පරීක්ෂාව සමත් වී ඇත."
-                  : `ගැටලු ${validationReport.issues.length} ක් හඳුනාගෙන ඇත.`}
+                {`ප්‍රකාශන සීමා වාර්තාව: ${repository.getPublicationSummary().lessons.public} පොදු පාඩම්, ${repository.getPublicationSummary().lessons.quarantined} quarantine, ${repository.getPublicationSummary().lessons.needsReview} needs-review. සම්පූර්ණ සත්‍යාපනය ප්‍රකාශ කර නැත.`}
               </span>
             </div>
           </div>
@@ -120,7 +150,7 @@ export default function AdminReviewDashboardPage() {
                 : "bg-red-600 text-white"
             }`}
           >
-            {validationReport.isValid ? "සත්‍යාපනය සමත් (Valid)" : "අවධානය අවශ්‍යයි"}
+            {validationReport.isValid ? "සීමා පරීක්ෂා කර ඇත" : "අවධානය අවශ්‍යයි"}
           </span>
         </div>
 
