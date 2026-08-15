@@ -10,7 +10,8 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "sanitize:metadata": "node scripts/sanitize-metadata.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

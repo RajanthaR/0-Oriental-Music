@@ -38,6 +38,9 @@ export const SWARA_SEMITONES: Record<string, SwaraPitchInfo> = {
 export const DEFAULT_ROOT_FREQ = 261.63; // C4
 
 export function getSwaraFrequency(swaraNotation: string, rootFreq: number = DEFAULT_ROOT_FREQ): number {
+  const safeRootFreq = typeof rootFreq === "number" && isFinite(rootFreq) && rootFreq > 0 ? rootFreq : DEFAULT_ROOT_FREQ;
+  if (!swaraNotation || typeof swaraNotation !== "string") return safeRootFreq;
+
   let clean = swaraNotation.trim();
   let octaveShift = 0;
 
@@ -50,10 +53,10 @@ export function getSwaraFrequency(swaraNotation: string, rootFreq: number = DEFA
   }
 
   const info = SWARA_SEMITONES[clean];
-  if (!info) return rootFreq;
+  if (!info) return safeRootFreq;
 
   const totalSemitones = info.semitonesFromSa + octaveShift;
-  return rootFreq * Math.pow(2, totalSemitones / 12);
+  return safeRootFreq * Math.pow(2, totalSemitones / 12);
 }
 
 class SwaraSynthEngine {
@@ -82,11 +85,12 @@ class SwaraSynthEngine {
     rootFreq: number = DEFAULT_ROOT_FREQ,
     timbre: "harmonium" | "flute" | "sitar" | "pure" = "harmonium"
   ) {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !swara || typeof swara !== "string") return;
     this.initContext();
     if (!this.ctx || !this.masterGain) return;
 
     const freq = getSwaraFrequency(swara, rootFreq);
+    if (!isFinite(freq) || freq <= 0) return;
     const now = this.ctx.currentTime;
 
     const noteGain = this.ctx.createGain();

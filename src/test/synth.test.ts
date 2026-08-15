@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { SWARA_SEMITONES, swaraSynth } from "@/lib/audio/synth";
+import { SWARA_SEMITONES, swaraSynth, getSwaraFrequency } from "@/lib/audio/synth";
 import { ROOT_PITCHES } from "@/lib/audio/tanpura";
 
 describe("Audio Synthesis Engine & Tuning Suite", () => {
@@ -33,5 +33,22 @@ describe("Audio Synthesis Engine & Tuning Suite", () => {
     const cPitch = ROOT_PITCHES.find((p) => p.name.startsWith("C (ස)"));
     expect(cPitch).toBeDefined();
     expect(cPitch?.freq).toBeCloseTo(130.81, 1);
+  });
+
+  it("should gracefully handle defensive inputs in getSwaraFrequency", () => {
+    // Empty, non-string, or unknown swara returns safe root frequency
+    expect(getSwaraFrequency("")).toBe(261.63);
+    expect(getSwaraFrequency("unknown")).toBe(261.63);
+    // @ts-expect-error - testing invalid runtime input
+    expect(getSwaraFrequency(null)).toBe(261.63);
+    // @ts-expect-error - testing invalid runtime input
+    expect(getSwaraFrequency(undefined, NaN)).toBe(261.63);
+
+    // Mandra octave notes calculation
+    const mandraDha = getSwaraFrequency(".D", 261.63);
+    expect(mandraDha).toBeCloseTo(261.63 * Math.pow(2, (9 - 12) / 12), 2);
+
+    const mandraNi = getSwaraFrequency(".n", 261.63);
+    expect(mandraNi).toBeCloseTo(261.63 * Math.pow(2, (10 - 12) / 12), 2);
   });
 });

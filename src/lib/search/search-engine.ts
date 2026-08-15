@@ -25,11 +25,11 @@ export function normalizeSinhalaText(text: string): string {
     .replace(/ණ/g, "න")
     .replace(/ළ/g, "ල")
     .replace(/ඥ/g, "ඤ")
-    // Remove zero-width joiners and spaces for matching
-    .replace(/[\u200B-\u200D\uFEFF]/g, "")
     // Normalize rakaransaya orthographic variants (e.g., ද්‍ර / ද්ර <-> දර)
     .replace(/ද්‍ර/g, "දර")
-    .replace(/ද්ර/g, "දර");
+    .replace(/ද්ර/g, "දර")
+    // Remove zero-width joiners and formatting spaces for matching
+    .replace(/[\u200B-\u200D\uFEFF]/g, "");
 }
 
 // Transliteration map for English phonetic queries
