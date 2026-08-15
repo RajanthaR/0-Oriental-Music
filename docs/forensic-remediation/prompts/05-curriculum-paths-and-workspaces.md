@@ -7,7 +7,7 @@ Implement Phase 5 of the Swara Maga forensic remediation programme: turn curricu
 - Read `AGENTS.md`, the forensic plan, all predecessor handoffs, the final public lesson catalog, provenance/publication contracts, correction ledger, and migration maps.
 - Start only after Prompt 4’s ready PR is human-merged into current `origin/main`. Fetch, verify a clean worktree, record the base SHA, and use the Codex worktree branch or create `codex/forensic-p05-curriculum-workspaces` if detached/on `main`.
 - Treat the remediated data layer as authoritative. Do not rewrite source facts in this phase unless a newly found contradiction is ledgered, evidenced, and narrowly corrected.
-- Diffray review of changed repository files is allowed. Never send secrets. Do not merge, deploy, or mutate hosted services.
+- Use `rajantha-skills-library:ce-code-review` for the mandatory full multi-agent review. Never expose secrets. Do not merge, deploy, or mutate hosted services.
 
 ## Objective
 
@@ -46,21 +46,19 @@ Build an exact competency → concept → prerequisite → lesson/activity/asses
 
 Run focused graph/path/search/Admin/Teacher/storage tests, then `npm run test`, `npm run type-check`, `npm run lint`, and `npm run build`. Browser-test representative student, search, path, Admin, Teacher, print, and direct-quarantine flows at 360px and desktop if supported. Report any unavailable browser/print evidence.
 
-## Mandatory local multi-agent Diffray review-fix loop
+## Mandatory `ce-code-review` skill review-fix loop
 
 1. Create and record a local implementation commit after initial verification.
-2. Record the exact local Diffray executable/version, `review --help`, available agents, and `codex-cli` support. An unknown-agent configuration warning is incomplete evidence and must be corrected and rerun.
-3. Inventory all committed files and review coherent bounded batches from the repository root with `diffray review --base <base-sha> --head HEAD --files <short-comma-list> --executor codex-cli --json`. For bounded full-file documentation/data review only, use `diffray review --files <short-comma-list> --full --executor codex-cli --json`; never combine `--full` with `--base`/`--head`.
-4. Primary coverage must omit `--agent` and `--skip-validation`, allowing the normal applicable multi-agent set and validation stage to run. Restricted-agent retries are diagnostic-only and validation-skipped runs cannot satisfy final coverage.
-5. Let Diffray manage concurrency. Keep Windows arguments and JSON log paths short; never inline the diff, patch, contents, or a huge file list.
-6. Record files, commands, transport, selected agents, validation, `agentsExecuted`, `agentsSucceeded`, failures, warnings, findings, and logs. Accept only valid `success: true` batches with applicable agents successful, validation complete, no unknown-agent warning, and no unresolved validated finding.
-7. A one-agent batch needs explicit evidence that only one agent applied. Multiple distinct applicable agents must succeed across the complete phase diff, and accepted primary batches must cover every changed file. Earlier restricted or validation-skipped logs are supplemental only.
-8. Treat this as an unresolved blocker: “All failed before analysis because Diffray’s codex-cli executor exceeded the Windows command-line limit (ENAMETOOLONG). Zero analyzers completed, so there were no findings, fixes, or rejected findings. This is the exact unresolved review blocker.”
-9. Preserve and retry a smaller/corrected batch after `ENAMETOOLONG`, timeout, HTTP/authentication failure, invalid/missing JSON, `success: false`, zero successful agents, incomplete validation, or unknown-agent warnings. Stop after three failed attempts for a required batch; no ready PR.
-10. Validate findings, fix valid ones with regression coverage, rerun relevant gates, and consolidate all accepted findings from the cycle into one local `fix(review): ...` commit. Explain rejected findings; do not commit per finding.
-11. Rerun only affected primary batches with normal multi-agent selection and validation enabled for at most three review-fix cycles, then run the complete final verification suite.
-12. Push and open a ready PR against `main` only after accepted multi-agent coverage, completed validation, and green gates. Never merge it.
+2. Inventory the complete phase diff from the predecessor/base SHA; stage required new files so the skill does not exclude them as untracked.
+3. Invoke `rajantha-skills-library:ce-code-review base:<base-sha> grouping:auto` in default mode. Never request a quick/fast/light review or combine `base:` with a PR/branch target.
+4. Record scope/base/head, the six always-on reviewers, warranted conditional reviewers and reasons, reviewer outcomes, run ID, and all artifacts under `/tmp/compound-engineering/ce-code-review/<run-id>/`.
+5. Require the independent per-finding validator wave whenever findings survive. Record validated/rejected counts and reasons, infrastructure failures, over-budget drops, and degraded P0/P1 evidence; zero surviving findings is the only valid reason to skip validation.
+6. Treat incomplete scope, missing artifacts, required reviewer failure, malformed output, degraded P0/P1 validation, or unmet explicit-plan requirements as blockers—not clean review evidence.
+7. Let default mode apply and verify clear fixes and create its isolated local `fix(review): ...` commit on the clean tree. Resolve any remaining actionable `downstream-resolver` items with regression coverage and one tested local review-fix commit per cycle; record rejections and human/release-owned items.
+8. Rerun the full skill against the same base for at most three review-fix cycles.
+9. Accept only `status: complete`, complete scope/reviewer coverage, `Ready to merge`, no actionable findings, no degraded P0/P1 validation, and no unmet explicit-plan requirement. Resolve or explicitly classify residual risks/testing gaps.
+10. Run the complete final verification suite on reviewed HEAD. Only then may the phase agent push and open a ready PR against `main`; the skill itself never pushes or opens PRs. Never merge it.
 
 ## Paste-ready handoff
 
-Return predecessor/base/branch, implementation and review-fix SHAs, final HEAD/clean status, changed files, graph/coverage/path/migration/ledger paths, local Diffray executable/version, exact primary commands/transport/batches/selected agents/validation/logs/counts/failures/warnings/findings/fixes/rejections, supplemental diagnostic runs, final multi-agent verdict, exact gates and browser results, ready PR URL/number/base/head/state, measured coverage categories, remaining graph/content/source blockers, and deferred scope.
+Return predecessor/base/branch, implementation and review-fix SHAs, final HEAD/clean status, changed files, graph/coverage/path/migration/ledger paths, review-skill identifier/arguments, scope/base/head, run IDs/artifacts, reviewers/reasons/outcomes, validator metrics, findings/fixes/rejections/suppressions/demotions, residual risks/testing gaps, final skill verdict, exact gates and browser results, ready PR URL/number/base/head/state, measured coverage categories, remaining graph/content/source blockers, and deferred scope.

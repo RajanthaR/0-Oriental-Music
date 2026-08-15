@@ -222,7 +222,7 @@ Every implementation phase is an independently reviewable slice.
 3. Keep the phase scope exact. Do not fold later content completion, redesign, deployment, or unrelated cleanup into an earlier remediation phase.
 4. Run the phase-specific tests and inspect the diff before the first commit.
 5. Create a local implementation commit before external review. Record its SHA.
-6. Run the mandatory local multi-agent Diffray review-fix loop in Section 10. Consolidate all accepted findings from one review cycle into one tested **local review-fix commit** such as `fix(review): address validated Diffray findings`.
+6. Run the mandatory `ce-code-review` skill review-fix loop in Section 10. The skill reviews the complete phase diff with multiple specialist agents, independently validates surviving findings, applies safe fixes, and creates a local review-fix commit when the pre-review tree is clean.
 7. Run the complete final verification gate on the reviewed HEAD.
 8. Push the phase branch and open a **ready-for-review pull request**, not a draft. Never merge it. Do not open a ready PR while the mandatory review is incomplete or a required gate is failing.
 9. Leave the worktree clean and report the final HEAD SHA, PR URL, base/head branches, and PR readiness state.
@@ -230,59 +230,42 @@ Every implementation phase is an independently reviewable slice.
 
 ---
 
-## 10. Mandatory Local Multi-Agent Diffray Review-Fix Loop on Windows
+## 10. Mandatory `ce-code-review` Skill Review-Fix Loop
 
-The review is initiated with the repository's **locally installed Diffray CLI** and executed through the local `codex-cli` executor. Diffray may send the selected changed code and documentation to its servers; that permission is granted in advance, so do not pause merely to request it again. Never send credentials, tokens, private keys, environment files, microphone/user data, or unrelated files.
+Use the `rajantha-skills-library:ce-code-review` skill for every phase review. This is the required multi-agent code-review system; do not substitute an ad hoc self-review, the harness's quick built-in review, or an unstructured set of agents.
 
-The canonical command and evidence checklist also lives in `docs/forensic-remediation/DIFFRAY_MULTI_AGENT_REVIEW.md`. The rules below remain mandatory even when a phase prompt is older or less specific.
+The canonical checklist also lives in `docs/forensic-remediation/SKILL_MULTI_AGENT_REVIEW.md`. The rules below remain mandatory even when a phase prompt is older or less specific.
 
-### A. CLI and configuration preflight
+### A. Pre-review checkpoint and invocation
 
-Before the first review invocation:
+After the implementation commit and before any push or PR creation:
 
-1. Discover and record the exact local Diffray executable, version, `review --help` output, and locally available agents. Use the working installation already present on the machine; do not add or upgrade a repository dependency just to run review.
-2. Confirm the CLI describes `review` as a multi-agent review and that `--executor codex-cli` is available.
-3. Treat configuration warnings such as `Rule references unknown agent` as degraded or incomplete review evidence. Correct or bypass the stale local rule configuration without disabling the normal reviewer set, then rerun.
+1. Record the exact phase base SHA, branch, implementation commit SHA, `HEAD`, and clean/dirty worktree state. The normal phase path must be clean so the skill can isolate its applied fixes in a review-labeled commit.
+2. Inventory the complete phase diff with Git, including code, tests, data, and documentation. Untracked files are outside skill scope unless staged; do not hide required phase files as untracked.
+3. Invoke the full skill on the current checkout with the explicit phase base: `rajantha-skills-library:ce-code-review base:<base-sha> grouping:auto`. Do not request a quick, fast, or light review because that activates the single-reviewer short circuit.
+4. Use default interactive mode so the skill can apply safe verified fixes and commit them when the pre-review tree is clean. `mode:agent` is allowed only when a coordinating workflow explicitly needs JSON and will itself apply, verify, and commit every accepted finding before rerunning the skill.
+5. The review skill never pushes, opens PRs, changes branches, or files tickets. Those outward actions remain the phase agent's responsibility after review acceptance and final verification.
 
-### B. Primary multi-agent review
+### B. Required reviewer and validation evidence
 
-After the implementation commit and before opening the ready PR:
+1. The review must cover the complete diff from the recorded base. Confirm the skill's `files_changed`/scope inventory agrees with Git and record any excluded untracked paths.
+2. Record the announced reviewer team and each conditional reviewer's selection reason. Every run must dispatch the four always-on personas—correctness, testing, maintainability, and project-standards—plus `ce-agent-native-reviewer` and `ce-learnings-researcher`. Add every conditional specialist warranted by the diff.
+3. Preserve the run ID and artifact directory under `/tmp/compound-engineering/ce-code-review/<run-id>/`, including `metadata.json`, the per-reviewer JSON artifacts, synthesized findings, actionable findings, advisory outputs, and `report.md` or `review.json` for the chosen mode.
+4. Findings must pass the skill's schema, deduplication, confidence gate, and severity calibration. Record malformed reviewer returns, suppressed findings, demotions, pre-existing findings, residual risks, and testing gaps rather than presenting an empty table as sufficient evidence.
+5. When any finding survives synthesis, the independent per-finding validator wave is mandatory. Record validator dispatches, validated/rejected counts and reasons, infrastructure failures, over-budget drops, and any degraded P0/P1 finding. When zero findings survive, record that validation correctly did not run.
+6. A required reviewer timeout/failure, missing required artifact, validator infrastructure failure that leaves degraded P0/P1 evidence, or incomplete scope is a review blocker. Correct the failure and rerun; do not convert degraded coverage into “zero findings.”
 
-1. Inventory every committed changed file with Git and partition the files into short, coherent batches. Include code, tests, JSON/data, and documentation.
-2. Run Diffray from the repository root with repository-based transport and structured JSON. Use the normal local multi-agent review, allowing Diffray to select all applicable agents and run its validation stage. Typical primary commands are:
+### C. Fix and rereview cycles
 
-   ```powershell
-   diffray review --base <base-sha> --head HEAD --files <short-comma-list> --executor codex-cli --json
-   diffray review --files <short-comma-list> --full --executor codex-cli --json
-   ```
+1. In default mode, let the skill apply clear reversible fixes, run affected checks, and create one isolated local `fix(review): ...` commit when the pre-review tree was clean. Record the applied table and commit SHA.
+2. For findings the skill does not apply, resolve every actionable `downstream-resolver` item in scope, add regression coverage where appropriate, and consolidate the accepted fixes from that cycle into one tested local `fix(review): ...` commit. Record human/release-owned findings and justified rejections separately.
+3. Rerun the full skill against the same phase base after fixes. Repeat for at most three review-fix cycles.
+4. Review acceptance requires `status: complete`, full scope and required-reviewer coverage, a final verdict of `Ready to merge`, no actionable findings, no degraded P0/P1 validation, and no unmet explicit-plan requirement. Residual risks and testing gaps must be explicitly accepted or remain blockers under the phase prompt.
+5. Run the complete phase verification gate on the final reviewed HEAD. Only then may the phase agent push and open a ready PR; the skill itself never performs those actions.
 
-   Use the first form for committed diff review. Use the second only for a bounded full-file review of documentation/data when diff transport is unsuitable. Do not combine `--full` with `--base`/`--head`.
-3. **The primary review commands must omit both `--agent` and `--skip-validation`.** A restricted `--agent <name>` invocation is allowed only as a narrow diagnostic retry after a valid default multi-agent batch; it is supplemental evidence and cannot replace mandatory coverage. Never use `--skip-validation` for final review evidence.
-4. Let Diffray manage its own agent concurrency. Do not launch uncontrolled parallel CLI processes against the same batch.
-5. Keep the Windows command short. Never place the full diff, patch, source contents, or an enormous file list in command-line arguments. Use short explicit `--files` batches and short temporary JSON log paths.
-6. For every batch, record the files, command, transport, agents selected, validation result, `agentsExecuted`, `agentsSucceeded`, agent failures, findings, and log path.
-7. A batch is complete only when its JSON is valid, `success` is true, the applicable agents actually executed, intended agents succeeded without unresolved failures, validation ran or the output explicitly establishes that no finding required validation, no unknown-agent warning remains, and no validated actionable finding is unresolved.
-8. One successful agent is not automatically sufficient. Accept a one-agent batch only when the structured output establishes that exactly one agent was applicable. Across the complete phase diff, multiple distinct applicable agents must have succeeded; otherwise the normal multi-agent review has not been demonstrated.
-9. The union of successful primary batches must cover every committed changed file. Earlier single-agent or `--skip-validation` logs are supplemental only and must be rerun under this workflow before a ready PR.
+### D. Failure and stop conditions
 
-### C. Finding validation and fix cycles
-
-1. Validate every finding against the implementation, tests, source evidence, and repository rules. Fix valid findings and add regression coverage where appropriate. Record rejected findings with concise technical reasons.
-2. Consolidate all accepted findings from one review cycle into one local `fix(review): ...` commit after relevant checks pass. Do not create one commit per finding or per analyzer.
-3. Rerun only the affected primary batches with the normal multi-agent command and validation enabled. Repeat for at most three review-fix cycles.
-4. Run the complete phase verification gate on the final reviewed HEAD. Review completion requires full file coverage and no unresolved validated actionable finding.
-
-### D. Windows and service failure handling
-
-The following outcome is an unresolved review blocker, **not** a clean review:
-
-> All failed before analysis because Diffray’s codex-cli executor exceeded the Windows command-line limit (ENAMETOOLONG). Zero analyzers completed, so there were no findings, fixes, or rejected findings. This is the exact unresolved review blocker.
-
-Prevent it with repository-based transport, bounded `--files` batches, the default internally managed agent set, and short temporary log paths. If `ENAMETOOLONG` occurs, reduce the file batch and rerun; never put the diff or file contents into an argument.
-
-A timeout, HTTP/authentication failure, missing or malformed JSON, `success: false`, zero successful agents, incomplete validation, or unknown-agent warning is also incomplete evidence. Preserve the failed log and retry the same required coverage with a smaller or corrected bounded batch.
-
-If three attempts still cannot produce valid successful multi-agent coverage for a required batch, stop. Report the exact executable, commands, files, logs, warnings, validation state, and agent counts. Do not claim "no findings," do not substitute self-review or a restricted single-agent run, and do not open a ready PR.
+If the skill is unavailable, the platform cannot dispatch the required reviewers/validators, artifacts are malformed or missing, all reviewers fail, validation remains degraded, or three review-fix cycles still leave actionable findings, stop and report the exact blocker. Preserve commits and artifacts. Do not replace the skill with an informal review, do not claim approval, and do not open or retain a ready PR while the gate is incomplete.
 
 ---
 
@@ -294,7 +277,7 @@ At the end of every implementation phase, return a paste-ready handoff containin
 - base SHA, branch name, and clean/dirty worktree status;
 - implementation commit SHA and every review-fix commit SHA;
 - final HEAD SHA and changed-file inventory;
-- exact local Diffray executable/version, primary command pattern and transport, file batches, selected agents, validation results, log locations, per-batch `agentsExecuted`/`agentsSucceeded`/failures, findings, fixes, rejected findings, supplemental diagnostic runs, and final multi-agent review verdict;
+- exact review-skill identifier and arguments, scope/base/head, run IDs and artifact paths, reviewer team with conditional reasons and outcomes, validator metrics, findings, applied fixes, review-fix commits, rejected/suppressed/demoted findings, residual risks, testing gaps, and final skill verdict;
 - exact verification commands and pass/fail summaries;
 - ready PR URL, number, base/head branches, and state;
 - source-evidence ledger or correction-log paths created or updated;

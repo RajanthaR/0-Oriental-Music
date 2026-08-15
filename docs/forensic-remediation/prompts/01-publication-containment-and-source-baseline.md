@@ -7,7 +7,7 @@ You are taking over the “ස්වර මඟ” (Swara Maga) repository after 
 - Repository: `RajanthaR/0-Oriental-Music`
 - Start from current `origin/main`, which must include guardrail commit `6e62a3a`.
 - Read `AGENTS.md` completely before taking action and follow Sections 8–11 literally.
-- The repository’s Markdown source corpus may be used as evidence. Sending the changed code and documentation to Diffray’s servers is explicitly allowed.
+- The repository’s Markdown source corpus may be used as evidence. The mandatory code review uses `rajantha-skills-library:ce-code-review`; do not substitute a quick review or informal reviewer set.
 - Do not send credentials, tokens, private keys, local environment files, or unrelated user data.
 - Do not merge the PR, deploy anything, mutate hosted services, or broaden this phase.
 
@@ -77,30 +77,20 @@ At minimum run the repository’s relevant targeted tests plus:
 
 Inspect the public-data paths for Grades 12–13/A/L and the named quarantined entities. If browser QA is practical, verify representative public and direct routes at 360px and desktop; report any environment limitation honestly.
 
-## Mandatory local multi-agent Diffray review-fix loop
+## Mandatory `ce-code-review` skill review-fix loop
 
 1. Commit the implemented phase locally first with a scoped implementation commit and record its SHA.
-2. Discover and record the exact locally installed Diffray executable, version, `review --help` output, available agents, and `codex-cli` executor support. A warning such as `Rule references unknown agent` makes review evidence incomplete until corrected and rerun.
-3. Inventory every committed changed file and divide code, tests, data, and documentation into short coherent batches. From the repository root, use the normal local multi-agent review with validation enabled:
-
-   ```powershell
-   diffray review --base <base-sha> --head HEAD --files <short-comma-list> --executor codex-cli --json
-   ```
-
-   When diff transport is unsuitable for a bounded documentation/data batch, use `diffray review --files <short-comma-list> --full --executor codex-cli --json`. Do not combine `--full` with `--base`/`--head`.
-4. Primary coverage commands must omit both `--agent` and `--skip-validation`, allowing Diffray to select all applicable agents and run validation. A later restricted `--agent <name>` retry is diagnostic-only; it cannot replace primary coverage. A validation-skipped run cannot satisfy final review.
-5. Let Diffray manage its own concurrency. Keep Windows commands short, use short temporary JSON log paths, and never pass the full diff, patch, source contents, or a huge file list in command arguments.
-6. Record every batch's files, command, transport, selected agents, validation result, `agentsExecuted`, `agentsSucceeded`, failures, findings, and log path. Accept a batch only with valid JSON, `success: true`, applicable successful agents, completed validation, no unknown-agent warning, and no unresolved validated actionable finding.
-7. A single successful agent is not automatically sufficient. Accept a one-agent batch only when the structured output establishes that exactly one agent was applicable. Across the complete phase diff, multiple distinct applicable agents must succeed, and accepted primary batches together must cover every changed file. Earlier restricted or validation-skipped logs are supplemental only.
-8. Treat this exact outcome as an unresolved blocker, never as “no findings”:
-
-   “All failed before analysis because Diffray’s codex-cli executor exceeded the Windows command-line limit (ENAMETOOLONG). Zero analyzers completed, so there were no findings, fixes, or rejected findings. This is the exact unresolved review blocker.”
-
-9. Preserve and retry a smaller or corrected bounded batch after `ENAMETOOLONG`, timeout, HTTP/authentication failure, invalid/missing JSON, `success: false`, zero successful agents, incomplete validation, or unknown-agent warnings. After three unsuccessful attempts for a required batch, stop and report the blocker; do not open a ready PR.
-10. Validate every finding. Fix valid findings, add regression coverage, rerun relevant checks, and consolidate all accepted findings from that review cycle into one local `fix(review): ...` commit. Record rejected findings with reasons; do not commit once per finding.
-11. Rerun only affected primary batches with normal multi-agent selection and validation enabled. Repeat for at most three review-fix cycles until no actionable finding remains.
-12. Run the full final verification suite on the reviewed HEAD.
-13. Push the branch and open a ready-for-review PR against `main` only when mandatory multi-agent coverage, validation, and required gates are complete. Do not merge it.
+2. Inventory the complete phase diff from `BASE_SHA`, including code, tests, data, and documentation. Stage required new files because untracked files are excluded from skill scope.
+3. Invoke the full review in default mode: `rajantha-skills-library:ce-code-review base:<BASE_SHA> grouping:auto`. Do not use quick/fast/light wording and do not combine `base:` with a PR number or branch target.
+4. Record the scope/base/head and announced team. The six always-on reviewers are correctness, testing, maintainability, project-standards, `ce-agent-native-reviewer`, and `ce-learnings-researcher`, plus every conditional specialist warranted by the diff.
+5. Preserve the run ID and `/tmp/compound-engineering/ce-code-review/<run-id>/` artifacts: metadata, per-reviewer JSON, synthesized/actionable findings, advisory outputs, and `report.md` or `review.json`.
+6. When findings survive synthesis, require the independent per-finding validator wave. Record validator dispatches, validated/rejected results and reasons, infrastructure failures, over-budget drops, and degraded P0/P1 evidence. If zero findings survive, record that validation correctly did not run.
+7. A required reviewer failure, missing artifact, incomplete file scope, validator infrastructure failure leaving degraded P0/P1 evidence, malformed result, or unmet explicit-plan requirement is a blocker—not “no findings.” Correct it and rerun; do not substitute an informal review.
+8. In default mode, let the skill apply clear reversible fixes, verify them, and create one local `fix(review): ...` commit on the clean tree. Resolve any remaining actionable `downstream-resolver` findings, add regression coverage, and consolidate that cycle into one tested local review-fix commit. Record rejected/human/release-owned findings separately.
+9. Rerun the full skill against the same base after fixes for at most three review-fix cycles.
+10. Accept review only with `status: complete`, complete scope and required-reviewer coverage, `Ready to merge`, no actionable findings, no degraded P0/P1 validation, and no unmet explicit-plan requirement. Explicitly resolve or accept residual risks/testing gaps under this phase’s rules.
+11. Run the full final verification suite on the reviewed HEAD.
+12. Only then push the branch and open a ready-for-review PR against `main`. The review skill itself must never push or open the PR. Do not merge it.
 
 ## Required paste-ready final handoff
 
@@ -110,15 +100,15 @@ Return a self-contained block that the user can paste into the coordinating task
 - `BASE_SHA`
 - `BRANCH`
 - `IMPLEMENTATION_COMMIT`
-- `REVIEW_FIX_COMMITS` (or explicit none, only if Diffray completed with no actionable findings)
+- `REVIEW_FIX_COMMITS` (or explicit none, only if the full skill review completed with no actionable findings)
 - `FINAL_HEAD_SHA`
 - clean/dirty `WORKTREE_STATUS`
 - `CHANGED_FILES`
 - forensic ledger, correction log, and report paths
-- exact local Diffray executable/version, primary command pattern, and transport
-- every file batch, selected agent set, and validation result, distinguishing primary multi-agent from supplemental diagnostic runs
-- per-batch `agentsExecuted`, `agentsSucceeded`, failures, warnings, log path, findings, fixes, and rejected findings
-- `DIFFRAY_FINAL_VERDICT`
+- exact review-skill identifier/arguments and scope/base/head
+- every run ID/artifact path, reviewer set, conditional selection reason, and reviewer outcome
+- validator metrics, findings, applied fixes, rejected/suppressed/demoted findings, residual risks, and testing gaps
+- `SKILL_REVIEW_FINAL_VERDICT`
 - exact verification commands and concise pass/fail results
 - browser QA performed or exact reason it was not
 - ready PR number, URL, base/head branches, and state

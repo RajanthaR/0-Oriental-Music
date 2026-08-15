@@ -8,19 +8,19 @@ This folder is the execution package for replacing the unreliable content layer 
 - Submission receipt: `client-new-thread:3acd6169-aca5-4af2-a0e2-04dd4cebdd48`.
 - A `clientThreadId` confirms that worktree setup was queued. It is not proof that implementation started or completed. Add the final task ID here when the app exposes it.
 - Dispatch baseline: `origin/main` at `6e62a3a` (`docs: add forensic remediation guardrails`).
-- Review-workflow correction (2026-08-15): Prompt 1 was initially dispatched with restricted single-analyzer guidance. The prompt files now require the normal local multi-agent Diffray workflow with validation enabled. Earlier restricted or validation-skipped logs are supplemental only.
+- Review-workflow correction (2026-08-15): all phase prompts now require the full `rajantha-skills-library:ce-code-review` workflow with specialist reviewers, independent finding validation, auditable artifacts, and local review-fix commits.
 
 ## Hard sequencing rule
 
 Run one prompt at a time. Prompt N+1 may start only after all of the following are true for Prompt N:
 
-1. its ready PR has completed the local multi-agent Diffray review-fix loop with validation enabled and accepted primary batches covering every changed file;
+1. its ready PR has completed the full `ce-code-review` review-fix loop with complete diff scope, required reviewer coverage, independent validation where findings survive, and a final `Ready to merge` verdict;
 2. required local gates pass on the final reviewed commit;
 3. the PR has been reviewed and merged by a human;
 4. `origin/main` contains that merge;
 5. the coordinating task has received the paste-ready handoff with SHAs, review evidence, unresolved source items, and PR state.
 
-Never infer a merge or clean review from a queued task ID, a green build, an empty finding list, a restricted single-agent run, a validation-skipped run, or a zero-analyzer Diffray run.
+Never infer a merge or clean review from a queued task ID, green tests/builds, an empty findings summary without artifacts, a quick single-reviewer run, failed reviewers/validators, or degraded validation.
 
 ## Programme map
 
@@ -34,7 +34,7 @@ Never infer a merge or clean review from a queued task ID, a green build, an emp
 | 6 | Student experience and quality | Mobile, accessibility, Sinhala presentation, Web Audio, privacy, and end-to-end flows are verified under content freeze. |
 | 7 | Independent final audit and release readiness | Residual repo-owned defects are fixed and evidence-backed readiness/blocker status is published without deploying. |
 
-Detailed work units, dependencies, gates, and acceptance criteria are in [PHASED_PLAN.md](./PHASED_PLAN.md). The canonical Windows-safe review procedure is in [DIFFRAY_MULTI_AGENT_REVIEW.md](./DIFFRAY_MULTI_AGENT_REVIEW.md). Self-contained implementation prompts are in [prompts](./prompts/).
+Detailed work units, dependencies, gates, and acceptance criteria are in [PHASED_PLAN.md](./PHASED_PLAN.md). The canonical review procedure is in [SKILL_MULTI_AGENT_REVIEW.md](./SKILL_MULTI_AGENT_REVIEW.md). Self-contained implementation prompts are in [prompts](./prompts/).
 
 ## Global rules
 
@@ -42,9 +42,9 @@ Detailed work units, dependencies, gates, and acceptance criteria are in [PHASED
 - Extracted Markdown is not a substitute for visual inspection of missing original PDFs. Ambiguous/OCR/diagram claims remain `needs-review`.
 - The public boundary stays Grades 6–11 unless a later, explicitly authorized source-ingestion programme supplies and verifies additional official sources.
 - No phase may fabricate source metadata, reviewer identities, licences, approval dates, coverage, or release status.
-- Every phase produces an implementation commit before review. Primary Diffray runs use the local CLI's default applicable multi-agent set with validation enabled; they omit `--agent` and `--skip-validation`.
-- Every committed changed file must be covered by accepted bounded primary batches. Across the phase diff, multiple distinct applicable agents must succeed; a one-agent batch needs explicit applicability evidence.
-- Consolidate all accepted findings from one review cycle into one tested local `fix(review): ...` commit, then rerun only affected primary batches for at most three cycles.
-- Sending selected changed files to Diffray is pre-authorized, but secrets, environment files, microphone/user data, and unrelated files remain prohibited.
+- Every phase produces an implementation commit before invoking `rajantha-skills-library:ce-code-review base:<base-sha> grouping:auto`. Quick/fast/light review is prohibited because it bypasses the full multi-agent pipeline.
+- Every run covers the complete phase diff and records its always-on and conditional reviewers, validator wave, findings, coverage, residual risks, testing gaps, run ID, and artifact directory.
+- The skill applies safe fixes and creates a local review-fix commit on a clean tree. Rerun the full skill against the same base for at most three review-fix cycles.
+- The review gate requires a complete run, `Ready to merge`, no actionable findings, no degraded P0/P1 validation, and no unmet explicit-plan requirement.
 - Every successful phase ends with a pushed ready PR against `main`; agents never merge their own PRs.
 - No prompt authorizes deployment, hosted-service mutation, copyrighted audio/media redistribution, tracking, or credentials.
