@@ -39,17 +39,21 @@ describe("Prompt 1 publication containment", () => {
     });
   });
 
-  it("contains named records on direct lookup", () => {
-    expect(repository.getLessonById("les-intro-01")).toBeUndefined();
+  it("contains quarantined records on direct lookup while exposing remediated records", () => {
+    // Quarantined records remain contained
     expect(repository.getLessonById("les-exam-skills")).toBeUndefined();
     expect(repository.getLessonById("les-raga-bhairav")).toBeUndefined();
-    expect(repository.getLessonById("les-tala-dadra")).toBeUndefined();
     expect(repository.getRagaById("raga-bhairav")).toBeUndefined();
-    expect(repository.getRagaById("raga-bilawal")).toBeUndefined();
     expect(repository.getTalaById("tala-roopak")).toBeUndefined();
-    expect(repository.getTalaById("tala-lawani")).toBeUndefined();
     expect(repository.getExamPaperById("exam-al-model-01")).toBeUndefined();
     expect(repository.getLearningPathById("path-exam-prep")).toBeUndefined();
+
+    // Remediated Phase 2 records are public and verified
+    expect(repository.getLessonById("les-intro-01")).toBeDefined();
+    expect(repository.getLessonById("les-tala-dadra")).toBeDefined();
+    expect(repository.getRagaById("raga-bilawal")).toBeDefined();
+    expect(repository.getTalaById("tala-dadra")).toBeDefined();
+    expect(repository.getTalaById("tala-lawani")).toBeDefined();
   });
 
   it("prevents CMS review status updates from leaking quarantined records into public getters", () => {

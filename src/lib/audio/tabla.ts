@@ -119,25 +119,30 @@ class TablaSynthEngine {
    */
   public playBol(bolName: string) {
     if (typeof window === "undefined") return;
-    this.initContext();
     const clean = bolName.trim().toLowerCase();
+    if (clean === "-" || clean === "s" || clean === " " || !clean) {
+      // Rest / silence
+      return;
+    }
 
-    if (clean === "dha" || clean === "ධා") {
+    this.initContext();
+
+    if (clean === "dha" || clean === "ධා" || clean === "ධන්න") {
       this.playBayanBass(true, 0.65);
       this.playDayanOpen(293.66, 0.5);
-    } else if (clean === "dhin" || clean === "ධින්") {
+    } else if (clean === "dhin" || clean === "ධින්" || clean === "ධී" || clean === "ධි" || clean === "ධ") {
       this.playBayanBass(false, 0.55);
       this.playDayanClosed(293.66, 0.3);
-    } else if (clean === "ge" || clean === "ගේ" || clean === "ghe") {
+    } else if (clean === "ge" || clean === "ගේ" || clean === "ගෙ" || clean === "ග" || clean === "ghe") {
       this.playBayanBass(true, 0.6);
-    } else if (clean === "na" || clean === "නා" || clean === "ta" || clean === "තා") {
+    } else if (clean === "na" || clean === "නා" || clean === "න" || clean === "ta" || clean === "තා" || clean === "ත" || clean === "නක") {
       this.playDayanOpen(293.66, 0.45);
-    } else if (clean === "tin" || clean === "තින්") {
+    } else if (clean === "tin" || clean === "තින්" || clean === "තී" || clean === "ති" || clean === "තන්න") {
       this.playDayanClosed(293.66, 0.35);
-    } else if (clean === "te" || clean === "තෙ" || clean === "ti" || clean === "කේ" || clean === "ke") {
+    } else if (clean === "te" || clean === "තෙ" || clean === "ti" || clean === "කේ" || clean === "කෙ" || clean === "ක" || clean === "ke" || clean === "කත්" || clean === "තූ" || clean === "තු") {
       this.playDayanClosed(220, 0.12);
     } else {
-      // General click
+      // General click / percussive stroke
       this.playDayanClosed(260, 0.2);
     }
   }

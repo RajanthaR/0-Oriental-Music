@@ -22,16 +22,12 @@
       "term-timbre"
     ],
     "relevantGrades": [
-      "6",
-      "7",
-      "8",
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටු 10-14 (නාදය සහ සංගීතය)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 2-4"
     },
     "confidence": "Verified",
     "reviewStatus": "Published"
@@ -52,16 +48,12 @@
       "term-nada"
     ],
     "relevantGrades": [
-      "6",
-      "7",
-      "8",
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 10"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටුව 2"
     },
     "confidence": "Verified",
     "reviewStatus": "Published"
@@ -84,14 +76,12 @@
       "term-anahata-nada"
     ],
     "relevantGrades": [
-      "8",
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "පිටුව 12 (නාද ප්‍රභේද)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 2-4"
     },
     "confidence": "Verified",
     "reviewStatus": "Published"
@@ -117,22 +107,23 @@
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "පිටුව 12"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 2-4"
     },
     "confidence": "Verified",
     "reviewStatus": "Published"
   },
   {
     "id": "term-pitch",
-    "term_si": "තාරතාවය (උස්-මිටි බව)",
+    "term_si": "තාරතාවය (උච්චනීච ප්‍රභේදය / උස්-මිටි බව)",
     "term_en": "Pitch",
     "transliteration": "Tāratāvaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "නාදයක සිහින් (උස්) හෝ ගොරෝසු (මිටි) ස්වභාවයයි. එය තීරණය වන්නේ කම්පන සංඛ්‍යාතය (Frequency) මතය.",
+    "definition_si": "නාදයක සිහින් (උස්) හෝ ගොරෝසු (මිටි) ස්වභාවයයි. එය තීරණය වන්නේ කම්පන සංඛ්‍යාතය (Frequency - Hz) මතය.",
     "knownVariants": [
       "තාරතාවය",
       "තාරතාව",
+      "උච්චනීච ප්‍රභේදය",
       "උස් මිටි බව"
     ],
     "prerequisites": [
@@ -144,29 +135,26 @@
       "term-frequency"
     ],
     "relevantGrades": [
-      "6",
-      "7",
-      "8",
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 12 (නාදයේ ලක්ෂණ)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 4"
     },
     "confidence": "Verified",
     "reviewStatus": "Published"
   },
   {
     "id": "term-intensity",
-    "term_si": "විපුලතාවය (තීව්‍රතාවය / මහත්-කුඩා බව)",
-    "term_en": "Intensity / Volume",
+    "term_si": "විපුලතාවය (රූප භේදය / මහත්-කුඩා බව)",
+    "term_en": "Intensity / Magnitude / Volume",
     "transliteration": "Vipulatāvaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "නාදයක ප්‍රබල හඬ (හයිය) හෝ මෘදු බවයි. එය තීරණය වන්නේ කම්පන විස්තාරය (Amplitude) මතය.",
+    "definition_si": "නාදයක ප්‍රබල හඬ (හයිය) හෝ මෘදු බවයි. එය තීරණය වන්නේ කම්පන විස්තාරය (Amplitude) හා යෙදූ බලය/ශක්තිය මතය.",
     "knownVariants": [
       "විපුලතාවය",
+      "රූප භේදය",
       "තීව්‍රතාවය",
       "මහත් කුඩා බව"
     ],
@@ -178,29 +166,26 @@
       "term-timbre"
     ],
     "relevantGrades": [
-      "6",
-      "7",
-      "8",
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 13"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 7, 8"
     },
     "confidence": "Verified",
     "reviewStatus": "Published"
   },
   {
     "id": "term-timbre",
-    "term_si": "ධ්වනි ගුණය (නාද ජාතිය)",
+    "term_si": "ධ්වනි ගුණය (ජාති භේදය / නාද ජාතිය)",
     "term_en": "Timbre / Quality",
     "transliteration": "Dhwani Guṇaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "එකම තාරතාවයෙන් හා තීව්‍රතාවයෙන් යුත් නාද දෙකක් වෙන්කොට හඳුනාගැනීමට උපකාරී වන නාදයේ සුවිශේෂී වර්ණය හෝ මාධ්‍ය ලක්ෂණයයි (උදා: වයලීන හා බටනලා හඬ වෙන්කර හඳුනාගැනීම).",
+    "definition_si": "එකම තාරතාවයෙන් හා විපුලතාවයෙන් යුත් නාද දෙකක් වෙන්කොට හඳුනාගැනීමට උපකාරී වන නාදයේ සුවිශේෂී තරංග රටාව හා මාධ්‍ය ලක්ෂණයයි (උදා: වයලීන හා බටනලා හඬ වෙන්කර හඳුනාගැනීම).",
     "knownVariants": [
       "ධ්වනි ගුණය",
+      "ජාති භේදය",
       "නාද ගුණය",
       "නාද ජාතිය"
     ],
@@ -212,16 +197,12 @@
       "term-intensity"
     ],
     "relevantGrades": [
-      "6",
-      "7",
-      "8",
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 14"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 10, 11"
     },
     "confidence": "Verified",
     "reviewStatus": "Published"
@@ -245,13 +226,12 @@
       "term-nada"
     ],
     "relevantGrades": [
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "පිටුව 88 (සංගීත භෞතික විද්‍යාව)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 4, 5"
     },
     "confidence": "Verified",
     "reviewStatus": "Published"

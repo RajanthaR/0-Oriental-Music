@@ -15,13 +15,13 @@
     "unsupportedGradeBands": ["12-13"],
     "publicCountsAreComputedBy": "src/lib/data/repository.ts#getPublicationSummary (applying src/lib/data/publication-policy.ts)",
     "publicCounts": {
-      "lessons": 0,
-      "ragas": 1,
-      "talas": 0,
+      "lessons": 2,
+      "ragas": 7,
+      "talas": 7,
       "instruments": 2,
       "culturalTraditions": 0,
       "theatreTraditions": 0,
-      "glossary": 0,
+      "glossary": 8,
       "learningPaths": 0,
       "exams": 0
     }

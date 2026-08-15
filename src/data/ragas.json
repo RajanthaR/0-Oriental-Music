@@ -1,15 +1,16 @@
 [
   {
     "id": "raga-bilawal",
-    "name_si": "බිලාවල් රාගය (අල්හයියා බිලාවල්)",
-    "name_en": "Raga Bilawal (Alhaiya Bilawal)",
+    "name_si": "බිලාවල් රාගය",
+    "name_en": "Raga Bilawal",
     "thata_si": "බිලාවල් ථාටය (සියලු ශුද්ධ ස්වර)",
-    "arohana_si": "ස , රි , ග , ප , ධ , නි , ස̇",
+    "arohana_si": "ස , රි , ග , ම , ප , ධ , නි , ස̇",
     "avarohana_si": "ස̇ , නි , ධ , ප , ම , ග , රි , ස",
     "arohana_swaras": [
       "S",
       "R",
       "G",
+      "M",
       "P",
       "D",
       "N",
@@ -27,14 +28,14 @@
     ],
     "vadi_si": "ධෛවත (ධ)",
     "samvadi_si": "ගාන්ධාර (ග)",
-    "jati_si": "ෂාඩව - සම්පූර්ණ (ආරෝහණයේ 'ම' වර්ජිතය)",
-    "time_si": "දිවා ප්‍රථම ප්‍රහාරය (උදෑසන)",
+    "jati_si": "සම්පූර්ණ - සම්පූර්ණ (ස්වර 7 ම ශුද්ධ වේ)",
+    "time_si": "දිවා ප්‍රථම ප්‍රහරය (උදෑසන)",
     "rasa_si": "ශාන්ත, භක්ති, ප්‍රසන්න",
-    "pakad_si": "ග රි , ග ප , ධ , නි ස̇",
+    "pakad_si": "ග රි , ග ප ධ නි ස̇",
     "characteristics_si": [
       "සියලුම ස්වර ශුද්ධ ස්වර වන මූලික ථාට රාගයයි.",
-      "ආරෝහණයේදී මධ්‍යම (ම) ස්වරය වර්ජිත වන බැවින් ෂාඩව-සම්පූර්ණ ජාතියට අයත් වේ.",
-      "පාසල් 8 ශ්‍රේණියේදී ප්‍රථමයෙන් උගන්වන ප්‍රධාන ශාන්ත රාගයකි."
+      "ආරෝහණ හා අවරෝහණ දෙකෙහිම ස්වර 7 ම ශුද්ධව යෙදෙන බැවින් සම්පූර්ණ-සම්පූර්ණ ජාතියට අයත් වේ.",
+      "පාසල් විෂය නිර්දේශයේ 8 ශ්‍රේණියේ සිට 11 ශ්‍රේණිය දක්වා මූලික ශාන්ත රාගයක් ලෙස උගන්වනු ලැබේ."
     ],
     "samplePhrases": [
       {
@@ -55,29 +56,28 @@
           "S",
           "R",
           "G",
-          "R",
-          "S",
+          "M",
+          "P",
           "D",
           "N",
-          "S"
+          "S'"
         ]
       }
     ],
     "gradeBands": [
-      "6-7",
       "8-9",
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G08-TG",
-      "pageOrSection": "පිටුව 38; sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
       "status": "Published",
       "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
       "reviewDate": "2026-08-15",
       "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "NIE 8 ශ්‍රේණි ගුරු මාර්ගෝපදේශය සහ 11 ශ්‍රේණි රාග වගුව අනුව සම්පූර්ණ කෙරිණි.",
+      "changeNotes": "11 ශ්‍රේණිය රාග හඳුනාගනිමු නිල ලේඛනයේ 1-2 පිටු අනුව ශුද්ධ බිලාවල් සම්පූර්ණ ජාතිය සහ ස්වර 7 ම සනාථ විය.",
       "license": "Educational Open Access",
       "reuseStatus": "Curriculum Canonical"
     }
@@ -110,7 +110,7 @@
     "jati_si": "ඖඩව - ඖඩව (ස්වර 5, ම සහ නි වර්ජිතය)",
     "time_si": "රාත්‍රී ප්‍රථම ප්‍රහාරය (සන්ධ්‍යා කාලය)",
     "rasa_si": "ශාන්ත, භක්ති, ප්‍රසන්න",
-    "pakad_si": "ග රි . ස ධ̣ , ස රි ග , ප ග , ධ ප , ග රි ස",
+    "pakad_si": "ග රි , ස ධ̣ , ස රි ග , ප ග , ධ ප , ග රි ස",
     "characteristics_si": [
       "මධ්‍යම (ම) සහ නිෂාද (නි) ස්වර දෙකම ආරෝහණ හා අවරෝහණ දෙකෙහිම වර්ජිතය.",
       "ස්වර 5 ක් පමණක් යෙදෙන ඖඩව-ඖඩව ජාතියේ මූලික රාගයකි.",
@@ -155,8 +155,8 @@
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G08-TG",
-      "pageOrSection": "පිටුව 40; sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
       "status": "Published",
@@ -246,8 +246,8 @@
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G09-TG",
-      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2; grade_11_music_textbook.md පිටුව 12"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
       "status": "Published",
@@ -334,8 +334,8 @@
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G09-TG",
-      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
       "status": "Published",
@@ -406,8 +406,8 @@
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-G09-RAGA",
-      "pageOrSection": "sg9_emus_raga.pdf පිටු 1-2; sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
       "status": "Published",
@@ -478,8 +478,8 @@
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2; sg9_emus_raga.pdf"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
       "status": "Published",
@@ -618,8 +618,8 @@
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-EPD-TB-G11",
-      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
       "status": "Published",

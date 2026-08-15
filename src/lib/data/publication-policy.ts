@@ -1,5 +1,6 @@
 import type { ReviewMetadata, SourceReference } from "@/types/content";
 import sourcesData from "@/data/sources.json";
+import lessonsData from "@/data/lessons.json";
 import sourceDocumentsData from "../../../data/source-documents.json";
 import sourcePageQualityData from "../../../data/source-page-quality.json";
 
@@ -62,19 +63,10 @@ export interface SourceDocumentSummary {
  * evidence. A route must never decide this independently.
  */
 export const KNOWN_QUARANTINED_ENTITY_IDS = new Set([
-  "les-intro-01",
-  "les-tala-dadra",
   "les-raga-bhairav",
   "les-exam-skills",
-  "raga-bilawal",
   "raga-bhairav",
-  "tala-dadra",
   "tala-roopak",
-  "tala-lawani",
-  "term-nada",
-  "term-sound",
-  "term-ahata-nada",
-  "term-anahata-nada",
   "exam-al-model-01",
   "path-exam-prep",
 ]);
@@ -106,6 +98,7 @@ const sourceRecords = sourcesData as SourceRecord[];
 
 type PublicationRecordShape = {
   id?: unknown;
+  lessonId?: unknown;
   gradeBand?: unknown;
   gradeBands?: unknown;
   partA_MCQ?: unknown;
@@ -165,6 +158,85 @@ function hasReadablePage(documentSlug: string, pageNumbers: number[]): boolean {
       (page.confidence === "A" || page.confidence === "B") &&
       page.hasSinhalaText
   );
+}
+
+function getRecordShape(record: unknown): PublicationRecordShape {
+  return record && typeof record === "object" ? (record as PublicationRecordShape) : {};
+}
+
+function isSourceReference(value: unknown): value is SourceReference {
+  if (!value || typeof value !== "object") return false;
+  const reference = value as Record<string, unknown>;
+  return typeof reference.sourceId === "string" && typeof reference.pageOrSection === "string";
+}
+
+function resolveRecordSourceReference(value: PublicationRecordShape): SourceReference | undefined {
+  if (isSourceReference(value.sourceReference)) return value.sourceReference;
+  if (typeof value.lessonId === "string") {
+    const parent = (lessonsData as unknown as Array<{ id: string; sourceReference?: SourceReference }>).find(
+      (l) => l.id === value.lessonId
+    );
+    if (parent && isSourceReference(parent.sourceReference)) {
+      return parent.sourceReference;
+    }
+  }
+  return undefined;
+}
+
+export function toPublicationInput(record: unknown): PublicationInput {
+  const value = getRecordShape(record);
+  return {
+    id: typeof value.id === "string" ? value.id : "",
+    gradeBands: getGradeBands(value),
+    sourceReference: resolveRecordSourceReference(value),
+  };
+}
+
+function getGradeBands(value: PublicationRecordShape): string[] {
+  const bands = new Set<string>();
+
+  if (typeof value.gradeBand === "string") bands.add(value.gradeBand);
+  if (Array.isArray(value.gradeBands)) {
+    value.gradeBands.forEach((band) => {
+      if (typeof band === "string") bands.add(band);
+    });
+  }
+
+  const questionFields: Array<"partA_MCQ" | "partB_Structured"> = ["partA_MCQ", "partB_Structured"];
+  questionFields.forEach((field) => {
+    const questions = value[field];
+    if (!Array.isArray(questions)) return;
+    questions.forEach((question) => {
+      if (!question || typeof question !== "object") return;
+      const questionBands = (question as Record<string, unknown>).gradeBands;
+      if (!Array.isArray(questionBands)) return;
+      questionBands.forEach((band) => {
+        if (typeof band === "string") bands.add(band);
+      });
+    });
+  });
+
+  if (bands.size === 0) {
+    const reference = resolveRecordSourceReference(value);
+    if (reference && typeof reference === "object") {
+      const sourceId = reference.sourceId;
+      if (typeof sourceId === "string") {
+        const source = sourceRecords.find((record) => record.id === sourceId);
+        source?.grades.forEach((band) => bands.add(band));
+      }
+    }
+  }
+
+  if (bands.size === 0 && typeof value.lessonId === "string") {
+    const parent = (lessonsData as unknown as Array<{ id: string; gradeBands?: string[] }>).find(
+      (l) => l.id === value.lessonId
+    );
+    if (parent && Array.isArray(parent.gradeBands)) {
+      parent.gradeBands.forEach((band) => bands.add(band));
+    }
+  }
+
+  return Array.from(bands);
 }
 
 export function getSourceDocumentSummary(sourceId: string): SourceDocumentSummary {
@@ -321,69 +393,17 @@ export function evaluateSourceReference(
   };
 }
 
-function getRecordShape(record: unknown): PublicationRecordShape {
-  return record && typeof record === "object" ? (record as PublicationRecordShape) : {};
-}
 
-function isSourceReference(value: unknown): value is SourceReference {
-  if (!value || typeof value !== "object") return false;
-  const reference = value as Record<string, unknown>;
-  return typeof reference.sourceId === "string" && typeof reference.pageOrSection === "string";
-}
-
-export function toPublicationInput(record: unknown): PublicationInput {
-  const value = getRecordShape(record);
-  return {
-    id: typeof value.id === "string" ? value.id : "",
-    gradeBands: getGradeBands(value),
-    sourceReference: isSourceReference(value.sourceReference) ? value.sourceReference : undefined,
-  };
-}
-
-function getGradeBands(value: PublicationRecordShape): string[] {
-  const bands = new Set<string>();
-
-  if (typeof value.gradeBand === "string") bands.add(value.gradeBand);
-  if (Array.isArray(value.gradeBands)) {
-    value.gradeBands.forEach((band) => {
-      if (typeof band === "string") bands.add(band);
-    });
-  }
-
-  const questionFields: Array<"partA_MCQ" | "partB_Structured"> = ["partA_MCQ", "partB_Structured"];
-  questionFields.forEach((field) => {
-    const questions = value[field];
-    if (!Array.isArray(questions)) return;
-    questions.forEach((question) => {
-      if (!question || typeof question !== "object") return;
-      const questionBands = (question as Record<string, unknown>).gradeBands;
-      if (!Array.isArray(questionBands)) return;
-      questionBands.forEach((band) => {
-        if (typeof band === "string") bands.add(band);
-      });
-    });
-  });
-
-  if (bands.size === 0) {
-    const reference = value.sourceReference;
-    if (reference && typeof reference === "object") {
-      const sourceId = (reference as Record<string, unknown>).sourceId;
-      if (typeof sourceId === "string") {
-        const source = sourceRecords.find((record) => record.id === sourceId);
-        source?.grades.forEach((band) => bands.add(band));
-      }
-    }
-  }
-
-  return Array.from(bands);
-}
 
 function hasUnsupportedGrade(gradeBands: string[]): boolean {
   return gradeBands.includes("12-13");
 }
 
 function hasPublicGrade(gradeBands: string[]): boolean {
-  return gradeBands.some((band) => PUBLIC_GRADE_BANDS.includes(band as PublicGradeBand) || band === "7");
+  const allowedIndividualGrades = ["6", "7", "8", "9", "10", "11"];
+  return gradeBands.some(
+    (band) => PUBLIC_GRADE_BANDS.includes(band as PublicGradeBand) || allowedIndividualGrades.includes(band)
+  );
 }
 
 export function getPublicationDecision(input: PublicationInput): PublicationDecision {

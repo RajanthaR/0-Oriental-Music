@@ -15,8 +15,8 @@
       "term-timbre"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටු 10-14 (නාදය සහ සංගීතය)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 2-4"
     }
   },
   {
@@ -31,8 +31,8 @@
       "term-nada"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 10"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටුව 2"
     }
   },
   {
@@ -47,8 +47,8 @@
       "term-anahata-nada"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "පිටුව 12 (නාද ප්‍රභේද)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 2-4"
     }
   },
   {
@@ -63,60 +63,60 @@
       "term-ahata-nada"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "පිටුව 12"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 2-4"
     }
   },
   {
     "id": "term-pitch",
-    "term_si": "තාරතාවය (උස්-මිටි බව)",
+    "term_si": "තාරතාවය (උච්චනීච ප්‍රභේදය / උස්-මිටි බව)",
     "term_en": "Pitch",
     "transliteration": "Tāratāvaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "නාදයක සිහින් (උස්) හෝ ගොරෝසු (මිටි) ස්වභාවයයි. එය තීරණය වන්නේ කම්පන සංඛ්‍යාතය (Frequency) මතය.",
-    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: තාරතාවය, තාරතාව, උස් මිටි බව",
+    "definition_si": "නාදයක සිහින් (උස්) හෝ ගොරෝසු (මිටි) ස්වභාවයයි. එය තීරණය වන්නේ කම්පන සංඛ්‍යාතය (Frequency - Hz) මතය.",
+    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: තාරතාවය, තාරතාව, උච්චනීච ප්‍රභේදය, උස් මිටි බව",
     "relatedTermIds": [
       "term-intensity",
       "term-timbre",
       "term-frequency"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 12 (නාදයේ ලක්ෂණ)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 4"
     }
   },
   {
     "id": "term-intensity",
-    "term_si": "විපුලතාවය (තීව්‍රතාවය / මහත්-කුඩා බව)",
-    "term_en": "Intensity / Volume",
+    "term_si": "විපුලතාවය (රූප භේදය / මහත්-කුඩා බව)",
+    "term_en": "Intensity / Magnitude / Volume",
     "transliteration": "Vipulatāvaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "නාදයක ප්‍රබල හඬ (හයිය) හෝ මෘදු බවයි. එය තීරණය වන්නේ කම්පන විස්තාරය (Amplitude) මතය.",
-    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: විපුලතාවය, තීව්‍රතාවය, මහත් කුඩා බව",
+    "definition_si": "නාදයක ප්‍රබල හඬ (හයිය) හෝ මෘදු බවයි. එය තීරණය වන්නේ කම්පන විස්තාරය (Amplitude) හා යෙදූ බලය/ශක්තිය මතය.",
+    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: විපුලතාවය, රූප භේදය, තීව්‍රතාවය, මහත් කුඩා බව",
     "relatedTermIds": [
       "term-pitch",
       "term-timbre"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 13"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 7, 8"
     }
   },
   {
     "id": "term-timbre",
-    "term_si": "ධ්වනි ගුණය (නාද ජාතිය)",
+    "term_si": "ධ්වනි ගුණය (ජාති භේදය / නාද ජාතිය)",
     "term_en": "Timbre / Quality",
     "transliteration": "Dhwani Guṇaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "එකම තාරතාවයෙන් හා තීව්‍රතාවයෙන් යුත් නාද දෙකක් වෙන්කොට හඳුනාගැනීමට උපකාරී වන නාදයේ සුවිශේෂී වර්ණය හෝ මාධ්‍ය ලක්ෂණයයි (උදා: වයලීන හා බටනලා හඬ වෙන්කර හඳුනාගැනීම).",
-    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: ධ්වනි ගුණය, නාද ගුණය, නාද ජාතිය",
+    "definition_si": "එකම තාරතාවයෙන් හා විපුලතාවයෙන් යුත් නාද දෙකක් වෙන්කොට හඳුනාගැනීමට උපකාරී වන නාදයේ සුවිශේෂී තරංග රටාව හා මාධ්‍ය ලක්ෂණයයි (උදා: වයලීන හා බටනලා හඬ වෙන්කර හඳුනාගැනීම).",
+    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: ධ්වනි ගුණය, ජාති භේදය, නාද ගුණය, නාද ජාතිය",
     "relatedTermIds": [
       "term-pitch",
       "term-intensity"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 14"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 10, 11"
     }
   },
   {
@@ -132,8 +132,8 @@
       "term-nada"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "පිටුව 88 (සංගීත භෞතික විද්‍යාව)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 4, 5"
     }
   },
   {
