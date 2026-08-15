@@ -40,7 +40,7 @@ type BaselineLedger = {
     sourcePages: number;
     sourceDocumentReviewStatus: Record<string, number>;
     sourcePageQuality: Record<string, number>;
-    rawContentRecords: Record<string, number>;
+    rawContentCounts: Record<string, number>;
     rawCompletedReviewMetadata: Record<string, number>;
     rawGradeScope: {
       legacyReconciliationRecords: number;
@@ -85,7 +85,7 @@ export function validateCoverageSnapshot(
   if (coverage.overview?.totalIndexedSourcePages !== expected.sourcePages) {
     issues.push(baselineIssue("generated-doc", "content-coverage", "totalIndexedSourcePages", "Generated coverage pages do not agree with forensic-ledger.json."));
   }
-  Object.entries(expected.rawContentRecords).forEach(([entityType, count]) => {
+  Object.entries(expected.rawContentCounts).forEach(([entityType, count]) => {
     if (coverage.rawContentCounts?.[entityType] !== count) {
       issues.push(baselineIssue("generated-doc", "content-coverage", `rawContentCounts.${entityType}`, "Generated raw-content count does not agree with forensic-ledger.json."));
     }
@@ -255,7 +255,7 @@ export function validateForensicInventory(): PublicationValidationResult {
   if (expected.sourcePageQuality.pagesWithoutSinhalaText !== sourcePages.length - pagesContainingSinhalaText) {
     issues.push(baselineIssue("inventory", "source-page-quality", "pagesWithoutSinhalaText", "No-Sinhala-text page count drifted from forensic-ledger.json."));
   }
-  Object.entries(expected.rawContentRecords).forEach(([entityType, count]) => {
+  Object.entries(expected.rawContentCounts).forEach(([entityType, count]) => {
     if ((rawCollections[entityType] || []).length !== count) {
       issues.push(baselineIssue("inventory", entityType, "rawCount", "Raw content count drifted from forensic-ledger.json."));
     }
@@ -268,6 +268,20 @@ export function validateForensicInventory(): PublicationValidationResult {
   });
   if (publishedRecords.length !== expected.rawCompletedReviewMetadata.recordsClaimingPublished) {
     issues.push(baselineIssue("inventory", "reviewMetadata", "Published", "Completed review metadata count drifted from forensic-ledger.json."));
+  }
+  const swaraMagaReviewerRecords = reviewRecords.filter((record) => {
+    const metadata = (record as Record<string, unknown>).reviewMetadata as Record<string, unknown> | undefined;
+    return typeof metadata?.reviewer === "string" && metadata.reviewer.includes("Swara Maga");
+  });
+  if (swaraMagaReviewerRecords.length !== expected.rawCompletedReviewMetadata.recordsUsingSwaraMagaReviewer) {
+    issues.push(baselineIssue("inventory", "reviewMetadata", "reviewer", "Unverified Swara Maga reviewer count drifted from forensic-ledger.json."));
+  }
+  const recordsWith2026ReviewDates = reviewRecords.filter((record) => {
+    const metadata = (record as Record<string, unknown>).reviewMetadata as Record<string, unknown> | undefined;
+    return typeof metadata?.reviewDate === "string" && metadata.reviewDate.startsWith("2026-");
+  });
+  if (recordsWith2026ReviewDates.length !== expected.rawCompletedReviewMetadata.recordsWith2026ReviewDates) {
+    issues.push(baselineIssue("inventory", "reviewMetadata", "reviewDate", "Unverified 2026 review-date count drifted from forensic-ledger.json."));
   }
 
   const reconciliation = reconciliationData as Array<Record<string, unknown>>;

@@ -9,6 +9,13 @@
     "reviewBoundary": "Markdown extraction is evidence with limits. C/D, image-only, corrupt-font, visual, ambiguous, and missing-PDF cases remain needs-review until original-PDF/manual review.",
     "metadataBoundary": "Publisher, year, place, licence, reviewer, review date, and Published state are not accepted as evidence unless a real source or review event establishes them."
   },
+  "issueSchema": {
+    "entityOrPath": "Required human-readable display locator; machine navigation uses evidence[].path and evidence[].locator.",
+    "publicVisibilityValues": ["contained", "quarantined", "not-public"],
+    "confidenceValues": ["confirmed", "needs-review"],
+    "evidenceQualityValues": ["metadata-inventory", "review-required", "claim-comparison-missing", "citation-contradiction", "metadata-comparison", "canonical-inventory", "cross-artifact", "cross-entity", "canonical-inspection", "image-only", "corrupt-font", "cross-file", "runtime-inspection"],
+    "statusValues": ["contained", "needs-review"]
+  },
   "inventory": {
     "sourceMarkdownFilesInBySource": 30,
     "sourceMarkdownFilesAllArtifacts": 66,
@@ -28,7 +35,7 @@
       "pagesContainingSinhalaText": 895,
       "pagesWithoutSinhalaText": 128
     },
-    "rawContentRecords": {
+    "rawContentCounts": {
       "lessons": 21,
       "ragas": 8,
       "talas": 8,
@@ -46,7 +53,7 @@
       "recordsWith2026ReviewDates": 69
     },
     "rawGradeScope": {
-      "recordsContaining12-13Claims": 34,
+      "recordsContainingGrades12To13Claims": 34,
       "legacyReconciliationRecords": 101,
       "legacyReconciliationActions": {
         "KEEP": 22,
@@ -80,10 +87,10 @@
         {"path": "data/source-documents.json", "locator": "all 30 extracted documents", "exactSection": "no supplied Grade 12-13 source document"}
       ],
       "disposition": "central publication policy and public-surface containment",
-      "publicVisibility": "contained; unsupported grade bands are not discoverable",
+      "publicVisibility": "contained",
       "confidence": "confirmed",
-      "evidenceQuality": "metadata plus source inventory",
-      "status": "contained; claim correction deferred"
+      "evidenceQuality": "metadata-inventory",
+      "status": "contained"
     },
     {
       "id": "P01-RAGA-BHAIRAV-001",
@@ -97,9 +104,10 @@
       ],
       "disposition": "quarantine until raga facts and source mapping are corrected against the original PDF",
       "publicVisibility": "quarantined",
-      "confidence": "confirmed current claim; musical correction needs SME review",
-      "evidenceQuality": "source mapping Review Required",
-      "status": "contained; needs-review"
+      "confidence": "confirmed",
+      "confidenceScope": "current claim only; musical correction needs SME review",
+      "evidenceQuality": "review-required",
+      "status": "contained"
     },
     {
       "id": "P01-TALA-ROOPAK-001",
@@ -112,9 +120,10 @@
       ],
       "disposition": "quarantine until the tala structure and source page are verified",
       "publicVisibility": "quarantined",
-      "confidence": "confirmed current claim; tala correction needs SME review",
-      "evidenceQuality": "source mapping Review Required",
-      "status": "contained; needs-review"
+      "confidence": "confirmed",
+      "confidenceScope": "current claim only; tala correction needs SME review",
+      "evidenceQuality": "review-required",
+      "status": "contained"
     },
     {
       "id": "P01-RAGA-BILAWAL-001",
@@ -127,9 +136,10 @@
       ],
       "disposition": "quarantine until the name, swara sequence, and page evidence are manually reconciled",
       "publicVisibility": "quarantined",
-      "confidence": "confirmed current claim; correction not independently verified",
-      "evidenceQuality": "A page exists, but claim-level comparison is absent",
-      "status": "contained; needs-review"
+      "confidence": "confirmed",
+      "confidenceScope": "current claim only; correction not independently verified",
+      "evidenceQuality": "claim-comparison-missing",
+      "status": "contained"
     },
     {
       "id": "P01-TALA-LAWANI-001",
@@ -142,9 +152,10 @@
       ],
       "disposition": "quarantine until the framing and cross-document citation are verified",
       "publicVisibility": "quarantined",
-      "confidence": "confirmed citation contradiction",
-      "evidenceQuality": "mixed-document citation",
-      "status": "contained; needs-review"
+      "confidence": "confirmed",
+      "confidenceScope": "citation contradiction",
+      "evidenceQuality": "citation-contradiction",
+      "status": "contained"
     },
     {
       "id": "P01-SOUND-TERMINOLOGY-001",
@@ -158,9 +169,10 @@
       ],
       "disposition": "quarantine until terminology and exact page evidence pass language and SME review",
       "publicVisibility": "quarantined",
-      "confidence": "confirmed current claim; semantic correction needs-review",
-      "evidenceQuality": "source documents not fully triaged",
-      "status": "contained; needs-review"
+      "confidence": "confirmed",
+      "confidenceScope": "current claim only; semantic correction needs review",
+      "evidenceQuality": "review-required",
+      "status": "contained"
     },
     {
       "id": "P01-TALA-DADRA-CITE-001",
@@ -173,9 +185,10 @@
       ],
       "disposition": "quarantine until source-document and page-level citation are reconciled",
       "publicVisibility": "quarantined",
-      "confidence": "confirmed citation contradiction",
-      "evidenceQuality": "source mapping Review Required",
-      "status": "contained; needs-review"
+      "confidence": "confirmed",
+      "confidenceScope": "citation contradiction",
+      "evidenceQuality": "citation-contradiction",
+      "status": "contained"
     },
     {
       "id": "P01-SOURCE-METADATA-001",
@@ -187,10 +200,10 @@
         {"path": "data/source-documents.json", "locator": "30 extracted documents", "exactSection": "reviewStatus is Source Triaged, Review Required, or Image Only / Gaps; it does not establish all metadata"}
       ],
       "disposition": "sanitize public source views and retain raw metadata only as untrusted audit input",
-      "publicVisibility": "metadata no longer presented as verified",
+      "publicVisibility": "contained",
       "confidence": "confirmed",
-      "evidenceQuality": "metadata comparison",
-      "status": "contained; provenance verification deferred"
+      "evidenceQuality": "metadata-comparison",
+      "status": "contained"
     },
     {
       "id": "P01-REVIEW-METADATA-001",
@@ -202,10 +215,10 @@
         {"path": "data/forensic-ledger.json", "locator": "inventory.rawCompletedReviewMetadata", "exactSection": "69 records"}
       ],
       "disposition": "replace public review metadata with explicit unknown/unverified state; do not treat raw values as a review event",
-      "publicVisibility": "completed-review claims removed from public projections",
+      "publicVisibility": "contained",
       "confidence": "confirmed",
-      "evidenceQuality": "canonical-data inventory",
-      "status": "contained; real review events still required"
+      "evidenceQuality": "canonical-inventory",
+      "status": "contained"
     },
     {
       "id": "P01-ADMIN-COUNTS-001",
@@ -218,10 +231,10 @@
         {"path": "data/content-reconciliation.json", "locator": "array length and publicationStatus", "exactSection": "101 records, all Published"}
       ],
       "disposition": "derive counters from the forensic baseline and state that source/content review remains open",
-      "publicVisibility": "honest data-derived counters",
+      "publicVisibility": "contained",
       "confidence": "confirmed",
-      "evidenceQuality": "cross-artifact reconciliation",
-      "status": "contained; later content reconciliation deferred"
+      "evidenceQuality": "cross-artifact",
+      "status": "contained"
     },
     {
       "id": "P01-LEARNING-PATH-001",
@@ -233,10 +246,10 @@
         {"path": "src/data/lessons.json", "locator": "les-intro-01, les-tala-dadra, les-raga-bhairav, les-exam-skills", "exactSection": "known quarantined step targets"}
       ],
       "disposition": "publish a path only when every step is public and source-backed; retain incomplete paths for later remediation",
-      "publicVisibility": "incomplete paths unavailable",
+      "publicVisibility": "contained",
       "confidence": "confirmed",
-      "evidenceQuality": "cross-entity dependency check",
-      "status": "contained; path reconstruction deferred"
+      "evidenceQuality": "cross-entity",
+      "status": "contained"
     },
     {
       "id": "P01-CURRICULUM-COVERAGE-001",
@@ -248,10 +261,11 @@
         {"path": "data/curriculum-map.json", "locator": "20 competency records", "exactSection": "coverageStatus Covered and editorialStatus Published"}
       ],
       "disposition": "make the public map derive from the contained repository and label the raw map as unverified evidence",
-      "publicVisibility": "unsupported coverage claims removed",
-      "confidence": "confirmed contradiction",
-      "evidenceQuality": "cross-artifact reconciliation",
-      "status": "contained; curriculum mapping deferred"
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "cross-artifact contradiction",
+      "evidenceQuality": "cross-artifact",
+      "status": "contained"
     },
     {
       "id": "P01-EXAM-LABEL-001",
@@ -265,8 +279,8 @@
       "disposition": "quarantine the paper and remove the A/L selector, label, metadata, and homepage copy",
       "publicVisibility": "quarantined",
       "confidence": "confirmed",
-      "evidenceQuality": "canonical data and route inspection",
-      "status": "contained; exam source verification deferred"
+      "evidenceQuality": "canonical-inspection",
+      "status": "contained"
     },
     {
       "id": "P01-IMAGE-ONLY-001",
@@ -278,9 +292,9 @@
         {"path": "data/source-page-quality.json", "locator": "children_songs and grade_7_music pages", "exactSection": "confidence D"}
       ],
       "disposition": "retain as explicit needs-review placeholders; require original PDF visual/manual review",
-      "publicVisibility": "not used as public claim evidence",
+      "publicVisibility": "not-public",
       "confidence": "confirmed",
-      "evidenceQuality": "D / image-only",
+      "evidenceQuality": "image-only",
       "status": "needs-review"
     },
     {
@@ -293,9 +307,9 @@
         {"path": "data/source-page-quality.json", "locator": "oriental_music_2018 pages", "exactSection": "confidence D"}
       ],
       "disposition": "keep facts as needs-review unless independently supported by readable pages and record the alternate evidence",
-      "publicVisibility": "not accepted as sole evidence",
+      "publicVisibility": "not-public",
       "confidence": "confirmed",
-      "evidenceQuality": "D / corrupt-font",
+      "evidenceQuality": "corrupt-font",
       "status": "needs-review"
     },
     {
@@ -308,10 +322,10 @@
         {"path": "src/data/talas.json", "locator": "tala-dadra and tala-lawani", "exactSection": "mixed filename/page citations"}
       ],
       "disposition": "require exact filename mapping, page range, and readable-page quality before public eligibility",
-      "publicVisibility": "claims with unresolved mapping are needs-review or quarantined",
+      "publicVisibility": "quarantined",
       "confidence": "confirmed",
-      "evidenceQuality": "cross-file mapping",
-      "status": "contained by policy; correction deferred"
+      "evidenceQuality": "cross-file",
+      "status": "contained"
     },
     {
       "id": "P01-DIRECT-ROUTE-001",
@@ -323,9 +337,10 @@
         {"path": "src/app/lessons/[id]/page.tsx", "locator": "repository.getLessonById", "exactSection": "dynamic route loads by ID"}
       ],
       "disposition": "make all public-by-default ID lookups pass through the same typed publication policy",
-      "publicVisibility": "quarantined IDs resolve to unavailable/not-found state",
-      "confidence": "confirmed implementation defect",
-      "evidenceQuality": "runtime code inspection",
+      "publicVisibility": "quarantined",
+      "confidence": "confirmed",
+      "confidenceScope": "implementation defect",
+      "evidenceQuality": "runtime-inspection",
       "status": "contained"
     }
   ],
