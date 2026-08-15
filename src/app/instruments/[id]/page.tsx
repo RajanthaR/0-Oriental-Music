@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Radio, Play, ShieldAlert, FileText, ArrowRight, Wrench, Volume2 } from "lucide-react";
 import { repository } from "@/lib/data/repository";
+import { formatPublicSourceReference } from "@/lib/data/publication-policy";
 import { swaraSynth } from "@/lib/audio/synth";
 import { tablaSynth } from "@/lib/audio/tabla";
 
@@ -15,6 +16,7 @@ export default function InstrumentDetailPage() {
   const instrument = repository.getInstrumentById(instId);
   const source = instrument ? repository.getSourceById(instrument.sourceReference.sourceId) : undefined;
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [audioError, setAudioError] = useState(false);
 
   if (!instrument) {
     return (
@@ -30,18 +32,28 @@ export default function InstrumentDetailPage() {
   const handlePlaySample = () => {
     if (isPlayingAudio) return;
     setIsPlayingAudio(true);
+    setAudioError(false);
 
     if (instrument.id === "inst-tabla" || instrument.category_si.includes("අවනද්ධ")) {
       ["ධා", "ධින්", "ධින්", "ධා"].forEach((bol, i) => {
-        setTimeout(() => tablaSynth.playBol(bol), i * 400);
+        setTimeout(() => {
+          const handle = tablaSynth.playBol(bol, 400, () => setAudioError(true));
+          void handle.ready;
+        }, i * 400);
       });
       setTimeout(() => setIsPlayingAudio(false), 2000);
     } else if (instrument.id === "inst-flute") {
       swaraSynth.playSequence(["S", "G", "M", "P", "N", "S'"], 0.5, undefined, 261.63, "flute")
-        .then(() => setIsPlayingAudio(false));
+        .then((played) => {
+          if (!played) setAudioError(true);
+        })
+        .finally(() => setIsPlayingAudio(false));
     } else {
       swaraSynth.playSequence(["S", "R", "G", "M", "P", "D", "N", "S'"], 0.45, undefined, 261.63, "harmonium")
-        .then(() => setIsPlayingAudio(false));
+        .then((played) => {
+          if (!played) setAudioError(true);
+        })
+        .finally(() => setIsPlayingAudio(false));
     }
   };
 
@@ -85,6 +97,11 @@ export default function InstrumentDetailPage() {
           <Volume2 className="w-4 h-4" />
           {isPlayingAudio ? "නාද රටාව වාදනය වේ..." : "ආදර්ශ නාද රටාව අසන්න"}
         </button>
+        {audioError && (
+          <p role="status" className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950">
+            මෙම උපාංගයේ ආදර්ශ නාදය ආරම්භ කළ නොහැක. වාද්‍ය භාණ්ඩ විස්තරය දිගටම කියවිය හැක.
+          </p>
+        )}
       </div>
 
       {/* Structure & Sound Production Detailed Grid */}
@@ -145,7 +162,7 @@ export default function InstrumentDetailPage() {
         <div>
           <span className="font-bold text-text block">මූලාශ්‍ර සටහන:</span>
           <p>
-            {source?.title} ({source?.publisher}) — {instrument.sourceReference.pageOrSection}
+            {source?.title} — {formatPublicSourceReference(instrument.sourceReference)}
           </p>
         </div>
       </footer>

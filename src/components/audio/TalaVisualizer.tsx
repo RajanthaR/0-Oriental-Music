@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Tala } from "@/types/content";
 import { tablaSynth } from "@/lib/audio/tabla";
+import { normalizePracticeBpm } from "@/lib/audio/tempo";
 import { Play, Square, RotateCcw, Volume2, VolumeX, Hand, Waves } from "lucide-react";
 
 export interface TalaVisualizerProps {
@@ -26,8 +27,9 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentMatra, setCurrentMatra] = useState<number>(1);
-  const [bpm, setBpm] = useState<number>(initialBpm || tala.practiceTempoBpm?.thah_bpm || 75);
+  const [bpm, setBpm] = useState<number>(() => normalizePracticeBpm(initialBpm, tala.practiceTempoBpm?.thah_bpm));
   const [audioEnabled, setAudioEnabled] = useState(true);
+  const [audioError, setAudioError] = useState(false);
   const [visualMode, setVisualMode] = useState<"circular" | "linear">("circular");
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -69,7 +71,11 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
     cancelPlayback();
     if (!audioEnabledRef.current) return;
     const bol = tala.bols.find((candidate) => candidate.matra === matra);
-    if (bol) playbackCancelRef.current = tablaSynth.playBol(bol.bol_si, matraDurationMs);
+    if (bol) {
+      const handle = tablaSynth.playBol(bol.bol_si, matraDurationMs, () => setAudioError(true));
+      playbackCancelRef.current = handle;
+      void handle.ready;
+    }
   }, [cancelPlayback, matraDurationMs, tala.bols]);
 
   const stepNextMatra = useCallback(() => {
@@ -105,7 +111,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
     stopTimer();
     cancelPlayback();
     selectMatra(1);
-    setBpm(initialBpm || tala.practiceTempoBpm?.thah_bpm || 75);
+    setBpm(normalizePracticeBpm(initialBpm, tala.practiceTempoBpm?.thah_bpm));
   }, [cancelPlayback, initialBpm, playbackSignature, selectMatra, stopTimer, tala.practiceTempoBpm?.thah_bpm]);
 
   useEffect(() => () => {
@@ -120,6 +126,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
       cancelPlayback();
       return;
     }
+    setAudioError(false);
     playMatra(currentMatraRef.current);
     setIsPlaying(true);
   };
@@ -156,7 +163,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
             <button
               type="button"
               onClick={handleAudioToggle}
-              className={`p-2 rounded-lg border transition-all ${
+              className={`min-h-[44px] min-w-[44px] p-2 rounded-lg border transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                 audioEnabled
                   ? "bg-primary-50 text-primary border-primary-200"
                   : "bg-surface-warm text-text-muted border-border"
@@ -172,7 +179,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
           <button
             type="button"
             onClick={handleReset}
-            className="p-2 rounded-lg border border-border bg-surface-warm text-text hover:bg-white transition-all"
+            className="min-h-[44px] min-w-[44px] p-2 rounded-lg border border-border bg-surface-warm text-text hover:bg-white transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             title="නැවත මුලට"
             aria-label="නැවත මුලට"
           >
@@ -182,7 +189,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
           <button
             type="button"
             onClick={handleTogglePlay}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm text-white shadow-sm transition-all ${
+            className={`flex min-h-[44px] items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm text-white shadow-sm transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
               isPlaying ? "bg-red-600 hover:bg-red-700" : "bg-primary hover:bg-primary-dark"
             }`}
           >
@@ -200,6 +207,12 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
           </button>
         </div>
       </div>
+
+      {audioError && (
+        <p role="status" className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950">
+          මෙම උපාංගයේ තබ්ලා නාදය ආරම්භ කළ නොහැක. දෘශ්‍ය තාල ගණනය දිගටම භාවිත කළ හැක.
+        </p>
+      )}
 
       {/* Main Beat Display: Circular or Linear */}
       <div className="bg-surface-warm rounded-2xl p-6 mb-4 border border-border-light flex flex-col items-center justify-center min-h-[220px]">
@@ -332,11 +345,12 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
         {/* Visual Mode Toggle */}
         <div className="bg-surface-warm p-3 rounded-xl border border-border-light flex items-center justify-between">
           <span className="font-semibold text-text-secondary">දර්ශන මාදිලිය:</span>
-          <div className="flex bg-white rounded-lg p-1 border border-border">
+          <div className="flex bg-white rounded-lg p-1 border border-border" role="group" aria-label="තාල දර්ශන මාදිලිය">
             <button
               type="button"
               onClick={() => setVisualMode("circular")}
-              className={`px-3 py-1 rounded-md font-bold transition-all ${
+              aria-pressed={visualMode === "circular"}
+              className={`min-h-[44px] min-w-[44px] px-3 py-1 rounded-md font-bold transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                 visualMode === "circular" ? "bg-primary text-white" : "text-text-secondary"
               }`}
             >
@@ -345,7 +359,8 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
             <button
               type="button"
               onClick={() => setVisualMode("linear")}
-              className={`px-3 py-1 rounded-md font-bold transition-all ${
+              aria-pressed={visualMode === "linear"}
+              className={`min-h-[44px] min-w-[44px] px-3 py-1 rounded-md font-bold transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                 visualMode === "linear" ? "bg-primary text-white" : "text-text-secondary"
               }`}
             >

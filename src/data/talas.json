@@ -74,7 +74,7 @@
     "practiceTempoBpm": {
       "thah_bpm": 80,
       "dugun_bpm": 160,
-      "chaugun_bpm": 320
+      "chaugun_bpm": 240
     },
     "gradeBands": [
       "10-11"
@@ -186,7 +186,7 @@
     "practiceTempoBpm": {
       "thah_bpm": 90,
       "dugun_bpm": 180,
-      "chaugun_bpm": 360
+      "chaugun_bpm": 240
     },
     "gradeBands": [
       "10-11"
@@ -508,7 +508,7 @@
     "practiceTempoBpm": {
       "thah_bpm": 65,
       "dugun_bpm": 130,
-      "chaugun_bpm": 260
+      "chaugun_bpm": 240
     },
     "gradeBands": [
       "10-11"
@@ -783,7 +783,7 @@
     "practiceTempoBpm": {
       "thah_bpm": 70,
       "dugun_bpm": 140,
-      "chaugun_bpm": 280
+      "chaugun_bpm": 240
     },
     "gradeBands": [
       "10-11"
@@ -899,7 +899,7 @@
     "practiceTempoBpm": {
       "thah_bpm": 85,
       "dugun_bpm": 170,
-      "chaugun_bpm": 340
+      "chaugun_bpm": 240
     },
     "context_si": "ලාවනී යනු හින්දුස්ථානි තාල පද්ධතියේ දක්නට ලැබෙන තාලයක් නොවේ. මාත්‍රා දෙක බැගින් වූ විභාග සහිත ගීත පාසල් පද්ධතියේ භාවිත වන නිසාත්, දේශීය තිත් රූප හා බටහිර තාලවල එවැනි කොටස් ඇති නිසාත් එය පාසල් පද්ධතියට නිර්දේශ කර ඇත.",
     "contextSourceReference": {
@@ -985,7 +985,7 @@
     "practiceTempoBpm": {
       "thah_bpm": 100,
       "dugun_bpm": 200,
-      "chaugun_bpm": 400
+      "chaugun_bpm": 240
     },
     "gradeBands": [
       "10-11"

@@ -69,12 +69,25 @@ full rereview against the same base remains mandatory.
 ## Quarantine boundary
 
 The raw tala field registry in `data/musical-core-field-dispositions.json`
-enumerates the required context, theka, and every bol cell. Only `tala-khemta`
-has all required playable fields `verified` in the supplied extraction. Dadra,
-Keherwa, Teental, Jhaptal, Deepchandi, Lawani, and Roopak remain raw/auditable
-but are not public or playable until the relevant evidence is re-reviewed.
+enumerates required context, theka, and bol cells. `tala-khemta` retains readable
+page-7 fields, but the review demonstrated that its remaining learner-visible
+structure/actions were not closed through that registry. All eight Talas are
+therefore raw/auditable and nonpublic until every required field is explicitly
+dispositioned and re-reviewed.
 This is an evidence boundary, not a claim that the underlying musical forms do
 not exist.
+
+## Follow-up review-fix cycle
+
+The follow-up cycle centralizes canonical grade, question-shape, dependency,
+field, and sanitized-projection decisions in `getRecordPublicationDecision`.
+It adds closed runtime question discriminators, optional-link withholding,
+bounded practice tempo, single-shot rhythm completion, caller-owned Web Audio
+failure reporting, deterministic 16-beat hydration coverage, 44px/pressed-state
+Tala controls, filename-free public citations, and explicit warnings on the
+legacy source/curriculum documents. Khemta is newly quarantined rather than
+inventing evidence for its unregistered structure fields. Final review evidence
+is recorded separately and must not be inferred from this implementation log.
 
 ## Review-cycle boundary
 

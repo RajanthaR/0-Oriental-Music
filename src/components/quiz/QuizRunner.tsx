@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Quiz, Question } from "@/types/content";
-import { CheckCircle2, XCircle, Award, RotateCcw, ArrowRight, Sparkles } from "lucide-react";
+import { CheckCircle2, XCircle, Award, RotateCcw, ArrowRight, ArrowUp, ArrowDown, Sparkles } from "lucide-react";
 import { ProgressStorage } from "@/lib/storage/progress-storage";
 
 export type QuizRunnerQuiz = Pick<Quiz, "id" | "title_si" | "questions" | "passingScorePercent">;
@@ -44,6 +44,20 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
     setMatchingSelections((prev) => ({ ...prev, [left]: right }));
   };
 
+  const getOrderingIds = (target: Question): string[] =>
+    orderedItems[target.id] ?? [...(target.orderingItems ?? [])].reverse().map((item) => item.id);
+
+  const moveOrderingItem = (itemId: string, direction: -1 | 1) => {
+    if (isSubmitted) return;
+    const current = getOrderingIds(question);
+    const index = current.indexOf(itemId);
+    const target = index + direction;
+    if (index < 0 || target < 0 || target >= current.length) return;
+    const next = [...current];
+    [next[index], next[target]] = [next[target], next[index]];
+    setOrderedItems((previous) => ({ ...previous, [question.id]: next }));
+  };
+
   const handleCheckCurrentAnswer = () => {
     setIsSubmitted(true);
     let isCorrect = false;
@@ -60,12 +74,18 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
     } else if (question.type === "matching") {
       const pairs = question.matchingPairs || [];
       isCorrect = pairs.every((p) => matchingSelections[p.left_si] === p.right_si);
+    } else if (question.type === "ordering") {
+      const expected = [...(question.orderingItems ?? [])]
+        .sort((a, b) => a.correctIndex - b.correctIndex)
+        .map((item) => item.id);
+      const selected = getOrderingIds(question);
+      isCorrect = selected.length === expected.length && selected.every((id, index) => id === expected[index]);
     } else if (question.type === "short-answer") {
       const input = shortAnswerInput.trim().toLowerCase();
       const valid = question.correctShortAnswer_si || [];
       isCorrect = valid.some((v) => input.includes(v.toLowerCase()));
     } else {
-      isCorrect = true;
+      isCorrect = false;
     }
 
     if (isCorrect) {
@@ -269,6 +289,40 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Short Answer */}
+        {question.type === "ordering" && question.orderingItems && (
+          <div className="space-y-2" aria-label="අයිතම නිවැරදි පිළිවෙළට සකසන්න">
+            {getOrderingIds(question).map((itemId, index, current) => {
+              const item = question.orderingItems?.find((candidate) => candidate.id === itemId);
+              if (!item) return null;
+              return (
+                <div key={item.id} className="flex min-h-[44px] items-center gap-2 rounded-xl border border-border bg-surface-warm p-2">
+                  <span className="w-7 text-center text-xs font-bold text-primary">{index + 1}</span>
+                  <span className="flex-1 text-xs sm:text-sm">{item.text_si}</span>
+                  <button
+                    type="button"
+                    onClick={() => moveOrderingItem(item.id, -1)}
+                    disabled={isSubmitted || index === 0}
+                    className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-border bg-white disabled:opacity-40"
+                    aria-label={`${item.text_si} ඉහළට ගෙනයන්න`}
+                  >
+                    <ArrowUp className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveOrderingItem(item.id, 1)}
+                    disabled={isSubmitted || index === current.length - 1}
+                    className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-border bg-white disabled:opacity-40"
+                    aria-label={`${item.text_si} පහළට ගෙනයන්න`}
+                  >
+                    <ArrowDown className="h-4 w-4" />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
 

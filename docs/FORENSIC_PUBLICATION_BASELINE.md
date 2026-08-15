@@ -6,7 +6,7 @@ This is the Prompt 1 containment boundary for **ස්වර මඟ**. It is a s
 
 Phase 2 keeps the Prompt 1 fail-closed boundary and applies the selected **Option 2 whole-entity quarantine** rule to musical-core entities. Any unsupported required learner-visible or playable field withholds the whole public entity and its reverse dependencies; source-attributed raw/audit values are retained separately. Lawani remains nonpublic until its required Sri Lankan school-system context and playable fields are supportable.
 
-The current public projection contains 1 acoustics lesson, 7 Grade 11-evidenced ragas, 1 Tala (Khemta), 5 acoustics glossary terms, and 1 acoustics quiz. Public learning paths, exam papers, instruments, cultural traditions, and theatre traditions remain empty under this bounded evidence policy. These counts describe the current projection only; they do not establish curriculum completeness.
+The current public projection contains 1 acoustics lesson, 7 Grade 11-evidenced ragas, 5 acoustics glossary terms, and 1 acoustics quiz. All Talas, learning paths, exam papers, instruments, cultural traditions, and theatre traditions remain nonpublic under this bounded evidence policy. Khemta's readable raw cells are retained for audit, but its remaining learner-visible structure fields have not yet been closed through the field-disposition registry. These counts describe the current projection only; they do not establish curriculum completeness.
 
 ## States
 

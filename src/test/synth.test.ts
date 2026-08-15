@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { SWARA_SEMITONES, swaraSynth, getSwaraFrequency } from "@/lib/audio/synth";
 import { ROOT_PITCHES } from "@/lib/audio/tanpura";
+import { tablaSynth } from "@/lib/audio/tabla";
+import { normalizePracticeBpm } from "@/lib/audio/tempo";
 
 describe("Audio Synthesis Engine & Tuning Suite", () => {
   it("should have correct semitone mapping for standard 12 swaras", () => {
@@ -50,5 +52,25 @@ describe("Audio Synthesis Engine & Tuning Suite", () => {
 
     const mandraNi = getSwaraFrequency(".n", 261.63);
     expect(mandraNi).toBeCloseTo(261.63 * Math.pow(2, (10 - 12) / 12), 2);
+  });
+
+  it("fails Web Audio initialization closed without throwing and bounds hostile BPM", async () => {
+    const originalAudioContext = window.AudioContext;
+    const originalWebkitAudioContext = (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    class ThrowingAudioContext {
+      constructor() { throw new Error("audio unavailable"); }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: ThrowingAudioContext });
+    Object.defineProperty(window, "webkitAudioContext", { configurable: true, value: ThrowingAudioContext });
+    await expect(swaraSynth.playSwaraTone("S")).resolves.toBe(false);
+    const playback = tablaSynth.playBol("ධා");
+    await expect(playback.ready).resolves.toBe(false);
+    expect(() => playback()).not.toThrow();
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
+    Object.defineProperty(window, "webkitAudioContext", { configurable: true, value: originalWebkitAudioContext });
+
+    expect(normalizePracticeBpm(-1, 80)).toBe(80);
+    expect(normalizePracticeBpm(Number.POSITIVE_INFINITY, 80)).toBe(80);
+    expect(normalizePracticeBpm(9999, 80)).toBe(80);
   });
 });

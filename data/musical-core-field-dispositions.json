@@ -2,8 +2,12 @@
   "version": 1,
   "requiredFields": [
     "context",
+    "structure",
     "theka",
     "bols"
+  ],
+  "unclosedRequiredFields": [
+    "structure"
   ],
   "policy": "whole-entity-quarantine",
   "issueCatalog": [

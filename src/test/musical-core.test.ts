@@ -144,10 +144,10 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       expect(repository.getTalaById("tala-dadra")).toBeUndefined();
     });
 
-    it("publishes only Khemta under the whole-entity evidence policy", () => {
+    it("quarantines every Tala until every required learner-visible structure field is dispositioned", () => {
       const publicTalas = repository.getTalas();
-      expect(publicTalas.map((tala) => tala.id)).toEqual(["tala-khemta"]);
-      ["tala-dadra", "tala-keherwa", "tala-teental", "tala-jhaptal", "tala-deepchandi", "tala-lawani", "tala-roopak"]
+      expect(publicTalas).toEqual([]);
+      ["tala-dadra", "tala-keherwa", "tala-teental", "tala-jhaptal", "tala-deepchandi", "tala-lawani", "tala-roopak", "tala-khemta"]
         .forEach((id) => expect(repository.getTalaById(id)).toBeUndefined());
     });
 
@@ -161,10 +161,12 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       });
     });
 
-    it("locks the only public tala to its exact readable Grade 10 compound cells", () => {
-      expect(repository.getTalas().map((tala) => tala.id)).toEqual(["tala-khemta"]);
-      repository.getTalas().forEach((tala) => {
-        const expected = expectedTalas[tala.id as keyof typeof expectedTalas];
+    it("retains Khemta's readable Grade 10 compound cells in raw audit data only", () => {
+      expect(repository.getTalas()).toEqual([]);
+      const tala = talasData.find((candidate) => candidate.id === "tala-khemta");
+      expect(tala).toBeDefined();
+      if (tala) {
+        const expected = expectedTalas["tala-khemta"];
         const marks = tala.bols
           .filter((bol) => bol.isSam || bol.isTali || bol.isKhali)
           .map((bol) => [bol.matra, bol.isSam ? "X" : bol.isKhali ? "0" : "T"]);
@@ -178,7 +180,7 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
         expect(tala.sourceReference.sourceId).toBe("SRC-EPD-TB-G10");
         expect(tala.sourceReference.pageOrSection).not.toContain("s11tim173.pdf");
         expect(tala.practiceTempoBpm.thah_bpm).toBeGreaterThan(0);
-      });
+      }
     });
 
     it("retains Lawani's context for audit but withholds it from the public projection", () => {

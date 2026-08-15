@@ -6,6 +6,7 @@ import musicalCoreFieldDispositions from "../../data/musical-core-field-disposit
 import { repository } from "@/lib/data/repository";
 import {
   evaluateSourceReference,
+  formatPublicSourceReference,
   getContextClaimPublicationDecision,
   getRecordPublicationDecision,
   getSourceCorpusInventory,
@@ -62,7 +63,7 @@ describe("Prompt 1 publication containment", () => {
     expect(repository.getRagaById("raga-bilawal")).toBeDefined();
     expect(repository.getTalaById("tala-dadra")).toBeUndefined();
     expect(repository.getTalaById("tala-lawani")).toBeUndefined();
-    expect(repository.getTalaById("tala-khemta")).toBeDefined();
+    expect(repository.getTalaById("tala-khemta")).toBeUndefined();
   });
 
   it("prevents CMS review status updates from leaking quarantined records into public getters", () => {
@@ -223,9 +224,7 @@ describe("Prompt 1 publication containment", () => {
       state: "quarantined",
     });
 
-    const publicKhemta = repository.getTalaById("tala-khemta");
-    expect(publicKhemta).toBeDefined();
-    expect(getContextClaimPublicationDecision(publicKhemta).isPublic).toBe(true);
+    expect(repository.getTalaById("tala-khemta")).toBeUndefined();
   });
 
   it("preserves the historical baseline without claiming a stored SHA is the current checkout", () => {
@@ -346,13 +345,13 @@ describe("Prompt 1 publication containment", () => {
       expect(disposition?.theka).toBeDefined();
       expect(disposition?.bols).toHaveLength(tala.bols.length);
     });
-    expect(getTalaFieldDisposition("tala-khemta")?.allRequiredFieldsVerified).toBe(true);
-    ["tala-dadra", "tala-keherwa", "tala-teental", "tala-jhaptal", "tala-deepchandi", "tala-lawani", "tala-roopak"]
+    expect(getTalaFieldDisposition("tala-khemta")?.allRequiredFieldsVerified).toBe(false);
+    ["tala-dadra", "tala-keherwa", "tala-teental", "tala-jhaptal", "tala-deepchandi", "tala-lawani", "tala-roopak", "tala-khemta"]
       .forEach((id) => {
         expect(getTalaFieldDisposition(id)?.allRequiredFieldsVerified).toBe(false);
         expect(repository.getTalaById(id)).toBeUndefined();
       });
-    expect(repository.getPublicationSummary().talas.public).toBe(1);
+    expect(repository.getPublicationSummary().talas.public).toBe(0);
     expect(validateMusicalCoreFieldDispositions()).toEqual({ isValid: true, issues: [] });
   });
 
@@ -489,6 +488,71 @@ describe("Prompt 1 publication containment", () => {
       isPublic: false,
       reasonCodes: expect.arrayContaining(["missing-grade-scope"]),
     });
+  });
+
+  it("rejects individual and mixed grade tokens at the public boundary", () => {
+    const bilawal = structuredClone(ragasData.find((raga) => raga.id === "raga-bilawal"));
+    expect(bilawal).toBeDefined();
+    if (!bilawal) return;
+    for (const gradeBands of [["11"], ["10-11", "11"], ["10-11", 11]]) {
+      (bilawal as unknown as { gradeBands: unknown }).gradeBands = gradeBands;
+      expect(getRecordPublicationDecision(bilawal)).toMatchObject({
+        isPublic: false,
+        reasonCodes: expect.arrayContaining(["malformed-record"]),
+      });
+    }
+  });
+
+  it("rejects malformed or unsupported nested question discriminators", () => {
+    const canonical = quizzesData.find((item) => item.id === "quiz-les-intro-01");
+    expect(canonical).toBeDefined();
+    if (!canonical) return;
+    const malformedOptions = structuredClone(canonical) as unknown as Record<string, unknown>;
+    ((malformedOptions.questions as unknown[])[0] as Record<string, unknown>).options_si = [null];
+    expect(getRecordPublicationDecision(malformedOptions)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["malformed-record", "nested-question-unpublishable"]),
+    });
+
+    const unsupportedType = structuredClone(canonical) as unknown as Record<string, unknown>;
+    ((unsupportedType.questions as unknown[])[0] as Record<string, unknown>).type = "audio-id";
+    expect(getRecordPublicationDecision(unsupportedType)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["malformed-record", "nested-question-unpublishable"]),
+    });
+  });
+
+  it("uses one dependency decision for repository reads, summaries, and optional projections", () => {
+    const intro = repository.getLessonById("les-intro-01");
+    expect(intro).toBeDefined();
+    expect(intro?.nextRecommendedLessonId).toBeUndefined();
+    expect(intro?.quizId).toBe("quiz-les-intro-01");
+    expect(repository.getLearningPaths()).toEqual([]);
+    expect(repository.getPublicationSummary().learningPaths.public).toBe(repository.getLearningPaths().length);
+  });
+
+  it("fails closed for mixed Tala aliases, mixed Quiz grades, and unsafe practice BPM", () => {
+    const khemta = structuredClone(talasData.find((tala) => tala.id === "tala-khemta")) as unknown as Record<string, unknown>;
+    expect(khemta.id).toBe("tala-khemta");
+    khemta.aliases_si = ["ඛෙම්ටා තාලය", null];
+    expect(getRecordPublicationDecision(khemta).reasonCodes).toContain("malformed-record");
+
+    const unsafeTempo = structuredClone(talasData.find((tala) => tala.id === "tala-khemta")) as unknown as Record<string, unknown>;
+    (unsafeTempo.practiceTempoBpm as Record<string, unknown>).thah_bpm = -1;
+    expect(getRecordPublicationDecision(unsafeTempo).reasonCodes).toContain("malformed-record");
+
+    const quiz = structuredClone(quizzesData.find((item) => item.id === "quiz-les-intro-01")) as unknown as Record<string, unknown>;
+    quiz.gradeBands = ["10-11", null];
+    expect(getRecordPublicationDecision(quiz).reasonCodes).toContain("malformed-record");
+  });
+
+  it("formats public citations without leaking repository filenames", () => {
+    const bilawal = ragasData.find((raga) => raga.id === "raga-bilawal");
+    expect(bilawal).toBeDefined();
+    if (!bilawal) return;
+    const label = formatPublicSourceReference(bilawal.sourceReference);
+    expect(label).toBe("පිටු 1, 2");
+    expect(label).not.toMatch(/\.pdf/i);
   });
 
   it("validates exam question arrays as nested publication claims", () => {

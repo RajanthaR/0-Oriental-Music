@@ -21,7 +21,7 @@ describe("Search Engine & Sinhala Normalizer Suite", () => {
     expect(roopakResults.some((result) => result.id === "tala-roopak")).toBe(false);
   });
 
-  it("should discover the evidence-supported Khemta and Bilawal entities", () => {
+  it("should discover Bilawal while keeping Khemta in whole-entity quarantine", () => {
     const dadraResults = searchIndex.search("dadra");
     expect(dadraResults.some((result) => result.id === "tala-dadra" || result.id === "les-tala-dadra")).toBe(false);
 
@@ -32,7 +32,7 @@ describe("Search Engine & Sinhala Normalizer Suite", () => {
     expect(lawaniResults.some((result) => result.id === "tala-lawani")).toBe(false);
 
     const khemtaResults = searchIndex.search("khemta");
-    expect(khemtaResults.some((result) => result.id === "tala-khemta")).toBe(true);
+    expect(khemtaResults.some((result) => result.id === "tala-khemta")).toBe(false);
   });
 
   it("should discover canonical musical entities and acoustics terms via English transliterations", () => {

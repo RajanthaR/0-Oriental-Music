@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Sparkles, Clock, Play, ArrowRight, Music, FileText, CheckCircle2 } from "lucide-react";
 import { repository } from "@/lib/data/repository";
+import { formatPublicSourceReference } from "@/lib/data/publication-policy";
 import { swaraSynth } from "@/lib/audio/synth";
 import { SwaraKeyboard } from "@/components/audio/SwaraKeyboard";
 
@@ -15,6 +16,7 @@ export default function RagaDetailPage() {
   const raga = repository.getRagaById(ragaId);
   const source = raga ? repository.getSourceById(raga.sourceReference.sourceId) : undefined;
   const [playingPhraseIdx, setPlayingPhraseIdx] = useState<number | null>(null);
+  const [audioError, setAudioError] = useState(false);
 
   if (!raga) {
     return (
@@ -27,25 +29,26 @@ export default function RagaDetailPage() {
     );
   }
 
-  const handlePlayPhrase = async (phraseSwaras: string[], idx: number) => {
+  const playSequence = async (phraseSwaras: string[], idx: number) => {
     if (playingPhraseIdx !== null) return;
     setPlayingPhraseIdx(idx);
-    await swaraSynth.playSequence(phraseSwaras, 0.6, undefined, 261.63, "harmonium");
-    setPlayingPhraseIdx(null);
+    setAudioError(false);
+    try {
+      const played = await swaraSynth.playSequence(phraseSwaras, 0.6, undefined, 261.63, "harmonium");
+      if (!played) setAudioError(true);
+    } finally {
+      setPlayingPhraseIdx(null);
+    }
   };
 
+  const handlePlayPhrase = (phraseSwaras: string[], idx: number) => playSequence(phraseSwaras, idx);
+
   const handlePlayArohana = async () => {
-    if (playingPhraseIdx !== null) return;
-    setPlayingPhraseIdx(99);
-    await swaraSynth.playSequence(raga.arohana_swaras, 0.6, undefined, 261.63, "harmonium");
-    setPlayingPhraseIdx(null);
+    await playSequence(raga.arohana_swaras, 99);
   };
 
   const handlePlayAvarohana = async () => {
-    if (playingPhraseIdx !== null) return;
-    setPlayingPhraseIdx(98);
-    await swaraSynth.playSequence(raga.avarohana_swaras, 0.6, undefined, 261.63, "harmonium");
-    setPlayingPhraseIdx(null);
+    await playSequence(raga.avarohana_swaras, 98);
   };
 
   return (
@@ -127,6 +130,11 @@ export default function RagaDetailPage() {
             {playingPhraseIdx === 98 ? "වාදනය වේ..." : "අවරෝහණය අසන්න"}
           </button>
         </div>
+        {audioError && (
+          <p role="status" className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950">
+            මෙම උපාංගයේ රාග නාදය ආරම්භ කළ නොහැක. ස්වර සටහන් සහ යතුරුපුවරුව දිගටම භාවිත කළ හැක.
+          </p>
+        )}
       </div>
 
       {/* Interactive Swara Keyboard for this Raga */}
@@ -199,7 +207,7 @@ export default function RagaDetailPage() {
         <div>
           <span className="font-bold text-text block">මූලාශ්‍ර සටහන:</span>
           <p>
-            {source?.title} ({source?.publisher}) — {raga.sourceReference.pageOrSection}
+            {source?.title} — {formatPublicSourceReference(raga.sourceReference)}
           </p>
         </div>
       </footer>

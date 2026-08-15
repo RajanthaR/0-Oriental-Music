@@ -14,7 +14,7 @@
     "reviewRunId": "20260815-235819-p02r4",
     "status": "Findings input only; not acceptance evidence"
   },
-  "issueCountBaseline": 26,
+  "issueCountBaseline": 29,
   "evidencePolicy": {
     "publicGradeBands": [
       "6-7",
@@ -406,8 +406,8 @@
         },
         {
           "path": "src/data/talas.json",
-          "locator": "one public Khemta gradeBand plus seven raw quarantined tala gradeBands",
-          "exactPageOrSection": "SRC-EPD-TB-G10 Grade 10, PDF Page 7 supports public Khemta; Pages 2-6 remain raw audit locators for quarantined talas"
+          "locator": "eight raw quarantined tala gradeBands",
+          "exactPageOrSection": "SRC-EPD-TB-G10 Grade 10, PDF Page 7 supports readable raw Khemta cells; no Tala is public until every required structure/action field is dispositioned"
         },
         {
           "path": "src/data/lessons.json and src/data/quizzes.json",
@@ -449,10 +449,10 @@
           "exactPageOrSection": "SRC-EPD-TB-G10 PDF Pages 2, 4-5 establish දීප්චන්ද්; Grade 11 දීප්චන්දි remains retrieval-only and needs-review"
         }
       ],
-      "disposition": "publish only Khemta's readable four-matra compound cells; retain the Grade 10 spellings and all other normalized tala structures as raw audit data under whole-entity quarantine; keep Grade 11 දීප්චන්දි retrieval-only",
+      "disposition": "retain Khemta's readable four-matra compound cells and all other Tala structures as raw audit data; quarantine all eight Talas until every learner-visible/playable structure field is closed; keep Grade 11 දීප්චන්දි retrieval-only",
       "publicVisibility": "contained",
       "confidence": "needs-review",
-      "confidenceScope": "Khemta is bounded to Grade 10 page 7; all other normalized bol glyphs require original-PDF/manual review",
+      "confidenceScope": "Khemta's readable cells are bounded to Grade 10 page 7, but remaining structure/action fields and all other normalized bol glyphs require explicit disposition plus original-PDF/manual review",
       "status": "needs-review",
       "evidenceBasis": "review-required"
     },
@@ -831,6 +831,78 @@
       "publicVisibility": "quarantined",
       "confidence": "confirmed",
       "confidenceScope": "implementation defect",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-PUBLIC-PROJECTION-001",
+      "severity": "P1",
+      "entityOrPath": "src/lib/data/publication-policy.ts and src/lib/data/repository.ts",
+      "currentClaim": "Canonical grades, dependencies, field withholding, repository reads, search inputs, and summary counts could make separate publication decisions.",
+      "evidence": [
+        {
+          "path": "src/lib/data/publication-policy.ts",
+          "locator": "getRecordPublicationDecision / collectDependencyDispositions / sanitizePublicRecord",
+          "exactSection": "canonical browse bands, blocking and optional dependencies, and publicProjection"
+        },
+        {
+          "path": "src/test/publication-containment.test.ts",
+          "locator": "individual/mixed grade and dependency projection regressions",
+          "exactSection": "missing or malformed canonical scope fails closed; optional unavailable successors are stripped; summaries equal public getters"
+        }
+      ],
+      "disposition": "make one fail-closed decision return the exact sanitized public projection consumed by repository lists, direct lookups, search, and counts",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "runtime publication contract",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-QUESTION-CONTRACT-001",
+      "severity": "P1",
+      "entityOrPath": "nested quiz and exam questions plus src/components/quiz/QuizRunner.tsx",
+      "currentClaim": "A question with a missing answer shape or unsupported discriminator could be published and the runner's fallback treated it as correct.",
+      "evidence": [
+        {
+          "path": "src/lib/data/publication-policy.ts",
+          "locator": "hasCanonicalQuestionShape",
+          "exactSection": "closed discriminator and per-type answer contracts"
+        },
+        {
+          "path": "src/components/quiz/QuizRunner.tsx",
+          "locator": "ordering branch and fail-closed fallback",
+          "exactSection": "ordering requires learner interaction; unsupported types never auto-pass"
+        }
+      ],
+      "disposition": "reject malformed or unsupported nested questions before public projection and implement the supported ordering interaction explicitly",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "runtime question and assessment contract",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-AUDIO-RESILIENCE-001",
+      "severity": "P1",
+      "entityOrPath": "TalaVisualizer, RhythmTapGame, tablaSynth, and swaraSynth",
+      "currentClaim": "Unsafe BPM values could create hot timers and missing or throwing Web Audio APIs could escape while controls remained stuck in a playing state.",
+      "evidence": [
+        {
+          "path": "src/lib/audio/tempo.ts",
+          "locator": "isSafePracticeBpm / normalizePracticeBpm",
+          "exactSection": "finite 40-240 BPM application boundary"
+        },
+        {
+          "path": "src/test/components.test.tsx and src/test/synth.test.ts",
+          "locator": "StrictMode lifecycle, unavailable-audio, and hostile-BPM regressions",
+          "exactSection": "caller-owned cancellation, deterministic hydration, localized fallback, and nonthrowing initialization"
+        }
+      ],
+      "disposition": "bound application tempo, make rhythm completion single-shot, return caller-owned readiness handles, and keep text/visual tools usable with localized feedback when Web Audio is unavailable",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "application timing and browser capability contract; curriculum evidence N/A",
       "status": "contained",
       "evidenceBasis": "runtime-inspection"
     }

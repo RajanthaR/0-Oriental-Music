@@ -176,9 +176,12 @@ class ContentRepository {
   private examPapers: ExamPaper[] = examPapersData as ExamPaper[];
 
   private selectPublic<T extends { id: string }>(items: T[]): T[] {
-    return items
-      .filter((item) => getRecordPublicationDecision(item).isPublic)
-      .map((item) => sanitizePublicRecord(item));
+    return items.flatMap((item) => {
+      const decision = getRecordPublicationDecision(item);
+      return decision.isPublic && decision.publicProjection
+        ? [decision.publicProjection as T]
+        : [];
+    });
   }
 
   private selectForReview<T extends { id: string }>(items: T[]): T[] {
@@ -392,13 +395,10 @@ class ContentRepository {
     return list;
   }
 
-  // Learning Paths. A path is not discoverable if any of its steps are
-  // quarantined or otherwise unavailable in the public lesson collection.
+  // Learning-path dependency closure is enforced by the central publication
+  // decision, so every public surface consumes the same result.
   public getLearningPaths(gradeBand?: GradeBandType): LearningPath[] {
-    const publicLessonIds = new Set(this.getLessons().map((lesson) => lesson.id));
-    let list = this.selectPublic(this.learningPaths).filter((path) =>
-      path.steps.every((step) => publicLessonIds.has(step.lessonId))
-    );
+    let list = this.selectPublic(this.learningPaths);
     if (gradeBand) {
       list = list.filter((path) => path.gradeBands.includes(gradeBand));
     }
@@ -411,9 +411,12 @@ class ContentRepository {
 
   // Quizzes & Exams
   public getQuizzes(): Quiz[] {
-    return this.quizzes
-      .filter((quiz) => getQuizPublicationDecision(quiz).isPublic)
-      .map((quiz) => sanitizePublicRecord(quiz));
+    return this.quizzes.flatMap((quiz) => {
+      const decision = getQuizPublicationDecision(quiz);
+      return decision.isPublic && decision.publicProjection
+        ? [decision.publicProjection as Quiz]
+        : [];
+    });
   }
 
   public getQuizById(id: string): Quiz | undefined {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { StrictMode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
@@ -12,6 +12,8 @@ import { repository } from "@/lib/data/repository";
 import { EarTrainingModule } from "@/components/audio/EarTrainingModule";
 import SearchPage from "@/app/search/page";
 import { TalaDirectoryResults } from "@/components/tala/TalaDirectoryResults";
+import talasData from "@/data/talas.json";
+import type { Tala } from "@/types/content";
 
 const audioMocks = vi.hoisted(() => ({
   playBol: vi.fn(),
@@ -20,6 +22,15 @@ const audioMocks = vi.hoisted(() => ({
 vi.mock("@/lib/audio/tabla", () => ({
   tablaSynth: audioMocks,
 }));
+
+const getKhemtaFixture = (): Tala => {
+  const tala = (talasData as Tala[]).find((candidate) => candidate.id === "tala-khemta");
+  if (!tala) throw new Error("Missing raw Khemta test fixture");
+  return tala;
+};
+
+const readyCancel = (cancel: ReturnType<typeof vi.fn> = vi.fn()) =>
+  Object.assign(cancel, { ready: Promise.resolve(true) });
 
 afterEach(() => {
   audioMocks.playBol.mockReset();
@@ -54,9 +65,7 @@ describe("Interactive Audio & Quiz Components Suite", () => {
   });
 
   it("maps the evidence-supported tala into the visualizer and discloses practice-only BPM", () => {
-    const khemta = repository.getTalaById("tala-khemta");
-    expect(khemta).toBeDefined();
-    if (!khemta) return;
+    const khemta = getKhemtaFixture();
     render(<TalaVisualizer tala={khemta} />);
     expect(screen.getByText(/මාත්‍රා 4 \| විභාග 2 \(2\+2\)/)).toBeInTheDocument();
     expect(screen.getByText(/යෙදුමේ පුහුණු වේගය:/)).toBeInTheDocument();
@@ -64,14 +73,12 @@ describe("Interactive Audio & Quiz Components Suite", () => {
   });
 
   it("keeps each TalaVisualizer playback handle owned by its lifecycle", () => {
-    const tala = repository.getTalaById("tala-khemta");
-    expect(tala).toBeDefined();
-    if (!tala) return;
+    const tala = getKhemtaFixture();
     const cancels: Array<ReturnType<typeof vi.fn>> = [];
     audioMocks.playBol.mockImplementation(() => {
       const cancel = vi.fn();
       cancels.push(cancel);
-      return cancel;
+      return readyCancel(cancel);
     });
     vi.useFakeTimers();
     const { unmount } = render(<TalaVisualizer tala={tala} />);
@@ -91,19 +98,17 @@ describe("Interactive Audio & Quiz Components Suite", () => {
   });
 
   it("cancels active audio on audio-off without stopping visual timing", () => {
-    const tala = repository.getTalaById("tala-khemta");
-    expect(tala).toBeDefined();
-    if (!tala) return;
+    const tala = getKhemtaFixture();
     const cancels: Array<ReturnType<typeof vi.fn>> = [];
     audioMocks.playBol.mockImplementation(() => {
       const cancel = vi.fn();
       cancels.push(cancel);
-      return cancel;
+      return readyCancel(cancel);
     });
     vi.useFakeTimers();
     render(<TalaVisualizer tala={tala} />);
     fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
-    expect(audioMocks.playBol).toHaveBeenLastCalledWith(tala.bols[0].bol_si, 600);
+    expect(audioMocks.playBol).toHaveBeenLastCalledWith(tala.bols[0].bol_si, 600, expect.any(Function));
     act(() => { vi.advanceTimersByTime(300); });
     fireEvent.click(screen.getByRole("button", { name: "තබ්ලා නාදය පාලනය" }));
     expect(cancels[0]).toHaveBeenCalledTimes(1);
@@ -115,11 +120,9 @@ describe("Interactive Audio & Quiz Components Suite", () => {
   });
 
   it("cancels the caller-owned stroke when BPM changes while playing", () => {
-    const tala = repository.getTalaById("tala-khemta");
-    expect(tala).toBeDefined();
-    if (!tala) return;
+    const tala = getKhemtaFixture();
     const cancel = vi.fn();
-    audioMocks.playBol.mockReturnValue(cancel);
+    audioMocks.playBol.mockReturnValue(readyCancel(cancel));
     vi.useFakeTimers();
     render(<TalaVisualizer tala={tala} />);
     fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
@@ -137,11 +140,9 @@ describe("Interactive Audio & Quiz Components Suite", () => {
   });
 
   it("resets playback when a same-ID tala is replaced", () => {
-    const tala = repository.getTalaById("tala-khemta");
-    expect(tala).toBeDefined();
-    if (!tala) return;
+    const tala = getKhemtaFixture();
     const cancel = vi.fn();
-    audioMocks.playBol.mockReturnValue(cancel);
+    audioMocks.playBol.mockReturnValue(readyCancel(cancel));
     const { rerender } = render(<TalaVisualizer tala={tala} />);
     fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
     rerender(<TalaVisualizer tala={{ ...tala, bols: tala.bols.map((bol, index) => index === 0 ? { ...bol, bol_si: `${bol.bol_si} වෙනස්` } : bol) }} />);
@@ -151,14 +152,12 @@ describe("Interactive Audio & Quiz Components Suite", () => {
   });
 
   it("cancels playback on Reset, tala change, and unmount", () => {
-    const tala = repository.getTalaById("tala-khemta");
-    expect(tala).toBeDefined();
-    if (!tala) return;
+    const tala = getKhemtaFixture();
     const cancels: Array<ReturnType<typeof vi.fn>> = [];
     audioMocks.playBol.mockImplementation(() => {
       const cancel = vi.fn();
       cancels.push(cancel);
-      return cancel;
+      return readyCancel(cancel);
     });
     vi.useFakeTimers();
     const { rerender, unmount } = render(<TalaVisualizer tala={tala} />);
@@ -178,14 +177,12 @@ describe("Interactive Audio & Quiz Components Suite", () => {
   });
 
   it("keeps co-mounted TalaVisualizer playback cancellation isolated", () => {
-    const tala = repository.getTalaById("tala-khemta");
-    expect(tala).toBeDefined();
-    if (!tala) return;
+    const tala = getKhemtaFixture();
     const cancels: Array<ReturnType<typeof vi.fn>> = [];
     audioMocks.playBol.mockImplementation(() => {
       const cancel = vi.fn();
       cancels.push(cancel);
-      return cancel;
+      return readyCancel(cancel);
     });
     const { unmount } = render(
       <>
@@ -205,10 +202,8 @@ describe("Interactive Audio & Quiz Components Suite", () => {
   });
 
   it("keeps a co-mounted rhythm caller advancing when the Tala visualizer stops", () => {
-    const tala = repository.getTalaById("tala-khemta");
-    expect(tala).toBeDefined();
-    if (!tala) return;
-    audioMocks.playBol.mockImplementation(() => vi.fn());
+    const tala = getKhemtaFixture();
+    audioMocks.playBol.mockImplementation(() => readyCancel());
     vi.useFakeTimers();
     render(
       <>
@@ -228,13 +223,27 @@ describe("Interactive Audio & Quiz Components Suite", () => {
 
   it("serializes circular beat coordinates deterministically", async () => {
     const { getCircularBeatStyle } = await import("@/components/audio/TalaVisualizer");
-    expect(getCircularBeatStyle(3, 16)).toStrictEqual(getCircularBeatStyle(3, 16));
+    expect(getCircularBeatStyle(1, 16)).toEqual({ transform: "translate(30.614675px, -73.910363px)" });
   });
 
   it("hydrates the TalaVisualizer without coordinate mismatch warnings", async () => {
-    const tala = repository.getTalaById("tala-khemta");
-    expect(tala).toBeDefined();
-    if (!tala) return;
+    const base = getKhemtaFixture();
+    const tala: Tala = {
+      ...base,
+      id: "tala-hydration-16",
+      matras: 16,
+      vibhagCount: 4,
+      vibhagStructure: [4, 4, 4, 4],
+      taliKhali_si: ["X", "2", "0", "3"],
+      bols: Array.from({ length: 16 }, (_, index) => ({
+        ...base.bols[index % base.bols.length],
+        matra: index + 1,
+        vibhagIndex: Math.floor(index / 4),
+        isSam: index === 0,
+        isTali: index === 4 || index === 12,
+        isKhali: index === 8,
+      })),
+    };
     const container = document.createElement("div");
     container.innerHTML = renderToString(<TalaVisualizer tala={tala} />);
     document.body.appendChild(container);
@@ -253,6 +262,38 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     consoleError.mockRestore();
   });
 
+  it("exposes 44px controls, pressed mode state, and bounded invalid BPM", () => {
+    const tala = getKhemtaFixture();
+    render(<TalaVisualizer tala={tala} initialBpm={-500} />);
+    expect(screen.getByText(/යෙදුමේ පුහුණු වේගය: 100 BPM/)).toBeInTheDocument();
+    const circular = screen.getByRole("button", { name: "චක්‍රාකාර" });
+    const linear = screen.getByRole("button", { name: "සරල රේඛීය" });
+    expect(circular).toHaveAttribute("aria-pressed", "true");
+    expect(circular.className).toContain("min-h-[44px]");
+    expect(screen.getByRole("button", { name: "තබ්ලා නාදය පාලනය" }).className).toContain("min-w-[44px]");
+    fireEvent.click(linear);
+    expect(linear).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("survives rapid StrictMode start-stop-start and reports unavailable Web Audio", async () => {
+    const tala = getKhemtaFixture();
+    const cancels: Array<ReturnType<typeof vi.fn>> = [];
+    audioMocks.playBol.mockImplementation((_bol, _duration, onUnavailable) => {
+      const cancel = vi.fn();
+      cancels.push(cancel);
+      onUnavailable?.();
+      return Object.assign(cancel, { ready: Promise.resolve(false) });
+    });
+    render(<StrictMode><TalaVisualizer tala={tala} /></StrictMode>);
+    fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
+    expect(await screen.findByRole("status")).toHaveTextContent("තබ්ලා නාදය ආරම්භ කළ නොහැක");
+    fireEvent.click(screen.getByRole("button", { name: "නවත්වන්න" }));
+    fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
+    expect(cancels).toHaveLength(2);
+    expect(cancels[0]).toHaveBeenCalledTimes(1);
+    expect(cancels[1]).not.toHaveBeenCalled();
+  });
+
   it("renders QuizRunner and first question properly", () => {
     const quizzes = repository.getQuizzes();
     if (quizzes.length === 0) {
@@ -264,6 +305,33 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     render(<QuizRunner quiz={quiz} />);
     expect(screen.getByText(quiz.questions[0].prompt_si)).toBeInTheDocument();
     expect(screen.getByText("පිළිතුර පරීක්ෂා කරන්න")).toBeInTheDocument();
+  });
+
+  it("requires an explicit learner ordering instead of auto-passing the format", () => {
+    const onComplete = vi.fn();
+    render(<QuizRunner quiz={{
+      id: "ordering-regression",
+      title_si: "පිළිවෙළ",
+      passingScorePercent: 70,
+      questions: [{
+        id: "q-order",
+        type: "ordering",
+        gradeBands: ["10-11"],
+        difficulty: "පහසු",
+        strandId: "fundamentals",
+        prompt_si: "නිවැරදි පිළිවෙළ සකසන්න",
+        orderingItems: [
+          { id: "first", text_si: "පළමු", correctIndex: 0 },
+          { id: "second", text_si: "දෙවන", correctIndex: 1 },
+        ],
+        explanation_si: "පළමු අයිතමය පෙර යෙදේ.",
+        sourceReference: { sourceId: "SRC-G10-NADA", pageOrSection: "sg10_emus_chap8_nadaya.pdf පිටුව 2" },
+      }],
+    }} onComplete={onComplete} />);
+    fireEvent.click(screen.getByRole("button", { name: "පළමු ඉහළට ගෙනයන්න" }));
+    fireEvent.click(screen.getByRole("button", { name: "පිළිතුර පරීක්ෂා කරන්න" }));
+    fireEvent.click(screen.getByRole("button", { name: "ප්‍රතිඵලය බලන්න" }));
+    expect(onComplete).toHaveBeenCalledWith(1, 1, true);
   });
 
   it("does not advertise quarantined Bhairav or Roopak claims in static public UI", () => {
@@ -288,9 +356,7 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     expect(screen.getByText("දැනට ප්‍රසිද්ධ භාවිතයට සනාථ වූ තාල නොමැත.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "සෙවුම හිස් කරන්න" })).not.toBeInTheDocument();
 
-    const khemta = repository.getTalaById("tala-khemta");
-    expect(khemta).toBeDefined();
-    if (!khemta) return;
+    const khemta = getKhemtaFixture();
     rerender(<TalaDirectoryResults allTalas={[khemta]} talas={[]} onClearSearch={onClearSearch} />);
     fireEvent.click(screen.getByRole("button", { name: "සෙවුම හිස් කරන්න" }));
     expect(onClearSearch).toHaveBeenCalledTimes(1);

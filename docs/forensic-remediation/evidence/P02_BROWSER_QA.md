@@ -23,7 +23,7 @@ Routes:
 - `/lessons/les-intro-01`
 - `/lessons/les-tala-dadra`
 
-The interaction pass exercised the verified Tala directory, a distinct zero-result state and clear action, hostile `__proto__` search input, Lawani containment, Khemta retrieval, and real Web Audio controls. Khemta Start was instrumented at its 100 BPM practice value to observe the two delayed compound-stroke timers without cancelling them immediately. The pass then observed the tick replacing only its caller-owned handle and verified Stop, Reset, and audio-off cancellation. A co-mounted `RhythmTapGame` continued from beat 1 to beat 2 while the Tala visualizer started and stopped, demonstrating caller isolation in the production browser.
+This historical pre-review interaction pass exercised the then-current reduced Tala directory, hostile `__proto__` search input, Lawani containment, Khemta retrieval, and real Web Audio controls. Khemta Start was instrumented at its 100 BPM practice value to observe the two delayed compound-stroke timers without cancelling them immediately. A later mandatory review found additional unclosed Khemta structure fields, so Khemta is now also quarantined. These historical results are not final accepted-head browser evidence.
 
 ## Results
 
@@ -32,10 +32,10 @@ The interaction pass exercised the verified Tala directory, a distinct zero-resu
 | 16 route/viewport combinations returned HTTP 200 | Pass |
 | No horizontal overflow at 1440×900 or 360×568 | Pass |
 | No console warnings/errors, page errors, HTTP errors, or hydration messages | Pass |
-| Reduced Tala directory exposes Khemta but not Dadra, Lawani, or Roopak | Pass |
+| Historical reduced Tala directory exposed Khemta but not Dadra, Lawani, or Roopak | Superseded: all Talas now quarantined |
 | Quarantined Tala and Dadra lesson routes render honest unavailable states | Pass |
 | Empty/zero-result Tala states are distinct and recoverable | Pass |
-| Hostile search key does not throw; Lawani remains absent; Khemta is retrievable | Pass |
+| Hostile search key does not throw; Lawani remains absent; Khemta retrieval | Search safety remains relevant; Khemta retrieval result superseded by quarantine |
 | Web Audio available in the test browser | Yes |
 | Start preserves initial compound-stroke timers | Pass |
 | Tick advances and replaces only the active caller handle | Pass |

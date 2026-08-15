@@ -63,40 +63,47 @@ class SwaraSynthEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
 
-  private initContext() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.ctx = new AudioCtx();
-      this.masterGain = this.ctx.createGain();
-      this.masterGain.gain.setValueAtTime(0.7, this.ctx.currentTime);
-      this.masterGain.connect(this.ctx.destination);
-    }
-    if (this.ctx.state === "suspended") {
-      this.ctx.resume();
+  private async initContext(): Promise<boolean> {
+    try {
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+        if (!AudioCtx) return false;
+        this.ctx = new AudioCtx();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+        this.masterGain.connect(this.ctx.destination);
+      }
+      if (this.ctx.state === "suspended") await this.ctx.resume();
+      return this.ctx.state !== "closed";
+    } catch {
+      this.ctx = null;
+      this.masterGain = null;
+      return false;
     }
   }
 
   /**
    * Play a single swara tone with harmonium-like acoustic rich overtones
    */
-  public playSwaraTone(
+  public async playSwaraTone(
     swara: string,
     durationSec: number = 0.8,
     rootFreq: number = DEFAULT_ROOT_FREQ,
     timbre: "harmonium" | "flute" | "sitar" | "pure" = "harmonium"
-  ) {
-    if (typeof window === "undefined" || !swara || typeof swara !== "string") return;
-    this.initContext();
-    if (!this.ctx || !this.masterGain) return;
+  ): Promise<boolean> {
+    if (typeof window === "undefined" || !swara || typeof swara !== "string") return false;
+    if (!(await this.initContext()) || !this.ctx || !this.masterGain) return false;
 
     const freq = getSwaraFrequency(swara, rootFreq);
-    if (!isFinite(freq) || freq <= 0) return;
-    const now = this.ctx.currentTime;
+    if (!isFinite(freq) || freq <= 0) return false;
 
-    const noteGain = this.ctx.createGain();
-    noteGain.connect(this.masterGain);
+    try {
+      const now = this.ctx.currentTime;
 
-    if (timbre === "harmonium") {
+      const noteGain = this.ctx.createGain();
+      noteGain.connect(this.masterGain);
+
+      if (timbre === "harmonium") {
       // Additive harmonics for reedy harmonium texture
       const harmonics = [1, 2, 3, 4, 5, 6];
       const gains = [0.4, 0.35, 0.2, 0.15, 0.08, 0.04];
@@ -121,7 +128,7 @@ class SwaraSynthEngine {
       noteGain.gain.linearRampToValueAtTime(0.5, now + 0.05);
       noteGain.gain.setValueAtTime(0.45, now + durationSec * 0.8);
       noteGain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
-    } else if (timbre === "flute") {
+      } else if (timbre === "flute") {
       // Gentle sine + slight octave harmonic with breath-like attack
       const osc = this.ctx.createOscillator();
       osc.type = "sine";
@@ -146,7 +153,7 @@ class SwaraSynthEngine {
       osc2.start(now);
       osc.stop(now + durationSec + 0.05);
       osc2.stop(now + durationSec + 0.05);
-    } else {
+      } else {
       // Default pure tone
       const osc = this.ctx.createOscillator();
       osc.type = "sine";
@@ -159,6 +166,10 @@ class SwaraSynthEngine {
 
       osc.start(now);
       osc.stop(now + durationSec + 0.05);
+      }
+      return true;
+    } catch {
+      return false;
     }
   }
 
@@ -171,13 +182,15 @@ class SwaraSynthEngine {
     onStep?: (index: number, swara: string) => void,
     rootFreq: number = DEFAULT_ROOT_FREQ,
     timbre: "harmonium" | "flute" | "sitar" | "pure" = "harmonium"
-  ): Promise<void> {
+  ): Promise<boolean> {
     for (let i = 0; i < swaras.length; i++) {
       const swara = swaras[i];
       if (onStep) onStep(i, swara);
-      this.playSwaraTone(swara, noteDurationSec, rootFreq, timbre);
+      const played = await this.playSwaraTone(swara, noteDurationSec, rootFreq, timbre);
+      if (!played) return false;
       await new Promise((resolve) => setTimeout(resolve, noteDurationSec * 1000));
     }
+    return true;
   }
 
   public setVolume(vol: number) {

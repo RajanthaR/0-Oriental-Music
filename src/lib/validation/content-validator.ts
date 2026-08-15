@@ -25,6 +25,7 @@ import {
 import { repository } from "@/lib/data/repository";
 import { normalizeSinhalaText } from "@/lib/search/normalize-sinhala";
 import { planTablaBol } from "@/lib/audio/tabla";
+import { isSafePracticeBpm } from "@/lib/audio/tempo";
 
 export interface ValidationIssue {
   entityType: string;
@@ -301,8 +302,12 @@ export function validateMusicalCoreFieldDispositions(
     theka: { status: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string };
     bols: Array<{ matra: number; status: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string }>;
   }>;
-  if (registry.policy !== "whole-entity-quarantine" || JSON.stringify(registry.requiredFields) !== JSON.stringify(["context", "theka", "bols"])) {
-    issues.push({ entityType: "TalaFieldDisposition", entityId: "registry", field: "policy", message: "Registry must require context, theka, and bols under whole-entity quarantine", severity: "error" });
+  if (
+    registry.policy !== "whole-entity-quarantine" ||
+    JSON.stringify(registry.requiredFields) !== JSON.stringify(["context", "structure", "theka", "bols"]) ||
+    JSON.stringify(registry.unclosedRequiredFields) !== JSON.stringify(["structure"])
+  ) {
+    issues.push({ entityType: "TalaFieldDisposition", entityId: "registry", field: "policy", message: "Registry must explicitly record the unclosed structure field under whole-entity quarantine", severity: "error" });
   }
   const entryById = new Map(entries.map((entry) => [entry.talaId, entry]));
   if (entryById.size !== entries.length) {
@@ -1054,7 +1059,7 @@ export function validateContent(
       });
     } else {
       r.samplePhrases.forEach((phrase, phraseIndex) => {
-        if (!phrase || typeof phrase !== "object" || !Array.isArray(phrase.swaras)) {
+        if (!phrase || typeof phrase !== "object" || !Array.isArray(phrase.swaras) || phrase.swaras.length === 0) {
           issues.push({
             entityType: "Raga",
             entityId: r.id,
@@ -1168,6 +1173,21 @@ export function validateContent(
         severity: "error",
       });
     }
+
+    const tempo = t.practiceTempoBpm;
+    if (
+      !tempo ||
+      typeof tempo !== "object" ||
+      ![tempo.thah_bpm, tempo.dugun_bpm, tempo.chaugun_bpm].every(isSafePracticeBpm)
+    ) {
+      issues.push({
+        entityType: "Tala",
+        entityId: t.id,
+        field: "practiceTempoBpm",
+        message: "Application practice tempos must be finite values between 40 and 240 BPM",
+        severity: "error",
+      });
+    }
   });
 
   const normalizedTalaNames = new Map<string, { id: string; canonical: boolean }>();
@@ -1215,12 +1235,12 @@ export function validateContent(
   });
 
   const rawCatalogs: Array<{ type: string; records: unknown[] }> = [
-    { type: "Lesson", records: lessonsData },
-    { type: "Raga", records: ragasData },
-    { type: "Tala", records: talasData },
-    { type: "Instrument", records: instrumentsData },
-    { type: "CulturalTradition", records: culturalTraditionsData },
-    { type: "TheatreTradition", records: theatreTraditionsData },
+    { type: "Lesson", records: Array.isArray(lessons) ? lessons : [] },
+    { type: "Raga", records: Array.isArray(ragas) ? ragas : [] },
+    { type: "Tala", records: Array.isArray(talas) ? talas : [] },
+    { type: "Instrument", records: Array.isArray(instruments) ? instruments : [] },
+    { type: "CulturalTradition", records: Array.isArray(culturalTraditions) ? culturalTraditions : [] },
+    { type: "TheatreTradition", records: Array.isArray(theatreTraditions) ? theatreTraditions : [] },
     { type: "Glossary", records: glossaryData },
     { type: "LearningPath", records: learningPathsData },
     { type: "Quiz", records: quizzesData },

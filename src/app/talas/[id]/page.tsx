@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Activity, ArrowRight, FileText } from "lucide-react";
 import { repository } from "@/lib/data/repository";
+import { formatPublicSourceReference } from "@/lib/data/publication-policy";
 import { TalaVisualizer } from "@/components/audio/TalaVisualizer";
 import { RhythmTapGame } from "@/components/audio/RhythmTapGame";
 
@@ -59,7 +60,7 @@ export default function TalaDetailPage() {
             <p>{tala.context_si}</p>
             {tala.contextSourceReference && (
               <p className="mt-2 text-xs text-amber-800">
-                මූලාශ්‍රය: {tala.contextSourceReference.pageOrSection}
+                මූලාශ්‍රය: {formatPublicSourceReference(tala.contextSourceReference)}
               </p>
             )}
           </div>
@@ -96,7 +97,7 @@ export default function TalaDetailPage() {
         <div>
           <span className="font-bold text-text block">මූලාශ්‍ර සටහන:</span>
           <p>
-            {source?.title} ({source?.publisher}) — {tala.sourceReference.pageOrSection}
+            {source?.title} — {formatPublicSourceReference(tala.sourceReference)}
           </p>
         </div>
       </footer>

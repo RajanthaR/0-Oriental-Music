@@ -18,6 +18,7 @@ import {
   FileText,
 } from "lucide-react";
 import { repository } from "@/lib/data/repository";
+import { formatPublicSourceReference } from "@/lib/data/publication-policy";
 import { ProgressStorage } from "@/lib/storage/progress-storage";
 import { swaraSynth } from "@/lib/audio/synth";
 import { SwaraKeyboard } from "@/components/audio/SwaraKeyboard";
@@ -41,6 +42,7 @@ export default function LessonDetailPage() {
   const [diagnosticSelected, setDiagnosticSelected] = useState<number | null>(null);
   const [showDiagnosticResult, setShowDiagnosticResult] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
+  const [audioError, setAudioError] = useState(false);
 
   useEffect(() => {
     if (!lesson) return;
@@ -65,12 +67,14 @@ export default function LessonDetailPage() {
     setIsSaved(saved);
   };
 
-  const handlePlayLessonAudio = () => {
+  const handlePlayLessonAudio = async () => {
     if (audioPlaying) return;
     setAudioPlaying(true);
+    setAudioError(false);
     if (lesson.listenActivity.notes) {
-      swaraSynth.playSequence(lesson.listenActivity.notes, 0.6, undefined, 261.63, "harmonium")
-        .then(() => setAudioPlaying(false));
+      const played = await swaraSynth.playSequence(lesson.listenActivity.notes, 0.6, undefined, 261.63, "harmonium");
+      if (!played) setAudioError(true);
+      setAudioPlaying(false);
     } else {
       setTimeout(() => setAudioPlaying(false), 2000);
     }
@@ -299,6 +303,11 @@ export default function LessonDetailPage() {
             <Play className="w-4 h-4 fill-current" />
             {audioPlaying ? "ශ්‍රවණය වෙමින් පවතී..." : "ආදර්ශනයට සවන් දෙන්න"}
           </button>
+          {audioError && (
+            <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950">
+              මෙම උපාංගයේ නාදය ආරම්භ කළ නොහැක. පාඩමේ ලිඛිත සහ දෘශ්‍ය අන්තර්ගතය දිගටම භාවිත කළ හැක.
+            </p>
+          )}
         </section>
 
         {/* 11 & 12. Interactive Practice Activity */}
@@ -380,7 +389,7 @@ export default function LessonDetailPage() {
           <div className="space-y-0.5">
             <span className="font-bold text-text block">මූලාශ්‍ර සටහන (Source Reference):</span>
             <p>
-              {source?.title} ({source?.publisher}, {source?.year}) — {lesson.sourceReference.pageOrSection}
+              {source?.title} — {formatPublicSourceReference(lesson.sourceReference)}
             </p>
             <p className="text-[11px] text-text-muted">
               සමාලෝචනය: {lesson.reviewMetadata.reviewer} ({lesson.reviewMetadata.lastVerifiedDate}) | බලපත්‍රය: {lesson.reviewMetadata.license}

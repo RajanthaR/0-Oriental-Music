@@ -43,7 +43,7 @@ Canonical source for the seven public records: `oriental_music_markdown/by-sourc
 
 ## 2. Tala evidence
 
-Raw structural evidence source: `oriental_music_markdown/by-source/grade_10_musical_fundamentals.md`, extracted from `sg10_emus_chap1_mulikanga.pdf`, PDF pages 2–7 (`SRC-EPD-TB-G10`, extraction quality A). Because the original PDF is absent, extraction quality does not prove the visual bol cells or notation layout. Under the selected whole-entity policy, only Khemta's readable compound cells are accepted publicly; Dadra, Keherwa, Teental, Jhaptal, Deepchandi, Lawani, and Roopak remain complete raw audit records under quarantine. The extracted Grade 11 text lists names on pages 23–24, but `DOC-GRADE_11_MUSIC_TEXTBOOK` remains `Review Required` and is not accepted publication evidence.
+Raw structural evidence source: `oriental_music_markdown/by-source/grade_10_musical_fundamentals.md`, extracted from `sg10_emus_chap1_mulikanga.pdf`, PDF pages 2–7 (`SRC-EPD-TB-G10`, extraction quality A). Because the original PDF is absent, extraction quality does not prove visual bol cells, notation layout, vibhag actions, or boolean playback flags. Khemta's readable compound cells remain raw audit evidence, but all eight Talas are nonpublic until every learner-visible/playable structure field is explicitly dispositioned. The extracted Grade 11 text lists names on pages 23–24, but `DOC-GRADE_11_MUSIC_TEXTBOOK` remains `Review Required` and is not accepted publication evidence.
 
 Source-catalog boundary: for `SRC-EPD-TB-G10`, `SRC-EPD-TB-G11`, `SRC-G10-NADA`, and `SRC-G11-RAGA-ID`, the supplied corpus establishes stable ID mapping, filename, grade, page count, extraction state, and page quality. It does **not** establish publisher, year, place, licence, or canonical tier; those raw fields are explicitly `නොදනී / සනාථ වී නැත`. The legacy `SRC-EPD-*` IDs are retained only for progress/link stability and do not prove an EPD publisher.
 
@@ -57,7 +57,7 @@ Source-catalog boundary: for `SRC-EPD-TB-G10`, `SRC-EPD-TB-G11`, `SRC-G10-NADA`,
 | `tala-jhaptal` | Grade 10 locator | ජප් තාලය (`ජප්තාල්` retrieval alias, N/A) | Jhaptal (editorial, N/A) | 10 | `2+3+2+3` / 4 | Raw X/2/0/3 positions | 2, 6 | **SOURCE SPELLING CORRECTED; WHOLE ENTITY QUARANTINED** pending original bol-cell review. |
 | `tala-deepchandi` | Grade 10 locator | දීප්චන්ද් තාලය | Deepchandi Tala (editorial, N/A) | 14 | `3+4+3+4` / 4 | Raw X/2/0/3 positions | 2, 4–5 | **WHOLE ENTITY QUARANTINED**. Grade 11 `දීප්චන්දි` remains retrieval-only and needs-review. |
 | `tala-lawani` | Grade 10 locator plus unresolved Grade 11 context | ලාවනී තාලය | Lawani Tala (editorial, N/A) | 8 | `2+2+2+2` / 4 | Raw X/2/0/3 positions | 3, 6; context 24 | **WHOLE ENTITY QUARANTINED**; required school context and playable cells are unresolved. |
-| `tala-khemta` | Grade 10 | ඛෙම්ටෝ තාලය (`ඛෙම්ටා` alias, N/A) | Khemta Tala (editorial, N/A) | 4 | `2+2` / 2 | X on 1; 0 on 3 | 7 | **VERIFIED / PUBLIC**; four readable compound cells, three aksharas per matra. |
+| `tala-khemta` | Grade 10 raw locator | ඛෙම්ටෝ තාලය (`ඛෙම්ටා` alias, N/A) | Khemta Tala (editorial, N/A) | 4 | Raw `2+2` / 2 | Raw X on 1; 0 on 3 | 7 | **READABLE CELLS RETAINED / WHOLE ENTITY QUARANTINED** pending closed disposition of all structure/action fields. |
 | `tala-roopak` | Not in supplied list | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | none | **NEEDS-REVIEW / QUARANTINED**. |
 
 ### 2.2 Exact theka and bol-to-matra fields
@@ -81,8 +81,8 @@ Source-catalog boundary: for `SRC-EPD-TB-G10`, `SRC-EPD-TB-G11`, `SRC-G10-NADA`,
 | Khemta laya context | Source says its laya is fast | A, page 7 | **VERIFIED** only as qualitative `fast`. |
 | Other tempo/usage claims | Not established by cited pages | N/A | **WITHHELD** from curriculum claims. |
 | `practiceTempoBpm` | Client-only visualizer/game defaults; UI explicitly discloses this and does not derive vilambit/madhya/drut labels | N/A | **PRACTICE DEFAULT**, not curriculum evidence. |
-| Khemta public `sourceReference` | `SRC-EPD-TB-G10`, exact page 7 | A extraction and readable compound cells | **PUBLIC** under the closed-world field registry. |
-| Seven quarantined raw tala records | Exact field dispositions in `data/musical-core-field-dispositions.json` | A extraction or missing, but not accepted visual truth | **NEEDS-REVIEW / NONPUBLIC** with reverse-dependency containment. |
+| Khemta raw `sourceReference` | `SRC-EPD-TB-G10`, exact page 7 | A extraction and readable compound cells; remaining structure/action fields are not closed | **NEEDS-REVIEW / NONPUBLIC**. |
+| Eight quarantined raw tala records | Exact partial field dispositions in `data/musical-core-field-dispositions.json` | A extraction or missing, but not accepted visual truth | **NEEDS-REVIEW / NONPUBLIC** with reverse-dependency containment. |
 | Tala review metadata | Explicit unknown/unverified | N/A | No SME/publication event claimed. |
 | `tala-roopak` source/review/publication | Every raw musical field withheld; metadata unknown; stable-ID quarantine | N/A | **QUARANTINED**. |
 
@@ -108,7 +108,7 @@ Canonical source: `oriental_music_markdown/by-source/grade_10_nadaya.md`, extrac
 ## 4. Unresolved evidence boundary
 
 - Original PDFs are absent; visually ambiguous glyphs, layout, and OCR-normalized bol spelling remain `needs-review` where noted.
-- Bhairav and all seven non-Khemta tala raw values are retained for audit, but their learner-visible and playable projections are withheld as whole entities.
+- Bhairav and all eight Tala raw values are retained for audit, but their learner-visible and playable projections are withheld as whole entities.
 - Lawani's Grade 11 school-context statement, all unresolved normalized bol cells, and the Grade 11 `දීප්චන්දි` spelling remain source-attributed `needs-review` items until document triage/original-PDF review is complete; none is a verified public data field.
 - English transliterations and `practiceTempoBpm` are editorial/application values with `N/A` evidence quality.
 - Earlier grades are not inferred from “previously studied” wording; they require exact source locators in a later phase.

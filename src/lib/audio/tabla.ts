@@ -24,6 +24,14 @@ export interface TablaTimerApi<TTimer = number> {
   clear: (timer: TTimer) => void;
 }
 
+export type TablaPlaybackHandle = (() => void) & {
+  ready: Promise<boolean>;
+};
+
+function createPlaybackHandle(cancel: () => void, ready: Promise<boolean>): TablaPlaybackHandle {
+  return Object.assign(cancel, { ready });
+}
+
 export function scheduleTablaPlan<TTimer>(
   plan: PlannedTablaStroke[],
   onStroke: (stroke: PlannedTablaStroke) => void,
@@ -94,16 +102,22 @@ class TablaSynthEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
 
-  private initContext() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.ctx = new AudioCtx();
-      this.masterGain = this.ctx.createGain();
-      this.masterGain.gain.setValueAtTime(0.7, this.ctx.currentTime);
-      this.masterGain.connect(this.ctx.destination);
-    }
-    if (this.ctx.state === "suspended") {
-      this.ctx.resume();
+  private async initContext(): Promise<boolean> {
+    try {
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+        if (!AudioCtx) return false;
+        this.ctx = new AudioCtx();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+        this.masterGain.connect(this.ctx.destination);
+      }
+      if (this.ctx.state === "suspended") await this.ctx.resume();
+      return this.ctx.state !== "closed";
+    } catch {
+      this.ctx = null;
+      this.masterGain = null;
+      return false;
     }
   }
 
@@ -221,16 +235,44 @@ class TablaSynthEngine {
     }
   }
 
-  public playBol(bolName: string, matraDurationMs: number = 500): () => void {
-    if (typeof window === "undefined" || !bolName || typeof bolName !== "string") return () => undefined;
+  public playBol(
+    bolName: string,
+    matraDurationMs: number = 500,
+    onUnavailable?: () => void
+  ): TablaPlaybackHandle {
+    const unavailable = () => {
+      onUnavailable?.();
+      return false;
+    };
+    if (typeof window === "undefined" || !bolName || typeof bolName !== "string") {
+      return createPlaybackHandle(() => undefined, Promise.resolve(unavailable()));
+    }
     const plan = planTablaBol(bolName, matraDurationMs);
-    if (plan.length === 0) return () => undefined;
+    if (plan.length === 0) return createPlaybackHandle(() => undefined, Promise.resolve(true));
 
-    this.initContext();
-    return scheduleTablaPlan(plan, (stroke) => this.playStroke(stroke.kind), {
-      set: (callback, delayMs) => window.setTimeout(callback, delayMs),
-      clear: (timer) => window.clearTimeout(timer),
-    });
+    let cancelled = false;
+    let cancelScheduled: () => void = () => undefined;
+    const ready = this.initContext().then((available) => {
+      if (!available) return unavailable();
+      if (cancelled) return true;
+      cancelScheduled = scheduleTablaPlan(plan, (stroke) => {
+        if (cancelled) return;
+        try {
+          this.playStroke(stroke.kind);
+        } catch {
+          onUnavailable?.();
+        }
+      }, {
+        set: (callback, delayMs) => window.setTimeout(callback, delayMs),
+        clear: (timer) => window.clearTimeout(timer),
+      });
+      return true;
+    }).catch(unavailable);
+
+    return createPlaybackHandle(() => {
+      cancelled = true;
+      cancelScheduled();
+    }, ready);
   }
 }
 
