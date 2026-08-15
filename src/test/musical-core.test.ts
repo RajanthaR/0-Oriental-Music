@@ -165,4 +165,36 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       });
     });
   });
+
+  describe("Review Metadata & Provenance Safety Invariants", () => {
+    it("strictly maintains explicit unverified metadata across all raw datasets", () => {
+      const allRawRecords = [
+        ...ragasData,
+        ...talasData,
+        ...lessonsData,
+      ];
+
+      allRawRecords.forEach((record) => {
+        if ("published" in record && record.published !== undefined) {
+          expect(record.published).toBe(false);
+        }
+        expect(record.reviewMetadata.status).toBe("Needs Revision");
+        expect(record.reviewMetadata.reviewer).toBe("නොදනී / සනාථ වී නැත");
+        expect(record.reviewMetadata.reviewDate).toBe("නොදනී / සනාථ වී නැත");
+        expect(record.reviewMetadata.lastVerifiedDate).toBe("නොදනී / සනාථ වී නැත");
+        expect(record.reviewMetadata.license).toBe("නොදනී / සනාථ වී නැත");
+        expect(record.reviewMetadata.reuseStatus).toBe("Unknown / Unverified");
+      });
+    });
+
+    it("verifies bounded quarantine status for out-of-scope entities (Bhairav & Roopak)", () => {
+      const bhairav = ragasData.find((r) => r.id === "raga-bhairav");
+      expect(bhairav).toBeDefined();
+      expect(repository.getRagaById("raga-bhairav")).toBeUndefined();
+
+      const roopak = talasData.find((t) => t.id === "tala-roopak");
+      expect(roopak).toBeDefined();
+      expect(repository.getTalaById("tala-roopak")).toBeUndefined();
+    });
+  });
 });

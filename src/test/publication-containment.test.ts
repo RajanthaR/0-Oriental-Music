@@ -61,6 +61,9 @@ describe("Prompt 1 publication containment", () => {
     expect(success).toBe(true);
     expect(repository.getLessons().some((l) => l.id === "les-raga-bhairav")).toBe(false);
     expect(repository.getLessonById("les-raga-bhairav")).toBeUndefined();
+
+    // Reset in-memory test mutation so baseline remains pure
+    repository.updateLessonReviewStatus("les-raga-bhairav", "Needs Revision", false);
   });
 
   it("does not expose the old A/L selector scope through repository data", () => {
