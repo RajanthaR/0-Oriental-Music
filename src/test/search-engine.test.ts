@@ -2,9 +2,15 @@ import { describe, it, expect } from "vitest";
 import { searchIndex, normalizeSinhalaText } from "@/lib/search/search-engine";
 
 describe("Search Engine & Sinhala Normalizer Suite", () => {
-  it("should normalize Sinhala characters and diacritics", () => {
+  it("should normalize Sinhala characters, diacritics, and rakaransaya variations", () => {
     expect(normalizeSinhalaText("ශඩ්ජ")).toBe("සඩ්ජ");
     expect(normalizeSinhalaText("ලක්ෂණ")).toBe("ලක්සන");
+    expect(normalizeSinhalaText("දාද්‍රා")).toBe("දාදරා");
+  });
+
+  it("should match Sinhala query with rakaransaya to canonical Dadra", () => {
+    const rakaransayaResults = searchIndex.search("දාද්‍රා");
+    expect(rakaransayaResults.some((result) => result.id === "tala-dadra")).toBe(true);
   });
 
   it("should not discover quarantined Bhairav or Roopak claims", () => {
@@ -25,6 +31,26 @@ describe("Search Engine & Sinhala Normalizer Suite", () => {
 
     const lawaniResults = searchIndex.search("lawani");
     expect(lawaniResults.some((result) => result.id === "tala-lawani")).toBe(true);
+  });
+
+  it("should discover canonical musical entities and acoustics terms via English transliterations", () => {
+    const acousticsNada = searchIndex.search("nada");
+    expect(acousticsNada.length).toBeGreaterThan(0);
+
+    const acousticsPitch = searchIndex.search("pitch");
+    expect(acousticsPitch.length).toBeGreaterThan(0);
+
+    const kafiResults = searchIndex.search("kafi");
+    expect(kafiResults.some((result) => result.id === "raga-kafi")).toBe(true);
+
+    const bhimpalasiResults = searchIndex.search("bhimpalasi");
+    expect(bhimpalasiResults.some((result) => result.id === "raga-bhimpalasi")).toBe(true);
+
+    const deepchandiResults = searchIndex.search("deepchandi");
+    expect(deepchandiResults.some((result) => result.id === "tala-deepchandi")).toBe(true);
+
+    const khemtaResults = searchIndex.search("khemta");
+    expect(khemtaResults.some((result) => result.id === "tala-khemta")).toBe(true);
   });
 
   it("should keep search results inside the publication boundary", () => {

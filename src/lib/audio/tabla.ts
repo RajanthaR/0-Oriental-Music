@@ -118,7 +118,7 @@ class TablaSynthEngine {
    * Play any standard Tabla Bol
    */
   public playBol(bolName: string) {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !bolName || typeof bolName !== "string") return;
     const clean = bolName.trim().toLowerCase();
     if (clean === "-" || clean === "s" || clean === " " || !clean) {
       // Rest / silence
