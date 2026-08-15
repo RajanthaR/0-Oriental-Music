@@ -8,12 +8,12 @@
     "publicationState": "source-backed baseline; not fully reviewed"
   },
   "overview": {
-    "totalCanonicalSources": 21,
+    "totalRawSourceRecords": 21,
     "totalIndexedSourcePages": 1023,
     "totalSourceDocuments": 30,
     "totalStructuredLessons": 21,
-    "totalCanonicalRagas": 8,
-    "totalCanonicalTalas": 8,
+    "totalRawRagas": 8,
+    "totalRawTalas": 8,
     "totalInstruments": 10,
     "totalCulturalTraditions": 7,
     "totalTheatreTraditions": 4,
@@ -57,7 +57,7 @@
     "gradeDPagesCount": 403,
     "readableSinhalaPagesCount": 895,
     "unreadableOrNoSinhalaPagesCount": 128,
-    "verifiedUsablePagePercent": "57.4%",
+    "gradeABExtractionQualityPercent": 57.4,
     "interpretation": "A/B counts describe extraction quality only; they do not prove a musical claim."
   },
   "sourceDocumentStates": {
@@ -78,11 +78,29 @@
   },
   "pedagogicalValidation": {
     "status": "not-assessed",
-    "allLessonsMeet17PointSchema": "not independently established in Prompt 1",
-    "allLessonsCiteCanonicalSources": "not established; claim-level page evidence is still being reviewed",
-    "allGoalsStartWithStandardPrefix": "not a source-truth decision",
-    "allFeedbackEncouragingAndNonPunitive": "not assessed in this containment phase",
-    "zeroStreamingOrRedistributedAudioFiles": "technical policy remains documented; release readiness not claimed",
-    "localInBrowserWebAudioSynthesisOnly": "technical policy remains documented; release readiness not claimed"
+    "lessonSchemaAssessment": {
+      "status": "not-assessed",
+      "note": "Not independently established in Prompt 1."
+    },
+    "lessonSourceEvidenceAssessment": {
+      "status": "not-assessed",
+      "note": "Claim-level page evidence is still being reviewed."
+    },
+    "lessonGoalPrefixAssessment": {
+      "status": "not-assessed",
+      "note": "Not a source-truth decision in this containment phase."
+    },
+    "lessonFeedbackAssessment": {
+      "status": "not-assessed",
+      "note": "Not assessed in this containment phase."
+    },
+    "audioPolicyAssessment": {
+      "status": "not-assessed",
+      "note": "Technical policy remains documented; release readiness is not claimed."
+    },
+    "webAudioPolicyAssessment": {
+      "status": "not-assessed",
+      "note": "Technical policy remains documented; release readiness is not claimed."
+    }
   }
 }
