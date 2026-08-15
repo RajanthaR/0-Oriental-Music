@@ -114,8 +114,17 @@ type PublicationRecordShape = {
   questions?: unknown;
   type?: unknown;
   prompt_si?: unknown;
+  context_si?: unknown;
+  contextSourceReference?: unknown;
   sourceReference?: unknown;
 };
+
+export interface ContextClaimPublicationDecision {
+  present: boolean;
+  isPublic: boolean;
+  reasonCode: SourceEvidenceReasonCode | "no-context-claim" | "unpaired-context-claim";
+  sourceEvidence: SourceEvidenceDecision;
+}
 
 export interface PublicationInput {
   id: string;
@@ -160,10 +169,13 @@ function explicitPageReferences(pageOrSection: string): number[] {
 }
 
 function hasMismatchedPdfReference(locator: string, expectedFilename: string): boolean {
-  const pdfMentions = Array.from(locator.matchAll(/(?:^|;)\s*([^;]*?\.pdf)(?=\s|;|$)/gi))
-    .map((match) => match[1].trim().toLocaleLowerCase());
-  if (pdfMentions.length === 0) return false;
-  return pdfMentions.length !== 1 || pdfMentions[0] !== expectedFilename.trim().toLocaleLowerCase();
+  const pdfOccurrences = Array.from(locator.matchAll(/\.pdf/gi));
+  if (pdfOccurrences.length === 0) return false;
+  if (pdfOccurrences.length !== 1) return true;
+  const end = (pdfOccurrences[0].index ?? 0) + pdfOccurrences[0][0].length;
+  const beforePdf = locator.slice(0, end);
+  const candidate = beforePdf.slice(beforePdf.lastIndexOf(";") + 1).trim();
+  return candidate.toLocaleLowerCase() !== expectedFilename.trim().toLocaleLowerCase();
 }
 
 function qualityForPages(documentSlug: string, pageNumbers: number[]): EvidenceQuality {
@@ -541,6 +553,29 @@ export function getRecordPublicationDecision(record: unknown): PublicationDecisi
 
 export const getQuizPublicationDecision = getRecordPublicationDecision;
 
+export function getContextClaimPublicationDecision(record: unknown): ContextClaimPublicationDecision {
+  const value = getRecordShape(record);
+  const hasContext = typeof value.context_si === "string" && value.context_si.trim().length > 0;
+  const hasReference = isSourceReference(value.contextSourceReference);
+  const contextSourceReference: SourceReference | undefined = hasReference
+    ? (value.contextSourceReference as SourceReference)
+    : undefined;
+  const present = hasContext || value.contextSourceReference !== undefined;
+  const sourceEvidence = evaluateSourceReference(contextSourceReference);
+  if (!present) {
+    return { present: false, isPublic: false, reasonCode: "no-context-claim", sourceEvidence };
+  }
+  if (!hasContext || !hasReference) {
+    return { present: true, isPublic: false, reasonCode: "unpaired-context-claim", sourceEvidence };
+  }
+  return {
+    present: true,
+    isPublic: sourceEvidence.supportable,
+    reasonCode: sourceEvidence.reasonCode,
+    sourceEvidence,
+  };
+}
+
 export function createUnverifiedReviewMetadata(): ReviewMetadata {
   return {
     status: "Needs Revision",
@@ -561,6 +596,11 @@ export function sanitizePublicRecord<T>(record: T): T {
     value.reviewMetadata = createUnverifiedReviewMetadata();
   }
   if ("published" in value) value.published = false;
+  const contextDecision = getContextClaimPublicationDecision(record);
+  if (contextDecision.present && !contextDecision.isPublic) {
+    delete value.context_si;
+    delete value.contextSourceReference;
+  }
   return value as T;
 }
 

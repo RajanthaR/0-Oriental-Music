@@ -19,6 +19,24 @@ export interface PlannedTablaStroke {
   delayMs: number;
 }
 
+export interface TablaTimerApi<TTimer = number> {
+  set: (callback: () => void, delayMs: number) => TTimer;
+  clear: (timer: TTimer) => void;
+}
+
+export function scheduleTablaPlan<TTimer>(
+  plan: PlannedTablaStroke[],
+  onStroke: (stroke: PlannedTablaStroke) => void,
+  timerApi: TablaTimerApi<TTimer>
+): () => void {
+  const timers: TTimer[] = [];
+  plan.forEach((stroke) => {
+    if (stroke.delayMs === 0) onStroke(stroke);
+    else timers.push(timerApi.set(() => onStroke(stroke), stroke.delayMs));
+  });
+  return () => timers.forEach((timer) => timerApi.clear(timer));
+}
+
 export function expandTablaBol(bolName: string): string[] {
   const clean = typeof bolName === "string" ? bolName.trim().toLowerCase() : "";
   if (!clean || clean === "-" || clean === "s") return [];
@@ -75,7 +93,6 @@ export function planTablaBol(bolName: string, matraDurationMs: number = 500): Pl
 class TablaSynthEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
-  private scheduledTimers: number[] = [];
 
   private initContext() {
     if (!this.ctx) {
@@ -204,26 +221,15 @@ class TablaSynthEngine {
     }
   }
 
-  public cancelScheduledStrokes() {
-    if (typeof window === "undefined") return;
-    this.scheduledTimers.forEach((timer) => window.clearTimeout(timer));
-    this.scheduledTimers = [];
-  }
-
-  public playBol(bolName: string, matraDurationMs: number = 500) {
-    if (typeof window === "undefined" || !bolName || typeof bolName !== "string") return;
+  public playBol(bolName: string, matraDurationMs: number = 500): () => void {
+    if (typeof window === "undefined" || !bolName || typeof bolName !== "string") return () => undefined;
     const plan = planTablaBol(bolName, matraDurationMs);
-    this.cancelScheduledStrokes();
-    if (plan.length === 0) return;
+    if (plan.length === 0) return () => undefined;
 
     this.initContext();
-    plan.forEach((stroke) => {
-      if (stroke.delayMs === 0) {
-        this.playStroke(stroke.kind);
-        return;
-      }
-      const timer = window.setTimeout(() => this.playStroke(stroke.kind), stroke.delayMs);
-      this.scheduledTimers.push(timer);
+    return scheduleTablaPlan(plan, (stroke) => this.playStroke(stroke.kind), {
+      set: (callback, delayMs) => window.setTimeout(callback, delayMs),
+      clear: (timer) => window.clearTimeout(timer),
     });
   }
 }

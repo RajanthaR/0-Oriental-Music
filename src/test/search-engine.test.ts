@@ -48,6 +48,8 @@ describe("Search Engine & Sinhala Normalizer Suite", () => {
 
     const deepchandiResults = searchIndex.search("deepchandi");
     expect(deepchandiResults.some((result) => result.id === "tala-deepchandi")).toBe(true);
+    const gradeElevenSpellingResults = searchIndex.search("දීප්චන්දි");
+    expect(gradeElevenSpellingResults.some((result) => result.id === "tala-deepchandi")).toBe(true);
 
     const khemtaResults = searchIndex.search("khemta");
     expect(khemtaResults.some((result) => result.id === "tala-khemta")).toBe(true);

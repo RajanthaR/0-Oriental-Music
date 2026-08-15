@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { repository } from "@/lib/data/repository";
 import { getSwaraFrequency, SWARA_SEMITONES } from "@/lib/audio/synth";
-import { classifyTablaBol, expandTablaBol, planTablaBol } from "@/lib/audio/tabla";
+import { classifyTablaBol, expandTablaBol, planTablaBol, scheduleTablaPlan } from "@/lib/audio/tabla";
 import ragasData from "@/data/ragas.json";
 import talasData from "@/data/talas.json";
 import lessonsData from "@/data/lessons.json";
@@ -40,7 +40,7 @@ const expectedTalas = {
   "tala-keherwa": { name: "කෙහෙර්වා තාලය", theka: "ධා ගේ න ත | න ක ධ න", matras: 8, vibhags: [4, 4], bols: ["ධා", "ගේ", "න", "ත", "න", "ක", "ධ", "න"], marks: [[1, "X"], [5, "0"]] },
   "tala-teental": { name: "ත්‍රීතාල් තාලය", theka: "ධා ධින් ධින් ධා | ධා ධින් ධින් ධා | ධා තින් තින් තා | තා ධින් ධින් ධා", matras: 16, vibhags: [4, 4, 4, 4], bols: ["ධා", "ධින්", "ධින්", "ධා", "ධා", "ධින්", "ධින්", "ධා", "ධා", "තින්", "තින්", "තා", "තා", "ධින්", "ධින්", "ධා"], marks: [[1, "X"], [5, "T"], [9, "0"], [13, "T"]] },
   "tala-jhaptal": { name: "ජප්තාල් තාලය", theka: "ධී නා | ධී ධී නා | තී නා | ධී ධී නා", matras: 10, vibhags: [2, 3, 2, 3], bols: ["ධී", "නා", "ධී", "ධී", "නා", "තී", "නා", "ධී", "ධී", "නා"], marks: [[1, "X"], [3, "T"], [6, "0"], [8, "T"]] },
-  "tala-deepchandi": { name: "දීප්චන්දි තාලය", theka: "ධා ධින් - | ධා ධා ධින් - | තා තින් - | ධා ධා ධින් -", matras: 14, vibhags: [3, 4, 3, 4], bols: ["ධා", "ධින්", "-", "ධා", "ධා", "ධින්", "-", "තා", "තින්", "-", "ධා", "ධා", "ධින්", "-"], marks: [[1, "X"], [4, "T"], [8, "0"], [11, "T"]] },
+  "tala-deepchandi": { name: "දීප්චන්ද් තාලය", theka: "ධා ධින් - | ධා ධා ධින් - | තා තින් - | ධා ධා ධින් -", matras: 14, vibhags: [3, 4, 3, 4], bols: ["ධා", "ධින්", "-", "ධා", "ධා", "ධින්", "-", "තා", "තින්", "-", "ධා", "ධා", "ධින්", "-"], marks: [[1, "X"], [4, "T"], [8, "0"], [11, "T"]] },
   "tala-lawani": { name: "ලාවනී තාලය", theka: "ධා ගේ | න ත | න ක | ධ න", matras: 8, vibhags: [2, 2, 2, 2], bols: ["ධා", "ගේ", "න", "ත", "න", "ක", "ධ", "න"], marks: [[1, "X"], [3, "T"], [5, "0"], [7, "T"]] },
   "tala-khemta": { name: "ඛෙම්ටෝ තාලය", theka: "ධන්න ධනක | තන්න ධනක", matras: 4, vibhags: [2, 2], bols: ["ධන්න", "ධනක", "තන්න", "ධනක"], marks: [[1, "X"], [3, "0"]] },
 } as const;
@@ -192,14 +192,19 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       });
     });
 
-    it("represents Lawani's school-system context with separate Grade 11 evidence", () => {
-      const lawani = repository.getTalaById("tala-lawani");
-      expect(lawani?.context_si).toContain("හින්දුස්ථානි තාල පද්ධතියේ දක්නට ලැබෙන තාලයක් නොවේ");
-      expect(lawani?.context_si).toContain("පාසල් පද්ධතියට නිර්දේශ");
-      expect(lawani?.contextSourceReference).toEqual({
+    it("retains Lawani's context for audit but withholds it from the public projection", () => {
+      const rawLawani = talasData.find((tala) => tala.id === "tala-lawani");
+      expect(rawLawani?.context_si).toContain("හින්දුස්ථානි තාල පද්ධතියේ දක්නට ලැබෙන තාලයක් නොවේ");
+      expect(rawLawani?.context_si).toContain("පාසල් පද්ධතියට නිර්දේශ");
+      expect(rawLawani?.contextSourceReference).toEqual({
         sourceId: "SRC-EPD-TB-G11",
         pageOrSection: "s11tim173.pdf පිටුව 24",
       });
+
+      const publicLawani = repository.getTalaById("tala-lawani");
+      expect(publicLawani).toBeDefined();
+      expect(publicLawani).not.toHaveProperty("context_si");
+      expect(publicLawani).not.toHaveProperty("contextSourceReference");
     });
   });
 
@@ -304,8 +309,36 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       repository.getTalas().flatMap((tala) => tala.bols).forEach((bol) => {
         const plan = planTablaBol(bol.bol_si);
         if (bol.bol_si === "-") expect(plan).toEqual([]);
-        else expect(plan.every((stroke) => stroke.kind !== "fallback" && stroke.kind !== "rest")).toBe(true);
+        else {
+          expect(plan.length).toBeGreaterThan(0);
+          expect(plan.every((stroke) => stroke.kind !== "fallback" && stroke.kind !== "rest")).toBe(true);
+        }
       });
+    });
+
+    it("keeps scheduled tabla playback cancellation scoped to its owning session", () => {
+      let nextTimer = 1;
+      const activeTimers = new Map<number, { callback: () => void; delayMs: number }>();
+      const played: string[] = [];
+      const timerApi = {
+        set: (callback: () => void, delayMs: number) => {
+          const timer = nextTimer++;
+          activeTimers.set(timer, { callback, delayMs });
+          return timer;
+        },
+        clear: (timer: number) => { activeTimers.delete(timer); },
+      };
+      const cancelOwnerA = scheduleTablaPlan(planTablaBol("ධනක", 600), (stroke) => played.push(`A:${stroke.bol}`), timerApi);
+      const cancelOwnerB = scheduleTablaPlan(planTablaBol("තන්න", 600), (stroke) => played.push(`B:${stroke.bol}`), timerApi);
+
+      expect(played).toEqual(["A:ධ", "B:ත"]);
+      expect(Array.from(activeTimers.keys())).toEqual([1, 2, 3, 4]);
+      cancelOwnerB();
+      expect(Array.from(activeTimers.keys())).toEqual([1, 2]);
+      Array.from(activeTimers.values()).forEach(({ callback }) => callback());
+      expect(played).toEqual(["A:ධ", "B:ත", "A:න", "A:ක"]);
+      cancelOwnerA();
+      expect(activeTimers.size).toBe(0);
     });
   });
 

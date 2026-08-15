@@ -1,11 +1,13 @@
 import React from "react";
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { SwaraKeyboard } from "@/components/audio/SwaraKeyboard";
 import { DroneController } from "@/components/audio/DroneController";
 import { QuizRunner } from "@/components/quiz/QuizRunner";
 import { TalaVisualizer } from "@/components/audio/TalaVisualizer";
 import { repository } from "@/lib/data/repository";
+import { EarTrainingModule } from "@/components/audio/EarTrainingModule";
+import SearchPage from "@/app/search/page";
 
 describe("Interactive Audio & Quiz Components Suite", () => {
   it("renders SwaraKeyboard with Sinhala key labels", () => {
@@ -55,5 +57,19 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     render(<QuizRunner quiz={quiz} />);
     expect(screen.getByText(quiz.questions[0].prompt_si)).toBeInTheDocument();
     expect(screen.getByText("පිළිතුර පරීක්ෂා කරන්න")).toBeInTheDocument();
+  });
+
+  it("does not advertise quarantined Bhairav or Roopak claims in static public UI", () => {
+    const { unmount } = render(<EarTrainingModule />);
+    fireEvent.click(screen.getByText("ස (ෂඩ්ජ)"));
+    fireEvent.click(screen.getByText("මීළඟ අභ්‍යාසය →"));
+    expect(screen.getByText("ලාවනී තාලය (මාත්‍රා 8)")).toBeInTheDocument();
+    expect(screen.queryByText(/රූපක්/)).not.toBeInTheDocument();
+    unmount();
+
+    render(<SearchPage />);
+    expect(screen.queryByText(/භෛරව්/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/රූපක්/)).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText(/භෛරව්|රූපක්/)).not.toBeInTheDocument();
   });
 });

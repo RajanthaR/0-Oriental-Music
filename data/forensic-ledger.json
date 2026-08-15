@@ -250,7 +250,7 @@
       "id": "P01-TALA-LAWANI-001",
       "severity": "P1",
       "entityOrPath": "src/data/talas.json:tala-lawani",
-      "currentClaim": "Lawani was previously presented with mixed cross-document citations and lacked school-system pedagogical framing. Phase 2 now models its Grade 10 structure separately from the Grade 11 school-system context.",
+      "currentClaim": "Lawani was previously presented with mixed cross-document citations and generic framing. Phase 2 models its Grade 10 structure separately; the raw Grade 11 school-context statement remains needs-review and is withheld from the public projection.",
       "evidence": [
         {
           "path": "src/data/talas.json",
@@ -268,10 +268,10 @@
           "exactSection": "full field-level audit matrix"
         }
       ],
-      "disposition": "remediated with 8 matras, 4 vibhagas of 2 matras (2+2+2+2, X 2 0 3), and school-system adaptation context; unquarantined in public scope",
+      "disposition": "publish the independently supported Grade 10 structure with 8 matras and 2+2+2+2 vibhagas; retain the Grade 11 context in raw audit data but strip it from the public projection until source-document triage is complete",
       "publicVisibility": "contained",
       "confidence": "confirmed",
-      "confidenceScope": "structure bounded to DOC-GRADE_10_MUSICAL_FUNDAMENTALS pages 3 and 6; school-system context bounded separately to DOC-GRADE_11_MUSIC_TEXTBOOK page 24",
+      "confidenceScope": "structure confirmed from DOC-GRADE_10_MUSICAL_FUNDAMENTALS pages 3 and 6 (A); context text occurs on DOC-GRADE_11_MUSIC_TEXTBOOK page 24 (A extraction) but that document remains Review Required",
       "status": "contained",
       "evidenceBasis": "canonical-inspection"
     },
@@ -361,7 +361,7 @@
       "id": "P02-LOCATOR-POLICY-001",
       "severity": "P1",
       "entityOrPath": "src/lib/data/publication-policy.ts:evaluateSourceReference",
-      "currentClaim": "Digits in filenames, partial in-range locators, prefixed counterfeit filenames, mixed readable/corrupt page sets, and second PDF names could previously satisfy parts of the publication gate.",
+      "currentClaim": "Digits in filenames, partial in-range locators, prefixed counterfeit filenames, mixed readable/corrupt page sets, and second PDF names separated by whitespace, comma, slash, parentheses, or newline could previously satisfy parts of the publication gate.",
       "evidence": [
         {
           "path": "src/lib/data/publication-policy.ts",
@@ -371,7 +371,7 @@
         {
           "path": "src/test/publication-containment.test.ts",
           "locator": "adversarial source locator test",
-          "exactSection": "filename-only, page 2-999, mixed-PDF, counterfeit-prefix, and mixed-quality page cases"
+          "exactSection": "filename-only, page 2-999, counterfeit-prefix, mixed-quality pages, and whitespace/comma/slash/parenthesis/newline second-PDF cases"
         }
       ],
       "disposition": "fail closed unless explicit pages all fall in range, every cited page is A/B Sinhala-readable, and the sole named PDF exactly agrees with the source ID",
@@ -396,6 +396,16 @@
           "path": "src/data/talas.json",
           "locator": "seven public tala gradeBands",
           "exactPageOrSection": "SRC-EPD-TB-G10 Grade 10, PDF Pages 2-7"
+        },
+        {
+          "path": "src/data/lessons.json and src/data/quizzes.json",
+          "locator": "les-tala-dadra and quiz-les-tala-dadra",
+          "exactPageOrSection": "SRC-EPD-TB-G10 Grade 10, PDF Page 6, quality A"
+        },
+        {
+          "path": "src/data/lessons.json, src/data/quizzes.json, and src/data/glossary.json",
+          "locator": "les-intro-01, quiz-les-intro-01, and five public acoustics terms",
+          "exactPageOrSection": "SRC-G10-NADA Grade 10, PDF Pages 2-12 (question pages 3, 4, 10-11), quality A"
         }
       ],
       "disposition": "use only the 10-11 browse bucket containing the exact source grade and require every public band to intersect the selected source's grade metadata",
@@ -408,8 +418,8 @@
     {
       "id": "P02-TALA-STRUCTURE-001",
       "severity": "P1",
-      "entityOrPath": "src/data/talas.json:tala-keherwa, tala-lawani, tala-khemta",
-      "currentClaim": "Keherwa and Lawani used bols absent from the cited table, while Khemta was modeled as six rather than four compound matras.",
+      "entityOrPath": "src/data/talas.json:tala-deepchandi, tala-keherwa, tala-lawani, tala-khemta",
+      "currentClaim": "Keherwa and Lawani used bols absent from the cited table, Khemta was modeled as six rather than four compound matras, and Deepchandi used a spelling not established by the accepted Grade 10 source.",
       "evidence": [
         {
           "path": "oriental_music_markdown/by-source/grade_10_musical_fundamentals.md",
@@ -420,14 +430,101 @@
           "path": "src/test/musical-core.test.ts",
           "locator": "expectedTalas fixture",
           "exactSection": "exact matra, vibhag, bol, and hand-mark assertions"
+        },
+        {
+          "path": "src/data/talas.json",
+          "locator": "tala-deepchandi.name_si",
+          "exactPageOrSection": "SRC-EPD-TB-G10 PDF Pages 2, 4-5 establish දීප්චන්ද්; Grade 11 දීප්චන්දි remains retrieval-only and needs-review"
         }
       ],
-      "disposition": "restore exact source cells and four-matra Khemta structure; expand each Khemta cell into three timed akshara strokes; distinguish open Dha from closed Dhin; disclose numeric BPMs as non-curricular practice defaults",
+      "disposition": "restore exact source cells and four-matra Khemta structure; use Grade 10 දීප්චන්ද් as canonical; keep Grade 11 දීප්චන්දි retrieval-only pending triage; expand compound cells for application audio and disclose timing/BPM as non-curricular practice defaults",
       "publicVisibility": "contained",
       "confidence": "confirmed",
       "confidenceScope": "Grade 10 pages 3, 6-7; normalized glyphs retain original-PDF review boundary",
       "status": "contained",
       "evidenceBasis": "canonical-inspection"
+    },
+    {
+      "id": "P02-STATIC-QUARANTINE-001",
+      "severity": "P1",
+      "entityOrPath": "src/components/audio/EarTrainingModule.tsx and src/app/search/page.tsx",
+      "currentClaim": "Static public practice/search copy exposed quarantined Roopak and Bhairav even though repository and direct-route gates contained those records.",
+      "evidence": [
+        {
+          "path": "src/components/audio/EarTrainingModule.tsx",
+          "locator": "DEFAULT_CHALLENGES tala options",
+          "exactSection": "Roopak removed; public Lawani used as the distractor"
+        },
+        {
+          "path": "src/app/search/page.tsx",
+          "locator": "placeholder and quick samples",
+          "exactSection": "Bhairav removed from static discovery suggestions"
+        },
+        {
+          "path": "src/test/components.test.tsx",
+          "locator": "static quarantine regression",
+          "exactSection": "public EarTraining and Search UI contain neither Roopak nor Bhairav claims"
+        }
+      ],
+      "disposition": "remove quarantined static claims and regression-lock public UI copy independently of repository filtering",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "application containment invariant; source evidence N/A",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-TALA-VALIDATION-001",
+      "severity": "P1",
+      "entityOrPath": "src/lib/validation/content-validator.ts:Tala validation",
+      "currentClaim": "Malformed Tala fields, in-range but incorrect vibhag indexes, blank or fallback bols, and search-equivalent identities could pass structural validation or throw instead of returning issues.",
+      "evidence": [
+        {
+          "path": "src/lib/validation/content-validator.ts",
+          "locator": "Tala structural and identity validation",
+          "exactSection": "runtime type guards, cumulative vibhag membership, intentional bol plans, and shared search normalization"
+        },
+        {
+          "path": "src/test/content-validator.test.ts",
+          "locator": "negative Tala and catalog identity mutations",
+          "exactSection": "null fields, string booleans, blank bols, wrong vibhag membership, duplicate IDs, and search-equivalent variants fail closed"
+        }
+      ],
+      "disposition": "return structured errors for malformed records and reject any public Tala or searchable catalog identity that violates the canonical runtime contract",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "application validation invariant; source evidence N/A",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-AUDIO-OWNERSHIP-001",
+      "severity": "P1",
+      "entityOrPath": "src/lib/audio/tabla.ts and src/components/audio/TalaVisualizer.tsx",
+      "currentClaim": "A singleton scheduled-timer list allowed one mounted audio activity to cancel another activity's pending compound Khemta strokes.",
+      "evidence": [
+        {
+          "path": "src/lib/audio/tabla.ts",
+          "locator": "scheduleTablaPlan and playBol",
+          "exactSection": "each play call owns and returns its cancellation handle"
+        },
+        {
+          "path": "src/components/audio/TalaVisualizer.tsx",
+          "locator": "playbackCancelRef",
+          "exactSection": "stop, reset, replay, and unmount cancel only the visualizer's own session"
+        },
+        {
+          "path": "src/test/musical-core.test.ts",
+          "locator": "scheduled tabla playback ownership regression",
+          "exactSection": "interleaved owner cancellation leaves the other owner's delayed strokes executable"
+        }
+      ],
+      "disposition": "replace global cancellation with caller-owned scheduling handles and regression-lock independent playback sessions",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "application audio invariant; source evidence N/A",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
     },
     {
       "id": "P02-RAGA-FIELDS-001",

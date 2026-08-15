@@ -57,7 +57,7 @@ export default function SearchPage() {
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="උදා: භෛරව්, Bhairav, තීන්තාල, ෂඩ්ජය, ගැටබෙරය..."
+            placeholder="උදා: බිලාවල්, Yaman, ත්‍රීතාල්, තාරතාවය..."
             className="w-full bg-surface-warm border-2 border-border focus:border-accent rounded-2xl pl-12 pr-4 py-3.5 text-sm sm:text-base text-text focus:outline-none"
           />
         </div>
@@ -65,7 +65,7 @@ export default function SearchPage() {
         {/* Quick Sample Queries */}
         <div className="flex flex-wrap items-center gap-2 mt-3 text-xs">
           <span className="text-text-muted font-bold">ඉක්මන් සෙවුම්:</span>
-          {["භෛරව්", "දාද්‍රා", "සිතාරය", "ගොයම් කවි", "මාත්‍රා", "නාඩගම්"].map((sample) => (
+          {["බිලාවල්", "දාදරා", "යමන්", "ලාවනී", "තාරතාවය", "මාත්‍රා"].map((sample) => (
             <button
               key={sample}
               type="button"

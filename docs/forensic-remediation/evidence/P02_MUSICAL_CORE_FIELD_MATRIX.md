@@ -43,7 +43,7 @@ Canonical source for the seven public records: `oriental_music_markdown/by-sourc
 
 ## 2. Tala evidence
 
-Canonical structural source: `oriental_music_markdown/by-source/grade_10_musical_fundamentals.md`, extracted from `sg10_emus_chap1_mulikanga.pdf`, PDF pages 2–7 (`SRC-EPD-TB-G10`, quality A). Grade 11 pages 23–24 establish prescribed names but are not embedded inside a singular Grade 10 `SourceReference`; every published reference names only the document selected by its `sourceId`.
+Canonical structural source: `oriental_music_markdown/by-source/grade_10_musical_fundamentals.md`, extracted from `sg10_emus_chap1_mulikanga.pdf`, PDF pages 2–7 (`SRC-EPD-TB-G10`, quality A). The extracted Grade 11 text lists names on pages 23–24, but `DOC-GRADE_11_MUSIC_TEXTBOOK` remains `Review Required` and is not accepted publication evidence. Every published reference names only the document selected by its `sourceId`.
 
 Source-catalog boundary: for `SRC-EPD-TB-G10`, `SRC-EPD-TB-G11`, `SRC-G10-NADA`, and `SRC-G11-RAGA-ID`, the supplied corpus establishes stable ID mapping, filename, grade, page count, extraction state, and page quality. It does **not** establish publisher, year, place, licence, or canonical tier; those raw fields are explicitly `නොදනී / සනාථ වී නැත`. The legacy `SRC-EPD-*` IDs are retained only for progress/link stability and do not prove an EPD publisher.
 
@@ -55,7 +55,7 @@ Source-catalog boundary: for `SRC-EPD-TB-G10`, `SRC-EPD-TB-G11`, `SRC-G10-NADA`,
 | `tala-keherwa` | Grade 10 | කෙහෙර්වා තාලය | Keherwa Tala (editorial, N/A) | 8 | `4+4` / 2 | X on 1; 0 on 5 | 3, 6 | **CORRECTED / VERIFIED**. |
 | `tala-teental` | Grade 10 | ත්‍රීතාල් තාලය (`ත්‍රීතාලය`, `තීන්තාල්` aliases, N/A) | Teental Tala (editorial, N/A) | 16 | `4+4+4+4` / 4 | X/2/0/3 on 1/5/9/13 | 4–5 | **VERIFIED**. |
 | `tala-jhaptal` | Grade 10 | ජප්තාල් තාලය (`ජප්තාලය` alias, N/A) | Jhaptal (editorial, N/A) | 10 | `2+3+2+3` / 4 | X/2/0/3 on 1/3/6/8 | 2, 6 | **VERIFIED**. |
-| `tala-deepchandi` | Grade 10 | දීප්චන්දි තාලය | Deepchandi Tala (editorial, N/A) | 14 | `3+4+3+4` / 4 | X/2/0/3 on 1/4/8/11 | 2, 4–5 | **VERIFIED**. |
+| `tala-deepchandi` | Grade 10 | දීප්චන්ද් තාලය | Deepchandi Tala (editorial, N/A) | 14 | `3+4+3+4` / 4 | X/2/0/3 on 1/4/8/11 | 2, 4–5 | **CORRECTED / VERIFIED** from Grade 10. `දීප්චන්දි` is retained only as a retrieval variant attributed to the Review Required Grade 11 extraction, not as a verified/public data alias. |
 | `tala-lawani` | Grade 10 | ලාවනී තාලය | Lawani Tala (editorial, N/A) | 8 | `2+2+2+2` / 4 | X/2/0/3 on 1/3/5/7 | 3, 6 | **CORRECTED / VERIFIED**. |
 | `tala-khemta` | Grade 10 | ඛෙම්ටෝ තාලය (`ඛෙම්ටා` alias, N/A) | Khemta Tala (editorial, N/A) | 4 | `2+2` / 2 | X on 1; 0 on 3 | 7 | **CORRECTED / VERIFIED**; three aksharas per matra. |
 | `tala-roopak` | Not in supplied list | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | none | **NEEDS-REVIEW / QUARANTINED**. |
@@ -77,7 +77,7 @@ Source-catalog boundary: for `SRC-EPD-TB-G10`, `SRC-EPD-TB-G11`, `SRC-G10-NADA`,
 
 | Entity / field | Audited state | Quality | Disposition |
 |---|---|---|---|
-| Lawani school context | Not a Hindustani-system tala; prescribed for school use because two-matra divisions occur in school songs, local tit-rupa, and Western meters | Grade 11 page 24, A; separate `contextSourceReference` | **VERIFIED** and rendered to learners, without generic Hindustani framing. |
+| Lawani school context | Raw audit text records the Grade 11 extraction's statement that it is not a Hindustani-system tala and explains its school use | Grade 11 page 24 is A text extraction, but the source document is `Review Required`; separate `contextSourceReference` | **NEEDS-REVIEW / WITHHELD FROM PUBLIC PROJECTION**. The independently supported Grade 10 structure remains public; the application makes no generic North Indian context claim. |
 | Khemta laya context | Source says its laya is fast | A, page 7 | **VERIFIED** only as qualitative `fast`. |
 | Other tempo/usage claims | Not established by cited pages | N/A | **WITHHELD** from curriculum claims. |
 | `practiceTempoBpm` | Client-only visualizer/game defaults; UI explicitly discloses this and does not derive vilambit/madhya/drut labels | N/A | **PRACTICE DEFAULT**, not curriculum evidence. |
@@ -109,5 +109,6 @@ Canonical source: `oriental_music_markdown/by-source/grade_10_nadaya.md`, extrac
 
 - Original PDFs are absent; visually ambiguous glyphs, layout, and OCR-normalized bol spelling remain `needs-review` where noted.
 - Bhairav and Roopak raw values are retained for audit, but each musical field is separately withheld above.
+- Lawani's Grade 11 school-context statement and the Grade 11 `දීප්චන්දි` spelling remain source-attributed `needs-review` items until document triage/original-PDF review is complete; neither is a verified public data field.
 - English transliterations and `practiceTempoBpm` are editorial/application values with `N/A` evidence quality.
 - Earlier grades are not inferred from “previously studied” wording; they require exact source locators in a later phase.

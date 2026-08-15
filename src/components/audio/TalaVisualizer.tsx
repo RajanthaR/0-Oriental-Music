@@ -23,6 +23,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
   const [visualMode, setVisualMode] = useState<"circular" | "linear">("circular");
 
   const timerRef = useRef<NodeJS.Timeout | number | null>(null);
+  const playbackCancelRef = useRef<(() => void) | null>(null);
 
   const currentBol = tala.bols.find((b) => b.matra === currentMatra) || tala.bols[0];
   const matraDurationMs = (60 / bpm) * 1000;
@@ -32,7 +33,8 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
       const next = prev >= tala.matras ? 1 : prev + 1;
       const nextBol = tala.bols.find((b) => b.matra === next);
       if (nextBol && audioEnabled) {
-        tablaSynth.playBol(nextBol.bol_si, matraDurationMs);
+        playbackCancelRef.current?.();
+        playbackCancelRef.current = tablaSynth.playBol(nextBol.bol_si, matraDurationMs);
       }
       return next;
     });
@@ -45,7 +47,8 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
         stepNextMatra();
       }, intervalMs);
     } else {
-      tablaSynth.cancelScheduledStrokes();
+      playbackCancelRef.current?.();
+      playbackCancelRef.current = null;
       if (timerRef.current) {
         clearInterval(timerRef.current as number);
         timerRef.current = null;
@@ -55,22 +58,26 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
       if (timerRef.current) {
         clearInterval(timerRef.current as number);
       }
-      tablaSynth.cancelScheduledStrokes();
+      playbackCancelRef.current?.();
+      playbackCancelRef.current = null;
     };
   }, [isPlaying, bpm, stepNextMatra]);
 
   const handleTogglePlay = () => {
     if (!isPlaying && audioEnabled) {
-      tablaSynth.playBol(currentBol.bol_si, matraDurationMs);
+      playbackCancelRef.current?.();
+      playbackCancelRef.current = tablaSynth.playBol(currentBol.bol_si, matraDurationMs);
     } else if (isPlaying) {
-      tablaSynth.cancelScheduledStrokes();
+      playbackCancelRef.current?.();
+      playbackCancelRef.current = null;
     }
     setIsPlaying(!isPlaying);
   };
 
   const handleReset = () => {
     setIsPlaying(false);
-    tablaSynth.cancelScheduledStrokes();
+    playbackCancelRef.current?.();
+    playbackCancelRef.current = null;
     setCurrentMatra(1);
   };
 

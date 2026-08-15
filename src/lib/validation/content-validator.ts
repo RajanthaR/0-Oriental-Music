@@ -21,6 +21,8 @@ import {
   UNKNOWN_PROVENANCE,
 } from "@/lib/data/publication-policy";
 import { repository } from "@/lib/data/repository";
+import { normalizeSinhalaText } from "@/lib/search/normalize-sinhala";
+import { planTablaBol } from "@/lib/audio/tabla";
 
 export interface ValidationIssue {
   entityType: string;
@@ -33,6 +35,65 @@ export interface ValidationIssue {
 export interface PublicationValidationResult {
   isValid: boolean;
   issues: ValidationIssue[];
+}
+
+type IdentityRecord = {
+  id?: unknown;
+  term_si?: unknown;
+  term_en?: unknown;
+  transliteration?: unknown;
+  knownVariants?: unknown;
+};
+
+const identityKey = (value: string) =>
+  normalizeSinhalaText(value).replace(/[\s()|,.'’\-–—/]/g, "");
+
+export function validateCatalogIdentityContracts(
+  catalogs: Array<{ type: string; records: IdentityRecord[] }>,
+  glossaryRecords: IdentityRecord[],
+  terminologyRecords: IdentityRecord[]
+): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
+  catalogs.forEach(({ type, records }) => {
+    const ids = new Set<string>();
+    records.forEach((record) => {
+      if (typeof record.id !== "string" || !record.id.trim() || ids.has(record.id)) {
+        issues.push({ entityType: type, entityId: String(record.id ?? ""), field: "id", message: `Duplicate or missing ${type} ID`, severity: "error" });
+      } else ids.add(record.id);
+    });
+  });
+
+  const validateTerms = (type: "Glossary" | "Terminology", records: IdentityRecord[]) => {
+    const identities = new Map<string, string>();
+    records.forEach((record) => {
+      const id = typeof record.id === "string" ? record.id : "";
+      const canonical = typeof record.term_si === "string" ? record.term_si.trim() : "";
+      if (!canonical) {
+        issues.push({ entityType: type, entityId: id, field: "term_si", message: `${type} canonical term is missing`, severity: "error" });
+      }
+      const sharedVariants = [record.term_en, record.transliteration]
+        .filter((variant): variant is string => typeof variant === "string" && !!variant.trim());
+      const variants = type === "Terminology"
+        ? [...sharedVariants, ...(Array.isArray(record.knownVariants) ? record.knownVariants : [])]
+        : sharedVariants;
+      if (type === "Terminology" && (!Array.isArray(record.knownVariants) || variants.some((variant) => typeof variant !== "string" || !variant.trim()))) {
+        issues.push({ entityType: type, entityId: id, field: "knownVariants", message: "Terminology variants must be non-empty strings", severity: "error" });
+      }
+      [canonical, ...variants.filter((variant): variant is string => typeof variant === "string")]
+        .filter(Boolean)
+        .forEach((name) => {
+          const key = identityKey(name);
+          const existing = identities.get(key);
+          if (existing && existing !== id) {
+            issues.push({ entityType: type, entityId: id, field: type === "Terminology" ? "knownVariants" : "term_si", message: `Search-equivalent ${type.toLowerCase()} identity collides with '${existing}'`, severity: "error" });
+          } else identities.set(key, id);
+        });
+    });
+  };
+
+  validateTerms("Glossary", glossaryRecords);
+  validateTerms("Terminology", terminologyRecords);
+  return issues;
 }
 
 type BaselineLedger = {
@@ -572,7 +633,9 @@ export function validateContent(
       });
     }
     const validSwaras = new Set(["S", "r", "R", "g", "G", "M", "m", "P", "d", "D", "n", "N", "S'", ".r", ".R", ".g", ".G", ".M", ".m", ".P", ".d", ".D", ".n", ".N"]);
-    [...(r.arohana_swaras || []), ...(r.avarohana_swaras || [])].forEach((swara) => {
+    const arohana = Array.isArray(r.arohana_swaras) ? r.arohana_swaras : [];
+    const avarohana = Array.isArray(r.avarohana_swaras) ? r.avarohana_swaras : [];
+    [...arohana, ...avarohana].forEach((swara) => {
       if (!validSwaras.has(swara)) {
         issues.push({
           entityType: "Raga",
@@ -613,16 +676,34 @@ export function validateContent(
 
   // Validate Talas
   talas.forEach((t) => {
-    if (t.matras <= 0 || !t.bols || t.bols.length !== t.matras) {
+    const vibhagStructure = Array.isArray(t.vibhagStructure) ? t.vibhagStructure : [];
+    const bols = Array.isArray(t.bols) ? t.bols : [];
+    const validVibhagStructure =
+      vibhagStructure.length > 0 &&
+      vibhagStructure.every((size) => Number.isInteger(size) && size > 0);
+    const validBolObjects = bols.every((bol) =>
+      !!bol &&
+      typeof bol === "object" &&
+      Number.isInteger(bol.matra) &&
+      Number.isInteger(bol.vibhagIndex) &&
+      typeof bol.bol_si === "string" &&
+      typeof bol.action_si === "string" &&
+      !!bol.action_si.trim() &&
+      typeof bol.isSam === "boolean" &&
+      typeof bol.isTali === "boolean" &&
+      typeof bol.isKhali === "boolean"
+    );
+
+    if (t.matras <= 0 || !validBolObjects || bols.length !== t.matras) {
       issues.push({
         entityType: "Tala",
         entityId: t.id,
         field: "bols",
-        message: `Tala bols array length (${t.bols?.length}) does not match matra count (${t.matras})`,
+        message: `Tala bols array is malformed or its length (${bols.length}) does not match matra count (${t.matras})`,
         severity: "error",
       });
     }
-    if (t.vibhagStructure.reduce((sum, size) => sum + size, 0) !== t.matras) {
+    if (!validVibhagStructure || vibhagStructure.reduce((sum, size) => sum + size, 0) !== t.matras) {
       issues.push({
         entityType: "Tala",
         entityId: t.id,
@@ -631,7 +712,7 @@ export function validateContent(
         severity: "error",
       });
     }
-    if (t.vibhagCount !== t.vibhagStructure.length) {
+    if (t.vibhagCount !== vibhagStructure.length) {
       issues.push({
         entityType: "Tala",
         entityId: t.id,
@@ -640,16 +721,25 @@ export function validateContent(
         severity: "error",
       });
     }
-    if (t.bols?.some((bol, index) => bol.matra !== index + 1 || bol.vibhagIndex < 0 || bol.vibhagIndex >= t.vibhagCount)) {
+    const expectedVibhagByMatra: number[] = [];
+    if (validVibhagStructure) {
+      vibhagStructure.forEach((size, vibhagIndex) => {
+        for (let index = 0; index < size; index += 1) expectedVibhagByMatra.push(vibhagIndex);
+      });
+    }
+    if (validBolObjects && bols.some((bol, index) =>
+      bol.matra !== index + 1 ||
+      bol.vibhagIndex !== expectedVibhagByMatra[index]
+    )) {
       issues.push({
         entityType: "Tala",
         entityId: t.id,
         field: "bols",
-        message: "Tala bol matras must be sequential and reference a valid vibhag",
+        message: "Tala bol matras must be sequential and match the vibhag implied by vibhagStructure",
         severity: "error",
       });
     }
-    if (t.bols?.filter((bol) => bol.isSam).length !== 1 || t.bols?.some((bol) => bol.isKhali && bol.isTali)) {
+    if (validBolObjects && (bols.filter((bol) => bol.isSam).length !== 1 || bols.some((bol) => bol.isKhali && bol.isTali))) {
       issues.push({
         entityType: "Tala",
         entityId: t.id,
@@ -658,12 +748,37 @@ export function validateContent(
         severity: "error",
       });
     }
+
+    if (validBolObjects && bols.some((bol) => {
+      if (typeof bol.bol_si !== "string" || !bol.bol_si.trim()) return true;
+      const plan = planTablaBol(bol.bol_si);
+      if (bol.bol_si === "-") return plan.length !== 0;
+      return plan.length === 0 || plan.some((stroke) => stroke.kind === "fallback" || stroke.kind === "rest");
+    })) {
+      issues.push({
+        entityType: "Tala",
+        entityId: t.id,
+        field: "bols.bol_si",
+        message: "Every non-rest tala bol must map to a non-empty intentional tabla stroke plan",
+        severity: "error",
+      });
+    }
   });
 
   const normalizedTalaNames = new Map<string, string>();
   talas.forEach((tala) => {
-    [tala.name_si, ...(tala.aliases_si || [])].forEach((name) => {
-      const normalized = name.normalize("NFC").toLocaleLowerCase().replace(/[\s()|,.-]/g, "");
+    if (typeof tala.name_si !== "string" || !tala.name_si.trim()) {
+      issues.push({ entityType: "Tala", entityId: tala.id, field: "name_si", message: "Tala canonical name is missing", severity: "error" });
+    }
+    if (!Array.isArray(tala.aliases_si) || tala.aliases_si.some((name) => typeof name !== "string" || !name.trim())) {
+      issues.push({ entityType: "Tala", entityId: tala.id, field: "aliases_si", message: "Tala aliases must be an array of non-empty strings", severity: "error" });
+    }
+    const names = [
+      ...(typeof tala.name_si === "string" ? [tala.name_si] : []),
+      ...(Array.isArray(tala.aliases_si) ? tala.aliases_si.filter((name): name is string => typeof name === "string") : []),
+    ];
+    names.forEach((name) => {
+      const normalized = identityKey(name);
       const existing = normalizedTalaNames.get(normalized);
       if (existing && existing !== tala.id) {
         issues.push({
@@ -678,6 +793,25 @@ export function validateContent(
       }
     });
   });
+
+  const rawCatalogs: Array<{ type: string; records: Array<{ id?: unknown }> }> = [
+    { type: "Lesson", records: lessonsData },
+    { type: "Raga", records: ragasData },
+    { type: "Tala", records: talasData },
+    { type: "Instrument", records: instrumentsData },
+    { type: "CulturalTradition", records: culturalTraditionsData },
+    { type: "TheatreTradition", records: theatreTraditionsData },
+    { type: "Glossary", records: glossaryData },
+    { type: "LearningPath", records: learningPathsData },
+    { type: "Quiz", records: quizzesData },
+    { type: "ExamPaper", records: examPapersData },
+    { type: "Terminology", records: terminologyData },
+  ];
+  issues.push(...validateCatalogIdentityContracts(
+    rawCatalogs,
+    glossaryData.filter((term) => getRecordPublicationDecision(term).isPublic),
+    terminologyData
+  ));
 
   allEntities.forEach(({ type, item }) => {
     const decision = getRecordPublicationDecision(item);

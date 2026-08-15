@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { validateContent } from "@/lib/validation/content-validator";
+import { validateCatalogIdentityContracts, validateContent } from "@/lib/validation/content-validator";
 import { repository } from "@/lib/data/repository";
 import type { Raga, Tala } from "@/types/content";
 
@@ -65,7 +65,7 @@ describe("Content Validation Suite", () => {
     } as Tala;
     const aliasCollision = {
       ...talas[1],
-      aliases_si: [talas[0].name_si],
+      aliases_si: ["දාද්‍රා තාලය"],
     } as Tala;
     const report = validateContent(
       lessons,
@@ -77,6 +77,87 @@ describe("Content Validation Suite", () => {
     );
     expect(report.issues.some((issue) => issue.field === "vibhagStructure")).toBe(true);
     expect(report.issues.some((issue) => issue.field === "aliases_si" && issue.message.includes("collides"))).toBe(true);
+  });
+
+  it("rejects an in-range bol vibhagIndex that contradicts cumulative vibhag membership", () => {
+    const invalidTala = structuredClone(talas[0]) as Tala;
+    invalidTala.bols[2].vibhagIndex = 1;
+    const report = validateContent(
+      lessons,
+      ragas,
+      [invalidTala, ...talas.slice(1)],
+      instruments,
+      culturalTraditions,
+      theatreTraditions
+    );
+    expect(report.issues.some((issue) =>
+      issue.entityId === invalidTala.id &&
+      issue.field === "bols" &&
+      issue.message.includes("match the vibhag")
+    )).toBe(true);
+  });
+
+  it.each(["", "   "])("rejects blank non-rest tabla bol %j", (blankBol) => {
+    const invalidTala = structuredClone(talas[0]) as Tala;
+    invalidTala.bols[0].bol_si = blankBol;
+    const report = validateContent(
+      lessons,
+      ragas,
+      [invalidTala, ...talas.slice(1)],
+      instruments,
+      culturalTraditions,
+      theatreTraditions
+    );
+    expect(report.issues.some((issue) =>
+      issue.entityId === invalidTala.id && issue.field === "bols.bol_si"
+    )).toBe(true);
+  });
+
+  it("rejects malformed boolean bol flags", () => {
+    const invalidTala = structuredClone(talas[0]) as Tala;
+    (invalidTala.bols[1] as unknown as { isTali: unknown }).isTali = "false";
+    const report = validateContent(
+      lessons,
+      ragas,
+      [invalidTala as Tala, ...talas.slice(1)],
+      instruments,
+      culturalTraditions,
+      theatreTraditions
+    );
+    expect(report.issues.some((issue) => issue.entityId === invalidTala.id && issue.field === "bols")).toBe(true);
+  });
+
+  it("returns validation issues instead of throwing on malformed tala fields", () => {
+    const malformedTala = {
+      ...structuredClone(talas[0]),
+      name_si: null,
+      aliases_si: null,
+      vibhagStructure: null,
+      bols: [null],
+    } as unknown as Tala;
+
+    expect(() => validateContent(
+      lessons,
+      ragas,
+      [malformedTala, ...talas.slice(1)],
+      instruments,
+      culturalTraditions,
+      theatreTraditions
+    )).not.toThrow();
+    const report = validateContent(
+      lessons,
+      ragas,
+      [malformedTala, ...talas.slice(1)],
+      instruments,
+      culturalTraditions,
+      theatreTraditions
+    );
+    expect(report.isValid).toBe(false);
+    expect(report.issues.map((issue) => issue.field)).toEqual(expect.arrayContaining([
+      "name_si",
+      "vibhagStructure",
+      "bols",
+    ]));
   });
 
   it("rejects unknown raga swara tokens", () => {
@@ -93,5 +174,24 @@ describe("Content Validation Suite", () => {
       theatreTraditions
     );
     expect(report.issues.some((issue) => issue.message.includes("Unknown swara token"))).toBe(true);
+  });
+
+  it("rejects duplicate catalog IDs and search-equivalent glossary or terminology identities", () => {
+    const issues = validateCatalogIdentityContracts(
+      [{ type: "Glossary", records: [{ id: "term-a" }, { id: "term-a" }] }],
+      [
+        { id: "term-a", term_si: "නාදය", term_en: "Sound", transliteration: "Nadaya" },
+        { id: "term-b", term_si: "ණාදය", term_en: "Tone", transliteration: "Nadaya" },
+      ],
+      [
+        { id: "term-a", term_si: "ස්වරය", term_en: "Swara", transliteration: "Svaraya", knownVariants: ["ස්වර"] },
+        { id: "term-b", term_si: "ලය", term_en: "Rhythm", transliteration: "Laya", knownVariants: ["ස්වර"] },
+      ]
+    );
+    expect(issues.map((issue) => `${issue.entityType}.${issue.field}`)).toEqual(expect.arrayContaining([
+      "Glossary.id",
+      "Glossary.term_si",
+      "Terminology.knownVariants",
+    ]));
   });
 });

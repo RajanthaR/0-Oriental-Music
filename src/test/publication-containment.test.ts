@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import coverageData from "../../data/content-coverage.json";
 import ragasData from "@/data/ragas.json";
+import talasData from "@/data/talas.json";
 import { repository } from "@/lib/data/repository";
 import {
   evaluateSourceReference,
+  getContextClaimPublicationDecision,
   getRecordPublicationDecision,
   getSourceCorpusInventory,
   KNOWN_QUARANTINED_ENTITY_IDS,
@@ -185,6 +187,39 @@ describe("Prompt 1 publication containment", () => {
       sourceId: "SRC-G10-NADA",
       pageOrSection: "SG10_EMUS_CHAP8_NADAYA.PDF පිටුව 2",
     }).supportable).toBe(true);
+
+    [
+      "sg10_emus_chap8_nadaya.pdf wrong.pdf පිටුව 2",
+      "sg10_emus_chap8_nadaya.pdf,wrong.pdf, පිටුව 2",
+      "sg10_emus_chap8_nadaya.pdf/wrong.pdf/ පිටුව 2",
+      "sg10_emus_chap8_nadaya.pdf(wrong.pdf) පිටුව 2",
+      "sg10_emus_chap8_nadaya.pdf/(wrong.pdf) පිටුව 2",
+      "sg10_emus_chap8_nadaya.pdf\nwrong.pdf පිටුව 2",
+    ].forEach((pageOrSection) => {
+      expect(evaluateSourceReference({
+        sourceId: "SRC-G10-NADA",
+        pageOrSection,
+      })).toMatchObject({ supportable: false, reasonCode: "mismatched-source-document" });
+    });
+  });
+
+  it("keeps Lawani's supported core public while withholding unsupported nested context", () => {
+    const rawLawani = talasData.find((tala) => tala.id === "tala-lawani");
+    expect(rawLawani).toBeDefined();
+    expect(getContextClaimPublicationDecision(rawLawani)).toMatchObject({
+      present: true,
+      isPublic: false,
+      reasonCode: "source-document-needs-review",
+    });
+
+    const publicLawani = repository.getTalaById("tala-lawani");
+    expect(publicLawani).toBeDefined();
+    expect(publicLawani).not.toHaveProperty("context_si");
+    expect(publicLawani).not.toHaveProperty("contextSourceReference");
+
+    const publicKhemta = repository.getTalaById("tala-khemta");
+    expect(publicKhemta).toHaveProperty("context_si");
+    expect(getContextClaimPublicationDecision(publicKhemta).isPublic).toBe(true);
   });
 
   it("requires every cited page to contain readable A/B Sinhala evidence", () => {

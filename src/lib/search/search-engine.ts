@@ -4,6 +4,8 @@
  */
 
 import { repository } from "@/lib/data/repository";
+import { normalizeSinhalaText } from "@/lib/search/normalize-sinhala";
+export { normalizeSinhalaText } from "@/lib/search/normalize-sinhala";
 
 export interface SearchResultItem {
   id: string;
@@ -13,23 +15,6 @@ export interface SearchResultItem {
   snippet_si: string;
   url: string;
   gradeBand?: string;
-}
-
-export function normalizeSinhalaText(text: string): string {
-  if (!text) return "";
-  return text
-    .toLowerCase()
-    .trim()
-    // Normalize interchangeable characters for fuzzy search
-    .replace(/[ශෂ]/g, "ස")
-    .replace(/ණ/g, "න")
-    .replace(/ළ/g, "ල")
-    .replace(/ඥ/g, "ඤ")
-    // Normalize rakaransaya orthographic variants (e.g., ද්‍ර / ද්ර <-> දර)
-    .replace(/ද්‍ර/g, "දර")
-    .replace(/ද්ර/g, "දර")
-    // Remove zero-width joiners and formatting spaces for matching
-    .replace(/[\u200B-\u200D\uFEFF]/g, "");
 }
 
 // Transliteration map for English phonetic queries
@@ -60,8 +45,8 @@ const TRANSLITERATION_MAP: Record<string, string> = {
   keherwa: "කෙහර්වා",
   roopak: "රූපක්",
   jhaptal: "ජප්තාල",
-  deepchandi: "දීප්චන්දි",
-  dipchandi: "දීප්චන්දි",
+  deepchandi: "දීප්චන්ද්",
+  dipchandi: "දීප්චන්ද්",
   lawani: "ලාවනී",
   khemta: "ඛෙම්ටෝ",
   khemto: "ඛෙම්ටෝ",
@@ -84,6 +69,13 @@ const TRANSLITERATION_MAP: Record<string, string> = {
   raban: "රබන්",
 };
 
+// Retrieval-only source variant. The Grade 11 extraction uses දීප්චන්දි, but
+// that document remains Review Required; keep the Grade 10 form canonical.
+const SOURCE_QUERY_VARIANTS: Record<string, string> = {
+  "දීප්චන්දි": "දීප්චන්ද්",
+  "දීප්චන්දි තාලය": "දීප්චන්ද් තාලය",
+};
+
 export function searchFilter<T>(
   items: T[],
   query: string,
@@ -92,7 +84,7 @@ export function searchFilter<T>(
   if (!query || !query.trim()) return items;
 
   const rawQ = query.trim().toLowerCase();
-  const normalizedQ = normalizeSinhalaText(rawQ);
+  const normalizedQ = normalizeSinhalaText(SOURCE_QUERY_VARIANTS[rawQ] || rawQ);
   const transliterated = TRANSLITERATION_MAP[rawQ] || "";
   const normalizedTrans = normalizeSinhalaText(transliterated);
 
