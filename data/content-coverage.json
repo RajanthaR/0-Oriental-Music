@@ -10,17 +10,17 @@
   "overview": {
     "totalRawSourceRecords": 21,
     "totalIndexedSourcePages": 1023,
-    "totalSourceDocuments": 30,
-    "totalStructuredLessons": 21,
+    "totalRawSourceDocuments": 30,
+    "totalRawLessons": 21,
     "totalRawRagas": 8,
     "totalRawTalas": 8,
-    "totalInstruments": 10,
-    "totalCulturalTraditions": 7,
-    "totalTheatreTraditions": 4,
-    "totalGlossaryTerms": 43,
-    "totalConceptSpinePaths": 9,
-    "totalExamPapers": 2,
-    "totalQuizzes": 7
+    "totalRawInstruments": 10,
+    "totalRawCulturalTraditions": 7,
+    "totalRawTheatreTraditions": 4,
+    "totalRawGlossaryTerms": 43,
+    "totalRawLearningPaths": 9,
+    "totalRawExamPapers": 2,
+    "totalRawQuizzes": 7
   },
   "publicScope": {
     "gradeBands": ["6-7", "8-9", "10-11"],
@@ -94,13 +94,13 @@
       "status": "not-assessed",
       "note": "Not assessed in this containment phase."
     },
-    "audioPolicyAssessment": {
+    "audioDistributionPolicyAssessment": {
       "status": "not-assessed",
-      "note": "Technical policy remains documented; release readiness is not claimed."
+      "note": "The no-streaming and no-redistributed-recordings policy remains documented; release readiness is not claimed."
     },
-    "webAudioPolicyAssessment": {
+    "clientSideWebAudioSynthesisAssessment": {
       "status": "not-assessed",
-      "note": "Technical policy remains documented; release readiness is not claimed."
+      "note": "The browser-only Web Audio synthesis policy remains documented; release readiness is not claimed."
     }
   }
 }

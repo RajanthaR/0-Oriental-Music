@@ -218,7 +218,7 @@ export function validateForensicInventory(): PublicationValidationResult {
   if (coverage.overview?.totalIndexedSourcePages !== expected.sourcePages) {
     issues.push(baselineIssue("generated-doc", "content-coverage", "totalIndexedSourcePages", "Generated coverage pages do not agree with forensic-ledger.json."));
   }
-  if (coverage.overview?.totalStructuredLessons !== expected.rawContentRecords.lessons) {
+  if (coverage.overview?.totalRawLessons !== expected.rawContentRecords.lessons) {
     issues.push(baselineIssue("generated-doc", "content-coverage", "totalStructuredLessons", "Generated lesson count does not agree with forensic-ledger.json."));
   }
   if (coverage.sourceQualityMetrics?.gradeAPagesCount !== expected.sourcePageQuality.A) {
