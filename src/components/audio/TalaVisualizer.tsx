@@ -18,7 +18,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentMatra, setCurrentMatra] = useState<number>(1);
-  const [bpm, setBpm] = useState<number>(initialBpm || tala.layaVariants?.thah_bpm || 75);
+  const [bpm, setBpm] = useState<number>(initialBpm || tala.practiceTempoBpm?.thah_bpm || 75);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [visualMode, setVisualMode] = useState<"circular" | "linear">("circular");
 

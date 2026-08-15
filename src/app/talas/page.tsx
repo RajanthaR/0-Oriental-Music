@@ -71,7 +71,7 @@ export default function TalasDirectoryPage() {
 
             <div className="pt-3 border-t border-border-light flex items-center justify-between text-xs">
               <span className="text-text-muted font-medium">
-                ශ්‍රේණි: {tala.gradeBands.join(", ")}
+                ශ්‍රේණි කාණ්ඩය: {tala.gradeBands.join(", ")}
               </span>
               <span className="font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                 <span>දෘශ්‍යකාරකය බලන්න</span>

@@ -678,8 +678,6 @@
     "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට දාද්‍රා තාලයේ මාත්‍රා, විභාග, තාළි, ඛාලි විස්තර කිරීමටත්, 'ධා ධී නා | ධා තී නා' ථේකාව නිවැරදිව අත්පුඩි ගසමින් උච්චාරණය කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 15,
     "gradeBands": [
-      "6-7",
-      "8-9",
       "10-11"
     ],
     "difficulty": "පහසු",
@@ -769,7 +767,7 @@
     ],
     "sourceReference": {
       "sourceId": "SRC-EPD-TB-G10",
-      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6; s11tim173.pdf පිටු 23-24"
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
     },
     "reviewMetadata": {
       "status": "Needs Revision",

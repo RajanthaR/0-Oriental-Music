@@ -74,7 +74,7 @@ export default function TalaDetailPage() {
           තාලයේ ස්පන්දනයට අනුව අත්පුඩි ගසමින් හෝ තිරය මත තට්ටු කරමින් නිරවද්‍යතාව මැන බලන්න.
         </p>
 
-        <RhythmTapGame bpm={tala.layaVariants?.thah_bpm || 80} totalBeats={tala.matras * 2} />
+        <RhythmTapGame bpm={tala.practiceTempoBpm?.thah_bpm || 80} totalBeats={tala.matras * 2} />
       </section>
 
       {/* Source Citation */}

@@ -1,403 +1,111 @@
-# Phase 2 Musical Core Field Audit Matrix
+# Phase 2 musical-core field audit matrix
 
-This document provides the exhaustive, field-by-field audit matrix for every Raga, Tala, and Acoustic Sound Property entity in the Swara Maga platform, evaluated strictly against the supplied canonical Grades 6–11 source corpus (`oriental_music_markdown/by-source`).
+This is the claim-level audit for Phase 2. Each column is an independently reviewed field. `A` is used only for readable extracted source pages. Repository policy, editorial transliteration, synthesized practice tempo, and review-state rows use `N/A` and are never presented as curriculum-page evidence.
 
-**Audit Protocol Rules Applied**:
-1. Zero aggregate "all fields" rows: every musicological field is independently audited and cited.
-2. Field dispositions are classified as **VERIFIED**, **CORRECTED**, **WITHHELD**, or **NEEDS-REVIEW / QUARANTINED**.
-3. No facts are inferred from general musical knowledge or external tradition memory.
-4. All raw review metadata is strictly sanitized to explicit unverified states.
+Evidence boundary: the checkout contains extracted Markdown, not the original PDFs. Layout-sensitive notation remains subject to original-PDF/manual review. Internal agent work is not an SME approval event; every `reviewMetadata` record therefore remains `Needs Revision` with unknown reviewer/date/licence values.
 
----
+## 1. Raga evidence
 
-## 1. Canonical Ragas Field-by-Field Audit Matrix
+Canonical source for the seven public records: `oriental_music_markdown/by-source/grade_11_raga_identification.md`, extracted from `sg11_emus_ chap3_raga_handunaganimu.pdf`, PDF pages 1–2 (`SRC-G11-RAGA-ID`, quality A). The source establishes Grade 11 inclusion, not lower-grade assignment. `gradeBands: ["10-11"]` is the application browse bucket containing the evidenced Grade 11; public pages must describe it as a band, not as proof of both grades.
 
-### 1.1 `raga-bilawal` (බිලාවල් රාගය) — Prescribed School Raga (Grade 11)
-*Source Document: `oriental_music_markdown/by-source/grade_11_raga_identification.md` (`SRC-G11-RAGA-ID`)*
+### 1.1 Inclusion, identity, scale, and note-form fields
 
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 11) | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Confirmed in official 7-raga school syllabus list on PDF Page 1. |
-| `name_si` | `"බිලාවල් රාගය (අල්හයියා බිලාවල්)"` | `"බිලාවල් රාගය"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **CORRECTED**: Removed Alhaiya Bilawal alias. Official syllabus prescribes pure Shuddha Bilawal. |
-| `name_en` | `"Raga Bilawal (Alhaiya Bilawal)"` | `"Raga Bilawal"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **CORRECTED**: Aligned English title with canonical pure Bilawal. |
-| `thata_si` | `"බිලාවල්"` | `"බිලාවල් ථාටය (සියලු ශුද්ධ ස්වර)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Canonical Janaka Thata (බිලාවල්). |
-| `arohana_si` | `"ස , රි , ග , ප , ධ , නි , ස̇"` | `"ස , රි , ග , ම , ප , ධ , නි , ස̇"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **CORRECTED**: Restored missing Shuddha Madhyama (`ම`). Arohana has all 7 Shuddha notes. |
-| `avarohana_si` | `"ස̇ , නි , ධ , ප , ම , ග , රි , ස"` | `"ස̇ , නි , ධ , ප , ම , ග , රි , ස"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Complete 7-note descending scale (`ස̇ නි ධ ඳ ම ග රි ස`). |
-| `arohana_swaras` | `["S", "R", "G", "P", "D", "N", "S'"]` | `["S", "R", "G", "M", "P", "D", "N", "S'"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **CORRECTED**: Added `"M"` (Shuddha Ma) to array. |
-| `avarohana_swaras` | `["S'", "N", "D", "P", "M", "G", "R", "S"]` | `["S'", "N", "D", "P", "M", "G", "R", "S"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Correct 8-element array including upper octave Sa endpoint. |
-| `swara_forms` | All Shuddha except Alhaiya variants | All 7 Shuddha Swaras | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **CORRECTED**: Text explicitly notes `"ස්වර 7 ම ශුද්ධ වේ"`. |
-| `omitted_swaras` | Arohana Ma omitted | None (Sampurna) | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **CORRECTED**: No omitted swaras in either ascent or descent. |
-| `vadi_si` | `"ධ"` | `"ධෛවත (ධ)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Vadi is Dhaivata (ධ). |
-| `samvadi_si` | `"ග"` | `"ගාන්ධාර (ග)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Samvadi is Gandhara (ග). |
-| `jati_si` | `"ෂාඩව - සම්පූර්ණ"` | `"සම්පූර්ණ - සම්පූර්ණ (ස්වර 7 ම ශුද්ධ වේ)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **CORRECTED**: Jati is Sampurna-Sampurna (7 ascent, 7 descent). |
-| `time_si` | `"දිවා ප්‍රථම ප්‍රහරය"` | `"දිවා ප්‍රථම ප්‍රහරය (උදෑසන)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: First prahara of the day (දිවා ප්‍රථම ප්‍රහරය). |
-| `pakad_si` | `"ග රි , ග ප , ධ , නි ස̇"` | `"ග රි , ග ප ධ නි ස̇"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Canonical Mukhyangaya (`ග රි , ග ඳ ධ නි ස̇`). |
-| `samplePhrases` | Missing | `[{"name_si": "මුඛ්‍යාංගය (පකඩ්)", "swaras": ["G", "R", "G", "P", "D", "N", "S'"]}]` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Aligned with canonical mukhyanga phrase. |
-| `characteristics_si` | Incomplete | Prescribed 3 bullet summary (All Shuddha, Vadi/Samvadi relationship, morning performance) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **VERIFIED**: Grounded in official syllabus text. |
-| `sourceReference` | `SRC-NIE-G1011-TG` (Page 38) | `SRC-G11-RAGA-ID` (`sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2`) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **CORRECTED**: Replaced unverified teacher guide page with direct Grade 11 raga identification document. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 11 | A | **VERIFIED**: Prescribed Grade 11 school raga. |
+| Entity | Inclusion | Grade | `name_si` | `name_en` | `arohana_swaras` | `avarohana_swaras` | Forms / omissions | Disposition |
+|---|---|---|---|---|---|---|---|---|
+| `raga-bilawal` | Page 1 | 11 | බිලාවල් රාගය | Raga Bilawal (editorial, N/A) | `S R G M P D N S'` | `S' N D P M G R S` | all Shuddha; none omitted | **CORRECTED / VERIFIED** — removed Alhaiya mismatch and restored Ma. |
+| `raga-bhupali` | Page 1 | 11 | භූපාලි රාගය | Raga Bhupali (editorial, N/A) | `S R G P D S'` | `S' D P G R S` | Ma and Ni omitted | **VERIFIED**. |
+| `raga-kafi` | Page 1 | 11 | කාෆි රාගය | Raga Kafi (editorial, N/A) | `S R g M P D n S'` | `S' n D P M g R S` | Komal Ga/Ni; none omitted | **VERIFIED**. |
+| `raga-khamaj` | Page 1 | 11 | ඛමාජ් රාගය | Raga Khamaj (editorial, N/A) | `S G M P D N S'` | `S' n D P M G R S` | Ri omitted in ascent; dual Ni | **VERIFIED**. |
+| `raga-bhimpalasi` | Page 1 | 11 | භිම්පලාසි රාගය (භීම්පලාශ්‍රී) | Raga Bhimpalasi (editorial, N/A) | `.n S g M P n S'` | `S' n D P M g R S` | Ri/Dha omitted in ascent; Komal Ga/Ni | **VERIFIED**; mandra Ni normalized for synthesis. |
+| `raga-yaman` | Page 1 | 11 | යමන් රාගය | Raga Yaman (editorial, N/A) | `S R G m P D N S'` | `S' N D P m G R S` | Teevra Ma; none omitted | **CORRECTED / VERIFIED** — restored source ascent Sa and Pa. |
+| `raga-bhairavi` | Page 1 | 11 | භෛරවී රාගය | Raga Bhairavi (editorial, N/A) | `S r g M P d n S'` | `S' n d P M g r S` | Komal Ri/Ga/Dha/Ni; none omitted | **VERIFIED**. |
+| `raga-bhairav` | Not listed | Not established | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | **NEEDS-REVIEW / QUARANTINED**. |
 
----
+### 1.2 Thata, jati, vadi/samvadi, time, pakad, and derived UI fields
 
-### 1.2 `raga-bhupali` (භූපාලි රාගය) — Prescribed School Raga (Grade 8–11)
-*Source Document: `oriental_music_markdown/by-source/grade_11_raga_identification.md` (`SRC-G11-RAGA-ID`)*
+| Entity | `thata_si` | `jati_si` | `vadi_si` / `samvadi_si` | `time_si` | `pakad_si` / `samplePhrases` | `rasa_si` | `characteristics_si` | Evidence |
+|---|---|---|---|---|---|---|---|---|
+| `raga-bilawal` | Bilawal | Sampurna–Sampurna | Dha / Ga | දිවා ප්‍රථම ප්‍රහරය | Page-2 mukhyanga only | **WITHHELD** | all seven Shuddha; Sampurna | Page 2, A. |
+| `raga-bhupali` | Kalyan | Audav–Audav | Ga / Dha | රාත්‍රී ප්‍රථම ප්‍රහරය | Page-2 mukhyanga only | **WITHHELD** | Ma/Ni omitted; Audav | Page 2, A. |
+| `raga-kafi` | Kafi | Sampurna–Sampurna | Pa / Sa | රාත්‍රී දෙවන ප්‍රහරය | Page-2 mukhyanga only | **WITHHELD** | Komal Ga/Ni | Page 2, A. |
+| `raga-khamaj` | Khamaj | Shadav–Sampurna | Ga / Ni | රාත්‍රී දෙවන ප්‍රහරය | Page-2 mukhyanga only | **WITHHELD** | Ri omitted in ascent; dual Ni | Page 2, A. |
+| `raga-bhimpalasi` | Kafi | Audav–Sampurna | Ma / Sa | රාත්‍රී තෙවන ප්‍රහරය | Page-2 mukhyanga only | **WITHHELD** | Ri/Dha omitted in ascent; Komal Ga/Ni | Page 2, A; corrected previous day claim. |
+| `raga-yaman` | Kalyan | Sampurna–Sampurna | Ga / Ni | රාත්‍රී ප්‍රථම ප්‍රහරය | Page-2 mukhyanga only | **WITHHELD** | Teevra Ma | Page 2, A. |
+| `raga-bhairavi` | Bhairavi | Sampurna–Sampurna | Ma / Sa | දිවා ප්‍රථම ප්‍රහරය | Page-2 mukhyanga only | **WITHHELD** | four Komal swaras | Page 2, A; unsupported concert-ending claim removed. |
+| `raga-bhairav` | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | No accepted prescribed-list evidence. |
 
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 8–11) | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Listed in official prescribed syllabus on PDF Page 1. |
-| `name_si` | `"භූපාලි රාගය (භූපාලී)"` | `"භූපාලි රාගය (භූපාලී)"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Canonical Sinhala name. |
-| `name_en` | `"Raga Bhupali"` | `"Raga Bhupali"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Standard transliteration. |
-| `thata_si` | `"කල්‍යාන් ථාටය"` | `"කල්‍යාන් ථාටය"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Thata is Kalyan (කල්‍යාණ). |
-| `arohana_si` | `"ස , රි , ග , ප , ධ , ස̇"` | `"ස , රි , ග , ප , ධ , ස̇"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Pentatonic ascent (`ස රි ග ඳ ධ ස̇`). |
-| `avarohana_si` | `"ස̇ , ධ , ප , ග , රි , ස"` | `"ස̇ , ධ , ප , ග , රි , ස"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Pentatonic descent (`ස̇ ධ ඳ ග රි ස`). |
-| `arohana_swaras` | `["S", "R", "G", "P", "D", "S'"]` | `["S", "R", "G", "P", "D", "S'"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: 6-element array including upper Sa. |
-| `avarohana_swaras` | `["S'", "D", "P", "G", "R", "S"]` | `["S'", "D", "P", "G", "R", "S"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: 6-element descending array. |
-| `swara_forms` | All Shuddha | All Shuddha (Shuddha Ri, Ga, Pa, Dha) | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Notes used are pure Shuddha swaras. |
-| `omitted_swaras` | Ma, Ni omitted | Ma (මධ්‍යම) and Ni (නිෂාද) omitted in ascent and descent | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Explicitly states `"ම , නි ස්වර වර්ජ්‍ය වේ"`. |
-| `vadi_si` | `"ගාන්ධාර (ග)"` | `"ගාන්ධාර (ග)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Vadi is Gandhara (ග). |
-| `samvadi_si` | `"ධෛවත (ධ)"` | `"ධෛවත (ධ)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Samvadi is Dhaivata (ධ). |
-| `jati_si` | `"ඖඩව - ඖඩව"` | `"ඖඩව - ඖඩව (ස්වර 5 බැගින්)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Audav-Audav (5 ascent, 5 descent). |
-| `time_si` | `"රාත්‍රී ප්‍රථම ප්‍රහාරය"` | `"රාත්‍රී ප්‍රථම ප්‍රහාරය (සන්ධ්‍යා කාලය)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: First prahara of the night (රාත්‍රී ප්‍රථම ප්‍රශරය). |
-| `pakad_si` | `"ග රි . ස ධ , ස රි ග ප ග , ධ ප , ග රි ස"` | `"ග රි . ස ධ , ස රි ග ප ග , ධ ප , ග රි ස"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Canonical Mukhyangaya. |
-| `samplePhrases` | `["G", "R", "S", "D", ...]` | `[{"name_si": "මුඛ්‍යාංගය (පකඩ්)", "swaras": ["G", "R", "S", ".D", "S", "R", "G", "P", "G", "D", "P", "G", "R", "S"]}]` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Aligned with official mukhyanga phrase. |
-| `characteristics_si` | General text | Prescribed 3 bullet summary (Ma/Ni varjit, Audav-Audav jati, Vadi Ga, evening performance) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **VERIFIED**: Grounded in official syllabus text. |
-| `sourceReference` | `SRC-NIE-G1011-TG` | `SRC-G11-RAGA-ID` (`sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2`) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **CORRECTED**: Mapped to exact Grade 11 raga identification document. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 8–11 | A | **VERIFIED**: Prescribed Grade 8–11 school raga. |
+### 1.3 Source, review, and publication fields
 
----
-
-### 1.3 `raga-kafi` (කාෆි රාගය) — Prescribed School Raga (Grade 9–11)
-*Source Document: `oriental_music_markdown/by-source/grade_11_raga_identification.md` (`SRC-G11-RAGA-ID`)*
-
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 9–11) | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Listed in official prescribed syllabus on PDF Page 1. |
-| `name_si` | `"කාෆි රාගය (කාෆී)"` | `"කාෆි රාගය (කාෆී)"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Canonical Sinhala name. |
-| `name_en` | `"Raga Kafi"` | `"Raga Kafi"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Standard transliteration. |
-| `thata_si` | `"කාෆි ථාටය"` | `"කාෆි ථාටය"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Janaka Thata (කාෆී). |
-| `arohana_si` | `"ස , රි , ග(කෝ) , ම , ප , ධ , නි(කෝ) , ස̇"` | `"ස , රි , ග(කෝ) , ම , ප , ධ , නි(කෝ) , ස̇"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Komal Ga and Komal Ni in ascent. |
-| `avarohana_si` | `"ස̇ , නි(කෝ) , ධ , ප , ම , ග(කෝ) , රි , ස"` | `"ස̇ , නි(කෝ) , ධ , ප , ම , ග(කෝ) , රි , ස"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Komal Ni and Komal Ga in descent. |
-| `arohana_swaras` | `["S", "R", "g", "M", "P", "D", "n", "S'"]` | `["S", "R", "g", "M", "P", "D", "n", "S'"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: 8-element array with `"g"` and `"n"`. |
-| `avarohana_swaras` | `["S'", "n", "D", "P", "M", "g", "R", "S"]` | `["S'", "n", "D", "P", "M", "g", "R", "S"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: 8-element descending array. |
-| `swara_forms` | Komal Ga, Komal Ni | Komal Ga (ගාන්ධාර) and Komal Ni (නිෂාද); Shuddha Ri, Ma, Pa, Dha | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Explicitly states `"ග නි ස්වර කෝමල වේ"`. |
-| `omitted_swaras` | None | None (Sampurna) | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: All 7 swaras present in ascent and descent. |
-| `vadi_si` | `"පඤ්චම (ප)"` | `"පඤ්චම (ප)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Vadi is Panchama (ප). |
-| `samvadi_si` | `"ෂඩ්ජ (ස)"` | `"ෂඩ්ජ (ස)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Samvadi is Shadja (ස). |
-| `jati_si` | `"සම්පූර්ණ - සම්පූර්ණ"` | `"සම්පූර්ණ - සම්පූර්ණ (ස්වර 7 ම යෙදේ)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Sampurna-Sampurna. |
-| `time_si` | `"රාත්‍රී දෙවන ප්‍රහාරය"` | `"රාත්‍රී දෙවන ප්‍රහාරය (මධ්‍යම රාත්‍රිය)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Second prahara of the night (රාත්‍රී ශ්‍දලන ප්‍රශරය). |
-| `pakad_si` | `"ස ස , රි රි , ග(කෝ) ග(කෝ) , ම ම , ප"` | `"ස ස , රි රි , ග(කෝ) ග(කෝ) , ම ම , ප"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Canonical Mukhyangaya (`ව ව , රි රි , ග ග , ම ම , ඳ`). |
-| `samplePhrases` | `["S", "S", "R", "R", "g", "g", "M", "M", "P"]` | `[{"name_si": "මුඛ්‍යාංගය (පකඩ්)", "swaras": ["S", "S", "R", "R", "g", "g", "M", "M", "P"]}]` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Aligned with canonical phrase. |
-| `characteristics_si` | General text | Prescribed 3 bullet summary (Komal Ga/Ni, Sampurna jati, Vadi Pa, midnight performance) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **VERIFIED**: Grounded in official syllabus text. |
-| `sourceReference` | `SRC-NIE-G1011-TG` | `SRC-G11-RAGA-ID` (`sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2`) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **CORRECTED**: Mapped to exact Grade 11 raga identification document. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 9–11 | A | **VERIFIED**: Prescribed Grade 9–11 school raga. |
-
----
-
-### 1.4 `raga-khamaj` (ඛමාජ් රාගය) — Prescribed School Raga (Grade 9–11)
-*Source Document: `oriental_music_markdown/by-source/grade_11_raga_identification.md` (`SRC-G11-RAGA-ID`)*
-
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 9–11) | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Listed in official prescribed syllabus on PDF Page 1. |
-| `name_si` | `"ඛමාජ් රාගය (ඛ්මාජ්)"` | `"ඛමාජ් රාගය (ඛ්මාජ්)"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Canonical Sinhala name. |
-| `name_en` | `"Raga Khamaj"` | `"Raga Khamaj"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Standard transliteration. |
-| `thata_si` | `"ඛමාජ් ථාටය"` | `"ඛමාජ් ථාටය"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Janaka Thata (ඛමාජ්). |
-| `arohana_si` | `"ස , ග , ම , ප , ධ , නි , ස̇"` | `"ස , ග , ම , ප , ධ , නි , ස̇"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Hexatonic ascent with Shuddha Ni (`ස ග ම ඳ ධ නි ස̇`). |
-| `avarohana_si` | `"ස̇ , නි(කෝ) , ධ , ප , ම , ග , රි , ස"` | `"ස̇ , නි(කෝ) , ධ , ප , ම , ග , රි , ස"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Heptatonic descent with Komal Ni (`ස̇ නි ධ ඳ ම ග රි ස`). |
-| `arohana_swaras` | `["S", "G", "M", "P", "D", "N", "S'"]` | `["S", "G", "M", "P", "D", "N", "S'"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: 7-element array (without R). |
-| `avarohana_swaras` | `["S'", "n", "D", "P", "M", "G", "R", "S"]` | `["S'", "n", "D", "P", "M", "G", "R", "S"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: 8-element array with `"n"`. |
-| `swara_forms` | Dwi-Nishada (Shuddha Ni in ascent, Komal Ni in descent) | Dwi-Nishada (ආරෝහණයේ ශුද්ධ නි, අවරෝහණයේ කෝමල නි) | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Explicitly states `"ද්වි නිෂාද යෙදේ"`. |
-| `omitted_swaras` | Ri omitted in ascent | Ri (රිෂභ) omitted in ascent only | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Explicitly states `"ආරෝහණයේ රි වර්ජ්‍ය වේ"`. |
-| `vadi_si` | `"ගාන්ධාර (ග)"` | `"ගාන්ධාර (ග)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Vadi is Gandhara (ග). |
-| `samvadi_si` | `"නිෂාද (නි)"` | `"නිෂාද (නි)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Samvadi is Nishada (නි). |
-| `jati_si` | `"ෂාඩව - සම්පූර්ණ"` | `"ෂාඩව - සම්පූර්ණ (ආරෝහණයේ 'රි' වර්ජිතය)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Shadav-Sampurna (6 ascent, 7 descent). |
-| `time_si` | `"රාත්‍රී දෙවන ප්‍රහාරය"` | `"රාත්‍රී දෙවන ප්‍රහාරය (මධ්‍යම රාත්‍රිය)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Second prahara of the night (රාත්‍රී ශ්‍දලන ප්‍රශරය). |
-| `pakad_si` | `"නි ධ , ම ප ධ , ම ග"` | `"නි ධ , ම ප ධ , ම ග"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Canonical Mukhyangaya (`නි ධ , ම ඳ ධ , ම ග`). |
-| `samplePhrases` | `["n", "D", "M", "P", "D", "M", "G"]` | `[{"name_si": "මුඛ්‍යාංගය (පකඩ්)", "swaras": ["n", "D", "M", "P", "D", "M", "G"]}]` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Aligned with canonical phrase. |
-| `characteristics_si` | General text | Prescribed 3 bullet summary (Dwi-Nishada, Shadav-Sampurna, Vadi Ga, midnight performance) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **VERIFIED**: Grounded in official syllabus text. |
-| `sourceReference` | `SRC-NIE-G1011-TG` | `SRC-G11-RAGA-ID` (`sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2`) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **CORRECTED**: Mapped to exact Grade 11 raga identification document. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 9–11 | A | **VERIFIED**: Prescribed Grade 9–11 school raga. |
-
----
-
-### 1.5 `raga-bhimpalasi` (භිම්පලාසි රාගය) — Prescribed School Raga (Grade 10–11)
-*Source Document: `oriental_music_markdown/by-source/grade_11_raga_identification.md` (`SRC-G11-RAGA-ID`)*
-
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 10–11) | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Listed in official prescribed syllabus on PDF Page 1. |
-| `name_si` | `"භිම්පලාසි රාගය (භීම්පලාශ්‍රී)"` | `"භිම්පලාසි රාගය (භීම්පලාශ්‍රී)"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Canonical Sinhala name and Sanskrit alias. |
-| `name_en` | `"Raga Bhimpalasi"` | `"Raga Bhimpalasi"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Standard transliteration. |
-| `thata_si` | `"කාෆි ථාටය"` | `"කාෆි ථාටය"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Thata is Kafi (කාෆී). |
-| `arohana_si` | `"නි̣(කෝ) . ස ග(කෝ) ම ප නි(කෝ) ස̇"` | `"නි̣(කෝ) . ස ග(කෝ) ම ප නි(කෝ) ස̇"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Mandra Komal Ni leading into Sa, Komal Ga, Ma, Pa, Komal Ni, Tara Sa. |
-| `avarohana_si` | `"ස̇ නි(කෝ) ධ ප ම ග(කෝ) රි ස"` | `"ස̇ නි(කෝ) ධ ප ම ග(කෝ) රි ස"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Heptatonic descent with Komal Ni and Komal Ga (`ස̇ නි ධ ඳ ම ග රි ස`). |
-| `arohana_swaras` | `["n", "S", "g", "M", "P", "n", "S'"]` | `[".n", "S", "g", "M", "P", "n", "S'"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **CORRECTED**: Opening note marked as Mandra Komal Ni (`".n"`) for accurate pitch synthesis. |
-| `avarohana_swaras` | `["S'", "n", "D", "P", "M", "g", "R", "S"]` | `["S'", "n", "D", "P", "M", "g", "R", "S"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: 8-element descending array. |
-| `swara_forms` | Komal Ga, Komal Ni | Komal Ga (ගාන්ධාර) and Komal Ni (නිෂාද); Shuddha Ri, Ma, Pa, Dha | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Explicitly states `"ග නි ස්වර කෝමල වේ"`. |
-| `omitted_swaras` | Ri and Dha omitted in ascent | Ri (රිෂභ) and Dha (ධෛවත) omitted in ascent only | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Explicitly states `"ආරෝහණයේ රි ධ වර්ජ්‍ය වේ"`. |
-| `vadi_si` | `"මධ්‍යම (ම)"` | `"මධ්‍යම (ම)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Vadi is Madhyama (ම). |
-| `samvadi_si` | `"ෂඩ්ජ (ස)"` | `"ෂඩ්ජ (ස)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Samvadi is Shadja (ස). |
-| `jati_si` | `"ඖඩව - සම්පූර්ණ"` | `"ඖඩව - සම්පූර්ණ (ආරෝහණයේ 'රි' සහ 'ධ' වර්ජිතය)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Audav-Sampurna (5 ascent, 7 descent). |
-| `time_si` | `"දිවා තෙවන ප්‍රහාරය"` | `"දිවා තෙවන ප්‍රහාරය (පස්වරුව)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Third prahara of the day / late afternoon (රාත්‍රී/දිවා තෙවන ප්‍රශරය - පස්වරුව). |
-| `pakad_si` | `"නි̣(කෝ) ස ම , ම ප ග(කෝ) ම ග(කෝ) රි ස"` | `"නි̣(කෝ) ස ම , ම ප ග(කෝ) ම ග(කෝ) රි ස"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Canonical Mukhyangaya (`නි. ව ම , ඳ ම ග , ම ග රි ව`). |
-| `samplePhrases` | `["n", "S", "M", "M", "P", "g", "M", "g", "R", "S"]` | `[{"name_si": "මුඛ්‍යාංගය (පකඩ්)", "swaras": [".n", "S", "M", "M", "P", "g", "M", "g", "R", "S"]}]` | `grade_11_raga_identification.md` | PDF Page 2 | A | **CORRECTED**: Grounded opening note in Mandra Saptaka (`".n"`). |
-| `characteristics_si` | General text | Prescribed 3 bullet summary (Audav-Sampurna, Komal Ga/Ni, Vadi Ma, late afternoon performance) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **VERIFIED**: Grounded in official syllabus text. |
-| `sourceReference` | `SRC-NIE-G1011-TG` | `SRC-G11-RAGA-ID` (`sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2`) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **CORRECTED**: Mapped to exact Grade 11 raga identification document. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 10–11 | A | **VERIFIED**: Prescribed Grade 10–11 school raga. |
-
----
-
-### 1.6 `raga-yaman` (යමන් රාගය) — Prescribed School Raga (Grade 8–11)
-*Source Document: `oriental_music_markdown/by-source/grade_11_raga_identification.md` (`SRC-G11-RAGA-ID`)*
-
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 8–11) | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Listed in official prescribed syllabus on PDF Page 1. |
-| `name_si` | `"යමන් රාගය (කල්‍යාන්)"` | `"යමන් රාගය (කල්‍යාන්)"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Canonical Sinhala name and Kalyan alias. |
-| `name_en` | `"Raga Yaman (Kalyan)"` | `"Raga Yaman (Kalyan)"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Standard transliteration. |
-| `thata_si` | `"කල්‍යාන් ථාටය"` | `"කල්‍යාන් ථාටය"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Janaka Thata (කල්‍යාණ). |
-| `arohana_si` | `"නි̣ , රි , ග , ම(තී) , ධ , නි , ස̇"` | `"නි̣ , රි , ග , ම(තී) , ධ , නි , ස̇"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Mandra Ni leading into Ri, Ga, Teevra Ma, Dha, Ni, Tara Sa. |
-| `avarohana_si` | `"ස̇ , නි , ධ , ප , ම(තී) , ග , රි , ස"` | `"ස̇ , නි , ධ , ප , ම(තී) , ග , රි , ස"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Heptatonic descent with Teevra Ma (`ස̇ නි ධ ඳ ම́ ග රි ස`). |
-| `arohana_swaras` | `["N", "R", "G", "m", "D", "N", "S'"]` | `[".N", "R", "G", "m", "D", "N", "S'"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **CORRECTED**: Opening note marked as Mandra Shuddha Ni (`".N"`) for accurate pitch synthesis. |
-| `avarohana_swaras` | `["S'", "N", "D", "P", "m", "G", "R", "S"]` | `["S'", "N", "D", "P", "m", "G", "R", "S"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: 8-element descending array with `"m"` (Teevra Ma). |
-| `swara_forms` | Teevra Ma | Teevra Ma (මධ්‍යම තීව්‍ර වේ); all other swaras Shuddha | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Explicitly states `"මධ්‍යමය තීව්‍ර වේ"`. |
-| `omitted_swaras` | Sa omitted in ascent start | Direct Sa omitted in ascent initiation (starts from Mandra Ni) | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Explicitly noted in performance practice notes. |
-| `vadi_si` | `"ගාන්ධාර (ග)"` | `"ගාන්ධාර (ග)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Vadi is Gandhara (ග). |
-| `samvadi_si` | `"නිෂාද (නි)"` | `"නිෂාද (නි)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Samvadi is Nishada (නි). |
-| `jati_si` | `"සම්පූර්ණ - සම්පූර්ණ"` | `"සම්පූර්ණ - සම්පූර්ණ (ආරෝහණයේ 'ස' මඟහැර මන්ද්‍ර නි වෙතින් ඇරඹෙයි)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Sampurna-Sampurna. |
-| `time_si` | `"රාත්‍රී ප්‍රථම ප්‍රහාරය"` | `"රාත්‍රී ප්‍රථම ප්‍රහාරය (සන්ධ්‍යා කාලය)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: First prahara of the night / evening (රාත්‍රී ප්‍රථම ප්‍රශරය). |
-| `pakad_si` | `"නි̣ රි ග රි ස , ප ම(තී) ග රි ස"` | `"නි̣ රි ග රි ස , ප ම(තී) ග රි ස"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Canonical Mukhyangaya (`නි. රි ග රි ව , ඳ ම ග රි ව`). |
-| `samplePhrases` | `["N", "R", "G", "R", "S", "P", "m", "G", "R", "S"]` | `[{"name_si": "මුඛ්‍යාංගය (පකඩ්)", "swaras": [".N", "R", "G", "R", "S", "P", "m", "G", "R", "S"]}]` | `grade_11_raga_identification.md` | PDF Page 2 | A | **CORRECTED**: Grounded opening note in Mandra Saptaka (`".N"`). |
-| `characteristics_si` | General text | Prescribed 3 bullet summary (Teevra Ma, Mandra Ni ascent start, Vadi Ga, evening performance) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **VERIFIED**: Grounded in official syllabus text. |
-| `sourceReference` | `SRC-NIE-G1011-TG` | `SRC-G11-RAGA-ID` (`sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2`) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **CORRECTED**: Mapped to exact Grade 11 raga identification document. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 8–11 | A | **VERIFIED**: Prescribed Grade 8–11 school raga. |
-
----
-
-### 1.7 `raga-bhairavi` (භෛරවී රාගය) — Prescribed School Raga (Grade 10–11)
-*Source Document: `oriental_music_markdown/by-source/grade_11_raga_identification.md` (`SRC-G11-RAGA-ID`)*
-
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 10–11) | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Listed in official prescribed syllabus on PDF Page 1. |
-| `name_si` | `"භෛරවී රාගය"` | `"භෛරවී රාගය"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Canonical Sinhala name. |
-| `name_en` | `"Raga Bhairavi"` | `"Raga Bhairavi"` | `grade_11_raga_identification.md` | PDF Page 1 | A | **VERIFIED**: Standard transliteration. |
-| `thata_si` | `"භෛරවී ථාටය"` | `"භෛරවී ථාටය"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Janaka Thata (භෛරවී). |
-| `arohana_si` | `"ස , රි(කෝ) , ග(කෝ) , ම , ප , ධ(කෝ) , නි(කෝ) , ස̇"` | `"ස , රි(කෝ) , ග(කෝ) , ම , ප , ධ(කෝ) , නි(කෝ) , ස̇"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: 4 Komal swaras (Ri, Ga, Dha, Ni) in ascent. |
-| `avarohana_si` | `"ස̇ , නි(කෝ) , ධ(කෝ) , ප , ම , ග(කෝ) , රි(කෝ) , ස"` | `"ස̇ , නි(කෝ) , ධ(කෝ) , ප , ම , ග(කෝ) , රි(කෝ) , ස"` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: 4 Komal swaras (Ni, Dha, Ga, Ri) in descent. |
-| `arohana_swaras` | `["S", "r", "g", "M", "P", "d", "n", "S'"]` | `["S", "r", "g", "M", "P", "d", "n", "S'"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: 8-element array with `"r"`, `"g"`, `"d"`, `"n"`. |
-| `avarohana_swaras` | `["S'", "n", "d", "P", "M", "g", "r", "S"]` | `["S'", "n", "d", "P", "M", "g", "r", "S"]` | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: 8-element descending array. |
-| `swara_forms` | Komal Ri, Ga, Dha, Ni | Komal Ri, Ga, Dha, Ni (රි ග ධ නි ස්වර කෝමල වේ); Shuddha Ma, Pa, Sa | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: Explicitly states `"රි ග ධ නි යන ස්වර කෝමල වේ. ස්වර 7 ම යෙදේ"`. |
-| `omitted_swaras` | None | None (Sampurna) | `grade_11_raga_identification.md` | PDF Page 1, 2 | A | **VERIFIED**: All 7 swaras present in ascent and descent. |
-| `vadi_si` | `"මධ්‍යම (ම)"` | `"මධ්‍යම (ම)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Vadi is Madhyama (ම). |
-| `samvadi_si` | `"ෂඩ්ජ (ස)"` | `"ෂඩ්ජ (ස)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Samvadi is Shadja (ස). |
-| `jati_si` | `"සම්පූර්ණ - සම්පූර්ණ"` | `"සම්පූර්ණ - සම්පූර්ණ (ස්වර 7 ම යෙදේ)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Sampurna-Sampurna. |
-| `time_si` | `"දිවා ප්‍රථම ප්‍රහාරය"` | `"දිවා ප්‍රථම ප්‍රහාරය (පාන්දර / ප්‍රාතඃ කාලය)"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: First prahara of the day (දිවා ප්‍රථම ප්‍රශරය). |
-| `pakad_si` | `"ම ග(කෝ) , ස රි(කෝ) ස , ධ̣(කෝ) නි̣(කෝ) ස"` | `"ම ග(කෝ) , ස රි(කෝ) ස , ධ̣(කෝ) නි̣(කෝ) ස"` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Canonical Mukhyangaya (`ම ග , ව රි ව , ධ. නි. ව`). |
-| `samplePhrases` | `["M", "g", "S", "r", "S", ".d", ".n", "S"]` | `[{"name_si": "මුඛ්‍යාංගය (පකඩ්)", "swaras": ["M", "g", "S", "r", "S", ".d", ".n", "S"]}]` | `grade_11_raga_identification.md` | PDF Page 2 | A | **VERIFIED**: Aligned with canonical phrase. |
-| `characteristics_si` | General text | Prescribed 3 bullet summary (4 Komal swaras, Sampurna jati, Vadi Ma, morning / concluding performance) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **VERIFIED**: Grounded in official syllabus text. |
-| `sourceReference` | `SRC-NIE-G1011-TG` | `SRC-G11-RAGA-ID` (`sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2`) | `grade_11_raga_identification.md` | PDF Pages 1–2 | A | **CORRECTED**: Mapped to exact Grade 11 raga identification document. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 10–11 | A | **VERIFIED**: Prescribed Grade 10–11 school raga. |
-
----
-
-### 1.8 `raga-bhairav` (භෛරව රාගය) — Quarantined Entity (Unestablished in G6–11 School Syllabus)
-
-| Field | Baseline State | Remediation Disposition | Source Evidence Status | Disposition & Musicological Justification |
+| Entity set | `sourceReference` | `reviewMetadata` | Browse band | Publication disposition |
 |---|---|---|---|---|
-| `prescribedInclusion` | Quarantined | **QUARANTINED** | Absent in `grade_11_raga_identification.md` (PDF Page 1 lists 7 ragas: Bilawal, Bhupali, Yaman, Khamaj, Kafi, Bhimpalasi, Bhairavi) | **RETAINED IN QUARANTINE**: Not established in supplied prescribed Grade 6–11 syllabus corpus. |
-| `allMusicologicalFields` | Raw data in `ragas.json` | **WITHHELD FROM PUBLIC API** | Unverified for school syllabus scope | **WITHHELD**: Excluded from `repository.getRagas()` and public UI routes. |
-| `reviewMetadata` | Fabricated approval | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A | **CORRECTED**: Metadata sanitized to prevent false verification claims. |
-| `publicationDisposition` | Quarantined | **QUARANTINED / WITHHELD** | Bounded quarantine rule | **QUARANTINED**: Returns 404 on direct route navigation. |
+| Seven prescribed ragas | `SRC-G11-RAGA-ID`, `sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2` | Explicit unknown/unverified (N/A) | `10-11`, containing evidenced Grade 11 | **PUBLIC** after field correction; no Grade 10 evidence is inferred. |
+| `raga-bhairav` | Raw locator is not accepted as prescribed-list evidence | Explicit unknown/unverified (N/A) | N/A | **QUARANTINED**; every raw musical field above remains individually withheld. |
 
----
+## 2. Tala evidence
 
-## 2. Canonical Talas Field-by-Field Audit Matrix
+Canonical structural source: `oriental_music_markdown/by-source/grade_10_musical_fundamentals.md`, extracted from `sg10_emus_chap1_mulikanga.pdf`, PDF pages 2–7 (`SRC-EPD-TB-G10`, quality A). Grade 11 pages 23–24 establish prescribed names but are not embedded inside a singular Grade 10 `SourceReference`; every published reference names only the document selected by its `sourceId`.
 
-### 2.1 `tala-dadra` (දාදරා තාලය) — Prescribed School Tala (Grade 6–11)
-*Source Document: `oriental_music_markdown/by-source/grade_10_musical_fundamentals.md` (`SRC-EPD-TB-G10`)*
+### 2.1 Inclusion, grade, name, structure, and hand actions
 
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 6–11) | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **VERIFIED**: Explicitly listed as prescribed school tala on PDF Page 6. |
-| `name_si` | `"දාදරා තාලය"` | `"දාදරා තාලය"` | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **VERIFIED**: Canonical Sinhala name. |
-| `name_en` | `"Tala Dadra"` | `"Tala Dadra"` | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **VERIFIED**: Standard transliteration. |
-| `matras` | 6 | 6 | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **VERIFIED**: 6 matras total. |
-| `vibhagCount` | 2 | 2 | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **VERIFIED**: 2 vibhagas. |
-| `vibhagStructure` | `[3, 3]` | `[3, 3]` | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **VERIFIED**: Equal 3+3 division. |
-| `tali_khali_sam` | Tali: 1 (Sam), Khali: 4 | Sam (x) on matra 1, Khali (0) on matra 4 | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **VERIFIED**: Explicitly diagrammed on PDF Page 6 (`x` on 1, `0` on 4). |
-| `theka_si` | `"ධා ධින් නා \| ධා තින් නා"` | `"ධා ධී නා \| ධා තී නා"` | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **VERIFIED**: Canonical school theka (`ධා ධි/ධී නා \| ධා තූ/තී නා`). |
-| `theka_en` | `"Dha Dhin Na \| Dha Tin Na"` | `"Dha Dhi Na \| Dha Ti Na"` | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **VERIFIED**: Aligned English stroke names. |
-| `bols` | 6 bol objects | 6 structured bol objects with matra, vibhagIndex, isSam, isTali, isKhali | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **VERIFIED**: 1:1 mapping with the 6 matras. |
-| `tempo_context` | Generic | Madhyama/Druta laya; widely used in light songs and Sinhala sarala gee | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **VERIFIED**: Documented school performance context. |
-| `sourceReference` | `SRC-NIE-G07-TG` (Page 34) | `SRC-EPD-TB-G10` (`sg10_emus_chap1_mulikanga.pdf පිටුව 6`) | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **CORRECTED**: Replaced unverified Grade 7 citation with verified Grade 10 fundamentals. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 6–11 | A | **VERIFIED**: Prescribed Grade 6–11 school tala. |
+| Entity | Inclusion / grade | `name_si` | `name_en` | `matras` | `vibhagStructure` / count | Sam, tali, khali | Page | Disposition |
+|---|---|---|---|---:|---|---|---|---|
+| `tala-dadra` | Grade 10 | දාද්‍රා තාලය | Dadra Tala (editorial, N/A) | 6 | `3+3` / 2 | X on 1; 0 on 4 | 6 | **CORRECTED / VERIFIED**; lower-grade claims removed. |
+| `tala-keherwa` | Grade 10 | කෙහෙර්වා තාලය | Keherwa Tala (editorial, N/A) | 8 | `4+4` / 2 | X on 1; 0 on 5 | 3, 6 | **CORRECTED / VERIFIED**. |
+| `tala-teental` | Grade 10 | ත්‍රිතාල් තාලය | Teental Tala (editorial, N/A) | 16 | `4+4+4+4` / 4 | X/2/0/3 on 1/5/9/13 | 4–5 | **VERIFIED**. |
+| `tala-jhaptal` | Grade 10 | ජප් තාලය | Jhaptal (editorial, N/A) | 10 | `2+3+2+3` / 4 | X/2/0/3 on 1/3/6/8 | 2, 6 | **VERIFIED**. |
+| `tala-deepchandi` | Grade 10 | දීප්චන්දි තාලය | Deepchandi Tala (editorial, N/A) | 14 | `3+4+3+4` / 4 | X/2/0/3 on 1/4/8/11 | 2, 4–5 | **VERIFIED**. |
+| `tala-lawani` | Grade 10 | ලාවනී තාලය | Lawani Tala (editorial, N/A) | 8 | `2+2+2+2` / 4 | X/2/0/3 on 1/3/5/7 | 3, 6 | **CORRECTED / VERIFIED**. |
+| `tala-khemta` | Grade 10 | ඛෙම්ටෝ තාලය (ඛෙම්ටා) | Khemta Tala (editorial, N/A) | 4 | `2+2` / 2 | X on 1; 0 on 3 | 7 | **CORRECTED / VERIFIED**; three aksharas per matra. |
+| `tala-roopak` | Not in supplied list | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | none | **NEEDS-REVIEW / QUARANTINED**. |
 
----
+### 2.2 Exact theka and bol-to-matra fields
 
-### 2.2 `tala-keherwa` (කෙහර්වා තාලය) — Prescribed School Tala (Grade 6–11)
-*Source Document: `oriental_music_markdown/by-source/grade_10_musical_fundamentals.md` (`SRC-EPD-TB-G10`)*
+| Entity | `theka_si` | `bols[].bol_si` by matra | Evidence / disposition |
+|---|---|---|---|
+| `tala-dadra` | `ධා ධී නා \| ධා තී නා` | `ධා, ධී, නා, ධා, තී, නා` | Page 6, A. |
+| `tala-keherwa` | `ධා ගේ න ත \| න ක ධ න` | `ධා, ගේ, න, ත, න, ක, ධ, න` | Pages 3, 6, A. |
+| `tala-teental` | `ධා ධින් ධින් ධා \| ධා ධින් ධින් ධා \| ධා තින් තින් තා \| තා ධින් ධින් ධා` | 16 one-to-one cells | Pages 4–5, A. |
+| `tala-jhaptal` | `ධී නා \| ධී ධී නා \| තී නා \| ධී ධී නා` | 10 one-to-one cells | Pages 2, 6, A; normalized spelling needs original-PDF visual confirmation. |
+| `tala-deepchandi` | `ධා ධින් - \| ධා ධා ධින් - \| තා තින් - \| ධා ධා ධින් -` | 14 cells including rests | Pages 2, 4–5, A. |
+| `tala-lawani` | `ධා ගේ \| න ත \| න ක \| ධ න` | `ධා, ගේ, න, ත, න, ක, ධ, න` | Pages 3, 6, A; exact table restored. |
+| `tala-khemta` | `ධන්න ධනක \| තන්න ධනක` | `ධන්න, ධනක, තන්න, ධනක` | Page 7, A; four compound matra cells. |
+| `tala-roopak` | **WITHHELD** | **WITHHELD** | No accepted evidence. |
 
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 6–11) | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: Listed as prescribed school tala on PDF Pages 3 and 6. |
-| `name_si` | `"කෙහර්වා තාලය"` | `"කෙහර්වා තාලය"` | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: Canonical Sinhala name. |
-| `name_en` | `"Tala Keherwa"` | `"Tala Keherwa"` | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: Standard transliteration. |
-| `matras` | 8 | 8 | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: 8 matras total. |
-| `vibhagCount` | 2 | 2 | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: 2 vibhagas. |
-| `vibhagStructure` | `[4, 4]` | `[4, 4]` | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: 4+4 division. |
-| `tali_khali_sam` | Tali: 1 (Sam), Khali: 5 | Sam (x) on matra 1, Khali (0) on matra 5 | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: Explicitly diagrammed on PDF Page 3 and Page 6 (`x` on 1, `0` on 5). |
-| `theka_si` | `"ධා ගෙ නා තින් \| නා ක ධින් නා"` | `"ධා ගෙ නා තින් \| නා ක ධින් නා"` | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: Canonical school theka (`ධා ගෙ න ත \| න ක ධ න`). |
-| `theka_en` | `"Dha Ge Na Tin \| Na Ka Dhin Na"` | `"Dha Ge Na Tin \| Na Ka Dhin Na"` | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: Aligned English strokes. |
-| `bols` | 8 bol objects | 8 structured bol objects | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: 1:1 mapping with 8 matras. |
-| `tempo_context` | Generic | Madhyama/Druta laya; foundation for fast rhythmic Sinhala songs | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: Documented school performance context. |
-| `sourceReference` | `SRC-NIE-G08-TG` | `SRC-EPD-TB-G10` (`sg10_emus_chap1_mulikanga.pdf පිටු 3, 6`) | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **CORRECTED**: Mapped to exact Grade 10 fundamentals source. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 6–11 | A | **VERIFIED**: Prescribed Grade 6–11 school tala. |
+### 2.3 Context, practice tempo, source, review, and publication fields
 
----
+| Entity / field | Audited state | Quality | Disposition |
+|---|---|---|---|
+| Lawani school context | Same bol sequence as Keherwa but different division; Grade 11 explains the school-system prescription | A for Grade 10 pages 3, 6; Grade 11 is ledger corroboration | **VERIFIED**, without generic Hindustani framing. |
+| Khemta laya context | Source says its laya is fast | A, page 7 | **VERIFIED** only as qualitative `fast`. |
+| Other tempo/usage claims | Not established by cited pages | N/A | **WITHHELD** from curriculum claims. |
+| `practiceTempoBpm` | Client-only visualizer/game defaults | N/A | **PRACTICE DEFAULT**, not curriculum evidence. |
+| Seven public `sourceReference` values | One `SRC-EPD-TB-G10` document and its own explicit pages | A | **CORRECTED**; embedded Grade 11 filenames removed. |
+| Seven public `reviewMetadata` values | Explicit unknown/unverified | N/A | No SME/publication event claimed. |
+| Seven public browse bands | `10-11`, containing evidenced Grade 10 | N/A | **PUBLIC**; no Grade 11 evidence inferred from the band. |
+| `tala-roopak` source/review/publication | Every raw musical field withheld; metadata unknown; stable-ID quarantine | N/A | **QUARANTINED**. |
 
-### 2.3 `tala-teental` (ත්‍රීතාල් තාලය) — Prescribed School Tala (Grade 7–11)
-*Source Document: `oriental_music_markdown/by-source/grade_10_musical_fundamentals.md` (`SRC-EPD-TB-G10`)*
+## 3. Acoustics and quiz evidence
 
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 7–11) | `grade_10_musical_fundamentals.md` | PDF Pages 4–5 | A | **VERIFIED**: Listed on PDF Pages 4 and 5. |
-| `name_si` | `"ත්‍රීතාල් තාලය (තීන්තාල)"` | `"ත්‍රීතාල් තාලය (තීන්තාල)"` | `grade_10_musical_fundamentals.md` | PDF Pages 4–5 | A | **VERIFIED**: Canonical Sinhala name and Teental alias. |
-| `name_en` | `"Tala Teental (Tritaal)"` | `"Tala Teental (Tritaal)"` | `grade_10_musical_fundamentals.md` | PDF Pages 4–5 | A | **VERIFIED**: Standard transliteration. |
-| `matras` | 16 | 16 | `grade_10_musical_fundamentals.md` | PDF Pages 4–5 | A | **VERIFIED**: 16 matras total (King of Talas). |
-| `vibhagCount` | 4 | 4 | `grade_10_musical_fundamentals.md` | PDF Pages 4–5 | A | **VERIFIED**: 4 vibhagas. |
-| `vibhagStructure` | `[4, 4, 4, 4]` | `[4, 4, 4, 4]` | `grade_10_musical_fundamentals.md` | PDF Pages 4–5 | A | **VERIFIED**: 4+4+4+4 equal division. |
-| `tali_khali_sam` | Tali: 1 (Sam), 5, 13; Khali: 9 | Sam (x) on 1, Tali 2 on 5, Khali (0) on 9, Tali 3 on 13 (`x 2 0 3`) | `grade_10_musical_fundamentals.md` | PDF Pages 4–5 | A | **VERIFIED**: Explicitly diagrammed (`x 2 0 3` sequence). |
-| `theka_si` | `"ධා ධින් ධින් ධා \| ධා ධින් ධින් ධා \| ධා තින් තින් තා \| තා ධින් ධින් ධා"` | `"ධා ධින් ධින් ධා \| ධා ධින් ධින් ධා \| ධා තින් තින් තා \| තා ධින් ධින් ධා"` | `grade_10_musical_fundamentals.md` | PDF Pages 4–5 | A | **VERIFIED**: Canonical classical theka (`ධා ධං ධං ධා \| ධා ධං ධං ධා \| ධා තං තං ත \| ත ධං ධං ධා`). |
-| `theka_en` | Standard | `"Dha Dhin Dhin Dha \| Dha Dhin Dhin Dha \| Dha Tin Tin Ta \| Ta Dhin Dhin Dha"` | `grade_10_musical_fundamentals.md` | PDF Pages 4–5 | A | **VERIFIED**: Standard transliteration. |
-| `bols` | 16 bol objects | 16 structured bol objects | `grade_10_musical_fundamentals.md` | PDF Pages 4–5 | A | **VERIFIED**: 1:1 mapping with 16 matras. |
-| `tempo_context` | Generic | Vilambit, Madhya, Druta; canonical vehicle for classical chota/bada khayal | `grade_10_musical_fundamentals.md` | PDF Pages 4–5 | A | **VERIFIED**: Documented school performance context. |
-| `sourceReference` | `SRC-NIE-G08-TG` | `SRC-EPD-TB-G10` (`sg10_emus_chap1_mulikanga.pdf පිටු 4-5`) | `grade_10_musical_fundamentals.md` | PDF Pages 4–5 | A | **CORRECTED**: Mapped to exact Grade 10 fundamentals source. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 7–11 | A | **VERIFIED**: Prescribed Grade 7–11 school tala. |
+Canonical source: `oriental_music_markdown/by-source/grade_10_nadaya.md`, extracted from `sg10_emus_chap8_nadaya.pdf` (`SRC-G10-NADA`, quality A).
 
----
+| Field / entity | Final state | Exact pages | Disposition |
+|---|---|---|---|
+| Curriculum grade | Grade 10 Unit 8 | 2–3 | **CORRECTED** from false Grade 6 claims. |
+| Pitch | තාරතාවය / උච්චනීච ප්‍රභේදය | 3–4 | **VERIFIED**. |
+| Intensity | විපුලතාවය / රූප භේදය | 3, 7–8 | **VERIFIED**. |
+| Timbre | ධ්වනි ගුණය / ජාති භේදය | 3, 10–11 | **VERIFIED**. |
+| `term-nada` | Narrow source-grounded description | 2 | **CORRECTED / VERIFIED**. |
+| `term-sound` | No bounded definition found | N/A | **NEEDS-REVIEW / QUARANTINED**. |
+| `term-ahata-nada` | No bounded definition found | N/A | **NEEDS-REVIEW / QUARANTINED**. |
+| `term-anahata-nada` | No bounded definition found | N/A | **NEEDS-REVIEW / QUARANTINED**. |
+| `les-intro-01` | Grade 10 lesson limited to three properties | 2–12 | **CORRECTED / PUBLIC** in browse band `10-11`. |
+| `quiz-les-intro-01` | Pitch, three properties, timbre | 3, 4, 10–11 | **CORRECTED / PUBLIC**; each question is gated. |
+| `quiz-les-tala-dadra` | Grade 10 Dadra structure | Grade 10 fundamentals page 6 | **CORRECTED / PUBLIC**; stale Grade 7 citation removed. |
+| Terminology review labels | `Unverified` / `Needs Review` | N/A | No undocumented SME/publication event. |
 
-### 2.4 `tala-jhaptal` (ජප්තාලය) — Prescribed School Tala (Grade 10–11)
-*Source Document: `oriental_music_markdown/by-source/grade_10_musical_fundamentals.md` (`SRC-EPD-TB-G10`)*
+## 4. Unresolved evidence boundary
 
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 10–11) | `grade_10_musical_fundamentals.md` | PDF Pages 2, 6 | A | **VERIFIED**: Listed on PDF Pages 2 and 6. |
-| `name_si` | `"ජප්තාලය (ඣප්තාල)"` | `"ජප්තාලය (ඣප්තාල)"` | `grade_10_musical_fundamentals.md` | PDF Pages 2, 6 | A | **VERIFIED**: Canonical Sinhala name. |
-| `name_en` | `"Tala Jhaptal"` | `"Tala Jhaptal"` | `grade_10_musical_fundamentals.md` | PDF Pages 2, 6 | A | **VERIFIED**: Standard transliteration. |
-| `matras` | 10 | 10 | `grade_10_musical_fundamentals.md` | PDF Pages 2, 6 | A | **VERIFIED**: 10 matras total. |
-| `vibhagCount` | 4 | 4 | `grade_10_musical_fundamentals.md` | PDF Pages 2, 6 | A | **VERIFIED**: 4 vibhagas. |
-| `vibhagStructure` | `[2, 3, 2, 3]` | `[2, 3, 2, 3]` | `grade_10_musical_fundamentals.md` | PDF Pages 2, 6 | A | **VERIFIED**: Asymmetrical 2+3+2+3 division (Khanda jati structure). |
-| `tali_khali_sam` | Tali: 1 (Sam), 3, 8; Khali: 6 | Sam (x) on 1, Tali 2 on 3, Khali (0) on 6, Tali 3 on 8 (`x 2 0 3`) | `grade_10_musical_fundamentals.md` | PDF Pages 2, 6 | A | **VERIFIED**: Explicitly diagrammed (`x 2 0 3` sequence). |
-| `theka_si` | `"ධී නා \| ධී ධී නා \| තී නා \| ධී ධී නා"` | `"ධී නා \| ධී ධී නා \| තී නා \| ධී ධී නා"` | `grade_10_musical_fundamentals.md` | PDF Pages 2, 6 | A | **VERIFIED**: Canonical classical theka (`ධ න \| ධ ධ න \| ත න \| ධ ධ න`). |
-| `theka_en` | Standard | `"Dhi Na \| Dhi Dhi Na \| Ti Na \| Dhi Dhi Na"` | `grade_10_musical_fundamentals.md` | PDF Pages 2, 6 | A | **VERIFIED**: Standard transliteration. |
-| `bols` | 10 bol objects | 10 structured bol objects | `grade_10_musical_fundamentals.md` | PDF Pages 2, 6 | A | **VERIFIED**: 1:1 mapping with 10 matras. |
-| `tempo_context` | Generic | Madhyama laya; traditional tala for madhya laya khayal and sadra | `grade_10_musical_fundamentals.md` | PDF Pages 2, 6 | A | **VERIFIED**: Documented school performance context. |
-| `sourceReference` | `SRC-NIE-G1011-TG` | `SRC-EPD-TB-G10` (`sg10_emus_chap1_mulikanga.pdf පිටු 2, 6`) | `grade_10_musical_fundamentals.md` | PDF Pages 2, 6 | A | **CORRECTED**: Mapped to exact Grade 10 fundamentals source. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 10–11 | A | **VERIFIED**: Prescribed Grade 10–11 school tala. |
-
----
-
-### 2.5 `tala-deepchandi` (දීප්චන්දි තාලය) — Prescribed School Tala (Grade 10–11)
-*Source Document: `oriental_music_markdown/by-source/grade_10_musical_fundamentals.md` (`SRC-EPD-TB-G10`)*
-
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 10–11) | `grade_10_musical_fundamentals.md` | PDF Pages 2, 4, 5 | A | **VERIFIED**: Listed on PDF Pages 2, 4, and 5. |
-| `name_si` | `"දීප්චන්දි තාලය (දීප්චන්දී)"` | `"දීප්චන්දි තාලය (දීප්චන්දී)"` | `grade_10_musical_fundamentals.md` | PDF Pages 2, 4, 5 | A | **VERIFIED**: Canonical Sinhala name. |
-| `name_en` | `"Tala Deepchandi"` | `"Tala Deepchandi"` | `grade_10_musical_fundamentals.md` | PDF Pages 2, 4, 5 | A | **VERIFIED**: Standard transliteration. |
-| `matras` | 14 | 14 | `grade_10_musical_fundamentals.md` | PDF Pages 2, 4, 5 | A | **VERIFIED**: 14 matras total. |
-| `vibhagCount` | 4 | 4 | `grade_10_musical_fundamentals.md` | PDF Pages 2, 4, 5 | A | **VERIFIED**: 4 vibhagas. |
-| `vibhagStructure` | `[3, 4, 3, 4]` | `[3, 4, 3, 4]` | `grade_10_musical_fundamentals.md` | PDF Pages 2, 4, 5 | A | **VERIFIED**: 3+4+3+4 division with silent rest on matras 3, 7, 10, 14. |
-| `tali_khali_sam` | Tali: 1 (Sam), 4, 11; Khali: 8 | Sam (x) on 1, Tali 2 on 4, Khali (0) on 8, Tali 3 on 11 (`x 2 0 3`) | `grade_10_musical_fundamentals.md` | PDF Pages 2, 4, 5 | A | **VERIFIED**: Explicitly diagrammed (`x 2 0 3` sequence). |
-| `theka_si` | `"ධා ධින් - \| ධා ධා ධින් - \| තා තින් - \| ධා ධා ධින් -"` | `"ධා ධින් - \| ධා ධා ධින් - \| තා තින් - \| ධා ධා ධින් -"` | `grade_10_musical_fundamentals.md` | PDF Pages 2, 4, 5 | A | **VERIFIED**: Canonical theka with rest tokens (`-`). |
-| `theka_en` | Standard | `"Dha Dhin - \| Dha Dha Dhin - \| Ta Tin - \| Dha Dha Dhin -"` | `grade_10_musical_fundamentals.md` | PDF Pages 2, 4, 5 | A | **VERIFIED**: Standard transliteration. |
-| `bols` | 14 bol objects | 14 structured bol objects (including rest marks) | `grade_10_musical_fundamentals.md` | PDF Pages 2, 4, 5 | A | **VERIFIED**: 1:1 mapping with 14 matras. |
-| `tempo_context` | Generic | Vilambit/Madhya laya; traditional tala for Thumri and expressive semi-classical songs | `grade_10_musical_fundamentals.md` | PDF Pages 2, 4, 5 | A | **VERIFIED**: Documented school performance context. |
-| `sourceReference` | `SRC-NIE-G1011-TG` | `SRC-EPD-TB-G10` (`sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5`) | `grade_10_musical_fundamentals.md` | PDF Pages 2, 4, 5 | A | **CORRECTED**: Mapped to exact Grade 10 fundamentals source. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 10–11 | A | **VERIFIED**: Prescribed Grade 10–11 school tala. |
-
----
-
-### 2.6 `tala-lawani` (ලාවනී තාලය) — Prescribed School Tala (Grade 10–11)
-*Source Document: `oriental_music_markdown/by-source/grade_10_musical_fundamentals.md` (`SRC-EPD-TB-G10`)*
-
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 10–11) | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: Listed on PDF Pages 3 and 6. |
-| `name_si` | `"ලාවනී තාලය"` | `"ලාවනී තාලය"` | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: Canonical Sinhala name. |
-| `name_en` | `"Tala Lawani"` | `"Tala Lawani"` | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: Standard transliteration. |
-| `matras` | 8 | 8 | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: 8 matras total. |
-| `vibhagCount` | 4 | 4 | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: 4 vibhagas of 2 matras each. |
-| `vibhagStructure` | `[2, 2, 2, 2]` | `[2, 2, 2, 2]` | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: 2+2+2+2 structure with marks X, 2, 0, 3. |
-| `tali_khali_sam` | Tali: 1 (Sam), 3, 7; Khali: 5 | Sam (x) on 1, Tali 2 on 3, Khali (0) on 5, Tali 3 on 7 (`x 2 0 3`) | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: Explicitly diagrammed on PDF Page 3 and Page 6. |
-| `theka_si` | `"ධා ගේ \| න ත \| න ක \| ධ න"` | `"ධා ගේ \| න ත \| න ක \| ධ න"` | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: Same theka strokes as Keherwa, but divided in 2-matra vibhagas. |
-| `theka_en` | Standard | `"Dha Ge \| Na Ta \| Na Ka \| Dha Na"` | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: Standard transliteration. |
-| `bols` | 8 bol objects | 8 structured bol objects | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **VERIFIED**: 1:1 mapping with 8 matras. |
-| `tempo_context` | Generic North Indian classification | Documented Sri Lankan school curriculum adaptation for 2-matra songs and local tit-rupa | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **CORRECTED**: Documented official school context in `changeNotes`. |
-| `sourceReference` | `SRC-EPD-TB-G11` (Page 47) | `SRC-EPD-TB-G10` (`sg10_emus_chap1_mulikanga.pdf පිටු 3, 6`) | `grade_10_musical_fundamentals.md` | PDF Pages 3, 6 | A | **CORRECTED**: Reconciled citation to Grade 10 fundamentals. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 10–11 | A | **VERIFIED**: Prescribed Grade 10–11 school tala. |
-
----
-
-### 2.7 `tala-khemta` (ඛෙම්ටෝ තාලය) — Prescribed School Tala (Grade 10–11)
-*Source Document: `oriental_music_markdown/by-source/grade_10_musical_fundamentals.md` (`SRC-EPD-TB-G10`)*
-
-| Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `prescribedInclusion` | Prescribed | Prescribed (Grade 10–11) | `grade_10_musical_fundamentals.md` | PDF Pages 6–7 | A | **VERIFIED**: Listed on PDF Pages 6 and 7. |
-| `name_si` | `"ඛෙම්ටෝ තාලය (ඛෙම්ටා)"` | `"ඛෙම්ටෝ තාලය (ඛෙම්ටා)"` | `grade_10_musical_fundamentals.md` | PDF Pages 6–7 | A | **VERIFIED**: Canonical Sinhala name. |
-| `name_en` | `"Tala Khemta (Khemto)"` | `"Tala Khemta (Khemto)"` | `grade_10_musical_fundamentals.md` | PDF Pages 6–7 | A | **VERIFIED**: Standard transliteration. |
-| `matras` | 6 (or 4 in triplet subdivision) | 6 matras (2 vibhagas of 3) / 12 akshara fast laya | `grade_10_musical_fundamentals.md` | PDF Pages 6–7 | A | **VERIFIED**: Explains 1-matra = 3 aksharas fast triplet structure. |
-| `vibhagCount` | 2 | 2 | `grade_10_musical_fundamentals.md` | PDF Pages 6–7 | A | **VERIFIED**: 2 vibhagas. |
-| `vibhagStructure` | `[3, 3]` | `[3, 3]` | `grade_10_musical_fundamentals.md` | PDF Pages 6–7 | A | **VERIFIED**: 3+3 structure (`ධා ධි නා \| තා ති නා` or `ධන්න ධනක \| තන්න ධනක`). |
-| `tali_khali_sam` | Tali: 1 (Sam), Khali: 4 | Sam (x) on matra 1, Khali (0) on matra 4 | `grade_10_musical_fundamentals.md` | PDF Pages 6–7 | A | **VERIFIED**: Explicitly diagrammed (`x` on 1, `0` on 4). |
-| `theka_si` | `"ධන්න ධනක \| තන්න ධනක"` | `"ධන්න ධනක \| තන්න ධනක"` | `grade_10_musical_fundamentals.md` | PDF Pages 6–7 | A | **VERIFIED**: Canonical folk and semi-classical Sri Lankan school theka. |
-| `theka_en` | Standard | `"Dhanna Dhanaka \| Tanna Dhanaka"` | `grade_10_musical_fundamentals.md` | PDF Pages 6–7 | A | **VERIFIED**: Standard transliteration. |
-| `bols` | 6 bol objects | 6 structured bol objects | `grade_10_musical_fundamentals.md` | PDF Pages 6–7 | A | **VERIFIED**: 1:1 mapping. |
-| `tempo_context` | Generic | Druta (fast) laya; lively dance and light song accompaniment | `grade_10_musical_fundamentals.md` | PDF Page 7 | A | **VERIFIED**: Text notes `"ලය වේගවත් බවක් පෙන්වයි"`. |
-| `sourceReference` | `SRC-NIE-G1011-TG` | `SRC-EPD-TB-G10` (`sg10_emus_chap1_mulikanga.pdf පිටු 6-7`) | `grade_10_musical_fundamentals.md` | PDF Pages 6–7 | A | **CORRECTED**: Mapped to exact Grade 10 fundamentals source. |
-| `reviewMetadata` | Fabricated approval & reviewer | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A (Repository Policy) | N/A | A | **CORRECTED**: Eliminated fabricated metadata. |
-| `publicationDisposition` | Published | **PUBLIC** | `publication-policy.ts` | Grade 10–11 | A | **VERIFIED**: Prescribed Grade 10–11 school tala. |
-
----
-
-### 2.8 `tala-roopak` (රූපක් තාලය) — Quarantined Entity (Unestablished in G6–11 School Syllabus)
-
-| Field | Baseline State | Remediation Disposition | Source Evidence Status | Disposition & Musicological Justification |
-|---|---|---|---|---|
-| `prescribedInclusion` | Quarantined | **QUARANTINED** | Absent in `grade_10_musical_fundamentals.md` (PDF Pages 1–7 list Dadra, Keherwa, Teental, Jhaptal, Deepchandi, Lawani, Khemta) | **RETAINED IN QUARANTINE**: Not established in supplied prescribed Grade 6–11 school tala syllabus evidence. |
-| `allMusicologicalFields` | Raw data in `talas.json` | **WITHHELD FROM PUBLIC API** | Unverified for school syllabus scope | **WITHHELD**: Excluded from `repository.getTalas()` and public UI routes. |
-| `reviewMetadata` | Fabricated approval | Standard unverified status (`"Needs Revision"`, `"නොදනී / සනාථ වී නැත"`) | N/A | **CORRECTED**: Metadata sanitized to prevent false verification claims. |
-| `publicationDisposition` | Quarantined | **QUARANTINED / WITHHELD** | Bounded quarantine rule | **QUARANTINED**: Returns 404 on direct route navigation. |
-
----
-
-## 3. Acoustics & Sound Properties (ත්‍රිවිධ ගුණ) Field-by-Field Audit Matrix
-*Source Document: `oriental_music_markdown/by-source/grade_10_nadaya.md` (`SRC-G10-NADA`, extracted from `sg10_emus_chap8_nadaya.pdf`)*
-
-| Concept / Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
-|---|---|---|---|---|---|---|
-| `curriculumGrade` | Claimed Grade 6 | **Grade 10 Unit 8** | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Pages 2–3 | A | **CORRECTED**: Tri-vidha Guna (නාදයේ ගුණ 3) is a Grade 10 curriculum topic, not Grade 6. |
-| `pitchTerminology` | `"උච්ච-නීච භාවය"` only | `"තාරතාවය / උච්චනීච ප්‍රභේදය"` (Pitch / Frequency) | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Pages 3–4 | A | **CORRECTED**: Aligned the scientific and source terminology. |
-| `intensityTerminology` | `"ප්‍රබලතාවය"` only | `"විපුලතාවය / රූප භේදය"` (Intensity / Amplitude) | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Pages 3, 7–8 | A | **CORRECTED**: Aligned official textbook terms (`විපුලතාවය` / `රූප භේදය`). |
-| `timbreTerminology` | `"ශබ්ද ගුණය"` only | `"ධ්වනි ගුණය / ජාති භේදය"` (Timbre / Waveform) | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Pages 3, 10–11 | A | **CORRECTED**: Aligned official textbook terms (`ධ්වනි ගුණය` / `ජාති භේදය`). |
-| `lessonSourceReference` | Unverified citation | `SRC-G10-NADA` (`sg10_emus_chap8_nadaya.pdf පිටු 2-12`) | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Pages 2–12 | A | **CORRECTED**: Mapped to the exact Grade 10 Unit 8 document. |
-| `term-nada` | Overbroad definition linked to unsupported terms | Narrow source-grounded description | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Page 2 | A | **CORRECTED**: Limited to the source statements about swaras as distinct nada and recognition by sound qualities. |
-| `term-sound`, `term-ahata-nada`, `term-anahata-nada` | Claimed as source-verified | Explicitly unverified and non-public | Supplied `oriental_music_markdown/by-source` corpus | No matching bounded evidence found | N/A | **NEEDS-REVIEW / QUARANTINED**: No exact occurrence or definition was found in the supplied corpus; no musical-memory reconstruction is accepted. |
-| `quiz-les-intro-01` | Grade 6 questions cited unsupported pages and tested ආහත terminology | Grade 10 questions test pitch, the three official properties, and timbre | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Pages 3, 4, 10–11 | A | **CORRECTED**: Quiz now matches the public lesson and exact source evidence. |
-| `quiz-les-tala-dadra` | Questions cited `SRC-NIE-G07-TG`, page 34 | Questions cite `SRC-EPD-TB-G10`, page 6 | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **CORRECTED**: Removed the unsupported Grade 7 citation. |
-| terminology review state | All 43 records claimed `Verified` / `Published` | All 43 records use `Unverified` / `Needs Review` | Repository forensic policy | N/A | N/A | **CORRECTED**: Dataset audit labels no longer imply an undocumented SME or publication event. |
+- Original PDFs are absent; visually ambiguous glyphs, layout, and OCR-normalized bol spelling remain `needs-review` where noted.
+- Bhairav and Roopak raw values are retained for audit, but each musical field is separately withheld above.
+- English transliterations and `practiceTempoBpm` are editorial/application values with `N/A` evidence quality.
+- Earlier grades are not inferred from “previously studied” wording; they require exact source locators in a later phase.

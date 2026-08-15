@@ -4,6 +4,40 @@
  * 100% browser-native Web Audio without recorded samples.
  */
 
+export type TablaStrokeKind = "rest" | "combined" | "bass" | "open" | "closed" | "fallback";
+
+export function classifyTablaBol(bolName: string): TablaStrokeKind {
+  const clean = typeof bolName === "string" ? bolName.trim().toLowerCase() : "";
+  if (!clean || clean === "-" || clean === "s") return "rest";
+  if (["dha", "ධා", "dhin", "ධින්", "ධී", "ධි", "ධ", "ධන්න", "ධනක"].includes(clean)) {
+    return "combined";
+  }
+  if (["ge", "ගේ", "ගෙ", "ග", "ghe"].includes(clean)) return "bass";
+  if (["na", "නා", "න", "ta", "තා", "ත", "නක"].includes(clean)) return "open";
+  if (
+    [
+      "tin",
+      "තින්",
+      "තී",
+      "ති",
+      "තන්න",
+      "te",
+      "තෙ",
+      "ti",
+      "කේ",
+      "කෙ",
+      "ක",
+      "ke",
+      "කත්",
+      "තූ",
+      "තු",
+    ].includes(clean)
+  ) {
+    return "closed";
+  }
+  return "fallback";
+}
+
 class TablaSynthEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
@@ -119,30 +153,21 @@ class TablaSynthEngine {
    */
   public playBol(bolName: string) {
     if (typeof window === "undefined" || !bolName || typeof bolName !== "string") return;
-    const clean = bolName.trim().toLowerCase();
-    if (clean === "-" || clean === "s" || clean === " " || !clean) {
-      // Rest / silence
-      return;
-    }
+    const strokeKind = classifyTablaBol(bolName);
+    if (strokeKind === "rest") return;
 
     this.initContext();
 
-    if (clean === "dha" || clean === "ධා" || clean === "ධන්න") {
+    if (strokeKind === "combined") {
       this.playBayanBass(true, 0.65);
       this.playDayanOpen(293.66, 0.5);
-    } else if (clean === "dhin" || clean === "ධින්" || clean === "ධී" || clean === "ධි" || clean === "ධ") {
-      this.playBayanBass(false, 0.55);
-      this.playDayanClosed(293.66, 0.3);
-    } else if (clean === "ge" || clean === "ගේ" || clean === "ගෙ" || clean === "ග" || clean === "ghe") {
+    } else if (strokeKind === "bass") {
       this.playBayanBass(true, 0.6);
-    } else if (clean === "na" || clean === "නා" || clean === "න" || clean === "ta" || clean === "තා" || clean === "ත" || clean === "නක") {
+    } else if (strokeKind === "open") {
       this.playDayanOpen(293.66, 0.45);
-    } else if (clean === "tin" || clean === "තින්" || clean === "තී" || clean === "ති" || clean === "තන්න") {
-      this.playDayanClosed(293.66, 0.35);
-    } else if (clean === "te" || clean === "තෙ" || clean === "ti" || clean === "කේ" || clean === "කෙ" || clean === "ක" || clean === "ke" || clean === "කත්" || clean === "තූ" || clean === "තු") {
-      this.playDayanClosed(220, 0.12);
+    } else if (strokeKind === "closed") {
+      this.playDayanClosed(293.66, 0.25);
     } else {
-      // General click / percussive stroke
       this.playDayanClosed(260, 0.2);
     }
   }

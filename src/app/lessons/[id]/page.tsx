@@ -131,7 +131,7 @@ export default function LessonDetailPage() {
               {lesson.difficulty} මට්ටම
             </span>
             <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800">
-              ශ්‍රේණි: {lesson.gradeBands.join(", ")}
+              ශ්‍රේණි කාණ්ඩය: {lesson.gradeBands.join(", ")}
             </span>
             <span className="text-xs text-text-muted flex items-center gap-1 ml-auto">
               <Clock className="w-3.5 h-3.5" /> විනාඩි {lesson.estimatedMinutes}

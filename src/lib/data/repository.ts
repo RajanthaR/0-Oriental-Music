@@ -396,7 +396,13 @@ class ContentRepository {
   // Quizzes & Exams
   public getQuizzes(): Quiz[] {
     const publicLessonIds = new Set(this.getLessons().map((lesson) => lesson.id));
-    return this.quizzes.filter((quiz) => !quiz.lessonId || publicLessonIds.has(quiz.lessonId));
+    return this.quizzes.filter(
+      (quiz) =>
+        !!quiz.lessonId &&
+        publicLessonIds.has(quiz.lessonId) &&
+        quiz.questions.length > 0 &&
+        quiz.questions.every((question) => getRecordPublicationDecision(question).isPublic)
+    );
   }
 
   public getQuizById(id: string): Quiz | undefined {

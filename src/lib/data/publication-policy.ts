@@ -17,9 +17,11 @@ export type SourceEvidenceFailureCode =
   | "unknown-source"
   | "ambiguous-source-document"
   | "source-document-needs-review"
+  | "mismatched-source-document"
   | "missing-page-evidence"
   | "page-out-of-range"
-  | "low-quality-page-evidence";
+  | "low-quality-page-evidence"
+  | "source-grade-mismatch";
 
 export type PublicationReasonCode =
   | "unsupported-grade"
@@ -133,10 +135,28 @@ function resolveSourceDocument(sourceId: string): SourceResolution {
   return { status: "found", document: matches[0] };
 }
 
-function numericPageReferences(pageOrSection: string): number[] {
-  return Array.from(new Set((pageOrSection.match(/\d+/g) || []).map(Number))).filter(
-    (page) => Number.isInteger(page) && page > 0
-  );
+function explicitPageReferences(pageOrSection: string): number[] {
+  const pages = new Set<number>();
+  const clausePattern = /(?:පිටුව|පිටු|pdf\s*pages?|pages?)\s*([0-9]+(?:\s*[-–]\s*[0-9]+)?(?:\s*,\s*[0-9]+(?:\s*[-–]\s*[0-9]+)?)*)/gi;
+
+  let match: RegExpExecArray | null;
+  while ((match = clausePattern.exec(pageOrSection)) !== null) {
+    for (const token of match[1].split(",")) {
+      const [startText, endText] = token.trim().split(/\s*[-–]\s*/);
+      const start = Number(startText);
+      const end = endText ? Number(endText) : start;
+      if (!Number.isInteger(start) || !Number.isInteger(end) || start < 1 || end < start) continue;
+      for (let page = start; page <= end && page - start <= 1000; page += 1) pages.add(page);
+    }
+  }
+
+  return Array.from(pages).sort((a, b) => a - b);
+}
+
+function hasMismatchedPdfReference(locator: string, expectedFilename: string): boolean {
+  const pdfMentions = locator.match(/\.pdf\b/gi)?.length ?? 0;
+  if (pdfMentions === 0) return false;
+  return pdfMentions !== 1 || !locator.toLocaleLowerCase().includes(expectedFilename.toLocaleLowerCase());
 }
 
 function qualityForPages(documentSlug: string, pageNumbers: number[]): EvidenceQuality {
@@ -328,7 +348,20 @@ export function evaluateSourceReference(
   }
 
   const document = resolution.document;
-  const pageNumbers = numericPageReferences(reference.pageOrSection);
+  if (hasMismatchedPdfReference(reference.pageOrSection, document.originalFilename)) {
+    return {
+      sourceId: reference.sourceId,
+      documentId: document.id,
+      documentSlug: document.slug,
+      pageNumbers: [],
+      quality: "missing",
+      supportable: false,
+      reasonCode: "mismatched-source-document",
+      reason: "The page locator names a PDF other than the document selected by its source ID.",
+    };
+  }
+
+  const pageNumbers = explicitPageReferences(reference.pageOrSection);
   const inRangePages = pageNumbers.filter((page) => page <= document.pageCount);
   const quality = qualityForPages(document.slug, inRangePages);
 
@@ -358,7 +391,7 @@ export function evaluateSourceReference(
     };
   }
 
-  if (inRangePages.length === 0) {
+  if (inRangePages.length !== pageNumbers.length) {
     return {
       sourceId: reference.sourceId,
       documentId: document.id,
@@ -367,7 +400,7 @@ export function evaluateSourceReference(
       quality: "missing",
       supportable: false,
       reasonCode: "page-out-of-range",
-      reason: "All cited page numbers fall outside the extracted document page range.",
+      reason: "At least one cited page number falls outside the extracted document page range.",
     };
   }
 
@@ -409,6 +442,25 @@ function hasPublicGrade(gradeBands: string[]): boolean {
   );
 }
 
+function bandContainsSourceGrade(band: string, sourceGrades: string[]): boolean {
+  if (sourceGrades.includes(band)) return true;
+  const match = band.match(/^(\d+)-(\d+)$/);
+  if (!match) return false;
+  const start = Number(match[1]);
+  const end = Number(match[2]);
+  return sourceGrades.some((grade) => {
+    const numericGrade = Number(grade);
+    return Number.isInteger(numericGrade) && numericGrade >= start && numericGrade <= end;
+  });
+}
+
+function gradeScopeMatchesSource(gradeBands: string[], sourceId: string | undefined): boolean {
+  if (!sourceId) return false;
+  const source = sourceRecords.find((record) => record.id === sourceId);
+  if (!source || source.grades.length === 0) return false;
+  return gradeBands.every((band) => bandContainsSourceGrade(band, source.grades));
+}
+
 export function getPublicationDecision(input: PublicationInput): PublicationDecision {
   const { id, gradeBands, sourceReference } = input;
   const sourceEvidence = evaluateSourceReference(sourceReference);
@@ -417,10 +469,16 @@ export function getPublicationDecision(input: PublicationInput): PublicationDeci
   if (hasUnsupportedGrade(gradeBands)) reasonCodes.push("unsupported-grade");
   if (KNOWN_QUARANTINED_ENTITY_IDS.has(id)) reasonCodes.push("known-forensic-issue");
   if (gradeBands.length === 0) reasonCodes.push("missing-grade-scope");
+  if (gradeBands.length > 0 && !gradeScopeMatchesSource(gradeBands, sourceReference?.sourceId)) {
+    reasonCodes.push("source-grade-mismatch");
+  }
   if (sourceEvidence.reasonCode !== "supportable") reasonCodes.push(sourceEvidence.reasonCode);
 
   const quarantined = hasUnsupportedGrade(gradeBands) || KNOWN_QUARANTINED_ENTITY_IDS.has(id);
-  const publicByEvidence = hasPublicGrade(gradeBands) && sourceEvidence.supportable;
+  const publicByEvidence =
+    hasPublicGrade(gradeBands) &&
+    gradeScopeMatchesSource(gradeBands, sourceReference?.sourceId) &&
+    sourceEvidence.supportable;
   const state: PublicationState = quarantined
     ? "quarantined"
     : publicByEvidence

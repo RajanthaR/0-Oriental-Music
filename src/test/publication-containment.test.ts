@@ -3,11 +3,13 @@ import coverageData from "../../data/content-coverage.json";
 import ragasData from "@/data/ragas.json";
 import { repository } from "@/lib/data/repository";
 import {
+  evaluateSourceReference,
   getRecordPublicationDecision,
   getSourceCorpusInventory,
   KNOWN_QUARANTINED_ENTITY_IDS,
   UNKNOWN_PROVENANCE,
 } from "@/lib/data/publication-policy";
+import quizzesData from "@/data/quizzes.json";
 import {
   validateCoverageSnapshot,
   validateForensicInventory,
@@ -160,5 +162,41 @@ describe("Prompt 1 publication containment", () => {
 
     const rawBhairav = ragasData.find((raga) => raga.id === "raga-bhairav");
     expect(validatePublicCollection("Raga", [rawBhairav])).toMatchObject({ isValid: false });
+  });
+
+  it("rejects filename digits, out-of-range pages, and mismatched PDF locators", () => {
+    expect(evaluateSourceReference({
+      sourceId: "SRC-G10-NADA",
+      pageOrSection: "sg10_emus_chap8_nadaya.pdf",
+    }).reasonCode).toBe("missing-page-evidence");
+    expect(evaluateSourceReference({
+      sourceId: "SRC-G10-NADA",
+      pageOrSection: "sg10_emus_chap8_nadaya.pdf පිටු 2-999",
+    }).reasonCode).toBe("page-out-of-range");
+    expect(evaluateSourceReference({
+      sourceId: "SRC-G10-NADA",
+      pageOrSection: "sg10_emus_chap8_nadaya.pdf පිටුව 2; s11tim173.pdf පිටුව 1",
+    }).reasonCode).toBe("mismatched-source-document");
+  });
+
+  it("requires each public grade band to contain a grade established by its source", () => {
+    const rawDadra = structuredClone(repository.getTalaById("tala-dadra"));
+    expect(rawDadra).toBeDefined();
+    if (!rawDadra) return;
+    rawDadra.gradeBands = ["6-7", "10-11"];
+    const decision = getRecordPublicationDecision(rawDadra);
+    expect(decision.isPublic).toBe(false);
+    expect(decision.reasonCodes).toContain("source-grade-mismatch");
+  });
+
+  it("fails closed when a public quiz contains an unsupported question", () => {
+    const quiz = quizzesData.find((item) => item.id === "quiz-les-intro-01");
+    expect(quiz).toBeDefined();
+    if (!quiz) return;
+    const originalQuestion = structuredClone(quiz.questions[0]);
+    quiz.questions[0].gradeBands = ["12-13"];
+    expect(repository.getQuizById(quiz.id)).toBeUndefined();
+    quiz.questions[0] = originalQuestion;
+    expect(repository.getQuizById(quiz.id)).toBeDefined();
   });
 });

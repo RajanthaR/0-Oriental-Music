@@ -70,19 +70,17 @@
         "action_si": "ඇඟිලි (3)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 80,
       "dugun_bpm": 160,
       "chaugun_bpm": 320
     },
     "gradeBands": [
-      "6-7",
-      "8-9",
       "10-11"
     ],
     "sourceReference": {
       "sourceId": "SRC-EPD-TB-G10",
-      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6; s11tim173.pdf පිටු 23-24"
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
     },
     "reviewMetadata": {
       "status": "Needs Revision",
@@ -108,7 +106,7 @@
       "1 වන මාත්‍රාව: තාළි (සම)",
       "5 වන මාත්‍රාව: ඛාලි"
     ],
-    "theka_si": "ධා ගේ නා තින් | නා කේ ධින් නා",
+    "theka_si": "ධා ගේ න ත | න ක ධ න",
     "bols": [
       {
         "matra": 1,
@@ -130,7 +128,7 @@
       },
       {
         "matra": 3,
-        "bol_si": "නා",
+        "bol_si": "න",
         "vibhagIndex": 0,
         "isSam": false,
         "isTali": false,
@@ -139,7 +137,7 @@
       },
       {
         "matra": 4,
-        "bol_si": "තින්",
+        "bol_si": "ත",
         "vibhagIndex": 0,
         "isSam": false,
         "isTali": false,
@@ -148,7 +146,7 @@
       },
       {
         "matra": 5,
-        "bol_si": "නා",
+        "bol_si": "න",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": false,
@@ -157,7 +155,7 @@
       },
       {
         "matra": 6,
-        "bol_si": "කේ",
+        "bol_si": "ක",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": false,
@@ -166,7 +164,7 @@
       },
       {
         "matra": 7,
-        "bol_si": "ධින්",
+        "bol_si": "ධ",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": false,
@@ -175,7 +173,7 @@
       },
       {
         "matra": 8,
-        "bol_si": "නා",
+        "bol_si": "න",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": false,
@@ -183,19 +181,17 @@
         "action_si": "ඇඟිලි (4)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 90,
       "dugun_bpm": 180,
       "chaugun_bpm": 360
     },
     "gradeBands": [
-      "6-7",
-      "8-9",
       "10-11"
     ],
     "sourceReference": {
       "sourceId": "SRC-EPD-TB-G10",
-      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6; s11tim173.pdf පිටු 23-24"
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
     },
     "reviewMetadata": {
       "status": "Needs Revision",
@@ -372,18 +368,17 @@
         "action_si": "ඇඟිලි (4)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 60,
       "dugun_bpm": 120,
       "chaugun_bpm": 240
     },
     "gradeBands": [
-      "8-9",
       "10-11"
     ],
     "sourceReference": {
       "sourceId": "SRC-EPD-TB-G10",
-      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5; s11tim173.pdf පිටු 23-24"
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
     },
     "reviewMetadata": {
       "status": "Needs Revision",
@@ -506,7 +501,7 @@
         "action_si": "ඇඟිලි (3)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 65,
       "dugun_bpm": 130,
       "chaugun_bpm": 260
@@ -516,7 +511,7 @@
     ],
     "sourceReference": {
       "sourceId": "SRC-EPD-TB-G10",
-      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6; s11tim173.pdf පිටු 23-24"
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6"
     },
     "reviewMetadata": {
       "status": "Needs Revision",
@@ -675,7 +670,7 @@
         "action_si": "විවේකය (4)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 60,
       "dugun_bpm": 120,
       "chaugun_bpm": 240
@@ -685,7 +680,7 @@
     ],
     "sourceReference": {
       "sourceId": "SRC-EPD-TB-G10",
-      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5; s11tim173.pdf පිටු 23-24"
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
     },
     "reviewMetadata": {
       "status": "Needs Revision",
@@ -779,7 +774,7 @@
         "action_si": "ඇඟිලි (2)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 70,
       "dugun_bpm": 140,
       "chaugun_bpm": 280
@@ -819,7 +814,7 @@
       "5 වන මාත්‍රාව: ඛාලි (0)",
       "7 වන මාත්‍රාව: තාළි 3"
     ],
-    "theka_si": "ධා ගේ | නා තින් | නා කේ | ධින් නා",
+    "theka_si": "ධා ගේ | න ත | න ක | ධ න",
     "bols": [
       {
         "matra": 1,
@@ -841,7 +836,7 @@
       },
       {
         "matra": 3,
-        "bol_si": "නා",
+        "bol_si": "න",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": true,
@@ -850,7 +845,7 @@
       },
       {
         "matra": 4,
-        "bol_si": "තින්",
+        "bol_si": "ත",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": false,
@@ -859,7 +854,7 @@
       },
       {
         "matra": 5,
-        "bol_si": "නා",
+        "bol_si": "න",
         "vibhagIndex": 2,
         "isSam": false,
         "isTali": false,
@@ -868,7 +863,7 @@
       },
       {
         "matra": 6,
-        "bol_si": "කේ",
+        "bol_si": "ක",
         "vibhagIndex": 2,
         "isSam": false,
         "isTali": false,
@@ -877,7 +872,7 @@
       },
       {
         "matra": 7,
-        "bol_si": "ධින්",
+        "bol_si": "ධ",
         "vibhagIndex": 3,
         "isSam": false,
         "isTali": true,
@@ -886,7 +881,7 @@
       },
       {
         "matra": 8,
-        "bol_si": "නා",
+        "bol_si": "න",
         "vibhagIndex": 3,
         "isSam": false,
         "isTali": false,
@@ -894,7 +889,7 @@
         "action_si": "ඇඟිලි (2)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 85,
       "dugun_bpm": 170,
       "chaugun_bpm": 340
@@ -904,7 +899,7 @@
     ],
     "sourceReference": {
       "sourceId": "SRC-EPD-TB-G10",
-      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6; s11tim173.pdf පිටු 23-24"
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
     },
     "reviewMetadata": {
       "status": "Needs Revision",
@@ -920,15 +915,15 @@
     "id": "tala-khemta",
     "name_si": "ඛෙම්ටෝ තාලය (ඛෙම්ටා)",
     "name_en": "Khemta Tala",
-    "matras": 6,
+    "matras": 4,
     "vibhagCount": 2,
     "vibhagStructure": [
-      3,
-      3
+      2,
+      2
     ],
     "taliKhali_si": [
       "1 වන මාත්‍රාව: තාළි (සම)",
-      "4 වන මාත්‍රාව: ඛාලි (0)"
+      "3 වන මාත්‍රාව: ඛාලි (0)"
     ],
     "theka_si": "ධන්න ධනක | තන්න ධනක",
     "bols": [
@@ -943,7 +938,7 @@
       },
       {
         "matra": 2,
-        "bol_si": "ධ",
+        "bol_si": "ධනක",
         "vibhagIndex": 0,
         "isSam": false,
         "isTali": false,
@@ -952,15 +947,6 @@
       },
       {
         "matra": 3,
-        "bol_si": "නක",
-        "vibhagIndex": 0,
-        "isSam": false,
-        "isTali": false,
-        "isKhali": false,
-        "action_si": "ඇඟිලි (3)"
-      },
-      {
-        "matra": 4,
         "bol_si": "තන්න",
         "vibhagIndex": 1,
         "isSam": false,
@@ -969,25 +955,16 @@
         "action_si": "වැනීම (0)"
       },
       {
-        "matra": 5,
-        "bol_si": "ධ",
+        "matra": 4,
+        "bol_si": "ධනක",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": false,
         "isKhali": false,
         "action_si": "ඇඟිලි (2)"
-      },
-      {
-        "matra": 6,
-        "bol_si": "නක",
-        "vibhagIndex": 1,
-        "isSam": false,
-        "isTali": false,
-        "isKhali": false,
-        "action_si": "ඇඟිලි (3)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 100,
       "dugun_bpm": 200,
       "chaugun_bpm": 400
@@ -997,7 +974,7 @@
     ],
     "sourceReference": {
       "sourceId": "SRC-EPD-TB-G10",
-      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 7; s11tim173.pdf පිටු 23-24"
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 7"
     },
     "reviewMetadata": {
       "status": "Needs Revision",

@@ -165,7 +165,7 @@ export interface Tala {
   taliKhali_si: string[];
   theka_si: string;
   bols: TalaBol[];
-  layaVariants: {
+  practiceTempoBpm: {
     thah_bpm: number;
     dugun_bpm: number;
     chaugun_bpm: number;

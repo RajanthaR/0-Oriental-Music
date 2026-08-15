@@ -358,6 +358,126 @@
       "evidenceBasis": "canonical-inspection"
     },
     {
+      "id": "P02-LOCATOR-POLICY-001",
+      "severity": "P1",
+      "entityOrPath": "src/lib/data/publication-policy.ts:evaluateSourceReference",
+      "currentClaim": "Digits in filenames and partial in-range locators could previously satisfy the exact-page publication gate; a second PDF filename could also be embedded under one source ID.",
+      "evidence": [
+        {
+          "path": "src/lib/data/publication-policy.ts",
+          "locator": "explicitPageReferences and hasMismatchedPdfReference",
+          "exactSection": "explicit page-clause parsing, full range validation, and singular-document filename agreement"
+        },
+        {
+          "path": "src/test/publication-containment.test.ts",
+          "locator": "adversarial source locator test",
+          "exactSection": "filename-only, page 2-999, and mixed-PDF cases"
+        }
+      ],
+      "disposition": "fail closed unless explicit pages all fall in range and any named PDF agrees with the source ID",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "runtime policy and adversarial regression cases",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-GRADE-EVIDENCE-001",
+      "severity": "P1",
+      "entityOrPath": "public Phase 2 raga, tala, lesson, and quiz grade bands",
+      "currentClaim": "Core records previously advertised lower grades not established by the document selected in their source reference.",
+      "evidence": [
+        {
+          "path": "src/data/ragas.json",
+          "locator": "seven public raga gradeBands",
+          "exactPageOrSection": "SRC-G11-RAGA-ID Grade 11, PDF Pages 1-2"
+        },
+        {
+          "path": "src/data/talas.json",
+          "locator": "seven public tala gradeBands",
+          "exactPageOrSection": "SRC-EPD-TB-G10 Grade 10, PDF Pages 2-7"
+        }
+      ],
+      "disposition": "use only the 10-11 browse bucket containing the exact source grade and require every public band to intersect the selected source's grade metadata",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "selected source-document grades; earlier grades are not inferred",
+      "status": "contained",
+      "evidenceBasis": "cross-entity"
+    },
+    {
+      "id": "P02-TALA-STRUCTURE-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/talas.json:tala-keherwa, tala-lawani, tala-khemta",
+      "currentClaim": "Keherwa and Lawani used bols absent from the cited table, while Khemta was modeled as six rather than four compound matras.",
+      "evidence": [
+        {
+          "path": "oriental_music_markdown/by-source/grade_10_musical_fundamentals.md",
+          "locator": "PDF Pages 3, 6-7",
+          "exactPageOrSection": "Keherwa/Lawani eight-cell table and Khemta four-matra, three-akshara explanation"
+        },
+        {
+          "path": "src/test/musical-core.test.ts",
+          "locator": "expectedTalas fixture",
+          "exactSection": "exact matra, vibhag, bol, and hand-mark assertions"
+        }
+      ],
+      "disposition": "restore exact source cells and four-matra Khemta structure; keep numeric BPMs as non-curricular practice defaults",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "Grade 10 pages 3, 6-7; normalized glyphs retain original-PDF review boundary",
+      "status": "contained",
+      "evidenceBasis": "canonical-inspection"
+    },
+    {
+      "id": "P02-RAGA-FIELDS-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/ragas.json and public raga UI",
+      "currentClaim": "Public raga records included unsupported rasa, usage/history, extra phrases, and lower-grade claims; Yaman ascent and Bhimpalasi time also contradicted the cited Grade 11 table.",
+      "evidence": [
+        {
+          "path": "oriental_music_markdown/by-source/grade_11_raga_identification.md",
+          "locator": "PDF Pages 1-2",
+          "exactPageOrSection": "seven raga scales, fields, times, and mukhyanga table"
+        },
+        {
+          "path": "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
+          "locator": "Raga evidence sections 1.1-1.3",
+          "exactSection": "independent verified, editorial, withheld, and quarantined field dispositions"
+        }
+      ],
+      "disposition": "remove or explicitly withhold absent claims; correct Yaman and Bhimpalasi; retain one source mukhyanga per public raga",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "Grade 11 pages 1-2; rasa and other absent details withheld",
+      "status": "contained",
+      "evidenceBasis": "canonical-inspection"
+    },
+    {
+      "id": "P02-QUIZ-POLICY-001",
+      "severity": "P1",
+      "entityOrPath": "src/lib/data/repository.ts:getQuizzes",
+      "currentClaim": "A quiz could remain public under a public parent even if a nested question had an unsupported grade or invalid source reference.",
+      "evidence": [
+        {
+          "path": "src/lib/data/repository.ts",
+          "locator": "getQuizzes",
+          "exactSection": "public parent, non-empty question set, and every-question publication decision"
+        },
+        {
+          "path": "src/test/publication-containment.test.ts",
+          "locator": "unsupported nested question mutation",
+          "exactSection": "12-13 question causes quiz lookup to fail closed"
+        }
+      ],
+      "disposition": "require every nested question to pass the same public grade and source evidence gate",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "repository getter and mutation regression test",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
       "id": "P01-SOURCE-METADATA-001",
       "severity": "P1",
       "entityOrPath": "src/data/sources.json and data/source-manifest.json",

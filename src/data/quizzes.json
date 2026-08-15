@@ -374,8 +374,6 @@
         "id": "q-tala-dadra-01",
         "type": "mcq",
         "gradeBands": [
-          "6-7",
-          "8-9",
           "10-11"
         ],
         "difficulty": "පහසු",
@@ -413,8 +411,6 @@
         "id": "q-tala-dadra-02",
         "type": "ordering",
         "gradeBands": [
-          "6-7",
-          "8-9",
           "10-11"
         ],
         "difficulty": "පහසු",
@@ -462,8 +458,6 @@
         "id": "q-tala-dadra-03",
         "type": "mcq",
         "gradeBands": [
-          "6-7",
-          "8-9",
           "10-11"
         ],
         "difficulty": "පහසු",

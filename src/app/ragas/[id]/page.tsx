@@ -74,7 +74,7 @@ export default function RagaDetailPage() {
           {raga.name_si}
         </h1>
         <p className="text-xs sm:text-sm text-text-secondary leading-relaxed mb-6">
-          ප්‍රධාන රසය: <span className="font-bold text-text">{raga.rasa_si}</span> | ජාතිය:{" "}
+          ජාතිය:{" "}
           <span className="font-bold text-text">{raga.jati_si}</span>
         </p>
 
