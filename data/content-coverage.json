@@ -8,19 +8,7 @@
     "publicationState": "source-backed baseline; not fully reviewed"
   },
   "overview": {
-    "totalRawSourceRecords": 21,
-    "totalIndexedSourcePages": 1023,
-    "totalRawSourceDocuments": 30,
-    "totalRawLessons": 21,
-    "totalRawRagas": 8,
-    "totalRawTalas": 8,
-    "totalRawInstruments": 10,
-    "totalRawCulturalTraditions": 7,
-    "totalRawTheatreTraditions": 4,
-    "totalRawGlossaryTerms": 43,
-    "totalRawLearningPaths": 9,
-    "totalRawExamPapers": 2,
-    "totalRawQuizzes": 7
+    "totalIndexedSourcePages": 1023
   },
   "publicScope": {
     "gradeBands": ["6-7", "8-9", "10-11"],
