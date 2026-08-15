@@ -36,7 +36,7 @@ export default function HomePage() {
     setStudentProgress({
       completedCount: p.completedLessonIds.length,
       streak: p.streakDays || 1,
-      lastLessonId: p.completedLessonIds[p.completedLessonIds.length - 1] || "les-intro-01",
+      lastLessonId: p.completedLessonIds[p.completedLessonIds.length - 1] || "les-swara-01",
     });
   }, []);
 

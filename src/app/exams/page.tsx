@@ -53,6 +53,11 @@ export default function ExamPracticeCenterPage() {
 
       {/* Exam Papers Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {examPapers.length === 0 && (
+          <div className="md:col-span-2 bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl p-6 text-center text-sm font-bold">
+            මෙම මට්ටම සඳහා දැනට විභාග අභ්‍යාස අඩංගු නොවේ.
+          </div>
+        )}
         {examPapers.map((paper) => (
           <div
             key={paper.id}

@@ -17,6 +17,12 @@ describe("Search Engine & Sinhala Normalizer Suite", () => {
     expect(results.some((result) => result.id === "tala-dadra" || result.id === "les-tala-dadra")).toBe(false);
   });
 
+  it("should not discover additional quarantined terms (bilawal, roopak, lawani)", () => {
+    expect(searchIndex.search("bilawal").some((result) => result.id === "raga-bilawal")).toBe(false);
+    expect(searchIndex.search("roopak").some((result) => result.id === "tala-roopak")).toBe(false);
+    expect(searchIndex.search("lawani").some((result) => result.id === "tala-lawani")).toBe(false);
+  });
+
   it("should keep search results inside the publication boundary", () => {
     const results = searchIndex.search("ස්වර");
     expect(results.every((result) => !["les-intro-01", "les-exam-skills", "raga-bhairav", "tala-roopak"].includes(result.id))).toBe(true);

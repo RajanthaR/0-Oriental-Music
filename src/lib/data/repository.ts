@@ -395,11 +395,12 @@ class ContentRepository {
 
   // Quizzes & Exams
   public getQuizzes(): Quiz[] {
-    return this.quizzes;
+    const publicLessonIds = new Set(this.getLessons().map((lesson) => lesson.id));
+    return this.quizzes.filter((quiz) => !quiz.lessonId || publicLessonIds.has(quiz.lessonId));
   }
 
   public getQuizById(id: string): Quiz | undefined {
-    return this.quizzes.find((quiz) => quiz.id === id);
+    return this.getQuizzes().find((quiz) => quiz.id === id);
   }
 
   public getExamPapers(gradeBand?: GradeBandType): ExamPaper[] {
@@ -443,7 +444,7 @@ class ContentRepository {
   // the policy after an update; a UI action cannot bypass source containment.
   public updateLessonReviewStatus(
     lessonId: string,
-    newStatus: ContentReviewStatus,
+    newStatus: ReviewStatus,
     isPublished: boolean = false
   ): boolean {
     const lesson = this.lessons.find((candidate) => candidate.id === lessonId);

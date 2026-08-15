@@ -200,6 +200,10 @@ export function validatePublicCollection(
       );
     }
 
+    if (value.published === true) {
+      issues.push(baselineIssue(entityType, id, "published", "A public record still claims published=true."));
+    }
+
     const reviewMetadata = value.reviewMetadata as Record<string, unknown> | undefined;
     if (reviewMetadata) {
       if (reviewMetadata.status === "Published") {
@@ -390,8 +394,20 @@ export function validateForensicLedger(
     issues.push(baselineIssue("forensic-ledger", "issues", "length", "Forensic ledger must contain at least one issue entry."));
   }
 
+  const seenIssueIds = new Set<string>();
+
   ledgerIssues.forEach((issue, index) => {
+    if (!issue || typeof issue !== "object") {
+      issues.push(baselineIssue("forensic-ledger", `issue-${index}`, "format", "Issue must be a non-null object."));
+      return;
+    }
+
     const issueId = typeof issue.id === "string" ? issue.id : `issue-${index}`;
+
+    if (seenIssueIds.has(issueId)) {
+      issues.push(baselineIssue("forensic-ledger", issueId, "id", `Duplicate issue ID '${issueId}'.`));
+    }
+    seenIssueIds.add(issueId);
 
     requiredIssueFields.forEach((field) => {
       if (issue[field] === undefined || issue[field] === null || issue[field] === "") {
@@ -425,6 +441,10 @@ export function validateForensicLedger(
       issues.push(baselineIssue("forensic-ledger", issueId, "evidence", "Issue must have a non-empty evidence array."));
     } else {
       (issue.evidence as Array<Record<string, unknown>>).forEach((entry, eIndex) => {
+        if (!entry || typeof entry !== "object") {
+          issues.push(baselineIssue("forensic-ledger", `${issueId}.evidence[${eIndex}]`, "format", "Evidence entry must be a non-null object."));
+          return;
+        }
         const entryLocator = typeof entry.locator === "string" ? entry.locator : `entry-${eIndex}`;
         requiredEvidenceFields.forEach((field) => {
           if (!entry[field] || typeof entry[field] !== "string" || !entry[field].trim()) {
@@ -529,7 +549,15 @@ export function validateContent(
         severity: "error",
       });
     }
-    if (!validSourceIds.has(r.sourceReference.sourceId)) {
+    if (!r.sourceReference || !r.sourceReference.sourceId) {
+      issues.push({
+        entityType: "Raga",
+        entityId: r.id,
+        field: "sourceReference",
+        message: "Source reference is missing",
+        severity: "error",
+      });
+    } else if (!validSourceIds.has(r.sourceReference.sourceId)) {
       issues.push({
         entityType: "Raga",
         entityId: r.id,

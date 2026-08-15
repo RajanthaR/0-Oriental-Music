@@ -149,9 +149,11 @@ function qualityForPages(documentSlug: string, pageNumbers: number[]): EvidenceQ
     .map((page) => page.confidence);
 
   if (qualities.length === 0) return "missing";
-  if (qualities.includes("D")) return qualities.length === 1 ? "D" : "mixed";
-  if (qualities.includes("C")) return qualities.length === 1 ? "C" : "mixed";
-  if (qualities.includes("B")) return qualities.length === 1 ? "B" : "mixed";
+  
+  const uniqueQualities = new Set(qualities);
+  if (uniqueQualities.has("D")) return uniqueQualities.size === 1 ? "D" : "mixed";
+  if (uniqueQualities.has("C")) return uniqueQualities.size === 1 ? "C" : "mixed";
+  if (uniqueQualities.has("B")) return uniqueQualities.size === 1 ? "B" : "mixed";
   return "A";
 }
 

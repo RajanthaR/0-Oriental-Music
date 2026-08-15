@@ -19,7 +19,7 @@ import {
   validatePublicBoundary,
   ValidationIssue,
 } from "@/lib/validation/content-validator";
-import { ContentReviewStatus, Lesson } from "@/types/content";
+import { ReviewStatus, Lesson } from "@/types/content";
 
 export default function AdminReviewDashboardPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -69,7 +69,7 @@ export default function AdminReviewDashboardPage() {
     });
   }, []);
 
-  const handleUpdateStatus = (lessonId: string, newStatus: ContentReviewStatus) => {
+  const handleUpdateStatus = (lessonId: string, newStatus: ReviewStatus) => {
     const isPublished = newStatus === "Published";
     repository.updateLessonReviewStatus(lessonId, newStatus, isPublished);
     setLessons(repository.getLessons({ visibility: "review" }));
@@ -79,7 +79,7 @@ export default function AdminReviewDashboardPage() {
     setTimeout(() => setUpdatedSuccessMsg(null), 3000);
   };
 
-  const statuses: ContentReviewStatus[] = [
+  const statuses: ReviewStatus[] = [
     "Draft",
     "SME Review",
     "Language Review",
@@ -87,6 +87,7 @@ export default function AdminReviewDashboardPage() {
     "Audio Verification",
     "Accessibility & Mobile QA",
     "Rights & Source Verification",
+    "Needs Revision",
     "Published",
   ];
 
@@ -249,7 +250,7 @@ export default function AdminReviewDashboardPage() {
                     <select
                       value={les.reviewMetadata.status}
                       onChange={(e) =>
-                        handleUpdateStatus(les.id, e.target.value as ContentReviewStatus)
+                        handleUpdateStatus(les.id, e.target.value as ReviewStatus)
                       }
                       className="bg-surface-warm border border-border rounded-lg px-2 py-1 text-[11px] text-text font-medium"
                       aria-label="තත්ත්වය වෙනස් කරන්න"

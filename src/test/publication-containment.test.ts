@@ -28,6 +28,8 @@ describe("Prompt 1 publication containment", () => {
       ...repository.getTheatreTraditions(),
       ...repository.getLearningPaths(),
       ...repository.getExamPapers(),
+      ...repository.getGlossary(),
+      ...repository.getQuizzes(),
     ];
 
     publicCollections.forEach((record) => {
@@ -38,6 +40,8 @@ describe("Prompt 1 publication containment", () => {
   });
 
   it("contains named records on direct lookup", () => {
+    expect(repository.getLessonById("les-intro-01")).toBeUndefined();
+    expect(repository.getLessonById("les-exam-skills")).toBeUndefined();
     expect(repository.getLessonById("les-raga-bhairav")).toBeUndefined();
     expect(repository.getLessonById("les-tala-dadra")).toBeUndefined();
     expect(repository.getRagaById("raga-bhairav")).toBeUndefined();
@@ -46,6 +50,13 @@ describe("Prompt 1 publication containment", () => {
     expect(repository.getTalaById("tala-lawani")).toBeUndefined();
     expect(repository.getExamPaperById("exam-al-model-01")).toBeUndefined();
     expect(repository.getLearningPathById("path-exam-prep")).toBeUndefined();
+  });
+
+  it("prevents CMS review status updates from leaking quarantined records into public getters", () => {
+    const success = repository.updateLessonReviewStatus("les-raga-bhairav", "Published", true);
+    expect(success).toBe(true);
+    expect(repository.getLessons().some((l) => l.id === "les-raga-bhairav")).toBe(false);
+    expect(repository.getLessonById("les-raga-bhairav")).toBeUndefined();
   });
 
   it("does not expose the old A/L selector scope through repository data", () => {
