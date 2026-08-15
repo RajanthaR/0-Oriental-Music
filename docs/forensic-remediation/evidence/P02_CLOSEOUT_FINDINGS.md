@@ -54,7 +54,7 @@ has a positive regression in `src/test/search-engine.test.ts`.
 
 Full review run `20260816-023434-p02c1-dd0c6774` covered the complete diff from
 `beba1479f473b3413b3f2de48a27c558e1937c6f`. All eleven required reviewers
-completed. Fifteen deduplicated findings survived independent validation and
+completed. Sixteen deduplicated findings survived independent validation and
 were resolved in the cycle-1 review-fix work: exact locator consumption,
 malformed and value-unbound context, candidate-bound Tala dispositions,
 missing dependency IDs and UI fallback, canonical quiz grades, non-array and
