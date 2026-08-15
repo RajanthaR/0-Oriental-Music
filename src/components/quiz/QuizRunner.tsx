@@ -5,8 +5,10 @@ import { Quiz, Question } from "@/types/content";
 import { CheckCircle2, XCircle, Award, RotateCcw, ArrowRight, Sparkles } from "lucide-react";
 import { ProgressStorage } from "@/lib/storage/progress-storage";
 
+export type QuizRunnerQuiz = Pick<Quiz, "id" | "title_si" | "questions" | "passingScorePercent">;
+
 export interface QuizRunnerProps {
-  quiz: Quiz;
+  quiz: QuizRunnerQuiz;
   onComplete?: (score: number, maxScore: number, passed: boolean) => void;
 }
 

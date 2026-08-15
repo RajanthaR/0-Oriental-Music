@@ -3,6 +3,8 @@ import sourcesData from "@/data/sources.json";
 import lessonsData from "@/data/lessons.json";
 import ragasData from "@/data/ragas.json";
 import talasData from "@/data/talas.json";
+import quizzesData from "@/data/quizzes.json";
+import examPapersData from "@/data/exam-papers.json";
 import sourceDocumentsData from "../../../data/source-documents.json";
 import sourcePageQualityData from "../../../data/source-page-quality.json";
 import musicalCoreFieldDispositionsData from "../../../data/musical-core-field-dispositions.json";
@@ -36,6 +38,7 @@ export type PublicationReasonCode =
   | "unpaired-context-claim"
   | "field-disposition-needs-review"
   | "dependent-entity-unavailable"
+  | "malformed-record"
   | SourceEvidenceFailureCode;
 
 export type SourceEvidenceReasonCode = SourceEvidenceFailureCode | "supportable";
@@ -209,25 +212,23 @@ function parseSourceLocator(pageOrSection: string, expectedFilename: string): Lo
     return { pageNumbers: [], mismatchedDocument: false, malformed: true };
   }
 
-  const pdfTokens = Array.from(pageOrSection.matchAll(/[A-Za-z0-9_ .-]+\.pdf/gi))
-    .map((match) => match[0].trim())
-    .filter(Boolean);
-  const normalizedExpected = expectedFilename.trim().toLocaleLowerCase();
-  if (pdfTokens.length > 0 && (
-    pdfTokens.length !== 1 ||
-    pdfTokens[0].toLocaleLowerCase() !== normalizedExpected
-  )) {
-    return { pageNumbers: [], mismatchedDocument: true, malformed: false };
+  const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pageList = "([0-9]+(?:\\s*[-–]\\s*[0-9]+)?(?:\\s*,\\s*[0-9]+(?:\\s*[-–]\\s*[0-9]+)?)*)";
+  const exactPattern = new RegExp(
+    `^${escapeRegex(expectedFilename.trim())}\\s+(?:පිටුව|පිටු|pdf\\s*pages?|pages?)\\s+${pageList}$`,
+    "i"
+  );
+  const exactMatch = pageOrSection.trim().match(exactPattern);
+  if (!exactMatch) {
+    const pdfTokenCount = Array.from(pageOrSection.matchAll(/\.pdf/gi)).length;
+    const startsWithExpected = pageOrSection.trim().toLocaleLowerCase().startsWith(expectedFilename.trim().toLocaleLowerCase());
+    return { pageNumbers: [], mismatchedDocument: pdfTokenCount > 1 || (pdfTokenCount === 1 && !startsWithExpected), malformed: true };
   }
 
-  const pageClausePattern = /(?:පිටුව|පිටු|pdf\s*pages?|pages?)\s+([0-9]+(?:\s*[-–]\s*[0-9]+)?(?:\s*,\s*[0-9]+(?:\s*[-–]\s*[0-9]+)?)*)\b/gi;
-  const pageClauseMatches = Array.from(pageOrSection.matchAll(pageClausePattern));
-  const pageWordCount = Array.from(pageOrSection.matchAll(/(?:පිටුව|පිටු|pdf\s*pages?|pages?)/gi)).length;
-  if (pageClauseMatches.length !== 1 || pageWordCount !== 1) {
+  const pageClause = exactMatch[1];
+  if (!pageClause) {
     return { pageNumbers: [], mismatchedDocument: false, malformed: true };
   }
-
-  const pageClause = pageClauseMatches[0][1];
   const pages = new Set<number>();
   for (const token of pageClause.split(",")) {
     const range = token.trim().split(/\s*[-–]\s*/);
@@ -237,15 +238,6 @@ function parseSourceLocator(pageOrSection: string, expectedFilename: string): Lo
       return { pageNumbers: [], mismatchedDocument: false, malformed: true };
     }
     for (let page = start; page <= end; page += 1) pages.add(page);
-  }
-
-  const clauseEnd = (pageClauseMatches[0].index ?? 0) + pageClauseMatches[0][0].length;
-  const trailing = pageOrSection.slice(clauseEnd);
-  if (
-    /(?:පිටුව|පිටු|pdf\s*pages?|pages?)/i.test(trailing) ||
-    /^\s*[.\-–]|^\s*[A-Za-z0-9]/.test(trailing)
-  ) {
-    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
   }
 
   return {
@@ -327,20 +319,6 @@ function getGradeBands(value: PublicationRecordShape): string[] {
       if (typeof band === "string") bands.add(band);
     });
   }
-
-  const questionFields: Array<"questions" | "partA_MCQ" | "partB_Structured"> = ["questions", "partA_MCQ", "partB_Structured"];
-  questionFields.forEach((field) => {
-    const questions = value[field];
-    if (!Array.isArray(questions)) return;
-    questions.forEach((question) => {
-      if (!question || typeof question !== "object") return;
-      const questionBands = (question as Record<string, unknown>).gradeBands;
-      if (!Array.isArray(questionBands)) return;
-      questionBands.forEach((band) => {
-        if (typeof band === "string") bands.add(band);
-      });
-    });
-  });
 
   return Array.from(bands);
 }
@@ -545,16 +523,24 @@ function gradeScopeMatchesSource(gradeBands: string[], sourceId: string | undefi
   return gradeBands.every((band) => bandContainsSourceGrade(band, source.grades));
 }
 
-export function getTalaFieldDisposition(talaId: string): TalaFieldDisposition | undefined {
+export function getTalaFieldDisposition(talaOrId: string | unknown): TalaFieldDisposition | undefined {
+  const supplied = typeof talaOrId === "string" ? undefined : getRecordShape(talaOrId);
+  const talaId = typeof talaOrId === "string" ? talaOrId : typeof supplied?.id === "string" ? supplied.id : "";
   const entry = talaFieldDispositions.talas.find((candidate) => candidate.talaId === talaId);
   if (!entry) return undefined;
-  const tala = (talasData as Array<{
+  const tala = (supplied ?? (talasData as Array<{
     id: string;
     context_si?: string;
     contextSourceReference?: SourceReference;
     theka_si: string;
     bols: Array<{ matra: number; bol_si: string }>;
-  }>).find((candidate) => candidate.id === talaId);
+  }>).find((candidate) => candidate.id === talaId)) as {
+    id?: unknown;
+    context_si?: unknown;
+    contextSourceReference?: unknown;
+    theka_si?: unknown;
+    bols?: unknown;
+  } | undefined;
   const hasExactEvidence = (field: TalaFieldDispositionField): boolean =>
     field.quality === "A" || field.quality === "B"
       ? evaluateSourceReference(field.sourceReference).supportable
@@ -563,8 +549,9 @@ export function getTalaFieldDisposition(talaId: string): TalaFieldDisposition | 
     entry.context.scope === "not-claimed"
       ? !tala?.context_si && !tala?.contextSourceReference && entry.context.quality === "N/A"
       : Boolean(
-          tala?.context_si &&
-          tala.contextSourceReference &&
+          typeof tala?.context_si === "string" &&
+          entry.context.value === tala.context_si &&
+          isSourceReference(tala.contextSourceReference) &&
           entry.context.sourceReference?.sourceId === tala.contextSourceReference.sourceId &&
           entry.context.sourceReference.pageOrSection === tala.contextSourceReference.pageOrSection &&
           hasExactEvidence(entry.context)
@@ -580,11 +567,12 @@ export function getTalaFieldDisposition(talaId: string): TalaFieldDisposition | 
     entry.bols.every((bol, index) =>
       bol.status === "verified" &&
       bol.matra === index + 1 &&
-      bol.matra === tala?.bols[index]?.matra &&
-      bol.value === tala?.bols[index]?.bol_si &&
+      Array.isArray(tala?.bols) &&
+      bol.matra === (tala.bols[index] as { matra?: unknown } | undefined)?.matra &&
+      bol.value === (tala.bols[index] as { bol_si?: unknown } | undefined)?.bol_si &&
       hasExactEvidence(bol)
     ) &&
-    tala?.bols.length === entry.bols.length;
+    Array.isArray(tala?.bols) && tala.bols.length === entry.bols.length;
   return { ...entry, allRequiredFieldsVerified };
 }
 
@@ -606,12 +594,20 @@ function collectDependencyDispositions(
   Object.entries(value as Record<string, unknown>).forEach(([key, child]) => {
     const childPath = path ? `${path}.${key}` : key;
     if (typeof child === "string") {
-      const dependency = ["talaId", "targetTalaId", "audioTalaId"].includes(key)
+      const recognizedTala = ["talaId", "targetTalaId", "audioTalaId"].includes(key);
+      const recognizedRaga = ["ragaId", "targetRagaId", "selectedRagaId"].includes(key);
+      const dependency = recognizedTala
         ? (talasData as Array<{ id: string }>).find((candidate) => candidate.id === child)
-        : ["ragaId", "targetRagaId", "selectedRagaId"].includes(key)
+        : recognizedRaga
         ? (ragasData as Array<{ id: string }>).find((candidate) => candidate.id === child)
         : undefined;
-      if (dependency) {
+      if ((recognizedTala || recognizedRaga) && !dependency) {
+        results.push({
+          path: childPath,
+          isPublic: false,
+          reasonCodes: ["dependent-entity-unavailable"],
+        });
+      } else if (dependency) {
         const decision = getRecordPublicationDecision(dependency);
         if (!decision.isPublic) {
           results.push({
@@ -624,6 +620,38 @@ function collectDependencyDispositions(
     }
     collectDependencyDispositions(child, childPath, seen, results);
   });
+}
+
+function hasCanonicalRuntimeShape(value: PublicationRecordShape): boolean {
+  const id = typeof value.id === "string" ? value.id : "";
+  if (!id) return false;
+  if ((talasData as Array<{ id: string }>).some((record) => record.id === id)) {
+    const tala = value as Record<string, unknown>;
+    const matras = tala.matras;
+    const bols = tala.bols;
+    return typeof tala.name_si === "string" && typeof tala.name_en === "string" &&
+      Array.isArray(tala.aliases_si) && typeof matras === "number" && Number.isInteger(matras) && matras > 0 &&
+      Array.isArray(tala.vibhagStructure) && Array.isArray(bols) && bols.length === matras &&
+      typeof tala.theka_si === "string" && tala.theka_si.trim().length > 0;
+  }
+  if ((ragasData as Array<{ id: string }>).some((record) => record.id === id)) {
+    const raga = value as Record<string, unknown>;
+    return typeof raga.name_si === "string" && typeof raga.name_en === "string" &&
+      Array.isArray(raga.arohana_swaras) && raga.arohana_swaras.length > 0 &&
+      Array.isArray(raga.avarohana_swaras) && raga.avarohana_swaras.length > 0;
+  }
+  if ((lessonsData as Array<{ id: string }>).some((record) => record.id === id)) {
+    const lesson = value as Record<string, unknown>;
+    return typeof lesson.title_si === "string" && typeof lesson.learningGoal_si === "string" &&
+      Array.isArray(lesson.contentSections);
+  }
+  if ((quizzesData as Array<{ id: string }>).some((record) => record.id === id)) {
+    return typeof value.lessonId === "string" && Array.isArray(value.gradeBands) && Array.isArray(value.questions);
+  }
+  if ((examPapersData as Array<{ id: string }>).some((record) => record.id === id)) {
+    return Array.isArray(value.partA_MCQ) && Array.isArray(value.partB_Structured);
+  }
+  return true;
 }
 
 export function getPublicationDecision(input: PublicationInput): PublicationDecision {
@@ -669,6 +697,8 @@ export function getRecordPublicationDecision(record: unknown): PublicationDecisi
   const nestedDispositions = [...baseDecision.nestedDispositions];
   const withheldFields = [...baseDecision.withheldFields];
 
+  if (!hasCanonicalRuntimeShape(value)) reasonCodes.add("malformed-record");
+
   const contextDecision = getContextClaimPublicationDecision(record);
   if (contextDecision.present && !contextDecision.isPublic) {
     if (contextDecision.reasonCode === "no-context-claim" || contextDecision.reasonCode === "unpaired-context-claim") {
@@ -681,7 +711,7 @@ export function getRecordPublicationDecision(record: unknown): PublicationDecisi
 
   const recordId = typeof value.id === "string" ? value.id : "";
   const isTalaRecord = (talasData as Array<{ id: string }>).some((tala) => tala.id === recordId);
-  const talaDisposition = getTalaFieldDisposition(recordId);
+  const talaDisposition = getTalaFieldDisposition(record);
   if (isTalaRecord && (!talaDisposition || !talaDisposition.allRequiredFieldsVerified)) {
     reasonCodes.add("field-disposition-needs-review");
     withheldFields.push("context", "theka", "bols");
@@ -692,7 +722,9 @@ export function getRecordPublicationDecision(record: unknown): PublicationDecisi
     reasonCodes.add("dependent-entity-unavailable");
   }
 
-  if (!Array.isArray(value.questions)) {
+  const isQuiz = (quizzesData as Array<{ id: string }>).some((quiz) => quiz.id === recordId);
+  const isExam = (examPapersData as Array<{ id: string }>).some((paper) => paper.id === recordId);
+  if (!isQuiz && !isExam) {
     const hasBlockingReason = reasonCodes.size > baseDecision.reasonCodes.length;
     const quarantined = baseDecision.state === "quarantined";
     const isPublic = baseDecision.isPublic && !hasBlockingReason;
@@ -706,14 +738,22 @@ export function getRecordPublicationDecision(record: unknown): PublicationDecisi
     };
   }
 
-  const parent = typeof value.lessonId === "string"
+  const parent = isQuiz && typeof value.lessonId === "string"
     ? (lessonsData as unknown as Array<{ id: string }>).find((lesson) => lesson.id === value.lessonId)
     : undefined;
-  const parentIsPublic = !!parent && getRecordPublicationDecision(parent).isPublic;
-  if (!parentIsPublic) reasonCodes.add("parent-lesson-unavailable");
-  if (!Array.isArray(value.questions) || value.questions.length === 0) reasonCodes.add("empty-question-set");
+  const parentIsPublic = !isQuiz || (!!parent && getRecordPublicationDecision(parent).isPublic);
+  if (isQuiz && !parentIsPublic) reasonCodes.add("parent-lesson-unavailable");
+  const nestedGroups = isQuiz
+    ? [{ path: "questions", items: value.questions }]
+    : [
+        { path: "partA_MCQ", items: value.partA_MCQ },
+        { path: "partB_Structured", items: value.partB_Structured },
+      ];
+  if (nestedGroups.some((group) => !Array.isArray(group.items) || group.items.length === 0)) {
+    reasonCodes.add("empty-question-set");
+  }
 
-  const questionsArePublic = value.questions.length > 0 && value.questions.every((question, index) => {
+  const questionsArePublic = nestedGroups.every((group) => Array.isArray(group.items) && group.items.length > 0 && group.items.every((question, index) => {
     const questionShape = getRecordShape(question);
     const hasExplicitGrades =
       Array.isArray(questionShape.gradeBands) &&
@@ -722,15 +762,16 @@ export function getRecordPublicationDecision(record: unknown): PublicationDecisi
     const hasDirectSource = isSourceReference(questionShape.sourceReference);
     const decision = getRecordPublicationDecision(question);
     nestedDispositions.push({
-      path: `questions[${index}]`,
+      path: `${group.path}[${index}]`,
       isPublic: decision.isPublic,
       reasonCodes: decision.reasonCodes,
     });
     return hasExplicitGrades && hasDirectSource && decision.isPublic;
-  });
+  }));
   if (!questionsArePublic) reasonCodes.add("nested-question-unpublishable");
 
-  const isPublic = baseDecision.isPublic && parentIsPublic && questionsArePublic &&
+  const hasBlockingReason = reasonCodes.size > baseDecision.reasonCodes.length;
+  const isPublic = baseDecision.isPublic && parentIsPublic && questionsArePublic && !hasBlockingReason &&
     !nestedDispositions.some((disposition) => !disposition.isPublic);
   return {
     ...baseDecision,
@@ -751,9 +792,8 @@ export function getContextClaimPublicationDecision(record: unknown): ContextClai
   const contextSourceReference: SourceReference | undefined = hasReference
     ? (value.contextSourceReference as SourceReference)
     : undefined;
-  const present = hasContext || (
-    value.contextSourceReference !== undefined && value.contextSourceReference !== null
-  );
+  const present = Object.prototype.hasOwnProperty.call(value, "context_si") ||
+    Object.prototype.hasOwnProperty.call(value, "contextSourceReference");
   const sourceEvidence = evaluateSourceReference(contextSourceReference);
   if (!present) {
     return { present: false, isPublic: false, reasonCode: "no-context-claim", sourceEvidence };

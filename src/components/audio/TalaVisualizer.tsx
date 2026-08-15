@@ -33,7 +33,15 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const playbackCancelRef = useRef<(() => void) | null>(null);
   const currentMatraRef = useRef(1);
-  const activeTalaIdRef = useRef(tala.id);
+  const audioEnabledRef = useRef(audioEnabled);
+  const playbackSignature = JSON.stringify({
+    id: tala.id,
+    matras: tala.matras,
+    theka: tala.theka_si,
+    bols: tala.bols.map((bol) => [bol.matra, bol.bol_si]),
+    tempo: tala.practiceTempoBpm?.thah_bpm ?? null,
+  });
+  const activeTalaSignatureRef = useRef(playbackSignature);
   const previousBpmRef = useRef(bpm);
 
   const currentBol = tala.bols.find((b) => b.matra === currentMatra) || tala.bols[0];
@@ -59,10 +67,10 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
 
   const playMatra = useCallback((matra: number) => {
     cancelPlayback();
-    if (!audioEnabled) return;
+    if (!audioEnabledRef.current) return;
     const bol = tala.bols.find((candidate) => candidate.matra === matra);
     if (bol) playbackCancelRef.current = tablaSynth.playBol(bol.bol_si, matraDurationMs);
-  }, [audioEnabled, cancelPlayback, matraDurationMs, tala.bols]);
+  }, [cancelPlayback, matraDurationMs, tala.bols]);
 
   const stepNextMatra = useCallback(() => {
     const next = currentMatraRef.current >= tala.matras ? 1 : currentMatraRef.current + 1;
@@ -91,14 +99,14 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
   }, [bpm, cancelPlayback, isPlaying]);
 
   useEffect(() => {
-    if (activeTalaIdRef.current === tala.id) return;
-    activeTalaIdRef.current = tala.id;
+    if (activeTalaSignatureRef.current === playbackSignature) return;
+    activeTalaSignatureRef.current = playbackSignature;
     setIsPlaying(false);
     stopTimer();
     cancelPlayback();
     selectMatra(1);
     setBpm(initialBpm || tala.practiceTempoBpm?.thah_bpm || 75);
-  }, [cancelPlayback, initialBpm, selectMatra, stopTimer, tala.id, tala.practiceTempoBpm?.thah_bpm]);
+  }, [cancelPlayback, initialBpm, playbackSignature, selectMatra, stopTimer, tala.practiceTempoBpm?.thah_bpm]);
 
   useEffect(() => () => {
     stopTimer();
@@ -125,7 +133,9 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
 
   const handleAudioToggle = () => {
     if (audioEnabled) cancelPlayback();
-    setAudioEnabled(!audioEnabled);
+    const next = !audioEnabled;
+    audioEnabledRef.current = next;
+    setAudioEnabled(next);
   };
 
   return (

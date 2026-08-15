@@ -209,6 +209,47 @@ describe("Content Validation Suite", () => {
     expect(issues.some((issue) => issue.entityType === "Terminology")).toBe(true);
   });
 
+  it("rejects non-array top-level catalogs instead of treating them as empty", () => {
+    const report = validateContent(null, {}, "ragas", false, 42, undefined);
+    expect(report.isValid).toBe(false);
+    expect(report.issues.filter((issue) => issue.field === "catalog")).toHaveLength(6);
+  });
+
+  it("does not throw when a published lesson has missing review metadata", () => {
+    const malformed = structuredClone(lessons[0]) as unknown as Record<string, unknown>;
+    delete malformed.reviewMetadata;
+    malformed.published = true;
+    expect(() => validateContent(
+      [malformed],
+      ragas,
+      publicTalas,
+      instruments,
+      culturalTraditions,
+      theatreTraditions
+    )).not.toThrow();
+    const report = validateContent(
+      [malformed],
+      ragas,
+      publicTalas,
+      instruments,
+      culturalTraditions,
+      theatreTraditions
+    );
+    expect(report.isValid).toBe(false);
+    expect(report.issues.some((issue) => issue.field === "reviewMetadata.status")).toBe(true);
+  });
+
+  it("rejects canonical-as-variant and duplicate variants within one terminology record", () => {
+    const issues = validateCatalogIdentityContracts([], [], [{
+      id: "term-one",
+      term_si: "ස්වරය",
+      term_en: "Swara",
+      transliteration: "Svaraya",
+      knownVariants: ["ස්වරය", "ස්වර", "ස්වර"],
+    }]);
+    expect(issues.filter((issue) => issue.field === "knownVariants").length).toBeGreaterThanOrEqual(2);
+  });
+
   it("rejects empty raga descents and invalid sample-phrase swaras", () => {
     const emptyDescent = structuredClone(ragas[0]) as Raga;
     emptyDescent.avarohana_swaras = [];

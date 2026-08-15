@@ -14,6 +14,7 @@ import {
   UNKNOWN_PROVENANCE,
 } from "@/lib/data/publication-policy";
 import quizzesData from "@/data/quizzes.json";
+import examPapersData from "@/data/exam-papers.json";
 import {
   validateCoverageSnapshot,
   validateForensicInventory,
@@ -390,6 +391,10 @@ describe("Prompt 1 publication containment", () => {
 
   it("rejects strict locator confusables, malformed numbers, and unconsumed clauses", () => {
     const locators = [
+      "පිටුව 2",
+      "අසත්‍ය sg10_emus_chap8_nadaya.pdf පිටුව 2",
+      "sg10_emus_chap8_nadaya.pdfx පිටුව 2",
+      "sg10_emus_chap8_nadaya.pdf පිටුව 2 අසත්‍ය",
       "sg10_emus_chap8_nadaya.wrong\u200Bpdf පිටුව 2",
       "sg10_emus_chap8_nadaya\uFF0Epdf පිටුව 2",
       "sg10_emus_chap8_nadaya.pdf පිටුව 2.5",
@@ -429,6 +434,85 @@ describe("Prompt 1 publication containment", () => {
     });
   });
 
+  it("quarantines recognized dependencies that do not resolve", () => {
+    const dependent = {
+      id: "synthetic-missing-dependent",
+      gradeBands: ["10-11"],
+      sourceReference: {
+        sourceId: "SRC-G11-RAGA-ID",
+        pageOrSection: "sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 1",
+      },
+      selectedRagaId: "raga-does-not-exist",
+      audioTalaId: "tala-does-not-exist",
+    };
+    expect(getRecordPublicationDecision(dependent)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["dependent-entity-unavailable"]),
+    });
+  });
+
+  it("treats every defined malformed context value as a blocking claim", () => {
+    const khemta = talasData.find((tala) => tala.id === "tala-khemta");
+    expect(khemta).toBeDefined();
+    if (!khemta) return;
+    for (const context_si of [{}, null, ""]) {
+      const candidate = structuredClone(khemta) as unknown as Record<string, unknown>;
+      candidate.context_si = context_si;
+      delete candidate.contextSourceReference;
+      expect(getRecordPublicationDecision(candidate)).toMatchObject({
+        isPublic: false,
+        reasonCodes: expect.arrayContaining(["unpaired-context-claim"]),
+      });
+    }
+  });
+
+  it("binds verified tala dispositions to the supplied candidate values", () => {
+    const khemta = talasData.find((tala) => tala.id === "tala-khemta");
+    expect(khemta).toBeDefined();
+    if (!khemta) return;
+    const changedContext = { ...structuredClone(khemta), context_si: "invented context" };
+    const changedTheka = { ...structuredClone(khemta), theka_si: "invented theka" };
+    [changedContext, changedTheka].forEach((candidate) => {
+      expect(getRecordPublicationDecision(candidate)).toMatchObject({
+        isPublic: false,
+        reasonCodes: expect.arrayContaining(["field-disposition-needs-review"]),
+      });
+    });
+  });
+
+  it("requires canonical quiz grades instead of inheriting question grades", () => {
+    const quiz = structuredClone(quizzesData.find((item) => item.id === "quiz-les-intro-01"));
+    expect(quiz).toBeDefined();
+    if (!quiz) return;
+    delete (quiz as { gradeBands?: unknown }).gradeBands;
+    expect(getRecordPublicationDecision(quiz)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["missing-grade-scope"]),
+    });
+  });
+
+  it("validates exam question arrays as nested publication claims", () => {
+    const paper = structuredClone(examPapersData.find((item) => item.id === "exam-ol-model-01"));
+    expect(paper).toBeDefined();
+    if (!paper) return;
+    delete (paper.partA_MCQ[0] as { gradeBands?: unknown }).gradeBands;
+    expect(getRecordPublicationDecision(paper)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["nested-question-unpublishable"]),
+    });
+  });
+
+  it("fails publication closed for malformed canonical entity shapes", () => {
+    const khemta = structuredClone(talasData.find((tala) => tala.id === "tala-khemta"));
+    expect(khemta).toBeDefined();
+    if (!khemta) return;
+    delete (khemta as { matras?: unknown }).matras;
+    expect(getRecordPublicationDecision(khemta)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["malformed-record"]),
+    });
+  });
+
   it("keeps missing quiz parent grades and parent identity non-public", () => {
     const quiz = structuredClone(quizzesData.find((item) => item.id === "quiz-les-intro-01"));
     expect(quiz).toBeDefined();
@@ -439,5 +523,13 @@ describe("Prompt 1 publication containment", () => {
     delete (quiz.questions[0] as { gradeBands?: unknown }).gradeBands;
     expect(getRecordPublicationDecision(quiz).isPublic).toBe(false);
     expect(getRecordPublicationDecision(quiz).reasonCodes).toContain("nested-question-unpublishable");
+  });
+
+  it("requires every disposition issue ID to resolve to the forensic ledger", () => {
+    const mutated = structuredClone(musicalCoreFieldDispositions) as typeof musicalCoreFieldDispositions;
+    mutated.talas[0].context.issueId = "P02-DANGLING-ISSUE";
+    const result = validateMusicalCoreFieldDispositions(talasData, mutated);
+    expect(result.isValid).toBe(false);
+    expect(result.issues.some((issue) => issue.field === "context.issueId")).toBe(true);
   });
 });

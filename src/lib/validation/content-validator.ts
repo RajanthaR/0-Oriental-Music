@@ -104,11 +104,25 @@ export function validateCatalogIdentityContracts(
         issueFor(type, id, "knownVariants", "Terminology variants must be non-empty strings");
       }
       const variantNames = variants.filter((variant): variant is string => typeof variant === "string" && !!variant.trim());
+      if (type === "Terminology") {
+        const canonicalKey = identityKey(canonical);
+        const localVariantKeys = new Set<string>();
+        (Array.isArray(record.knownVariants) ? record.knownVariants : []).forEach((variant) => {
+          if (typeof variant !== "string" || !variant.trim()) return;
+          const key = identityKey(variant);
+          if (key === canonicalKey) {
+            issueFor(type, id, "knownVariants", "Canonical terminology identity must not also be a variant");
+          } else if (localVariantKeys.has(key)) {
+            issueFor(type, id, "knownVariants", "Duplicate terminology variant within one record");
+          }
+          localVariantKeys.add(key);
+        });
+      }
       [{ name: canonical, canonical: true }, ...variantNames.map((name) => ({ name, canonical: false }))]
         .filter(({ name }) => !!name)
-        .forEach(({ name, canonical: isCanonical }) => {
-           const key = identityKey(name);
-           const existing = identities.get(key);
+          .forEach(({ name, canonical: isCanonical }) => {
+            const key = identityKey(name);
+            const existing = identities.get(key);
            if (existing && existing.id !== id) {
              issueFor(type, id, isCanonical ? "term_si" : type === "Terminology" ? "knownVariants" : "term_en", `Search-equivalent ${type.toLowerCase()} identity collides with '${existing.id}'`);
            } else if (!existing) {
@@ -269,9 +283,21 @@ export function validateMusicalCoreFieldDispositions(
 ): PublicationValidationResult {
   const issues: ValidationIssue[] = [];
   const registry = isRecord(registryInput) ? registryInput : {};
+  const ledgerIssueIds = new Set(
+    Array.isArray(forensicLedgerData.issues)
+      ? forensicLedgerData.issues.filter(isRecord).map((issue) => issue.id).filter((id): id is string => typeof id === "string")
+      : []
+  );
+  const issueCatalog = asUnknownArray(registry.issueCatalog).filter(isRecord);
+  const issueCatalogIds = new Set(issueCatalog.map((issue) => issue.id).filter((id): id is string => typeof id === "string"));
+  issueCatalog.forEach((issue, index) => {
+    if (typeof issue.id !== "string" || typeof issue.ledgerIssueId !== "string" || !ledgerIssueIds.has(issue.ledgerIssueId)) {
+      issues.push({ entityType: "TalaFieldDisposition", entityId: typeof issue.id === "string" ? issue.id : String(index), field: "issueCatalog", message: "Disposition issue catalog entries must resolve to a forensic-ledger issue", severity: "error" });
+    }
+  });
   const entries = asUnknownArray(registry.talas).filter(isRecord) as Array<{
     talaId: string;
-    context: { status: string; scope?: string; sourceReference?: unknown; quality?: string; issueId?: string };
+    context: { status: string; scope?: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string };
     theka: { status: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string };
     bols: Array<{ matra: number; status: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string }>;
   }>;
@@ -316,6 +342,8 @@ export function validateMusicalCoreFieldDispositions(
       }
       if (!value.quality || !value.issueId) {
         issues.push({ entityType: "TalaFieldDisposition", entityId: id, field, message: "Every disposition requires quality and forensic issue anchors", severity: "error" });
+      } else if (!issueCatalogIds.has(value.issueId)) {
+        issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `${field}.issueId`, message: "Disposition issue ID must resolve through the structured issue catalog", severity: "error" });
       }
       const contextScope = field === "context" ? entry.context.scope : undefined;
       const evidenceRequired = value.quality !== "missing" && !(field === "context" && contextScope === "not-claimed");
@@ -323,6 +351,9 @@ export function validateMusicalCoreFieldDispositions(
         issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `${field}.sourceReference`, message: "Readable disposition fields require exact supportable source evidence", severity: "error" });
       }
     });
+    if (entry.context.scope !== "not-claimed" && entry.context.quality !== "missing" && entry.context.value !== candidate.context_si) {
+      issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: "context.value", message: "Context disposition must preserve the exact raw auditable value", severity: "error" });
+    }
     if (entry.theka.quality !== "missing" && entry.theka.value !== candidate.theka_si) {
       issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: "theka.value", message: "Theka disposition must preserve the raw auditable value", severity: "error" });
     }
@@ -340,6 +371,8 @@ export function validateMusicalCoreFieldDispositions(
       }
       if (!bol.quality || !bol.issueId) {
         issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}]`, message: "Every bol disposition requires quality and forensic issue anchors", severity: "error" });
+      } else if (!issueCatalogIds.has(bol.issueId)) {
+        issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}].issueId`, message: "Bol issue ID must resolve through the structured issue catalog", severity: "error" });
       }
       if (bol.quality !== "missing" && !hasExactEvidence(bol.sourceReference, bol.status)) {
         issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}].sourceReference`, message: "Readable bol fields require exact supportable source evidence", severity: "error" });
@@ -835,6 +868,10 @@ export function validateContent(
   const issues: ValidationIssue[] = [];
   const validSourceIds = new Set(sourcesData.map((s) => s.id));
   const structuralRecords = (type: string, value: unknown): Record<string, unknown>[] => {
+    if (!Array.isArray(value)) {
+      issues.push({ entityType: type, entityId: "catalog", field: "catalog", message: `${type} catalog must be an array`, severity: "error" });
+      return [];
+    }
     return asUnknownArray(value).flatMap((candidate, index) => {
       if (!isRecord(candidate)) {
         issues.push({
@@ -932,11 +969,11 @@ export function validateContent(
       });
     }
 
-    if (l.published && l.reviewMetadata.status !== "Published") {
+    if (l.published && (!l.reviewMetadata || typeof l.reviewMetadata !== "object" || l.reviewMetadata.status !== "Published")) {
       issues.push({
         entityType: "Lesson",
         entityId: l.id,
-        field: "published",
+        field: "reviewMetadata.status",
         message: "Published lesson must have 'Published' status in reviewMetadata",
         severity: "error",
       });

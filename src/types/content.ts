@@ -320,6 +320,7 @@ export interface Quiz {
   id: string;
   title_si: string;
   lessonId: string;
+  gradeBands: GradeBandType[];
   questions: Question[];
   passingScorePercent: number;
 }

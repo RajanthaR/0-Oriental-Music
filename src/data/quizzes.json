@@ -3,6 +3,7 @@
     "id": "quiz-les-intro-01",
     "title_si": "නාදය සහ සංගීත නාදය කුඩා ප්‍රශ්නාවලිය",
     "lessonId": "les-intro-01",
+    "gradeBands": ["10-11"],
     "passingScorePercent": 75,
     "questions": [
       {
@@ -118,6 +119,7 @@
     "id": "quiz-les-swara-01",
     "title_si": "සප්ත ස්වර කුඩා ප්‍රශ්නාවලිය",
     "lessonId": "les-swara-01",
+    "gradeBands": ["6-7", "8-9"],
     "passingScorePercent": 75,
     "questions": [
       {
@@ -233,6 +235,7 @@
     "id": "quiz-les-swara-02",
     "title_si": "ස්වර ප්‍රභේද ප්‍රශ්නාවලිය",
     "lessonId": "les-swara-02",
+    "gradeBands": ["7", "8-9", "10-11"],
     "passingScorePercent": 75,
     "questions": [
       {
@@ -368,6 +371,7 @@
     "id": "quiz-les-tala-dadra",
     "title_si": "දාදරා තාල ප්‍රශ්නාවලිය",
     "lessonId": "les-tala-dadra",
+    "gradeBands": ["10-11"],
     "passingScorePercent": 75,
     "questions": [
       {
@@ -497,6 +501,7 @@
     "id": "quiz-les-raga-bhairav",
     "title_si": "භෛරව් රාග ප්‍රශ්නාවලිය",
     "lessonId": "les-raga-bhairav",
+    "gradeBands": ["10-11"],
     "passingScorePercent": 75,
     "questions": [
       {
@@ -602,6 +607,7 @@
     "id": "quiz-les-inst-desi-drums",
     "title_si": "දේශීය බෙර වර්ග ප්‍රශ්නාවලිය",
     "lessonId": "les-inst-desi-drums",
+    "gradeBands": ["8-9", "10-11"],
     "passingScorePercent": 75,
     "questions": [
       {
@@ -708,6 +714,7 @@
     "id": "quiz-les-theatre-nadagam",
     "title_si": "නාඩගම් නාට්‍ය සංගීත ප්‍රශ්නාවලිය",
     "lessonId": "les-theatre-nadagam",
+    "gradeBands": ["8-9", "10-11"],
     "passingScorePercent": 75,
     "questions": [
       {

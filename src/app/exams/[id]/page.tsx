@@ -29,7 +29,6 @@ export default function ExamPaperTakePage() {
   const mcqQuiz = {
     id: `quiz-${paper.id}`,
     title_si: `${paper.title_si} - I කොටස (බහුවරණ)`,
-    lessonId: paper.id,
     questions: paper.partA_MCQ,
     passingScorePercent: 60,
   };

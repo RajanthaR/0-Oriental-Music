@@ -84,8 +84,8 @@ export default function LessonDetailPage() {
   };
 
   const strand = repository.getStrandById(lesson.strandId);
-  const practiceTala = lesson.guidedPractice.interactiveTool === "tala-visualizer"
-    ? repository.getTalaById(lesson.guidedPractice.targetTalaId || "") || repository.getTalas()[0]
+  const practiceTala = lesson.guidedPractice.interactiveTool === "tala-visualizer" && lesson.guidedPractice.targetTalaId
+    ? repository.getTalaById(lesson.guidedPractice.targetTalaId)
     : undefined;
 
   return (

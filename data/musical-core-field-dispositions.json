@@ -6,6 +6,18 @@
     "bols"
   ],
   "policy": "whole-entity-quarantine",
+  "issueCatalog": [
+    { "id": "P02-TALA-CONTEXT-001", "ledgerIssueId": "P02-TALA-STRUCTURE-001" },
+    { "id": "P02-TALA-BOL-EVIDENCE-001", "ledgerIssueId": "P01-TALA-DADRA-CITE-001" },
+    { "id": "P02-TALA-BOL-EVIDENCE-002", "ledgerIssueId": "P02-TALA-STRUCTURE-001" },
+    { "id": "P02-TALA-BOL-EVIDENCE-003", "ledgerIssueId": "P02-TALA-STRUCTURE-001" },
+    { "id": "P02-TALA-BOL-EVIDENCE-004", "ledgerIssueId": "P02-TALA-STRUCTURE-001" },
+    { "id": "P02-TALA-BOL-EVIDENCE-005", "ledgerIssueId": "P02-TALA-STRUCTURE-001" },
+    { "id": "P02-TALA-ROOPAK-001", "ledgerIssueId": "P01-TALA-ROOPAK-001" },
+    { "id": "P02-TALA-LAWANI-CONTEXT-001", "ledgerIssueId": "P01-TALA-LAWANI-001" },
+    { "id": "P02-TALA-BOL-EVIDENCE-006", "ledgerIssueId": "P01-TALA-LAWANI-001" },
+    { "id": "P02-TALA-KHEMTA-001", "ledgerIssueId": "P02-TALA-STRUCTURE-001" }
+  ],
   "talas": [
     {
       "talaId": "tala-dadra",
@@ -767,6 +779,7 @@
       "talaId": "tala-lawani",
       "context": {
         "status": "needs-review",
+        "value": "ලාවනී යනු හින්දුස්ථානි තාල පද්ධතියේ දක්නට ලැබෙන තාලයක් නොවේ. මාත්‍රා දෙක බැගින් වූ විභාග සහිත ගීත පාසල් පද්ධතියේ භාවිත වන නිසාත්, දේශීය තිත් රූප හා බටහිර තාලවල එවැනි කොටස් ඇති නිසාත් එය පාසල් පද්ධතියට නිර්දේශ කර ඇත.",
         "sourceReference": {
           "sourceId": "SRC-EPD-TB-G11",
           "pageOrSection": "s11tim173.pdf පිටුව 24"
@@ -880,6 +893,7 @@
       "context": {
         "status": "verified",
         "scope": "claim",
+        "value": "එක් මාත්‍රාවකට අක්ෂර තුන බැගින් යෙදෙන මාත්‍රා හතරක තාලයකි; මූලාශ්‍රය මෙහි ලය වේගවත් බව සඳහන් කරයි.",
         "sourceReference": {
           "sourceId": "SRC-EPD-TB-G10",
           "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 7"

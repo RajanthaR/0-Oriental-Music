@@ -27,17 +27,17 @@ from musical memory.
 | Finding | Validated defect | Closure disposition | Regression or deterministic check |
 |---:|---|---|---|
 | 01 | TalaVisualizer Start cancelled its newly-created playback handle. | Separate caller-owned playback and timer lifecycles; cleanup captures only the handle it owns. | `src/test/components.test.tsx`: Start/Stop/Reset and compound scheduling lifecycle tests. |
-| 02 | Secondary context policy diverged from primary eligibility and accepted malformed or wrong-grade context. | Context claims are composed into the same fail-closed publication decision; malformed, unpaired, wrong-grade, and review-required context quarantines the parent. | `src/test/publication-containment.test.ts`: context mutation matrix and Lawani whole-record containment. |
-| 03 | Null catalog entries crashed identity validation. | Runtime guards emit structural issues and skip dependent checks. | `src/test/content-validator.test.ts`: null, primitive, and malformed catalog inputs never throw. |
+| 02 | Secondary context policy diverged from primary eligibility and accepted malformed or wrong-grade context. | Context claims are composed into the same fail-closed publication decision; any defined malformed/unpaired value blocks publication, and Tala context is bound to the supplied candidate and exact disposition value. | `src/test/publication-containment.test.ts`: context/candidate mutation matrix and Lawani whole-record containment. |
+| 03 | Null catalog entries crashed identity validation. | Runtime guards emit structural issues for malformed entries and non-array top-level catalogs, narrow review metadata safely, and skip dependent checks without throwing. | `src/test/content-validator.test.ts`: null, primitive, missing-metadata, and malformed catalog inputs never throw or fail open. |
 | 04 | Source manifest and bibliography retained unsupported metadata and syllabus claims. | Selected catalogs now use explicit unknown metadata and no unsupported Bhairav claim; cross-catalog consistency is checked. | `src/test/source-metadata-consistency.test.ts` and forensic inventory checks. |
 | 05 | Ledger header claimed Prompt 1 and an obsolete current checkout SHA. | Historical baseline and audited-through phase/base are separate; no stored current-checkout assertion remains. | Ledger header contract in `src/test/source-metadata-consistency.test.ts`. |
-| 06 | Unicode/confusable and malformed PDF locators bypassed exact-document checks. | Locator parser is fully consumed, rejects format controls/confusables, extra filenames, malformed pages, and trailing page clauses. | `src/test/publication-containment.test.ts`: locator rejection matrix plus accepted exact forms. |
-| 07 | Missing canonical grade scope was inferred from source metadata or a parent lesson. | Only declared grade fields are accepted; missing scope returns `missing-grade-scope`. | `src/test/publication-containment.test.ts`: Bilawal and nested question grade deletion. |
-| 08 | `Quiz.lessonId` was optional in TypeScript but mandatory at runtime. | `Quiz.lessonId` is required and runtime publication rejects missing parent identity. | `src/test/content-validator.test.ts` and quiz mutation in publication tests. |
-| 09 | Tala aliases were optional and canonical/same-record duplicates passed. | Every raw tala has an alias array; canonical-as-alias, repeated aliases, and normalized cross-record collisions fail. | `src/test/content-validator.test.ts`: alias mutation matrix. |
+| 06 | Unicode/confusable and malformed PDF locators bypassed exact-document checks. | Locator parser consumes an exact expected filename plus one bounded integer page clause; filename-free, prefixed/suffixed, format-control, confusable, extra-document, and malformed-page forms fail closed. | `src/test/publication-containment.test.ts`: hostile locator matrix plus accepted exact forms. |
+| 07 | Missing canonical grade scope was inferred from source metadata, parent, or nested questions. | Only each canonical record's own declared grade fields are accepted; quizzes and questions declare independent scopes and missing scope returns `missing-grade-scope`. | `src/test/publication-containment.test.ts`: canonical quiz and nested question grade deletion. |
+| 08 | `Quiz.lessonId` was optional in TypeScript but mandatory at runtime. | Canonical `Quiz.lessonId` and `Quiz.gradeBands` are required; `QuizRunner` accepts only its display subset so exam UI no longer fabricates a lesson relationship. | Type-check plus quiz/exam mutations in publication tests. |
+| 09 | Tala/term aliases were optional and canonical/same-record duplicates passed. | Every raw tala has an alias array; canonical-as-variant, repeated normalized variants, and cross-record collisions fail, with redundant audit variants removed rather than replaced. | `src/test/content-validator.test.ts`: Tala and terminology identity mutation matrices. |
 | 11 | Circular TalaVisualizer coordinates differed at hydration. | Coordinates are rounded to deterministic serialized values. | `src/test/components.test.tsx` coordinate serialization test and browser console QA. |
 | 12 | Public tala directory framed Lawani as generically North Indian. | Lawani is quarantined while its required school-system context source remains `Review Required`; directory copy is neutral. | `src/test/publication-containment.test.ts` and tala route/browser QA. |
-| 13 | Normalized public tala bol cells exceeded readable extracted evidence. | Closed-world field registry marks unsupported rows `needs-review`; whole tala and reverse dependents are unavailable. | `src/test/publication-containment.test.ts` disposition/dependency parity tests. |
+| 13 | Normalized public tala bol cells exceeded readable extracted evidence. | Closed-world field registry binds every context/theka/bol to the supplied candidate, maps every issue ID through a structured catalog to the forensic ledger, and quarantines missing/nonpublic reverse dependencies. | `src/test/publication-containment.test.ts` disposition, issue-reference, candidate-drift, and dependency tests. |
 | 14 | Acoustics prose added Hz/Hertz, directional rules, and flute/violin claims. | Public copy is limited to vibration count per second, non-directional source-listed factors, and general waveform recognition. | `src/test/musical-core.test.ts` public serialized-content assertions. |
 | 15 | Teental/Jhaptal canonical spellings drifted from accepted Grade 10 extraction. | Accepted Grade 10 forms remain canonical; review-required forms are retrieval-only and not aliases. | `src/test/search-engine.test.ts` canonical/retrieval-only spelling assertions. |
 | 16 | Bilawal added an unsupported basic-thaat-raga classification. | Unsupported classification removed; all-Shuddha characteristic remains bounded to the accepted source. | `src/test/musical-core.test.ts` Bilawal wording assertion. |
@@ -49,6 +49,22 @@ Finding 10 (`validator-10-deepchandi-variant.json`) was rejected as framed in
 `p02r4`: the Grade 11 spelling is retained as an explicitly retrieval-only
 mapping and does not become a verified canonical alias. The retrieval behavior
 has a positive regression in `src/test/search-engine.test.ts`.
+
+## Fresh closeout review cycle 1
+
+Full review run `20260816-023434-p02c1-dd0c6774` covered the complete diff from
+`beba1479f473b3413b3f2de48a27c558e1937c6f`. All eleven required reviewers
+completed. Fifteen deduplicated findings survived independent validation and
+were resolved in the cycle-1 review-fix work: exact locator consumption,
+malformed and value-unbound context, candidate-bound Tala dispositions,
+missing dependency IDs and UI fallback, canonical quiz grades, non-array and
+throwing validator inputs, exam nested claims and display typing, same-record
+term collisions, audio-off phase continuity, same-ID Tala replacement, missing
+transition assertions, disposition issue-ID referential integrity, and the
+runtime canonical-shape gate. The separate RhythmTapGame completion-timer
+report was classified as pre-existing and is retained as residual risk rather
+than Phase 2 acceptance evidence. This cycle is not final acceptance; a clean
+full rereview against the same base remains mandatory.
 
 ## Quarantine boundary
 

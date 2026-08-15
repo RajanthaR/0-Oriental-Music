@@ -103,9 +103,14 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     vi.useFakeTimers();
     render(<TalaVisualizer tala={tala} />);
     fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
+    expect(audioMocks.playBol).toHaveBeenLastCalledWith(tala.bols[0].bol_si, 600);
+    act(() => { vi.advanceTimersByTime(300); });
     fireEvent.click(screen.getByRole("button", { name: "තබ්ලා නාදය පාලනය" }));
     expect(cancels[0]).toHaveBeenCalledTimes(1);
-    act(() => { vi.advanceTimersByTime(800); });
+    act(() => { vi.advanceTimersByTime(299); });
+    expect(screen.getByText(/මාත්‍රා 1 \/ 4/)).toBeInTheDocument();
+    act(() => { vi.advanceTimersByTime(1); });
+    expect(screen.getByText(/මාත්‍රා 2 \/ 4/)).toBeInTheDocument();
     expect(audioMocks.playBol).toHaveBeenCalledTimes(1);
   });
 
@@ -115,13 +120,34 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     if (!tala) return;
     const cancel = vi.fn();
     audioMocks.playBol.mockReturnValue(cancel);
+    vi.useFakeTimers();
     render(<TalaVisualizer tala={tala} />);
     fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
     expect(cancel).not.toHaveBeenCalled();
+    act(() => { vi.advanceTimersByTime(400); });
     fireEvent.change(screen.getByRole("slider", { name: "තාලයේ වේගය (BPM)" }), {
       target: { value: "120" },
     });
     expect(cancel).toHaveBeenCalledTimes(1);
+    expect(screen.getByText(/මාත්‍රා 1 \/ 4/)).toBeInTheDocument();
+    act(() => { vi.advanceTimersByTime(499); });
+    expect(screen.getByText(/මාත්‍රා 1 \/ 4/)).toBeInTheDocument();
+    act(() => { vi.advanceTimersByTime(1); });
+    expect(screen.getByText(/මාත්‍රා 2 \/ 4/)).toBeInTheDocument();
+  });
+
+  it("resets playback when a same-ID tala is replaced", () => {
+    const tala = repository.getTalaById("tala-khemta");
+    expect(tala).toBeDefined();
+    if (!tala) return;
+    const cancel = vi.fn();
+    audioMocks.playBol.mockReturnValue(cancel);
+    const { rerender } = render(<TalaVisualizer tala={tala} />);
+    fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
+    rerender(<TalaVisualizer tala={{ ...tala, bols: tala.bols.map((bol, index) => index === 0 ? { ...bol, bol_si: `${bol.bol_si} වෙනස්` } : bol) }} />);
+    expect(cancel).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: "තාලය අරඹන්න" })).toBeInTheDocument();
+    expect(screen.getByText(/මාත්‍රා 1 \/ 4/)).toBeInTheDocument();
   });
 
   it("cancels playback on Reset, tala change, and unmount", () => {
