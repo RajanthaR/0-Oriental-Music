@@ -11,7 +11,7 @@ Planning decisions:
 - **Preservation:** Unsupported content is quarantined and logged rather than silently deleted. Stable IDs and migration aliases are preserved where safe.
 - **Sequence:** Establish containment first; repair canonical facts before dependent lessons; rebuild navigation/workspaces after content; perform UI/audio QA under content freeze; finish with an independent release audit.
 - **Integration:** One branch and ready PR per phase. The next phase starts from merged `origin/main`, never from an unmerged predecessor branch.
-- **External review:** All committed changes receive bounded-batch Diffray analysis with successful-analyzer evidence and a local review-fix commit when findings are accepted.
+- **External review:** The locally installed Diffray CLI runs its normal applicable multi-agent review with validation enabled over bounded Windows-safe batches. Restricted single-agent or validation-skipped runs are supplemental only. Accepted findings from each cycle are consolidated into one tested local review-fix commit.
 
 ## 2. Programme-level artifacts
 
@@ -34,7 +34,7 @@ Each phase must satisfy these gates in addition to its own acceptance criteria:
 - **G2 — Consistency:** Machine-readable canonical data and generated human documentation agree.
 - **G3 — Migration:** Stable IDs/progress mappings remain valid or have an explicit migration map.
 - **G4 — Verification:** Relevant targeted tests plus test, type-check, lint, and build pass on the final reviewed commit.
-- **G5 — Review:** Diffray successfully covers every changed file; zero successful analyzers is a blocker.
+- **G5 — Review:** Accepted primary Diffray batches cover every changed file, validation is complete, and multiple distinct applicable agents succeed across the phase diff. Restricted single-agent, validation-skipped, malformed, warning-degraded, or zero-successful-agent runs do not satisfy the gate.
 - **G6 — Git/PR:** Implementation commit, review-fix commit(s), clean worktree, pushed branch, and ready PR are evidenced.
 - **G7 — Handoff:** The paste-ready result includes SHAs, commands, logs, PR state, findings, fixes, rejections, and unresolved source items.
 
@@ -162,7 +162,7 @@ Each phase must satisfy these gates in addition to its own acceptance criteria:
 - **P7-U04 Full technical QA:** Run complete automated gates, dependency/security checks available in the repository, E2E/browser matrix, production build/start smoke, audio/privacy checks, and link/route integrity.
 - **P7-U05 Residual remediation:** Fix only evidence-backed repository-owned defects, add regressions, and update the ledger. Do not fabricate missing-source closure.
 - **P7-U06 Release report:** Publish exact verified scope, unresolved original-PDF/manual-review blockers, coverage, test/browser evidence, known risks, and rollback/operational notes applicable to this static app.
-- **P7-U07 Final external review:** Run Diffray across all phase changes in bounded batches plus the Phase 7 diff, fix findings in local review commits, and open the final ready PR.
+- **P7-U07 Final external review:** Run the normal local multi-agent Diffray workflow with validation enabled across all Phase 7 changes and a bounded high-risk cross-phase sample, consolidate fixes by review cycle, and open the final ready PR only after accepted coverage.
 
 **Acceptance:** Release status is evidence-backed and explicitly bounded. “Ready” is allowed only for the verified Grades 6–11 repository scope; unresolved source/visual/manual-review items remain visible blockers or exclusions. No deployment or merge occurs.
 
@@ -173,7 +173,7 @@ Stop a phase and report a blocker when:
 - required source evidence is absent or unreadable and proceeding would require invention;
 - predecessor PR/merge SHA is missing or the worktree contains unrelated changes;
 - a required verification gate remains failing because of the phase changes;
-- Diffray has no successful analyzer coverage after three bounded retries for a required batch;
+- Diffray cannot produce accepted default multi-agent coverage with completed validation after three bounded retries for a required batch;
 - PR creation/authentication fails after local work is safely committed and pushed; or
 - completion needs hosted mutation, new credentials, original PDFs, SME judgment, or scope not explicitly authorized.
 

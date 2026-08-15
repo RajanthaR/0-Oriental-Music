@@ -46,17 +46,21 @@ Build an exact competency → concept → prerequisite → lesson/activity/asses
 
 Run focused graph/path/search/Admin/Teacher/storage tests, then `npm run test`, `npm run type-check`, `npm run lint`, and `npm run build`. Browser-test representative student, search, path, Admin, Teacher, print, and direct-quarantine flows at 360px and desktop if supported. Report any unavailable browser/print evidence.
 
-## Mandatory local commit and Diffray review-fix loop
+## Mandatory local multi-agent Diffray review-fix loop
 
 1. Create and record a local implementation commit after initial verification.
-2. Review every committed changed file with Diffray from the repo root. Use repository/stdin transport, short bounded explicit `--files` batches, small analyzer sets, `--executor codex-cli`, structured JSON, and short temporary log paths; never place a full diff, file contents, or a huge combined file list in the command line.
-3. Record files/analyzers/`agentsExecuted`/`agentsSucceeded`/failures/findings/logs for each batch; successful batches must cover every changed file.
-4. Treat this as an unresolved blocker: “All failed before analysis because Diffray’s codex-cli executor exceeded the Windows command-line limit (ENAMETOOLONG). Zero analyzers completed, so there were no findings, fixes, or rejected findings. This is the exact unresolved review blocker.”
-5. Retry smaller batches after `ENAMETOOLONG`, timeout, invalid/missing JSON, `success: false`, or zero successful analyzers. Preserve failed evidence. Stop after three failed attempts for a required batch; no ready PR.
-6. Validate findings; fix valid ones with regression coverage, rerun relevant gates, and create a separate local `fix(review): ...` commit. Explain rejected findings.
-7. Re-run affected batches for up to three cycles until no actionable findings remain, then run the complete final verification suite.
-8. Push and open a ready PR against `main` only after successful Diffray coverage and gates. Never merge it.
+2. Record the exact local Diffray executable/version, `review --help`, available agents, and `codex-cli` support. An unknown-agent configuration warning is incomplete evidence and must be corrected and rerun.
+3. Inventory all committed files and review coherent bounded batches from the repository root with `diffray review --base <base-sha> --head HEAD --files <short-comma-list> --executor codex-cli --json`. For bounded full-file documentation/data review only, use `diffray review --files <short-comma-list> --full --executor codex-cli --json`; never combine `--full` with `--base`/`--head`.
+4. Primary coverage must omit `--agent` and `--skip-validation`, allowing the normal applicable multi-agent set and validation stage to run. Restricted-agent retries are diagnostic-only and validation-skipped runs cannot satisfy final coverage.
+5. Let Diffray manage concurrency. Keep Windows arguments and JSON log paths short; never inline the diff, patch, contents, or a huge file list.
+6. Record files, commands, transport, selected agents, validation, `agentsExecuted`, `agentsSucceeded`, failures, warnings, findings, and logs. Accept only valid `success: true` batches with applicable agents successful, validation complete, no unknown-agent warning, and no unresolved validated finding.
+7. A one-agent batch needs explicit evidence that only one agent applied. Multiple distinct applicable agents must succeed across the complete phase diff, and accepted primary batches must cover every changed file. Earlier restricted or validation-skipped logs are supplemental only.
+8. Treat this as an unresolved blocker: “All failed before analysis because Diffray’s codex-cli executor exceeded the Windows command-line limit (ENAMETOOLONG). Zero analyzers completed, so there were no findings, fixes, or rejected findings. This is the exact unresolved review blocker.”
+9. Preserve and retry a smaller/corrected batch after `ENAMETOOLONG`, timeout, HTTP/authentication failure, invalid/missing JSON, `success: false`, zero successful agents, incomplete validation, or unknown-agent warnings. Stop after three failed attempts for a required batch; no ready PR.
+10. Validate findings, fix valid ones with regression coverage, rerun relevant gates, and consolidate all accepted findings from the cycle into one local `fix(review): ...` commit. Explain rejected findings; do not commit per finding.
+11. Rerun only affected primary batches with normal multi-agent selection and validation enabled for at most three review-fix cycles, then run the complete final verification suite.
+12. Push and open a ready PR against `main` only after accepted multi-agent coverage, completed validation, and green gates. Never merge it.
 
 ## Paste-ready handoff
 
-Return predecessor/base/branch, implementation and review-fix SHAs, final HEAD/clean status, changed files, graph/coverage/path/migration/ledger paths, exact Diffray command/transport/batches/analyzers/logs/counts/findings/fixes/rejections/verdict, exact gates and browser results, ready PR URL/number/base/head/state, measured coverage categories, remaining graph/content/source blockers, and deferred scope.
+Return predecessor/base/branch, implementation and review-fix SHAs, final HEAD/clean status, changed files, graph/coverage/path/migration/ledger paths, local Diffray executable/version, exact primary commands/transport/batches/selected agents/validation/logs/counts/failures/warnings/findings/fixes/rejections, supplemental diagnostic runs, final multi-agent verdict, exact gates and browser results, ready PR URL/number/base/head/state, measured coverage categories, remaining graph/content/source blockers, and deferred scope.

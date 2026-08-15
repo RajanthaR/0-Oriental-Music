@@ -77,21 +77,30 @@ At minimum run the repository’s relevant targeted tests plus:
 
 Inspect the public-data paths for Grades 12–13/A/L and the named quarantined entities. If browser QA is practical, verify representative public and direct routes at 360px and desktop; report any environment limitation honestly.
 
-## Mandatory commit → Diffray review → fix loop
+## Mandatory local multi-agent Diffray review-fix loop
 
 1. Commit the implemented phase locally first with a scoped implementation commit and record its SHA.
-2. Inventory all committed changed files and review every one with Diffray.
-3. Prevent Windows `ENAMETOOLONG`: run Diffray from the repository root through its repository/stdin transport; use short, bounded explicit `--files` batches, small analyzer sets per invocation, `--executor codex-cli`, structured JSON, and short temporary log paths. Never pass the full diff, source contents, or a huge file list on the command line.
-4. For every batch, verify and report the attempted files, analyzers, `agentsExecuted`, `agentsSucceeded`, failures, findings, and log path. The successful batches together must cover every changed file.
-5. Treat this exact outcome as an unresolved blocker, never as “no findings”:
+2. Discover and record the exact locally installed Diffray executable, version, `review --help` output, available agents, and `codex-cli` executor support. A warning such as `Rule references unknown agent` makes review evidence incomplete until corrected and rerun.
+3. Inventory every committed changed file and divide code, tests, data, and documentation into short coherent batches. From the repository root, use the normal local multi-agent review with validation enabled:
+
+   ```powershell
+   diffray review --base <base-sha> --head HEAD --files <short-comma-list> --executor codex-cli --json
+   ```
+
+   When diff transport is unsuitable for a bounded documentation/data batch, use `diffray review --files <short-comma-list> --full --executor codex-cli --json`. Do not combine `--full` with `--base`/`--head`.
+4. Primary coverage commands must omit both `--agent` and `--skip-validation`, allowing Diffray to select all applicable agents and run validation. A later restricted `--agent <name>` retry is diagnostic-only; it cannot replace primary coverage. A validation-skipped run cannot satisfy final review.
+5. Let Diffray manage its own concurrency. Keep Windows commands short, use short temporary JSON log paths, and never pass the full diff, patch, source contents, or a huge file list in command arguments.
+6. Record every batch's files, command, transport, selected agents, validation result, `agentsExecuted`, `agentsSucceeded`, failures, findings, and log path. Accept a batch only with valid JSON, `success: true`, applicable successful agents, completed validation, no unknown-agent warning, and no unresolved validated actionable finding.
+7. A single successful agent is not automatically sufficient. Accept a one-agent batch only when the structured output establishes that exactly one agent was applicable. Across the complete phase diff, multiple distinct applicable agents must succeed, and accepted primary batches together must cover every changed file. Earlier restricted or validation-skipped logs are supplemental only.
+8. Treat this exact outcome as an unresolved blocker, never as “no findings”:
 
    “All failed before analysis because Diffray’s codex-cli executor exceeded the Windows command-line limit (ENAMETOOLONG). Zero analyzers completed, so there were no findings, fixes, or rejected findings. This is the exact unresolved review blocker.”
 
-6. If a batch hits `ENAMETOOLONG`, times out, lacks valid JSON, returns `success: false`, or has zero successful analyzers, preserve the attempt and retry a smaller batch. After three unsuccessful attempts for a required batch, stop and report the blocker; do not open a ready PR.
-7. Validate each finding. Fix valid findings, add regression coverage, rerun relevant tests, and create a separate local `fix(review): ...` commit. Record rejected findings with reasons.
-8. Re-run Diffray on the fixes/affected batch. Repeat for up to three review-fix cycles until no actionable findings remain.
-9. Run the full final verification suite on the reviewed HEAD.
-10. Push the branch and open a ready-for-review PR against `main` only when review coverage and required gates are complete. Do not merge it.
+9. Preserve and retry a smaller or corrected bounded batch after `ENAMETOOLONG`, timeout, HTTP/authentication failure, invalid/missing JSON, `success: false`, zero successful agents, incomplete validation, or unknown-agent warnings. After three unsuccessful attempts for a required batch, stop and report the blocker; do not open a ready PR.
+10. Validate every finding. Fix valid findings, add regression coverage, rerun relevant checks, and consolidate all accepted findings from that review cycle into one local `fix(review): ...` commit. Record rejected findings with reasons; do not commit once per finding.
+11. Rerun only affected primary batches with normal multi-agent selection and validation enabled. Repeat for at most three review-fix cycles until no actionable finding remains.
+12. Run the full final verification suite on the reviewed HEAD.
+13. Push the branch and open a ready-for-review PR against `main` only when mandatory multi-agent coverage, validation, and required gates are complete. Do not merge it.
 
 ## Required paste-ready final handoff
 
@@ -106,9 +115,9 @@ Return a self-contained block that the user can paste into the coordinating task
 - clean/dirty `WORKTREE_STATUS`
 - `CHANGED_FILES`
 - forensic ledger, correction log, and report paths
-- exact Diffray command pattern and transport
-- every file batch and analyzer set
-- per-batch `agentsExecuted`, `agentsSucceeded`, failures, log path, findings, fixes, and rejected findings
+- exact local Diffray executable/version, primary command pattern, and transport
+- every file batch, selected agent set, and validation result, distinguishing primary multi-agent from supplemental diagnostic runs
+- per-batch `agentsExecuted`, `agentsSucceeded`, failures, warnings, log path, findings, fixes, and rejected findings
 - `DIFFRAY_FINAL_VERDICT`
 - exact verification commands and concise pass/fail results
 - browser QA performed or exact reason it was not

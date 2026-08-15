@@ -222,7 +222,7 @@ Every implementation phase is an independently reviewable slice.
 3. Keep the phase scope exact. Do not fold later content completion, redesign, deployment, or unrelated cleanup into an earlier remediation phase.
 4. Run the phase-specific tests and inspect the diff before the first commit.
 5. Create a local implementation commit before external review. Record its SHA.
-6. Run the mandatory Diffray review-fix loop in Section 10. Every accepted review fix must be tested and placed in one or more **local review-fix commits** such as `fix(review): address Diffray findings`.
+6. Run the mandatory local multi-agent Diffray review-fix loop in Section 10. Consolidate all accepted findings from one review cycle into one tested **local review-fix commit** such as `fix(review): address validated Diffray findings`.
 7. Run the complete final verification gate on the reviewed HEAD.
 8. Push the phase branch and open a **ready-for-review pull request**, not a draft. Never merge it. Do not open a ready PR while the mandatory review is incomplete or a required gate is failing.
 9. Leave the worktree clean and report the final HEAD SHA, PR URL, base/head branches, and PR readiness state.
@@ -230,32 +230,59 @@ Every implementation phase is an independently reviewable slice.
 
 ---
 
-## 10. Mandatory Diffray Review-Fix Loop on Windows
+## 10. Mandatory Local Multi-Agent Diffray Review-Fix Loop on Windows
 
-Sending the changed code and documentation to Diffray's servers is explicitly permitted for this repository. Do not send credentials, tokens, private keys, local environment files, or unrelated user data.
+The review is initiated with the repository's **locally installed Diffray CLI** and executed through the local `codex-cli` executor. Diffray may send the selected changed code and documentation to its servers; that permission is granted in advance, so do not pause merely to request it again. Never send credentials, tokens, private keys, environment files, microphone/user data, or unrelated files.
 
-### A. Required review sequence
+The canonical command and evidence checklist also lives in `docs/forensic-remediation/DIFFRAY_MULTI_AGENT_REVIEW.md`. The rules below remain mandatory even when a phase prompt is older or less specific.
+
+### A. CLI and configuration preflight
+
+Before the first review invocation:
+
+1. Discover and record the exact local Diffray executable, version, `review --help` output, and locally available agents. Use the working installation already present on the machine; do not add or upgrade a repository dependency just to run review.
+2. Confirm the CLI describes `review` as a multi-agent review and that `--executor codex-cli` is available.
+3. Treat configuration warnings such as `Rule references unknown agent` as degraded or incomplete review evidence. Correct or bypass the stale local rule configuration without disabling the normal reviewer set, then rerun.
+
+### B. Primary multi-agent review
 
 After the implementation commit and before opening the ready PR:
 
-1. Inventory the committed changed files with Git and partition them into bounded, coherent batches. Review all changed files; do not omit data or documentation changes.
-2. Discover the installed Diffray command and available analyzers locally. Use the repository's working Diffray installation rather than silently substituting a different reviewer.
-3. Run Diffray from the repository root with its repository/stdin transport. Use short explicit `--files` batches, a small analyzer set per invocation, `--executor codex-cli`, and structured JSON output. Store logs at short temporary paths.
-4. Keep the Windows process command short. **Never place the full diff, patch, source contents, or one enormous file list in command-line arguments.** Split file lists further before they approach Windows command-line limits.
-5. For every batch, inspect the structured result and record the attempted files, analyzer names, `agentsExecuted`, `agentsSucceeded`, failed analyzers, findings, and log path. At least one intended analyzer must actually succeed, and the union of successful batches must cover every changed file.
-6. Validate each finding against the code and project source rules. Fix valid findings, add regression coverage where appropriate, rerun relevant verification, and create a local review-fix commit.
-7. Re-run Diffray on the fixes and the affected batch. Repeat for up to three review-fix cycles until there are no actionable findings.
-8. Record rejected findings with concise technical reasons. A review is complete only when all planned batches have successful analyzer coverage and no unresolved actionable finding remains.
+1. Inventory every committed changed file with Git and partition the files into short, coherent batches. Include code, tests, JSON/data, and documentation.
+2. Run Diffray from the repository root with repository-based transport and structured JSON. Use the normal local multi-agent review, allowing Diffray to select all applicable agents and run its validation stage. Typical primary commands are:
 
-### B. The known Windows failure and its required handling
+   ```powershell
+   diffray review --base <base-sha> --head HEAD --files <short-comma-list> --executor codex-cli --json
+   diffray review --files <short-comma-list> --full --executor codex-cli --json
+   ```
+
+   Use the first form for committed diff review. Use the second only for a bounded full-file review of documentation/data when diff transport is unsuitable. Do not combine `--full` with `--base`/`--head`.
+3. **The primary review commands must omit both `--agent` and `--skip-validation`.** A restricted `--agent <name>` invocation is allowed only as a narrow diagnostic retry after a valid default multi-agent batch; it is supplemental evidence and cannot replace mandatory coverage. Never use `--skip-validation` for final review evidence.
+4. Let Diffray manage its own agent concurrency. Do not launch uncontrolled parallel CLI processes against the same batch.
+5. Keep the Windows command short. Never place the full diff, patch, source contents, or an enormous file list in command-line arguments. Use short explicit `--files` batches and short temporary JSON log paths.
+6. For every batch, record the files, command, transport, agents selected, validation result, `agentsExecuted`, `agentsSucceeded`, agent failures, findings, and log path.
+7. A batch is complete only when its JSON is valid, `success` is true, the applicable agents actually executed, intended agents succeeded without unresolved failures, validation ran or the output explicitly establishes that no finding required validation, no unknown-agent warning remains, and no validated actionable finding is unresolved.
+8. One successful agent is not automatically sufficient. Accept a one-agent batch only when the structured output establishes that exactly one agent was applicable. Across the complete phase diff, multiple distinct applicable agents must have succeeded; otherwise the normal multi-agent review has not been demonstrated.
+9. The union of successful primary batches must cover every committed changed file. Earlier single-agent or `--skip-validation` logs are supplemental only and must be rerun under this workflow before a ready PR.
+
+### C. Finding validation and fix cycles
+
+1. Validate every finding against the implementation, tests, source evidence, and repository rules. Fix valid findings and add regression coverage where appropriate. Record rejected findings with concise technical reasons.
+2. Consolidate all accepted findings from one review cycle into one local `fix(review): ...` commit after relevant checks pass. Do not create one commit per finding or per analyzer.
+3. Rerun only the affected primary batches with the normal multi-agent command and validation enabled. Repeat for at most three review-fix cycles.
+4. Run the complete phase verification gate on the final reviewed HEAD. Review completion requires full file coverage and no unresolved validated actionable finding.
+
+### D. Windows and service failure handling
 
 The following outcome is an unresolved review blocker, **not** a clean review:
 
 > All failed before analysis because Diffray’s codex-cli executor exceeded the Windows command-line limit (ENAMETOOLONG). Zero analyzers completed, so there were no findings, fixes, or rejected findings. This is the exact unresolved review blocker.
 
-Prevent it by using repository/stdin transport and bounded `--files` batches, keeping analyzer groups and paths small, and writing structured output to short temporary log paths. If `ENAMETOOLONG` occurs, reduce the batch size and rerun it. A timeout, missing/malformed JSON, `success: false`, or zero successful analyzers is handled the same way: preserve the failed attempt as evidence and retry with a smaller bounded batch.
+Prevent it with repository-based transport, bounded `--files` batches, the default internally managed agent set, and short temporary log paths. If `ENAMETOOLONG` occurs, reduce the file batch and rerun; never put the diff or file contents into an argument.
 
-If three review attempts still produce no successful analyzer coverage for any required batch, stop. Report the exact blocker, commands, batch, logs, and analyzer counts. Do not claim "no findings," do not bypass Diffray with a self-review, and do not open a ready PR.
+A timeout, HTTP/authentication failure, missing or malformed JSON, `success: false`, zero successful agents, incomplete validation, or unknown-agent warning is also incomplete evidence. Preserve the failed log and retry the same required coverage with a smaller or corrected bounded batch.
+
+If three attempts still cannot produce valid successful multi-agent coverage for a required batch, stop. Report the exact executable, commands, files, logs, warnings, validation state, and agent counts. Do not claim "no findings," do not substitute self-review or a restricted single-agent run, and do not open a ready PR.
 
 ---
 
@@ -267,7 +294,7 @@ At the end of every implementation phase, return a paste-ready handoff containin
 - base SHA, branch name, and clean/dirty worktree status;
 - implementation commit SHA and every review-fix commit SHA;
 - final HEAD SHA and changed-file inventory;
-- exact Diffray command pattern, transport, analyzer set, file batches, log locations, per-batch `agentsExecuted`/`agentsSucceeded`/failures, findings, fixes, rejected findings, and final review verdict;
+- exact local Diffray executable/version, primary command pattern and transport, file batches, selected agents, validation results, log locations, per-batch `agentsExecuted`/`agentsSucceeded`/failures, findings, fixes, rejected findings, supplemental diagnostic runs, and final multi-agent review verdict;
 - exact verification commands and pass/fail summaries;
 - ready PR URL, number, base/head branches, and state;
 - source-evidence ledger or correction-log paths created or updated;
