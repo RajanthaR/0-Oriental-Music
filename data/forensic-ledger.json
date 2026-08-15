@@ -25,8 +25,8 @@
       "B": 190,
       "C": 33,
       "D": 403,
-      "readableSinhalaPages": 895,
-      "unreadableOrNoSinhalaPages": 128
+      "pagesContainingSinhalaText": 895,
+      "pagesWithoutSinhalaText": 128
     },
     "rawContentRecords": {
       "lessons": 21,

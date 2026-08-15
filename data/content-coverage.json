@@ -13,7 +13,7 @@
   "publicScope": {
     "gradeBands": ["6-7", "8-9", "10-11"],
     "unsupportedGradeBands": ["12-13"],
-    "publicCountsAreComputedBy": "src/lib/data/publication-policy.ts",
+    "publicCountsAreComputedBy": "src/lib/data/repository.ts#getPublicationSummary (applying src/lib/data/publication-policy.ts)",
     "publicCounts": {
       "lessons": 0,
       "ragas": 1,
@@ -43,8 +43,8 @@
     "gradeBPagesCount": 190,
     "gradeCPagesCount": 33,
     "gradeDPagesCount": 403,
-    "readableSinhalaPagesCount": 895,
-    "unreadableOrNoSinhalaPagesCount": 128,
+    "pagesContainingSinhalaTextCount": 895,
+    "pagesWithoutSinhalaTextCount": 128,
     "gradeABExtractionQualityPercent": 57.4,
     "interpretation": "A/B counts describe extraction quality only; they do not prove a musical claim."
   },

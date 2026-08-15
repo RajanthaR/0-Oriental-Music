@@ -76,6 +76,49 @@ describe("Prompt 1 publication containment", () => {
     expect(getSourceCorpusInventory()).toMatchObject({ sourceDocuments: 30, sourcePages: 1023 });
   });
 
+  it("detects drift in every mirrored forensic coverage section", () => {
+    const mutableCoverage = coverageData as unknown as {
+      rawContentCounts: Record<string, number>;
+      sourceQualityMetrics: Record<string, number>;
+      sourceDocumentStates: Record<string, number>;
+      legacyReconciliationSnapshot: {
+        actionCounts: Record<string, number>;
+      };
+      publicScope: { publicCounts: Record<string, number> };
+    };
+    const original = {
+      rawRagas: mutableCoverage.rawContentCounts.ragas,
+      gradeB: mutableCoverage.sourceQualityMetrics.gradeBPagesCount,
+      reviewRequired: mutableCoverage.sourceDocumentStates["Review Required"],
+      remapGrade: mutableCoverage.legacyReconciliationSnapshot.actionCounts.REMAP_GRADE,
+      publicRagas: mutableCoverage.publicScope.publicCounts.ragas,
+    };
+
+    try {
+      mutableCoverage.rawContentCounts.ragas += 1;
+      mutableCoverage.sourceQualityMetrics.gradeBPagesCount += 1;
+      mutableCoverage.sourceDocumentStates["Review Required"] += 1;
+      mutableCoverage.legacyReconciliationSnapshot.actionCounts.REMAP_GRADE += 1;
+      mutableCoverage.publicScope.publicCounts.ragas += 1;
+
+      const result = validateForensicInventory();
+      expect(result.isValid).toBe(false);
+      expect(result.issues.map((issue) => issue.field)).toEqual(expect.arrayContaining([
+        "rawContentCounts.ragas",
+        "sourceQualityMetrics.gradeBPagesCount",
+        "sourceDocumentStates.Review Required",
+        "legacyReconciliationSnapshot.actionCounts.REMAP_GRADE",
+        "publicScope.publicCounts.ragas",
+      ]));
+    } finally {
+      mutableCoverage.rawContentCounts.ragas = original.rawRagas;
+      mutableCoverage.sourceQualityMetrics.gradeBPagesCount = original.gradeB;
+      mutableCoverage.sourceDocumentStates["Review Required"] = original.reviewRequired;
+      mutableCoverage.legacyReconciliationSnapshot.actionCounts.REMAP_GRADE = original.remapGrade;
+      mutableCoverage.publicScope.publicCounts.ragas = original.publicRagas;
+    }
+  });
+
   it("validates the actual public collections and rejects a raw quarantined record", () => {
     const boundary = validatePublicBoundary({
       lessons: repository.getLessons(),
