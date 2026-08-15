@@ -12,6 +12,8 @@ const files = [
   'src/data/exam-papers.json',
 ];
 
+const terminologyFile = 'data/terminology-si.json';
+
 const unverifiedMetadata = {
   status: 'Needs Revision',
   reviewer: 'නොදනී / සනාථ වී නැත',
@@ -39,5 +41,20 @@ for (const relPath of files) {
     }
     fs.writeFileSync(fullPath, JSON.stringify(content, null, 2) + '\n', 'utf8');
     console.log('Sanitized:', relPath);
+  }
+}
+
+const terminologyPath = path.resolve(terminologyFile);
+if (fs.existsSync(terminologyPath)) {
+  const terms = JSON.parse(fs.readFileSync(terminologyPath, 'utf8'));
+  if (Array.isArray(terms)) {
+    for (const term of terms) {
+      if (term && typeof term === 'object') {
+        term.confidence = 'Unverified';
+        term.reviewStatus = 'Needs Review';
+      }
+    }
+    fs.writeFileSync(terminologyPath, JSON.stringify(terms, null, 2) + '\n', 'utf8');
+    console.log('Sanitized:', terminologyFile);
   }
 }

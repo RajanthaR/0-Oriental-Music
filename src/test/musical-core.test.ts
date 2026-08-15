@@ -6,6 +6,8 @@ import ragasData from "@/data/ragas.json";
 import talasData from "@/data/talas.json";
 import lessonsData from "@/data/lessons.json";
 import glossaryData from "@/data/glossary.json";
+import quizzesData from "@/data/quizzes.json";
+import terminologyData from "../../data/terminology-si.json";
 
 describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
   describe("Ragas Core Validation", () => {
@@ -127,22 +129,54 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       expect(introLesson?.sourceReference.pageOrSection).toContain("පිටු 2-12");
     });
 
-    it("verifies glossary acoustics terms cite SRC-G10-NADA with accurate terminology", () => {
-      const nadaTerms = [
+    it("publishes only the five acoustics terms established by SRC-G10-NADA", () => {
+      const supportedTerms = [
         "term-nada",
-        "term-sound",
-        "term-ahata-nada",
-        "term-anahata-nada",
         "term-pitch",
         "term-intensity",
         "term-timbre",
         "term-frequency",
       ];
+      const publicIds = repository.getGlossary().map((term) => term.id);
 
-      nadaTerms.forEach((id) => {
+      expect(publicIds).toEqual(expect.arrayContaining(supportedTerms));
+      expect(publicIds).not.toEqual(
+        expect.arrayContaining(["term-sound", "term-ahata-nada", "term-anahata-nada"])
+      );
+
+      supportedTerms.forEach((id) => {
         const term = glossaryData.find((g) => g.id === id);
         expect(term).toBeDefined();
         expect(term?.sourceReference.sourceId).toBe("SRC-G10-NADA");
+      });
+    });
+
+    it("keeps unsupported ahata/anahata claims out of the public lesson", () => {
+      const introLesson = repository.getLessonById("les-intro-01");
+      const serializedLesson = JSON.stringify(introLesson);
+
+      expect(serializedLesson).not.toContain("ආහත");
+      expect(serializedLesson).not.toContain("අනාහත");
+    });
+
+    it("aligns public acoustics and Dadra quizzes with their remediated source evidence", () => {
+      const acousticsQuiz = repository.getQuizById("quiz-les-intro-01");
+      const dadraQuiz = repository.getQuizById("quiz-les-tala-dadra");
+
+      expect(acousticsQuiz).toBeDefined();
+      expect(dadraQuiz).toBeDefined();
+
+      acousticsQuiz?.questions.forEach((question) => {
+        expect(question.gradeBands).toEqual(["10-11"]);
+        expect(question.sourceReference.sourceId).toBe("SRC-G10-NADA");
+        expect(question.sourceReference.sourceId).not.toBe("SRC-NIE-G06-TG");
+      });
+      expect(JSON.stringify(acousticsQuiz)).not.toMatch(/ආහත|අනාහත/);
+
+      dadraQuiz?.questions.forEach((question) => {
+        expect(question.sourceReference.sourceId).toBe("SRC-EPD-TB-G10");
+        expect(question.sourceReference.pageOrSection).toContain("පිටුව 6");
+        expect(question.sourceReference.sourceId).not.toBe("SRC-NIE-G07-TG");
       });
     });
   });
@@ -184,6 +218,13 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
         expect(record.reviewMetadata.lastVerifiedDate).toBe("නොදනී / සනාථ වී නැත");
         expect(record.reviewMetadata.license).toBe("නොදනී / සනාථ වී නැත");
         expect(record.reviewMetadata.reuseStatus).toBe("Unknown / Unverified");
+      });
+    });
+
+    it("does not represent the terminology catalog as an SME publication event", () => {
+      terminologyData.forEach((term) => {
+        expect(term.confidence).toBe("Unverified");
+        expect(term.reviewStatus).toBe("Needs Review");
       });
     });
 

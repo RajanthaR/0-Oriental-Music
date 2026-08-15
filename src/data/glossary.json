@@ -5,18 +5,16 @@
     "term_en": "Musical Sound (Nada)",
     "transliteration": "Nādaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "ක්‍රමවත් කම්පන සහිත, කනට ප්‍රිය උපදවන සුසර ශබ්දය නාදය නම් වේ. සංගීතයේ මූලික පදනම නාදයයි.",
+    "definition_si": "ස්වර යනු එකිනෙකට වෙනස් වූ නාද වන අතර ස්වර සප්තකය එම නාද අනුපිළිවෙළට සංවිධානය කිරීමෙන් ගොඩනැගේ.",
     "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: නාදය, නාද, Nada",
     "relatedTermIds": [
-      "term-ahata-nada",
-      "term-anahata-nada",
       "term-pitch",
       "term-intensity",
       "term-timbre"
     ],
     "sourceReference": {
       "sourceId": "SRC-G10-NADA",
-      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 2-4"
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටුව 2"
     }
   },
   {
@@ -25,14 +23,14 @@
     "term_en": "Sound / Acoustic Noise",
     "transliteration": "Śabdaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "ඕනෑම වස්තුවක කම්පනයෙන් උපදින, කනට ඇසෙන සියලුම ශ්‍රව්‍ය සංවේදනයන් ශබ්දය නම් වේ. ක්‍රමවත් ශබ්ද නාද වන අතර අක්‍රමවත් ශබ්ද ඝෝෂා වේ.",
-    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: ශබ්දය, ශබ්ද",
+    "definition_si": "සැපයූ SRC-G10-NADA ලේඛනය තුළ මෙම නිර්වචනය සනාථ වී නැත.",
+    "detailedNotes_si": "මූලාශ්‍ර සමාලෝචනය අවශ්‍යයි; පොදු ප්‍රදර්ශනයෙන් තාවකාලිකව වළක්වා ඇත.",
     "relatedTermIds": [
       "term-nada"
     ],
     "sourceReference": {
       "sourceId": "SRC-G10-NADA",
-      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටුව 2"
+      "pageOrSection": "සැපයූ SRC-G10-NADA පිටු 2-12 තුළ මෙම යෙදුම සනාථ වී නැත"
     }
   },
   {
@@ -41,14 +39,14 @@
     "term_en": "Ahata Nada (Struck Sound)",
     "transliteration": "Āhata Nādaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "භෞතික වස්තූන් දෙකක් එකිනෙක ගැටීමෙන්, පිරිමැදීමෙන් හෝ වාතය පිඹීමෙන් උපදින, මිනිස් කනට ඇසෙන ප්‍රායෝගික සංගීත නාදයයි.",
-    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: ආහත නාදය, ආහත",
+    "definition_si": "සැපයූ මූලාශ්‍ර කෝෂය තුළ මෙම යෙදුම හෝ නිර්වචනය සනාථ වී නැත.",
+    "detailedNotes_si": "මූලාශ්‍ර සමාලෝචනය අවශ්‍යයි; පොදු ප්‍රදර්ශනයෙන් තාවකාලිකව වළක්වා ඇත.",
     "relatedTermIds": [
       "term-anahata-nada"
     ],
     "sourceReference": {
       "sourceId": "SRC-G10-NADA",
-      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 2-4"
+      "pageOrSection": "සැපයූ SRC-G10-NADA පිටු 2-12 තුළ මෙම යෙදුම සනාථ වී නැත"
     }
   },
   {
@@ -57,14 +55,14 @@
     "term_en": "Anahata Nada (Unstruck / Cosmic Sound)",
     "transliteration": "Anāhata Nādaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "භෞතික ගැටීමකින් තොරව විශ්වයේ හෝ භාවනාවෙන් හදවත තුළ අත්විඳින අධ්‍යාත්මික නාදයයි. එය ප්‍රායෝගික ගායන වාදනයට යොදා නොගනී.",
-    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: අනාහත නාදය",
+    "definition_si": "සැපයූ මූලාශ්‍ර කෝෂය තුළ මෙම යෙදුම හෝ නිර්වචනය සනාථ වී නැත.",
+    "detailedNotes_si": "මූලාශ්‍ර සමාලෝචනය අවශ්‍යයි; පොදු ප්‍රදර්ශනයෙන් තාවකාලිකව වළක්වා ඇත.",
     "relatedTermIds": [
       "term-ahata-nada"
     ],
     "sourceReference": {
       "sourceId": "SRC-G10-NADA",
-      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 2-4"
+      "pageOrSection": "සැපයූ SRC-G10-NADA පිටු 2-12 තුළ මෙම යෙදුම සනාථ වී නැත"
     }
   },
   {

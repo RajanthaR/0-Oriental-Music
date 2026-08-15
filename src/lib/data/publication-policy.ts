@@ -69,6 +69,9 @@ export const KNOWN_QUARANTINED_ENTITY_IDS = new Set([
   "tala-roopak",
   "exam-al-model-01",
   "path-exam-prep",
+  "term-sound",
+  "term-ahata-nada",
+  "term-anahata-nada",
 ]);
 
 type SourceDocumentRecord = {

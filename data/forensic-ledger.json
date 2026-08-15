@@ -278,8 +278,8 @@
     {
       "id": "P01-SOUND-TERMINOLOGY-001",
       "severity": "P1",
-      "entityOrPath": "src/data/lessons.json:les-intro-01 and src/data/glossary.json:term-nada, term-sound, term-ahata-nada, term-anahata-nada",
-      "currentClaim": "Sound properties and acoustics terminology previously claimed Grade 6 scope and unverified citations. Remediated in Phase 2 to Grade 10 Unit 8 ('නාදයේ ගුණ') with official tri-vidha guna terminology and exact pages 2-12.",
+      "entityOrPath": "src/data/lessons.json:les-intro-01 and src/data/glossary.json acoustics records",
+      "currentClaim": "Sound properties and acoustics terminology previously claimed Grade 6 scope and unverified citations. The lesson and five evidenced glossary records are remediated to Grade 10 Unit 8; term-sound, term-ahata-nada, and term-anahata-nada remain quarantined because the supplied corpus does not establish their definitions.",
       "evidence": [
         {
           "path": "src/data/lessons.json",
@@ -288,19 +288,19 @@
         },
         {
           "path": "src/data/glossary.json",
-          "locator": "term-nada through term-frequency",
-          "exactPageOrSection": "SRC-G10-NADA (sg10_emus_chap8_nadaya.pdf පිටු 2-12)"
+          "locator": "term-nada, term-pitch, term-intensity, term-timbre, term-frequency",
+          "exactPageOrSection": "SRC-G10-NADA (sg10_emus_chap8_nadaya.pdf පිටු 2-12); term-sound, term-ahata-nada, and term-anahata-nada explicitly withheld"
         },
         {
           "path": "data/terminology-si.json",
-          "locator": "term-nada through term-frequency",
-          "exactPageOrSection": "SRC-G10-NADA (sg10_emus_chap8_nadaya.pdf පිටු 2-12)"
+          "locator": "all terminology records",
+          "exactPageOrSection": "review labels are Unverified / Needs Review; this dataset does not represent an SME approval event"
         }
       ],
-      "disposition": "remediated to Grade 10-11 scope and official tri-vidha guna terminology citing SRC-G10-NADA (PDF Pages 2-12); unquarantined in public scope",
+      "disposition": "publish only the Grade 10 lesson and five source-grounded acoustics records; quarantine three unsupported glossary definitions and retain all terminology audit labels as unverified",
       "publicVisibility": "contained",
       "confidence": "confirmed",
-      "confidenceScope": "remediated and verified against DOC-GRADE_10_NADAYA pages 2-12",
+      "confidenceScope": "bounded to DOC-GRADE_10_NADAYA pages 2-12 and an exact-term search of the supplied by-source corpus",
       "status": "contained",
       "evidenceBasis": "canonical-inspection"
     },
@@ -330,6 +330,30 @@
       "publicVisibility": "contained",
       "confidence": "confirmed",
       "confidenceScope": "remediated and verified against DOC-GRADE_10_MULIKANGA page 6 and DOC-GRADE_11_TB pages 23-24",
+      "status": "contained",
+      "evidenceBasis": "canonical-inspection"
+    },
+    {
+      "id": "P02-QUIZ-SYNC-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/quizzes.json:quiz-les-intro-01 and quiz-les-tala-dadra",
+      "currentClaim": "Public quizzes retained stale Grade 6/7 questions and unsupported citations after their parent lessons were remediated.",
+      "evidence": [
+        {
+          "path": "src/data/quizzes.json",
+          "locator": "quiz-les-intro-01 questions",
+          "exactPageOrSection": "SRC-G10-NADA (sg10_emus_chap8_nadaya.pdf පිටු 3, 4, 10-11)"
+        },
+        {
+          "path": "src/data/quizzes.json",
+          "locator": "quiz-les-tala-dadra questions",
+          "exactPageOrSection": "SRC-EPD-TB-G10 (sg10_emus_chap1_mulikanga.pdf පිටුව 6)"
+        }
+      ],
+      "disposition": "replace stale questions and citations with source-grounded Grade 10 acoustics and Dadra evidence",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "quiz claims compared with DOC-GRADE_10_NADAYA pages 3, 4, 10-11 and DOC-GRADE_10_MULIKANGA page 6",
       "status": "contained",
       "evidenceBasis": "canonical-inspection"
     },

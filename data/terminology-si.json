@@ -5,18 +5,14 @@
     "term_en": "Musical Sound (Nada)",
     "transliteration": "Nādaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "ක්‍රමවත් කම්පන සහිත, කනට ප්‍රිය උපදවන සුසර ශබ්දය නාදය නම් වේ. සංගීතයේ මූලික පදනම නාදයයි.",
+    "definition_si": "සංගීතයේ භාවිත වන ස්වර එකිනෙකට වෙනස් නාද ලෙස හඳුනාගත හැකි අතර, නාදයක ගුණ අනුව කටහඬ සහ වාද්‍ය භාණ්ඩ වෙන්කර හඳුනාගත හැක.",
     "knownVariants": [
       "නාදය",
       "නාද",
       "Nada"
     ],
-    "prerequisites": [
-      "term-sound"
-    ],
+    "prerequisites": [],
     "relatedTerms": [
-      "term-ahata-nada",
-      "term-anahata-nada",
       "term-pitch",
       "term-intensity",
       "term-timbre"
@@ -27,10 +23,10 @@
     ],
     "sourceReference": {
       "sourceId": "SRC-G10-NADA",
-      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 2-4"
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටුව 2"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-sound",
@@ -38,7 +34,7 @@
     "term_en": "Sound / Acoustic Noise",
     "transliteration": "Śabdaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "ඕනෑම වස්තුවක කම්පනයෙන් උපදින, කනට ඇසෙන සියලුම ශ්‍රව්‍ය සංවේදනයන් ශබ්දය නම් වේ. ක්‍රමවත් ශබ්ද නාද වන අතර අක්‍රමවත් ශබ්ද ඝෝෂා වේ.",
+    "definition_si": "මෙම නිර්වචනය සැපයූ Grades 6–11 මූලාශ්‍ර සංග්‍රහයෙන් සනාථ වී නැත. මූලාශ්‍රයක් සහ නිශ්චිත පිටුවක් සනාථ වන තෙක් ප්‍රසිද්ධ අන්තර්ගතයෙන් වළක්වා ඇත.",
     "knownVariants": [
       "ශබ්දය",
       "ශබ්ද"
@@ -53,10 +49,10 @@
     ],
     "sourceReference": {
       "sourceId": "SRC-G10-NADA",
-      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටුව 2"
+      "pageOrSection": "සැපයූ මූලාශ්‍ර සංග්‍රහයෙන් නිශ්චිත පිටු සාක්ෂියක් සනාථ වී නැත"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-ahata-nada",
@@ -64,7 +60,7 @@
     "term_en": "Ahata Nada (Struck Sound)",
     "transliteration": "Āhata Nādaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "භෞතික වස්තූන් දෙකක් එකිනෙක ගැටීමෙන්, පිරිමැදීමෙන් හෝ වාතය පිඹීමෙන් උපදින, මිනිස් කනට ඇසෙන ප්‍රායෝගික සංගීත නාදයයි.",
+    "definition_si": "‘ආහත නාදය’ යන නිර්වචනය සැපයූ Grades 6–11 මූලාශ්‍ර සංග්‍රහයෙන් සනාථ වී නැත. නිශ්චිත මූලාශ්‍ර සාක්ෂිය ලැබෙන තෙක් ප්‍රසිද්ධ අන්තර්ගතයෙන් වළක්වා ඇත.",
     "knownVariants": [
       "ආහත නාදය",
       "ආහත"
@@ -81,10 +77,10 @@
     ],
     "sourceReference": {
       "sourceId": "SRC-G10-NADA",
-      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 2-4"
+      "pageOrSection": "සැපයූ මූලාශ්‍ර සංග්‍රහයෙන් නිශ්චිත පිටු සාක්ෂියක් සනාථ වී නැත"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-anahata-nada",
@@ -92,7 +88,7 @@
     "term_en": "Anahata Nada (Unstruck / Cosmic Sound)",
     "transliteration": "Anāhata Nādaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "භෞතික ගැටීමකින් තොරව විශ්වයේ හෝ භාවනාවෙන් හදවත තුළ අත්විඳින අධ්‍යාත්මික නාදයයි. එය ප්‍රායෝගික ගායන වාදනයට යොදා නොගනී.",
+    "definition_si": "‘අනාහත නාදය’ යන නිර්වචනය සැපයූ Grades 6–11 මූලාශ්‍ර සංග්‍රහයෙන් සනාථ වී නැත. නිශ්චිත මූලාශ්‍ර සාක්ෂිය ලැබෙන තෙක් ප්‍රසිද්ධ අන්තර්ගතයෙන් වළක්වා ඇත.",
     "knownVariants": [
       "අනාහත නාදය"
     ],
@@ -108,10 +104,10 @@
     ],
     "sourceReference": {
       "sourceId": "SRC-G10-NADA",
-      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 2-4"
+      "pageOrSection": "සැපයූ මූලාශ්‍ර සංග්‍රහයෙන් නිශ්චිත පිටු සාක්ෂියක් සනාථ වී නැත"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-pitch",
@@ -142,8 +138,8 @@
       "sourceId": "SRC-G10-NADA",
       "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 4"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-intensity",
@@ -173,8 +169,8 @@
       "sourceId": "SRC-G10-NADA",
       "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 7, 8"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-timbre",
@@ -204,8 +200,8 @@
       "sourceId": "SRC-G10-NADA",
       "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 10, 11"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-frequency",
@@ -233,8 +229,8 @@
       "sourceId": "SRC-G10-NADA",
       "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 4, 5"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-swara",
@@ -269,8 +265,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 20 (සප්ත ස්වර හැඳින්වීම)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-shuddha-swara",
@@ -302,8 +298,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටු 22-25"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-vikruta-swara",
@@ -334,8 +330,8 @@
       "sourceId": "SRC-NIE-G07-TG",
       "pageOrSection": "පිටුව 18 (විකෘති ස්වර හඳුනාගැනීම)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-komala-swara",
@@ -367,8 +363,8 @@
       "sourceId": "SRC-NIE-G07-TG",
       "pageOrSection": "පිටුව 20"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-theevra-swara",
@@ -400,8 +396,8 @@
       "sourceId": "SRC-NIE-G07-TG",
       "pageOrSection": "පිටුව 21"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-saptaka",
@@ -435,8 +431,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටු 28-31 (සප්තක 3 හඳුනාගැනීම)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-mandra-saptaka",
@@ -468,8 +464,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 29"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-madhya-saptaka",
@@ -501,8 +497,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 29"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-tara-saptaka",
@@ -534,8 +530,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 30"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-alankara",
@@ -568,8 +564,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටු 32-38 (සරල අලංකාර 7)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-thata",
@@ -606,8 +602,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 35 (ථාට පද්ධතිය)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-laya",
@@ -641,8 +637,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 40 (ලය සහ තාලය)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-matra",
@@ -676,8 +672,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 42"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-vibhaga",
@@ -709,8 +705,8 @@
       "sourceId": "SRC-NIE-G07-TG",
       "pageOrSection": "පිටුව 32 (තාල ලක්ෂණ)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-tala",
@@ -747,8 +743,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 40"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-sam",
@@ -781,8 +777,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 43"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-tali",
@@ -815,8 +811,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 43"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-khali",
@@ -849,8 +845,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 44"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-theka",
@@ -882,8 +878,8 @@
       "sourceId": "SRC-NIE-G07-TG",
       "pageOrSection": "පිටුව 34"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-avarta",
@@ -915,8 +911,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 42"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-raga",
@@ -952,8 +948,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටු 36-39"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-arohana",
@@ -983,8 +979,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 37"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-avarohana",
@@ -1014,8 +1010,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 37"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-vadi",
@@ -1046,8 +1042,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 38"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-samvadi",
@@ -1077,8 +1073,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 38"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-jati",
@@ -1112,8 +1108,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 39"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-pakad",
@@ -1143,8 +1139,8 @@
       "sourceId": "SRC-NIE-G09-TG",
       "pageOrSection": "පිටුව 48"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-gana-samaya",
@@ -1173,8 +1169,8 @@
       "sourceId": "SRC-NIE-G1011-TG",
       "pageOrSection": "පිටුව 52"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-pancha-turya",
@@ -1209,8 +1205,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටු 55-60; sg9_emus_music_instruments.pdf පිටු 1-5"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-athatha",
@@ -1242,8 +1238,8 @@
       "sourceId": "SRC-NIE-G09-TG",
       "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-vithatha",
@@ -1275,8 +1271,8 @@
       "sourceId": "SRC-NIE-G09-TG",
       "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-vithathathatha",
@@ -1308,8 +1304,8 @@
       "sourceId": "SRC-NIE-G09-TG",
       "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-ghana",
@@ -1340,8 +1336,8 @@
       "sourceId": "SRC-NIE-G09-TG",
       "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-sushira",
@@ -1373,8 +1369,8 @@
       "sourceId": "SRC-NIE-G09-TG",
       "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-tabla",
@@ -1406,7 +1402,7 @@
       "sourceId": "SRC-NIE-G07-TG",
       "pageOrSection": "tabla.md පිටු 1-23"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   }
 ]

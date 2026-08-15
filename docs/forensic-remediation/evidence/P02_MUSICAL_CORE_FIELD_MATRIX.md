@@ -387,12 +387,17 @@ This document provides the exhaustive, field-by-field audit matrix for every Rag
 ---
 
 ## 3. Acoustics & Sound Properties (ත්‍රිවිධ ගුණ) Field-by-Field Audit Matrix
-*Source Document: `oriental_music_markdown/by-source/grade_10_sound_properties.md` (`SRC-G10-NADA`)*
+*Source Document: `oriental_music_markdown/by-source/grade_10_nadaya.md` (`SRC-G10-NADA`, extracted from `sg10_emus_chap8_nadaya.pdf`)*
 
 | Concept / Field | Before (Prompt 1 Baseline) | After (Prompt 2 Remediated) | Source Document | PDF Page / Section | Evidence Quality | Disposition & Musicological Justification |
 |---|---|---|---|---|---|---|
-| `curriculumGrade` | Claimed Grade 6 | **Grade 10 Unit 8** | `grade_10_sound_properties.md` (`SRC-G10-NADA`) | PDF Pages 2–3 | A | **CORRECTED**: Tri-vidha Guna (නාදයේ ගුණ 3) is a Grade 10 curriculum topic, not Grade 6. |
-| `pitchTerminology` | `"උච්ච-නීච භාවය"` only | `"තාරතාවය / උච්චනීච ප්‍රභේදය"` (Pitch / Frequency) | `grade_10_sound_properties.md` (`SRC-G10-NADA`) | PDF Pages 3–4 | A | **CORRECTED**: Aligned dual scientific (`තාරතාවය`) and classical (`උච්චනීච`) Sinhala terms. |
-| `intensityTerminology` | `"ප්‍රබලතාවය"` only | `"විපුලතාවය / රූප භේදය"` (Intensity / Amplitude) | `grade_10_sound_properties.md` (`SRC-G10-NADA`) | PDF Pages 5–8 | A | **CORRECTED**: Aligned official textbook terms (`විපුලතාවය` / `රූප භේදය`). |
-| `timbreTerminology` | `"ශබ්ද ගුණය"` only | `"ධ්වනි ගුණය / ජාති භේදය"` (Timbre / Waveform) | `grade_10_sound_properties.md` (`SRC-G10-NADA`) | PDF Pages 9–12 | A | **CORRECTED**: Aligned official textbook terms (`ධ්වනි ගුණය` / `ජාති භේදය`). |
-| `lessonSourceReference` | Unverified citation | `SRC-G10-NADA` (`sg10_emus_chap8_nadaye_guna.pdf පිටු 2-12`) | `grade_10_sound_properties.md` (`SRC-G10-NADA`) | PDF Pages 2–12 | A | **CORRECTED**: Mapped to exact Grade 10 Unit 8 document. |
+| `curriculumGrade` | Claimed Grade 6 | **Grade 10 Unit 8** | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Pages 2–3 | A | **CORRECTED**: Tri-vidha Guna (නාදයේ ගුණ 3) is a Grade 10 curriculum topic, not Grade 6. |
+| `pitchTerminology` | `"උච්ච-නීච භාවය"` only | `"තාරතාවය / උච්චනීච ප්‍රභේදය"` (Pitch / Frequency) | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Pages 3–4 | A | **CORRECTED**: Aligned the scientific and source terminology. |
+| `intensityTerminology` | `"ප්‍රබලතාවය"` only | `"විපුලතාවය / රූප භේදය"` (Intensity / Amplitude) | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Pages 3, 7–8 | A | **CORRECTED**: Aligned official textbook terms (`විපුලතාවය` / `රූප භේදය`). |
+| `timbreTerminology` | `"ශබ්ද ගුණය"` only | `"ධ්වනි ගුණය / ජාති භේදය"` (Timbre / Waveform) | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Pages 3, 10–11 | A | **CORRECTED**: Aligned official textbook terms (`ධ්වනි ගුණය` / `ජාති භේදය`). |
+| `lessonSourceReference` | Unverified citation | `SRC-G10-NADA` (`sg10_emus_chap8_nadaya.pdf පිටු 2-12`) | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Pages 2–12 | A | **CORRECTED**: Mapped to the exact Grade 10 Unit 8 document. |
+| `term-nada` | Overbroad definition linked to unsupported terms | Narrow source-grounded description | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Page 2 | A | **CORRECTED**: Limited to the source statements about swaras as distinct nada and recognition by sound qualities. |
+| `term-sound`, `term-ahata-nada`, `term-anahata-nada` | Claimed as source-verified | Explicitly unverified and non-public | Supplied `oriental_music_markdown/by-source` corpus | No matching bounded evidence found | N/A | **NEEDS-REVIEW / QUARANTINED**: No exact occurrence or definition was found in the supplied corpus; no musical-memory reconstruction is accepted. |
+| `quiz-les-intro-01` | Grade 6 questions cited unsupported pages and tested ආහත terminology | Grade 10 questions test pitch, the three official properties, and timbre | `grade_10_nadaya.md` (`SRC-G10-NADA`) | PDF Pages 3, 4, 10–11 | A | **CORRECTED**: Quiz now matches the public lesson and exact source evidence. |
+| `quiz-les-tala-dadra` | Questions cited `SRC-NIE-G07-TG`, page 34 | Questions cite `SRC-EPD-TB-G10`, page 6 | `grade_10_musical_fundamentals.md` | PDF Page 6 | A | **CORRECTED**: Removed the unsupported Grade 7 citation. |
+| terminology review state | All 43 records claimed `Verified` / `Published` | All 43 records use `Unverified` / `Needs Review` | Repository forensic policy | N/A | N/A | **CORRECTED**: Dataset audit labels no longer imply an undocumented SME or publication event. |
