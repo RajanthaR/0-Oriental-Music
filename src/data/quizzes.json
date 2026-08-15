@@ -366,7 +366,7 @@
   },
   {
     "id": "quiz-les-tala-dadra",
-    "title_si": "දාද්‍රා තාල ප්‍රශ්නාවලිය",
+    "title_si": "දාදරා තාල ප්‍රශ්නාවලිය",
     "lessonId": "les-tala-dadra",
     "passingScorePercent": 75,
     "questions": [
@@ -378,7 +378,7 @@
         ],
         "difficulty": "පහසු",
         "strandId": "strand-laya-tala",
-        "prompt_si": "දාද්‍රා තාලයේ විභාග ව්‍යුහය කුමක්ද?",
+        "prompt_si": "දාදරා තාලයේ විභාග ව්‍යුහය කුමක්ද?",
         "options_si": [
           {
             "id": "opt-1",
@@ -401,7 +401,7 @@
         "correctAnswerIds": [
           "opt-2"
         ],
-        "explanation_si": "දාද්‍රා තාලය මාත්‍රා 3 බැගින් වූ විභාග 2 කින් (3+3) සමන්විතය.",
+        "explanation_si": "දාදරා තාලය මාත්‍රා 3 බැගින් වූ විභාග 2 කින් (3+3) සමන්විතය.",
         "sourceReference": {
           "sourceId": "SRC-EPD-TB-G10",
           "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
@@ -415,7 +415,7 @@
         ],
         "difficulty": "පහසු",
         "strandId": "strand-laya-tala",
-        "prompt_si": "දාද්‍රා තාලයේ ථේකාවේ බෝල් නිවැරදි අනුපිළිවෙළට සකසන්න:",
+        "prompt_si": "දාදරා තාලයේ ථේකාවේ බෝල් නිවැරදි අනුපිළිවෙළට සකසන්න:",
         "orderingItems": [
           {
             "id": "bol-1",
@@ -448,7 +448,7 @@
             "correctIndex": 5
           }
         ],
-        "explanation_si": "දාද්‍රා ථේකාව: ධා ධී නා | ධා තී නා.",
+        "explanation_si": "දාදරා ථේකාව: ධා ධී නා | ධා තී නා.",
         "sourceReference": {
           "sourceId": "SRC-EPD-TB-G10",
           "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
@@ -462,7 +462,7 @@
         ],
         "difficulty": "පහසු",
         "strandId": "strand-laya-tala",
-        "prompt_si": "දාද්‍රා තාලයේ ඛාලි ලකුණ යෙදෙන්නේ කීවන මාත්‍රාවේද?",
+        "prompt_si": "දාදරා තාලයේ ඛාලි ලකුණ යෙදෙන්නේ කීවන මාත්‍රාවේද?",
         "options_si": [
           {
             "id": "opt-1",
@@ -485,7 +485,7 @@
         "correctAnswerIds": [
           "opt-3"
         ],
-        "explanation_si": "දාද්‍රා තාලයේ 4 වන මාත්‍රාව ඛාලියයි ('0').",
+        "explanation_si": "දාදරා තාලයේ 4 වන මාත්‍රාව ඛාලියයි ('0').",
         "sourceReference": {
           "sourceId": "SRC-EPD-TB-G10",
           "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"

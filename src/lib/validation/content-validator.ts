@@ -10,6 +10,7 @@ import glossaryData from "@/data/glossary.json";
 import learningPathsData from "@/data/learning-paths.json";
 import examPapersData from "@/data/exam-papers.json";
 import quizzesData from "@/data/quizzes.json";
+import terminologyData from "../../../data/terminology-si.json";
 import sourceDocumentsData from "../../../data/source-documents.json";
 import sourcePageQualityData from "../../../data/source-page-quality.json";
 import reconciliationData from "../../../data/content-reconciliation.json";
@@ -476,6 +477,27 @@ export function validateContent(
 ): { isValid: boolean; issues: ValidationIssue[] } {
   const issues: ValidationIssue[] = [];
   const validSourceIds = new Set(sourcesData.map((s) => s.id));
+  const allEntities = [
+    ...lessons.map((item) => ({ type: "Lesson", item })),
+    ...ragas.map((item) => ({ type: "Raga", item })),
+    ...talas.map((item) => ({ type: "Tala", item })),
+    ...instruments.map((item) => ({ type: "Instrument", item })),
+    ...culturalTraditions.map((item) => ({ type: "CulturalTradition", item })),
+    ...theatreTraditions.map((item) => ({ type: "TheatreTradition", item })),
+  ];
+  const seenIds = new Set<string>();
+  allEntities.forEach(({ type, item }) => {
+    if (seenIds.has(item.id)) {
+      issues.push({
+        entityType: type,
+        entityId: item.id,
+        field: "id",
+        message: `Duplicate canonical content ID '${item.id}'`,
+        severity: "error",
+      });
+    }
+    seenIds.add(item.id);
+  });
 
   // Validate Lessons
   lessons.forEach((l) => {
@@ -549,6 +571,27 @@ export function validateContent(
         severity: "error",
       });
     }
+    const validSwaras = new Set(["S", "r", "R", "g", "G", "M", "m", "P", "d", "D", "n", "N", "S'", ".r", ".R", ".g", ".G", ".M", ".m", ".P", ".d", ".D", ".n", ".N"]);
+    [...(r.arohana_swaras || []), ...(r.avarohana_swaras || [])].forEach((swara) => {
+      if (!validSwaras.has(swara)) {
+        issues.push({
+          entityType: "Raga",
+          entityId: r.id,
+          field: "arohana_swaras/avarohana_swaras",
+          message: `Unknown swara token '${swara}'`,
+          severity: "error",
+        });
+      }
+    });
+    if (!r.arohana_si?.trim() || !r.avarohana_si?.trim() || !r.pakad_si?.trim()) {
+      issues.push({
+        entityType: "Raga",
+        entityId: r.id,
+        field: "notation",
+        message: "Public raga display notation must include arohana, avarohana, and pakad",
+        severity: "error",
+      });
+    }
     if (!r.sourceReference || !r.sourceReference.sourceId) {
       issues.push({
         entityType: "Raga",
@@ -576,6 +619,94 @@ export function validateContent(
         entityId: t.id,
         field: "bols",
         message: `Tala bols array length (${t.bols?.length}) does not match matra count (${t.matras})`,
+        severity: "error",
+      });
+    }
+    if (t.vibhagStructure.reduce((sum, size) => sum + size, 0) !== t.matras) {
+      issues.push({
+        entityType: "Tala",
+        entityId: t.id,
+        field: "vibhagStructure",
+        message: "Tala vibhag sizes must sum to its matra count",
+        severity: "error",
+      });
+    }
+    if (t.vibhagCount !== t.vibhagStructure.length) {
+      issues.push({
+        entityType: "Tala",
+        entityId: t.id,
+        field: "vibhagCount",
+        message: "Tala vibhagCount must equal vibhagStructure length",
+        severity: "error",
+      });
+    }
+    if (t.bols?.some((bol, index) => bol.matra !== index + 1 || bol.vibhagIndex < 0 || bol.vibhagIndex >= t.vibhagCount)) {
+      issues.push({
+        entityType: "Tala",
+        entityId: t.id,
+        field: "bols",
+        message: "Tala bol matras must be sequential and reference a valid vibhag",
+        severity: "error",
+      });
+    }
+    if (t.bols?.filter((bol) => bol.isSam).length !== 1 || t.bols?.some((bol) => bol.isKhali && bol.isTali)) {
+      issues.push({
+        entityType: "Tala",
+        entityId: t.id,
+        field: "bols",
+        message: "Tala must contain one sam and may not mark a bol as both tali and khali",
+        severity: "error",
+      });
+    }
+  });
+
+  const normalizedTalaNames = new Map<string, string>();
+  talas.forEach((tala) => {
+    [tala.name_si, ...(tala.aliases_si || [])].forEach((name) => {
+      const normalized = name.normalize("NFC").toLocaleLowerCase().replace(/[\s()|,.-]/g, "");
+      const existing = normalizedTalaNames.get(normalized);
+      if (existing && existing !== tala.id) {
+        issues.push({
+          entityType: "Tala",
+          entityId: tala.id,
+          field: "aliases_si",
+          message: `Normalized tala name/alias '${name}' collides with '${existing}'`,
+          severity: "error",
+        });
+      } else {
+        normalizedTalaNames.set(normalized, tala.id);
+      }
+    });
+  });
+
+  allEntities.forEach(({ type, item }) => {
+    const decision = getRecordPublicationDecision(item);
+    if (!decision.isPublic) {
+      issues.push({
+        entityType: type,
+        entityId: item.id,
+        field: "sourceReference",
+        message: `Canonical public input failed publication evidence: ${decision.reasonCodes.join(", ")}`,
+        severity: "error",
+      });
+    }
+  });
+
+  const requiredTerms: Record<string, string> = {
+    "term-pitch": "තාරතාවය",
+    "term-intensity": "විපුලතාවය",
+    "term-timbre": "ධ්වනි ගුණය",
+    "term-frequency": "සංඛ්‍යාතය",
+  };
+  Object.entries(requiredTerms).forEach(([id, expected]) => {
+    const glossaryTerm = glossaryData.find((term) => term.id === id);
+    const terminologyTerm = terminologyData.find((term) => term.id === id);
+    if (!glossaryTerm?.term_si.includes(expected) || !terminologyTerm?.term_si.includes(expected)) {
+      issues.push({
+        entityType: "Terminology",
+        entityId: id,
+        field: "term_si",
+        message: `Canonical terminology must retain '${expected}' across catalogs`,
         severity: "error",
       });
     }

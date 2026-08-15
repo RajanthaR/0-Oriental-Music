@@ -177,6 +177,25 @@ describe("Prompt 1 publication containment", () => {
       sourceId: "SRC-G10-NADA",
       pageOrSection: "sg10_emus_chap8_nadaya.pdf පිටුව 2; s11tim173.pdf පිටුව 1",
     }).reasonCode).toBe("mismatched-source-document");
+    expect(evaluateSourceReference({
+      sourceId: "SRC-G10-NADA",
+      pageOrSection: "evil-sg10_emus_chap8_nadaya.pdf පිටුව 2",
+    }).reasonCode).toBe("mismatched-source-document");
+    expect(evaluateSourceReference({
+      sourceId: "SRC-G10-NADA",
+      pageOrSection: "SG10_EMUS_CHAP8_NADAYA.PDF පිටුව 2",
+    }).supportable).toBe(true);
+  });
+
+  it("requires every cited page to contain readable A/B Sinhala evidence", () => {
+    expect(evaluateSourceReference({
+      sourceId: "SRC-G07-VIOLIN",
+      pageOrSection: "sg7_emus_chap2.1.2_violin.pdf පිටු 1, 2",
+    })).toMatchObject({
+      supportable: false,
+      reasonCode: "low-quality-page-evidence",
+      quality: "mixed",
+    });
   });
 
   it("requires each public grade band to contain a grade established by its source", () => {
@@ -194,9 +213,20 @@ describe("Prompt 1 publication containment", () => {
     expect(quiz).toBeDefined();
     if (!quiz) return;
     const originalQuestion = structuredClone(quiz.questions[0]);
-    quiz.questions[0].gradeBands = ["12-13"];
-    expect(repository.getQuizById(quiz.id)).toBeUndefined();
-    quiz.questions[0] = originalQuestion;
+    try {
+      quiz.questions[0].gradeBands = ["12-13"];
+      const decision = getRecordPublicationDecision(quiz);
+      expect(decision.isPublic).toBe(false);
+      expect(decision.reasonCodes).toContain("nested-question-unpublishable");
+      expect(repository.getQuizById(quiz.id)).toBeUndefined();
+
+      quiz.questions[0].gradeBands = [];
+      expect(getRecordPublicationDecision(quiz).reasonCodes).toContain("nested-question-unpublishable");
+      expect(repository.getQuizById(quiz.id)).toBeUndefined();
+    } finally {
+      quiz.questions[0] = originalQuestion;
+    }
     expect(repository.getQuizById(quiz.id)).toBeDefined();
+    expect(repository.getPublicationSummary().quizzes.public).toBe(repository.getQuizzes().length);
   });
 });

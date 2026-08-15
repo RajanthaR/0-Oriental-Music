@@ -9,7 +9,7 @@
       "8-9",
       "10-11"
     ],
-    "publicEligibility": "A claim is discoverable only when its grade scope is within 6-11, its source ID maps to exactly one supplied extracted document, its exact page evidence is in range, and at least one cited page is an A/B readable Sinhala page.",
+    "publicEligibility": "A claim is discoverable only when its grade scope is within 6-11, its source ID maps to exactly one supplied extracted document, its named PDF exactly matches that document when present, its exact page evidence is in range, and every cited page is an A/B readable Sinhala page.",
     "reviewBoundary": "Markdown extraction is evidence with limits. C/D, image-only, corrupt-font, visual, ambiguous, and missing-PDF cases remain needs-review until original-PDF/manual review.",
     "metadataBoundary": "Publisher, year, place, licence, reviewer, review date, and Published state are not accepted as evidence unless a real source or review event establishes them."
   },
@@ -250,17 +250,17 @@
       "id": "P01-TALA-LAWANI-001",
       "severity": "P1",
       "entityOrPath": "src/data/talas.json:tala-lawani",
-      "currentClaim": "Lawani was previously presented with mixed cross-document citations and lacked school-system pedagogical framing. Remediated in Phase 2 with 8 matras, 4 vibhagas of 2 matras (2+2+2+2, X 2 0 3), and documented school-system adaptation context.",
+      "currentClaim": "Lawani was previously presented with mixed cross-document citations and lacked school-system pedagogical framing. Phase 2 now models its Grade 10 structure separately from the Grade 11 school-system context.",
       "evidence": [
         {
           "path": "src/data/talas.json",
           "locator": "tala-lawani.sourceReference",
-          "exactPageOrSection": "SRC-EPD-TB-G10 (sg10_emus_chap1_mulikanga.pdf පිටු 3, 6); SRC-EPD-TB-G11 (s11tim173.pdf පිටු 23-24)"
+          "exactPageOrSection": "SRC-EPD-TB-G10 (sg10_emus_chap1_mulikanga.pdf පිටු 3, 6)"
         },
         {
-          "path": "data/source-documents.json",
-          "locator": "DOC-GRADE_10_MULIKANGA and DOC-GRADE_11_TB",
-          "exactSection": "Grade 10 fundamentals and Grade 11 music textbook"
+          "path": "src/data/talas.json",
+          "locator": "tala-lawani.context_si and contextSourceReference",
+          "exactPageOrSection": "SRC-EPD-TB-G11 (s11tim173.pdf පිටුව 24), stored separately from the structural sourceReference"
         },
         {
           "path": "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
@@ -271,7 +271,7 @@
       "disposition": "remediated with 8 matras, 4 vibhagas of 2 matras (2+2+2+2, X 2 0 3), and school-system adaptation context; unquarantined in public scope",
       "publicVisibility": "contained",
       "confidence": "confirmed",
-      "confidenceScope": "remediated and verified against DOC-GRADE_10_MULIKANGA pages 3, 6",
+      "confidenceScope": "structure bounded to DOC-GRADE_10_MUSICAL_FUNDAMENTALS pages 3 and 6; school-system context bounded separately to DOC-GRADE_11_MUSIC_TEXTBOOK page 24",
       "status": "contained",
       "evidenceBasis": "canonical-inspection"
     },
@@ -308,17 +308,17 @@
       "id": "P01-TALA-DADRA-CITE-001",
       "severity": "P1",
       "entityOrPath": "src/data/talas.json:tala-dadra and src/data/lessons.json:les-tala-dadra",
-      "currentClaim": "Dadra tala and lesson previously cited unverified Grade 7 pages. Remediated in Phase 2 with verified Grade 10 fundamentals (6 matras, 2 vibhagas of 3, X 0) and Grade 11 textbook citations.",
+      "currentClaim": "Dadra tala and lesson previously cited unverified Grade 7 pages. Phase 2 uses the singular Grade 10 fundamentals source for the public structure, name, bols, and lesson.",
       "evidence": [
         {
           "path": "src/data/talas.json",
           "locator": "tala-dadra.sourceReference",
-          "exactPageOrSection": "SRC-EPD-TB-G10 (sg10_emus_chap1_mulikanga.pdf පිටුව 6); SRC-EPD-TB-G11 (s11tim173.pdf පිටු 23-24)"
+          "exactPageOrSection": "SRC-EPD-TB-G10 (sg10_emus_chap1_mulikanga.pdf පිටුව 6)"
         },
         {
           "path": "src/data/lessons.json",
           "locator": "les-tala-dadra.sourceReference",
-          "exactPageOrSection": "SRC-EPD-TB-G10 (sg10_emus_chap1_mulikanga.pdf පිටුව 6; s11tim173.pdf පිටු 23-24)"
+          "exactPageOrSection": "SRC-EPD-TB-G10 (sg10_emus_chap1_mulikanga.pdf පිටුව 6)"
         },
         {
           "path": "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
@@ -326,10 +326,10 @@
           "exactSection": "full field-level audit matrix"
         }
       ],
-      "disposition": "remediated with verified Grade 10 fundamentals and Grade 11 textbook citations; unquarantined in public scope",
+      "disposition": "remediated with the singular Grade 10 fundamentals citation; canonical name is දාදරා and the prior දාද්‍රා form is retained only as an explicit editorial/search alias",
       "publicVisibility": "contained",
       "confidence": "confirmed",
-      "confidenceScope": "remediated and verified against DOC-GRADE_10_MULIKANGA page 6 and DOC-GRADE_11_TB pages 23-24",
+      "confidenceScope": "remediated and bounded to DOC-GRADE_10_MUSICAL_FUNDAMENTALS page 6",
       "status": "contained",
       "evidenceBasis": "canonical-inspection"
     },
@@ -361,20 +361,20 @@
       "id": "P02-LOCATOR-POLICY-001",
       "severity": "P1",
       "entityOrPath": "src/lib/data/publication-policy.ts:evaluateSourceReference",
-      "currentClaim": "Digits in filenames and partial in-range locators could previously satisfy the exact-page publication gate; a second PDF filename could also be embedded under one source ID.",
+      "currentClaim": "Digits in filenames, partial in-range locators, prefixed counterfeit filenames, mixed readable/corrupt page sets, and second PDF names could previously satisfy parts of the publication gate.",
       "evidence": [
         {
           "path": "src/lib/data/publication-policy.ts",
           "locator": "explicitPageReferences and hasMismatchedPdfReference",
-          "exactSection": "explicit page-clause parsing, full range validation, and singular-document filename agreement"
+          "exactSection": "explicit page-clause parsing, exact single-filename agreement, full range validation, and all-cited-pages A/B Sinhala readability"
         },
         {
           "path": "src/test/publication-containment.test.ts",
           "locator": "adversarial source locator test",
-          "exactSection": "filename-only, page 2-999, and mixed-PDF cases"
+          "exactSection": "filename-only, page 2-999, mixed-PDF, counterfeit-prefix, and mixed-quality page cases"
         }
       ],
-      "disposition": "fail closed unless explicit pages all fall in range and any named PDF agrees with the source ID",
+      "disposition": "fail closed unless explicit pages all fall in range, every cited page is A/B Sinhala-readable, and the sole named PDF exactly agrees with the source ID",
       "publicVisibility": "contained",
       "confidence": "confirmed",
       "confidenceScope": "runtime policy and adversarial regression cases",
@@ -422,7 +422,7 @@
           "exactSection": "exact matra, vibhag, bol, and hand-mark assertions"
         }
       ],
-      "disposition": "restore exact source cells and four-matra Khemta structure; keep numeric BPMs as non-curricular practice defaults",
+      "disposition": "restore exact source cells and four-matra Khemta structure; expand each Khemta cell into three timed akshara strokes; distinguish open Dha from closed Dhin; disclose numeric BPMs as non-curricular practice defaults",
       "publicVisibility": "contained",
       "confidence": "confirmed",
       "confidenceScope": "Grade 10 pages 3, 6-7; normalized glyphs retain original-PDF review boundary",
@@ -456,13 +456,13 @@
     {
       "id": "P02-QUIZ-POLICY-001",
       "severity": "P1",
-      "entityOrPath": "src/lib/data/repository.ts:getQuizzes",
-      "currentClaim": "A quiz could remain public under a public parent even if a nested question had an unsupported grade or invalid source reference.",
+      "entityOrPath": "src/lib/data/publication-policy.ts:getQuizPublicationDecision and src/lib/data/repository.ts:getQuizzes",
+      "currentClaim": "A quiz could remain public under a public parent even if a nested question had unsupported or missing explicit grades, and repository-only filtering did not expose structured failure reasons or summary counts.",
       "evidence": [
         {
-          "path": "src/lib/data/repository.ts",
-          "locator": "getQuizzes",
-          "exactSection": "public parent, non-empty question set, and every-question publication decision"
+          "path": "src/lib/data/publication-policy.ts",
+          "locator": "getQuizPublicationDecision",
+          "exactSection": "structured public-parent, non-empty question-set, explicit question-grade/source, and nested-question decisions"
         },
         {
           "path": "src/test/publication-containment.test.ts",
@@ -470,7 +470,7 @@
           "exactSection": "12-13 question causes quiz lookup to fail closed"
         }
       ],
-      "disposition": "require every nested question to pass the same public grade and source evidence gate",
+      "disposition": "centralize aggregate quiz decisions, require every nested question to carry explicit grades and direct evidence, expose reason codes, and include quiz counts in the repository summary",
       "publicVisibility": "contained",
       "confidence": "confirmed",
       "confidenceScope": "repository getter and mutation regression test",
@@ -481,12 +481,12 @@
       "id": "P01-SOURCE-METADATA-001",
       "severity": "P1",
       "entityOrPath": "src/data/sources.json and data/source-manifest.json",
-      "currentClaim": "Source records display verified publishers, years, locations, licences, tiers, and statuses.",
+      "currentClaim": "Phase 2 source records displayed verified publishers, years, locations, licences, tiers, and statuses that are not established by the supplied extraction metadata.",
       "evidence": [
         {
           "path": "src/data/sources.json",
-          "locator": "all 21 source records",
-          "exactSection": "status Verified and populated publisher/year/location/license fields"
+          "locator": "SRC-EPD-TB-G10, SRC-EPD-TB-G11, SRC-G10-NADA, SRC-G11-RAGA-ID",
+          "exactSection": "Phase 2 selected source identities retain stable IDs and filenames; publisher/year/place/licence/tier are explicit unknown/unverified values"
         },
         {
           "path": "data/source-documents.json",
@@ -494,9 +494,10 @@
           "exactSection": "reviewStatus is Source Triaged, Review Required, or Image Only / Gaps; it does not establish all metadata"
         }
       ],
-      "disposition": "sanitize public source views and retain raw metadata only as untrusted audit input",
+      "disposition": "replace unsupported raw metadata on the four Phase 2 selected source records with explicit unknown/unverified values; retain stable IDs and filenames only for link/progress compatibility",
       "publicVisibility": "contained",
       "confidence": "confirmed",
+      "confidenceScope": "Phase 2 selected source records only; remaining catalog metadata is deferred to later source-specific phases",
       "status": "contained",
       "evidenceBasis": "metadata-comparison"
     },

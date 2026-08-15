@@ -27,6 +27,9 @@ export type PublicationReasonCode =
   | "unsupported-grade"
   | "known-forensic-issue"
   | "missing-grade-scope"
+  | "parent-lesson-unavailable"
+  | "empty-question-set"
+  | "nested-question-unpublishable"
   | SourceEvidenceFailureCode;
 
 export type SourceEvidenceReasonCode = SourceEvidenceFailureCode | "supportable";
@@ -108,6 +111,9 @@ type PublicationRecordShape = {
   gradeBands?: unknown;
   partA_MCQ?: unknown;
   partB_Structured?: unknown;
+  questions?: unknown;
+  type?: unknown;
+  prompt_si?: unknown;
   sourceReference?: unknown;
 };
 
@@ -154,9 +160,10 @@ function explicitPageReferences(pageOrSection: string): number[] {
 }
 
 function hasMismatchedPdfReference(locator: string, expectedFilename: string): boolean {
-  const pdfMentions = locator.match(/\.pdf\b/gi)?.length ?? 0;
-  if (pdfMentions === 0) return false;
-  return pdfMentions !== 1 || !locator.toLocaleLowerCase().includes(expectedFilename.toLocaleLowerCase());
+  const pdfMentions = Array.from(locator.matchAll(/(?:^|;)\s*([^;]*?\.pdf)(?=\s|;|$)/gi))
+    .map((match) => match[1].trim().toLocaleLowerCase());
+  if (pdfMentions.length === 0) return false;
+  return pdfMentions.length !== 1 || pdfMentions[0] !== expectedFilename.trim().toLocaleLowerCase();
 }
 
 function qualityForPages(documentSlug: string, pageNumbers: number[]): EvidenceQuality {
@@ -173,13 +180,15 @@ function qualityForPages(documentSlug: string, pageNumbers: number[]): EvidenceQ
   return "A";
 }
 
-function hasReadablePage(documentSlug: string, pageNumbers: number[]): boolean {
-  return sourcePageQuality.some(
-    (page) =>
-      page.documentSlug === documentSlug &&
-      pageNumbers.includes(page.pageNumber) &&
-      (page.confidence === "A" || page.confidence === "B") &&
-      page.hasSinhalaText
+function hasReadablePages(documentSlug: string, pageNumbers: number[]): boolean {
+  const citedPages = sourcePageQuality.filter(
+    (page) => page.documentSlug === documentSlug && pageNumbers.includes(page.pageNumber)
+  );
+  return (
+    citedPages.length === pageNumbers.length &&
+    citedPages.every(
+      (page) => (page.confidence === "A" || page.confidence === "B") && page.hasSinhalaText
+    )
   );
 }
 
@@ -239,7 +248,9 @@ function getGradeBands(value: PublicationRecordShape): string[] {
     });
   });
 
-  if (bands.size === 0) {
+  const isQuestionShape = typeof value.type === "string" && typeof value.prompt_si === "string";
+
+  if (bands.size === 0 && !isQuestionShape) {
     const reference = resolveRecordSourceReference(value);
     if (reference && typeof reference === "object") {
       const sourceId = reference.sourceId;
@@ -250,7 +261,7 @@ function getGradeBands(value: PublicationRecordShape): string[] {
     }
   }
 
-  if (bands.size === 0 && typeof value.lessonId === "string") {
+  if (bands.size === 0 && !isQuestionShape && typeof value.lessonId === "string") {
     const parent = (lessonsData as unknown as Array<{ id: string; gradeBands?: string[] }>).find(
       (l) => l.id === value.lessonId
     );
@@ -404,7 +415,7 @@ export function evaluateSourceReference(
     };
   }
 
-  if (!hasReadablePage(document.slug, inRangePages)) {
+  if (!hasReadablePages(document.slug, inRangePages)) {
     return {
       sourceId: reference.sourceId,
       documentId: document.id,
@@ -496,8 +507,39 @@ export function getPublicationDecision(input: PublicationInput): PublicationDeci
 }
 
 export function getRecordPublicationDecision(record: unknown): PublicationDecision {
-  return getPublicationDecision(toPublicationInput(record));
+  const value = getRecordShape(record);
+  const baseDecision = getPublicationDecision(toPublicationInput(record));
+  if (!Array.isArray(value.questions)) return baseDecision;
+
+  const reasonCodes = new Set(baseDecision.reasonCodes);
+  const parent = typeof value.lessonId === "string"
+    ? (lessonsData as unknown as Array<{ id: string }>).find((lesson) => lesson.id === value.lessonId)
+    : undefined;
+  const parentIsPublic = !!parent && getRecordPublicationDecision(parent).isPublic;
+  if (!parentIsPublic) reasonCodes.add("parent-lesson-unavailable");
+  if (value.questions.length === 0) reasonCodes.add("empty-question-set");
+
+  const questionsArePublic = value.questions.length > 0 && value.questions.every((question) => {
+    const questionShape = getRecordShape(question);
+    const hasExplicitGrades =
+      Array.isArray(questionShape.gradeBands) &&
+      questionShape.gradeBands.length > 0 &&
+      questionShape.gradeBands.every((band) => typeof band === "string");
+    const hasDirectSource = isSourceReference(questionShape.sourceReference);
+    return hasExplicitGrades && hasDirectSource && getRecordPublicationDecision(question).isPublic;
+  });
+  if (!questionsArePublic) reasonCodes.add("nested-question-unpublishable");
+
+  const isPublic = baseDecision.isPublic && parentIsPublic && questionsArePublic;
+  return {
+    ...baseDecision,
+    state: isPublic ? "public" : baseDecision.state === "quarantined" ? "quarantined" : "needs-review",
+    isPublic,
+    reasonCodes: Array.from(reasonCodes),
+  };
 }
+
+export const getQuizPublicationDecision = getRecordPublicationDecision;
 
 export function createUnverifiedReviewMetadata(): ReviewMetadata {
   return {

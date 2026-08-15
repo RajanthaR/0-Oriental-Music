@@ -45,17 +45,19 @@ Canonical source for the seven public records: `oriental_music_markdown/by-sourc
 
 Canonical structural source: `oriental_music_markdown/by-source/grade_10_musical_fundamentals.md`, extracted from `sg10_emus_chap1_mulikanga.pdf`, PDF pages 2–7 (`SRC-EPD-TB-G10`, quality A). Grade 11 pages 23–24 establish prescribed names but are not embedded inside a singular Grade 10 `SourceReference`; every published reference names only the document selected by its `sourceId`.
 
+Source-catalog boundary: for `SRC-EPD-TB-G10`, `SRC-EPD-TB-G11`, `SRC-G10-NADA`, and `SRC-G11-RAGA-ID`, the supplied corpus establishes stable ID mapping, filename, grade, page count, extraction state, and page quality. It does **not** establish publisher, year, place, licence, or canonical tier; those raw fields are explicitly `නොදනී / සනාථ වී නැත`. The legacy `SRC-EPD-*` IDs are retained only for progress/link stability and do not prove an EPD publisher.
+
 ### 2.1 Inclusion, grade, name, structure, and hand actions
 
 | Entity | Inclusion / grade | `name_si` | `name_en` | `matras` | `vibhagStructure` / count | Sam, tali, khali | Page | Disposition |
 |---|---|---|---|---:|---|---|---|---|
-| `tala-dadra` | Grade 10 | දාද්‍රා තාලය | Dadra Tala (editorial, N/A) | 6 | `3+3` / 2 | X on 1; 0 on 4 | 6 | **CORRECTED / VERIFIED**; lower-grade claims removed. |
+| `tala-dadra` | Grade 10 | දාදරා තාලය (`දාද්‍රා` editorial/search alias, N/A) | Dadra Tala (editorial, N/A) | 6 | `3+3` / 2 | X on 1; 0 on 4 | 6 | **CORRECTED / VERIFIED**; lower-grade claims removed. |
 | `tala-keherwa` | Grade 10 | කෙහෙර්වා තාලය | Keherwa Tala (editorial, N/A) | 8 | `4+4` / 2 | X on 1; 0 on 5 | 3, 6 | **CORRECTED / VERIFIED**. |
-| `tala-teental` | Grade 10 | ත්‍රිතාල් තාලය | Teental Tala (editorial, N/A) | 16 | `4+4+4+4` / 4 | X/2/0/3 on 1/5/9/13 | 4–5 | **VERIFIED**. |
-| `tala-jhaptal` | Grade 10 | ජප් තාලය | Jhaptal (editorial, N/A) | 10 | `2+3+2+3` / 4 | X/2/0/3 on 1/3/6/8 | 2, 6 | **VERIFIED**. |
+| `tala-teental` | Grade 10 | ත්‍රීතාල් තාලය (`ත්‍රීතාලය`, `තීන්තාල්` aliases, N/A) | Teental Tala (editorial, N/A) | 16 | `4+4+4+4` / 4 | X/2/0/3 on 1/5/9/13 | 4–5 | **VERIFIED**. |
+| `tala-jhaptal` | Grade 10 | ජප්තාල් තාලය (`ජප්තාලය` alias, N/A) | Jhaptal (editorial, N/A) | 10 | `2+3+2+3` / 4 | X/2/0/3 on 1/3/6/8 | 2, 6 | **VERIFIED**. |
 | `tala-deepchandi` | Grade 10 | දීප්චන්දි තාලය | Deepchandi Tala (editorial, N/A) | 14 | `3+4+3+4` / 4 | X/2/0/3 on 1/4/8/11 | 2, 4–5 | **VERIFIED**. |
 | `tala-lawani` | Grade 10 | ලාවනී තාලය | Lawani Tala (editorial, N/A) | 8 | `2+2+2+2` / 4 | X/2/0/3 on 1/3/5/7 | 3, 6 | **CORRECTED / VERIFIED**. |
-| `tala-khemta` | Grade 10 | ඛෙම්ටෝ තාලය (ඛෙම්ටා) | Khemta Tala (editorial, N/A) | 4 | `2+2` / 2 | X on 1; 0 on 3 | 7 | **CORRECTED / VERIFIED**; three aksharas per matra. |
+| `tala-khemta` | Grade 10 | ඛෙම්ටෝ තාලය (`ඛෙම්ටා` alias, N/A) | Khemta Tala (editorial, N/A) | 4 | `2+2` / 2 | X on 1; 0 on 3 | 7 | **CORRECTED / VERIFIED**; three aksharas per matra. |
 | `tala-roopak` | Not in supplied list | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | **WITHHELD** | none | **NEEDS-REVIEW / QUARANTINED**. |
 
 ### 2.2 Exact theka and bol-to-matra fields
@@ -75,10 +77,10 @@ Canonical structural source: `oriental_music_markdown/by-source/grade_10_musical
 
 | Entity / field | Audited state | Quality | Disposition |
 |---|---|---|---|
-| Lawani school context | Same bol sequence as Keherwa but different division; Grade 11 explains the school-system prescription | A for Grade 10 pages 3, 6; Grade 11 is ledger corroboration | **VERIFIED**, without generic Hindustani framing. |
+| Lawani school context | Not a Hindustani-system tala; prescribed for school use because two-matra divisions occur in school songs, local tit-rupa, and Western meters | Grade 11 page 24, A; separate `contextSourceReference` | **VERIFIED** and rendered to learners, without generic Hindustani framing. |
 | Khemta laya context | Source says its laya is fast | A, page 7 | **VERIFIED** only as qualitative `fast`. |
 | Other tempo/usage claims | Not established by cited pages | N/A | **WITHHELD** from curriculum claims. |
-| `practiceTempoBpm` | Client-only visualizer/game defaults | N/A | **PRACTICE DEFAULT**, not curriculum evidence. |
+| `practiceTempoBpm` | Client-only visualizer/game defaults; UI explicitly discloses this and does not derive vilambit/madhya/drut labels | N/A | **PRACTICE DEFAULT**, not curriculum evidence. |
 | Seven public `sourceReference` values | One `SRC-EPD-TB-G10` document and its own explicit pages | A | **CORRECTED**; embedded Grade 11 filenames removed. |
 | Seven public `reviewMetadata` values | Explicit unknown/unverified | N/A | No SME/publication event claimed. |
 | Seven public browse bands | `10-11`, containing evidenced Grade 10 | N/A | **PUBLIC**; no Grade 11 evidence inferred from the band. |
@@ -98,7 +100,7 @@ Canonical source: `oriental_music_markdown/by-source/grade_10_nadaya.md`, extrac
 | `term-sound` | No bounded definition found | N/A | **NEEDS-REVIEW / QUARANTINED**. |
 | `term-ahata-nada` | No bounded definition found | N/A | **NEEDS-REVIEW / QUARANTINED**. |
 | `term-anahata-nada` | No bounded definition found | N/A | **NEEDS-REVIEW / QUARANTINED**. |
-| `les-intro-01` | Grade 10 lesson limited to three properties | 2–12 | **CORRECTED / PUBLIC** in browse band `10-11`. |
+| `les-intro-01` | Grade 10 lesson limited to three properties and source-listed string/membrane factors; unsupported aerophone rule removed | 2–12 | **CORRECTED / PUBLIC** in browse band `10-11`. |
 | `quiz-les-intro-01` | Pitch, three properties, timbre | 3, 4, 10–11 | **CORRECTED / PUBLIC**; each question is gated. |
 | `quiz-les-tala-dadra` | Grade 10 Dadra structure | Grade 10 fundamentals page 6 | **CORRECTED / PUBLIC**; stale Grade 7 citation removed. |
 | Terminology review labels | `Unverified` / `Needs Review` | N/A | No undocumented SME/publication event. |

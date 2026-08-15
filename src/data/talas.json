@@ -3,6 +3,7 @@
     "id": "tala-dadra",
     "name_si": "දාදරා තාලය",
     "name_en": "Dadra Tala",
+    "aliases_si": ["දාද්‍රා තාලය"],
     "matras": 6,
     "vibhagCount": 2,
     "vibhagStructure": [
@@ -94,8 +95,9 @@
   },
   {
     "id": "tala-keherwa",
-    "name_si": "කෙහර්වා තාලය (කහර්වා)",
+    "name_si": "කෙහෙර්වා තාලය",
     "name_en": "Keherwa Tala",
+    "aliases_si": ["කෙහර්වා තාලය", "කහර්වා තාලය"],
     "matras": 8,
     "vibhagCount": 2,
     "vibhagStructure": [
@@ -205,8 +207,9 @@
   },
   {
     "id": "tala-teental",
-    "name_si": "ත්‍රීතාලය (තීන්තාල්)",
+    "name_si": "ත්‍රීතාල් තාලය",
     "name_en": "Teental (Tritala)",
+    "aliases_si": ["ත්‍රීතාලය", "තීන්තාල් තාලය"],
     "matras": 16,
     "vibhagCount": 4,
     "vibhagStructure": [
@@ -392,8 +395,9 @@
   },
   {
     "id": "tala-jhaptal",
-    "name_si": "ජප්තාලය",
+    "name_si": "ජප්තාල් තාලය",
     "name_en": "Jhaptal",
+    "aliases_si": ["ජප්තාලය"],
     "matras": 10,
     "vibhagCount": 4,
     "vibhagStructure": [
@@ -527,6 +531,7 @@
     "id": "tala-deepchandi",
     "name_si": "දීප්චන්දි තාලය",
     "name_en": "Deepchandi Tala",
+    "aliases_si": [],
     "matras": 14,
     "vibhagCount": 4,
     "vibhagStructure": [
@@ -800,6 +805,7 @@
     "id": "tala-lawani",
     "name_si": "ලාවනී තාලය",
     "name_en": "Lawani Tala",
+    "aliases_si": [],
     "matras": 8,
     "vibhagCount": 4,
     "vibhagStructure": [
@@ -894,6 +900,11 @@
       "dugun_bpm": 170,
       "chaugun_bpm": 340
     },
+    "context_si": "ලාවනී යනු හින්දුස්ථානි තාල පද්ධතියේ දක්නට ලැබෙන තාලයක් නොවේ. මාත්‍රා දෙක බැගින් වූ විභාග සහිත ගීත පාසල් පද්ධතියේ භාවිත වන නිසාත්, දේශීය තිත් රූප හා බටහිර තාලවල එවැනි කොටස් ඇති නිසාත් එය පාසල් පද්ධතියට නිර්දේශ කර ඇත.",
+    "contextSourceReference": {
+      "sourceId": "SRC-EPD-TB-G11",
+      "pageOrSection": "s11tim173.pdf පිටුව 24"
+    },
     "gradeBands": [
       "10-11"
     ],
@@ -913,8 +924,14 @@
   },
   {
     "id": "tala-khemta",
-    "name_si": "ඛෙම්ටෝ තාලය (ඛෙම්ටා)",
+    "name_si": "ඛෙම්ටෝ තාලය",
     "name_en": "Khemta Tala",
+    "aliases_si": ["ඛෙම්ටා තාලය"],
+    "context_si": "එක් මාත්‍රාවකට අක්ෂර තුන බැගින් යෙදෙන මාත්‍රා හතරක තාලයකි; මූලාශ්‍රය මෙහි ලය වේගවත් බව සඳහන් කරයි.",
+    "contextSourceReference": {
+      "sourceId": "SRC-EPD-TB-G10",
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 7"
+    },
     "matras": 4,
     "vibhagCount": 2,
     "vibhagStructure": [

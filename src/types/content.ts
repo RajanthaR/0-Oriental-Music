@@ -159,6 +159,7 @@ export interface Tala {
   id: string;
   name_si: string;
   name_en: string;
+  aliases_si?: string[];
   matras: number;
   vibhagCount: number;
   vibhagStructure: number[];
@@ -170,6 +171,8 @@ export interface Tala {
     dugun_bpm: number;
     chaugun_bpm: number;
   };
+  context_si?: string;
+  contextSourceReference?: SourceReference;
   gradeBands: GradeBandType[];
   sourceReference: SourceReference;
   reviewMetadata: ReviewMetadata;

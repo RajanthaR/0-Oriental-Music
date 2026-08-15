@@ -34,11 +34,11 @@ const DEFAULT_CHALLENGES: EarTrainingChallenge[] = [
     type: "tala",
     targetItem: "tala-dadra",
     options_si: [
-      { id: "o1", text_si: "දාද්‍රා තාලය (මාත්‍රා 6)", value: "tala-dadra" },
+      { id: "o1", text_si: "දාදරා තාලය (මාත්‍රා 6)", value: "tala-dadra" },
       { id: "o2", text_si: "කෙහර්වා තාලය (මාත්‍රා 8)", value: "tala-keherwa" },
       { id: "o3", text_si: "රූපක් තාලය (මාත්‍රා 7)", value: "tala-roopak" },
     ],
-    explanation_si: "මාත්‍රා 3 බැගින් වූ විභාග 2 කින් සමන්විත දාද්‍රා තාලයේ ථේකාවයි.",
+    explanation_si: "මාත්‍රා 3 බැගින් වූ විභාග 2 කින් සමන්විත දාදරා තාලයේ ථේකාවයි.",
   },
 ];
 

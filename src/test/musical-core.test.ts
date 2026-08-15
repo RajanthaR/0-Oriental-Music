@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { repository } from "@/lib/data/repository";
 import { getSwaraFrequency, SWARA_SEMITONES } from "@/lib/audio/synth";
-import { classifyTablaBol, tablaSynth } from "@/lib/audio/tabla";
+import { classifyTablaBol, expandTablaBol, planTablaBol } from "@/lib/audio/tabla";
 import ragasData from "@/data/ragas.json";
 import talasData from "@/data/talas.json";
 import lessonsData from "@/data/lessons.json";
@@ -13,6 +13,7 @@ import culturalTraditionsData from "@/data/cultural-traditions.json";
 import theatreTraditionsData from "@/data/theatre-traditions.json";
 import learningPathsData from "@/data/learning-paths.json";
 import examPapersData from "@/data/exam-papers.json";
+import sourcesData from "@/data/sources.json";
 
 const expectedRagas = {
   "raga-bilawal": { arohana: ["S", "R", "G", "M", "P", "D", "N", "S'"], avarohana: ["S'", "N", "D", "P", "M", "G", "R", "S"], vadi: "ධෛවත (ධ)", samvadi: "ගාන්ධාර (ග)", time: "දිවා ප්‍රථම ප්‍රහරය" },
@@ -24,14 +25,24 @@ const expectedRagas = {
   "raga-bhairavi": { arohana: ["S", "r", "g", "M", "P", "d", "n", "S'"], avarohana: ["S'", "n", "d", "P", "M", "g", "r", "S"], vadi: "මධ්‍යම (ම)", samvadi: "ෂඩ්ජ (ස)", time: "දිවා ප්‍රථම ප්‍රහරය" },
 } as const;
 
+const expectedRagaNotation = {
+  "raga-bilawal": ["ස , රි , ග , ම , ප , ධ , නි , ස̇", "ස̇ , නි , ධ , ප , ම , ග , රි , ස", "ග රි , ග ප ධ නි ස̇"],
+  "raga-bhupali": ["ස , රි , ග , ප , ධ , ස̇", "ස̇ , ධ , ප , ග , රි , ස", "ග රි , ස ධ̣ , ස රි ග , ප ග , ධ ප , ග රි ස"],
+  "raga-kafi": ["ස , රි , ග(කෝ) , ම , ප , ධ , නි(කෝ) , ස̇", "ස̇ , නි(කෝ) , ධ , ප , ම , ග(කෝ) , රි , ස", "ස ස , රි රි , ග(කෝ) ග(කෝ) , ම ම , ප"],
+  "raga-khamaj": ["ස , ග , ම , ප , ධ , නි , ස̇", "ස̇ , නි(කෝ) , ධ , ප , ම , ග , රි , ස", "නි(කෝ) ධ , ම ප ධ , ම ග"],
+  "raga-bhimpalasi": ["නි̣(කෝ) . ස ග(කෝ) ම ප නි(කෝ) ස̇", "ස̇ නි(කෝ) ධ ප ම ග(කෝ) රි ස", "නි̣(කෝ) ස ම , ම ප ග(කෝ) ම ග(කෝ) රි ස"],
+  "raga-yaman": ["ස , රි , ග , ම(තී) , ප , ධ , නි , ස̇", "ස̇ , නි , ධ , ප , ම(තී) , ග , රි , ස", "නි̣ රි ග රි ස , ප ම(තී) ග රි ස"],
+  "raga-bhairavi": ["ස , රි(කෝ) , ග(කෝ) , ම , ප , ධ(කෝ) , නි(කෝ) , ස̇", "ස̇ , නි(කෝ) , ධ(කෝ) , ප , ම , ග(කෝ) , රි(කෝ) , ස", "ම ග(කෝ) , ස රි(කෝ) ස , ධ̣(කෝ) නි̣(කෝ) ස"],
+} as const;
+
 const expectedTalas = {
-  "tala-dadra": { matras: 6, vibhags: [3, 3], bols: ["ධා", "ධී", "නා", "ධා", "තී", "නා"], marks: [[1, "X"], [4, "0"]] },
-  "tala-keherwa": { matras: 8, vibhags: [4, 4], bols: ["ධා", "ගේ", "න", "ත", "න", "ක", "ධ", "න"], marks: [[1, "X"], [5, "0"]] },
-  "tala-teental": { matras: 16, vibhags: [4, 4, 4, 4], bols: ["ධා", "ධින්", "ධින්", "ධා", "ධා", "ධින්", "ධින්", "ධා", "ධා", "තින්", "තින්", "තා", "තා", "ධින්", "ධින්", "ධා"], marks: [[1, "X"], [5, "T"], [9, "0"], [13, "T"]] },
-  "tala-jhaptal": { matras: 10, vibhags: [2, 3, 2, 3], bols: ["ධී", "නා", "ධී", "ධී", "නා", "තී", "නා", "ධී", "ධී", "නා"], marks: [[1, "X"], [3, "T"], [6, "0"], [8, "T"]] },
-  "tala-deepchandi": { matras: 14, vibhags: [3, 4, 3, 4], bols: ["ධා", "ධින්", "-", "ධා", "ධා", "ධින්", "-", "තා", "තින්", "-", "ධා", "ධා", "ධින්", "-"], marks: [[1, "X"], [4, "T"], [8, "0"], [11, "T"]] },
-  "tala-lawani": { matras: 8, vibhags: [2, 2, 2, 2], bols: ["ධා", "ගේ", "න", "ත", "න", "ක", "ධ", "න"], marks: [[1, "X"], [3, "T"], [5, "0"], [7, "T"]] },
-  "tala-khemta": { matras: 4, vibhags: [2, 2], bols: ["ධන්න", "ධනක", "තන්න", "ධනක"], marks: [[1, "X"], [3, "0"]] },
+  "tala-dadra": { name: "දාදරා තාලය", theka: "ධා ධී නා | ධා තී නා", matras: 6, vibhags: [3, 3], bols: ["ධා", "ධී", "නා", "ධා", "තී", "නා"], marks: [[1, "X"], [4, "0"]] },
+  "tala-keherwa": { name: "කෙහෙර්වා තාලය", theka: "ධා ගේ න ත | න ක ධ න", matras: 8, vibhags: [4, 4], bols: ["ධා", "ගේ", "න", "ත", "න", "ක", "ධ", "න"], marks: [[1, "X"], [5, "0"]] },
+  "tala-teental": { name: "ත්‍රීතාල් තාලය", theka: "ධා ධින් ධින් ධා | ධා ධින් ධින් ධා | ධා තින් තින් තා | තා ධින් ධින් ධා", matras: 16, vibhags: [4, 4, 4, 4], bols: ["ධා", "ධින්", "ධින්", "ධා", "ධා", "ධින්", "ධින්", "ධා", "ධා", "තින්", "තින්", "තා", "තා", "ධින්", "ධින්", "ධා"], marks: [[1, "X"], [5, "T"], [9, "0"], [13, "T"]] },
+  "tala-jhaptal": { name: "ජප්තාල් තාලය", theka: "ධී නා | ධී ධී නා | තී නා | ධී ධී නා", matras: 10, vibhags: [2, 3, 2, 3], bols: ["ධී", "නා", "ධී", "ධී", "නා", "තී", "නා", "ධී", "ධී", "නා"], marks: [[1, "X"], [3, "T"], [6, "0"], [8, "T"]] },
+  "tala-deepchandi": { name: "දීප්චන්දි තාලය", theka: "ධා ධින් - | ධා ධා ධින් - | තා තින් - | ධා ධා ධින් -", matras: 14, vibhags: [3, 4, 3, 4], bols: ["ධා", "ධින්", "-", "ධා", "ධා", "ධින්", "-", "තා", "තින්", "-", "ධා", "ධා", "ධින්", "-"], marks: [[1, "X"], [4, "T"], [8, "0"], [11, "T"]] },
+  "tala-lawani": { name: "ලාවනී තාලය", theka: "ධා ගේ | න ත | න ක | ධ න", matras: 8, vibhags: [2, 2, 2, 2], bols: ["ධා", "ගේ", "න", "ත", "න", "ක", "ධ", "න"], marks: [[1, "X"], [3, "T"], [5, "0"], [7, "T"]] },
+  "tala-khemta": { name: "ඛෙම්ටෝ තාලය", theka: "ධන්න ධනක | තන්න ධනක", matras: 4, vibhags: [2, 2], bols: ["ධන්න", "ධනක", "තන්න", "ධනක"], marks: [[1, "X"], [3, "0"]] },
 } as const;
 
 describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
@@ -98,6 +109,9 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
         expect(raga.gradeBands).toEqual(["10-11"]);
         expect(raga.rasa_si).toBe("නොදනී / සනාථ වී නැත");
         expect(raga.samplePhrases).toHaveLength(1);
+        expect([raga.arohana_si, raga.avarohana_si, raga.pakad_si]).toEqual(
+          expectedRagaNotation[raga.id as keyof typeof expectedRagaNotation]
+        );
         expect(raga.sourceReference).toEqual({
           sourceId: "SRC-G11-RAGA-ID",
           pageOrSection: "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2",
@@ -166,6 +180,8 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
           .filter((bol) => bol.isSam || bol.isTali || bol.isKhali)
           .map((bol) => [bol.matra, bol.isSam ? "X" : bol.isKhali ? "0" : "T"]);
         expect(tala.matras).toBe(expected.matras);
+        expect(tala.name_si).toBe(expected.name);
+        expect(tala.theka_si).toBe(expected.theka);
         expect(tala.vibhagStructure).toEqual(expected.vibhags);
         expect(tala.bols.map((bol) => bol.bol_si)).toEqual(expected.bols);
         expect(marks).toEqual(expected.marks);
@@ -173,6 +189,16 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
         expect(tala.sourceReference.sourceId).toBe("SRC-EPD-TB-G10");
         expect(tala.sourceReference.pageOrSection).not.toContain("s11tim173.pdf");
         expect(tala.practiceTempoBpm.thah_bpm).toBeGreaterThan(0);
+      });
+    });
+
+    it("represents Lawani's school-system context with separate Grade 11 evidence", () => {
+      const lawani = repository.getTalaById("tala-lawani");
+      expect(lawani?.context_si).toContain("හින්දුස්ථානි තාල පද්ධතියේ දක්නට ලැබෙන තාලයක් නොවේ");
+      expect(lawani?.context_si).toContain("පාසල් පද්ධතියට නිර්දේශ");
+      expect(lawani?.contextSourceReference).toEqual({
+        sourceId: "SRC-EPD-TB-G11",
+        pageOrSection: "s11tim173.pdf පිටුව 24",
       });
     });
   });
@@ -254,21 +280,32 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       expect(getSwaraFrequency("m", rootC)).toBeCloseTo(261.63 * Math.pow(2, 6 / 12), 1);
     });
 
-    it("safely handles all standard and rest bols in tabla synth", () => {
-      const testBols = ["ධා", "ධින්", "ධී", "ගේ", "ගෙ", "නා", "තින්", "තී", "තෙ", "කේ", "තූ", "ධන්න", "තන්න", "-", " "];
-      testBols.forEach((bol) => {
-        expect(() => tablaSynth.playBol(bol)).not.toThrow();
-      });
-    });
-
     it("classifies representative tabla bols into observable synthesis paths", () => {
-      expect(classifyTablaBol("ධා")).toBe("combined");
-      expect(classifyTablaBol("ධින්")).toBe("combined");
-      expect(classifyTablaBol("ධනක")).toBe("combined");
+      expect(classifyTablaBol("ධා")).toBe("combined-open");
+      expect(classifyTablaBol("ධින්")).toBe("combined-closed");
       expect(classifyTablaBol("ගේ")).toBe("bass");
       expect(classifyTablaBol("නා")).toBe("open");
       expect(classifyTablaBol("තින්")).toBe("closed");
       expect(classifyTablaBol("-")).toBe("rest");
+    });
+
+    it("expands each Khemta compound matra into three timed akshara strokes", () => {
+      expect(expandTablaBol("ධන්න")).toEqual(["ධ", "න", "න"]);
+      expect(expandTablaBol("ධනක")).toEqual(["ධ", "න", "ක"]);
+      expect(expandTablaBol("තන්න")).toEqual(["ත", "න", "න"]);
+      expect(planTablaBol("ධනක", 600)).toEqual([
+        { bol: "ධ", kind: "combined-open", delayMs: 0 },
+        { bol: "න", kind: "open", delayMs: 200 },
+        { bol: "ක", kind: "closed", delayMs: 400 },
+      ]);
+    });
+
+    it("maps every public tala cell to an intentional non-fallback stroke plan", () => {
+      repository.getTalas().flatMap((tala) => tala.bols).forEach((bol) => {
+        const plan = planTablaBol(bol.bol_si);
+        if (bol.bol_si === "-") expect(plan).toEqual([]);
+        else expect(plan.every((stroke) => stroke.kind !== "fallback" && stroke.kind !== "rest")).toBe(true);
+      });
     });
   });
 
@@ -302,6 +339,18 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       terminologyData.forEach((term) => {
         expect(term.confidence).toBe("Unverified");
         expect(term.reviewStatus).toBe("Needs Review");
+      });
+    });
+
+    it("keeps Phase 2 source publisher, year, place, licence, and status metadata explicit and unverified", () => {
+      ["SRC-EPD-TB-G10", "SRC-EPD-TB-G11", "SRC-G10-NADA", "SRC-G11-RAGA-ID"].forEach((id) => {
+        const source = sourcesData.find((item) => item.id === id);
+        expect(source).toBeDefined();
+        expect(source?.publisher).toBe("නොදනී / සනාථ වී නැත");
+        expect(source?.year).toBe("නොදනී / සනාථ වී නැත");
+        expect(source?.location).toBe("නොදනී / සනාථ වී නැත");
+        expect(source?.license).toBe("නොදනී / සනාථ වී නැත");
+        expect(source?.status).not.toBe("Verified");
       });
     });
 

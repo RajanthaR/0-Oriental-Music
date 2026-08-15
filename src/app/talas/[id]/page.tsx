@@ -52,6 +52,18 @@ export default function TalaDetailPage() {
           {tala.name_si} ({tala.name_en})
         </h1>
 
+        {tala.context_si && (
+          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+            <span className="mb-1 block font-bold">විෂය නිර්දේශ සන්දර්භය:</span>
+            <p>{tala.context_si}</p>
+            {tala.contextSourceReference && (
+              <p className="mt-2 text-xs text-amber-800">
+                මූලාශ්‍රය: {tala.contextSourceReference.pageOrSection}
+              </p>
+            )}
+          </div>
+        )}
+
         <div className="bg-surface-warm p-4 rounded-2xl border border-border-light text-xs sm:text-sm mb-6">
           <span className="font-bold text-text block mb-1">තාළි සහ ඛාලි ලකුණු:</span>
           <ul className="list-disc list-inside space-y-1 text-text-secondary">

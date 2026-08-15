@@ -28,6 +28,7 @@ import examPapersData from "@/data/exam-papers.json";
 import { searchFilter } from "@/lib/search/search-engine";
 import {
   getRecordPublicationDecision,
+  getQuizPublicationDecision,
   getSourceDocumentSummary,
   UNKNOWN_PROVENANCE,
   PUBLIC_GRADE_BANDS,
@@ -194,6 +195,16 @@ class ContentRepository {
     };
   }
 
+  private summarizeQuizzes(): PublicationCollectionSummary {
+    const decisions = this.quizzes.map((quiz) => getQuizPublicationDecision(quiz));
+    return {
+      raw: this.quizzes.length,
+      public: decisions.filter((decision) => decision.state === "public").length,
+      quarantined: decisions.filter((decision) => decision.state === "quarantined").length,
+      needsReview: decisions.filter((decision) => decision.state === "needs-review").length,
+    };
+  }
+
   // Sources: public transparency metadata is deliberately sanitized. The raw
   // publisher/year/location/license values are not provenance evidence.
   public getSources(): SourceCatalogView[] {
@@ -295,7 +306,12 @@ class ContentRepository {
   public getTalas(query?: string): Tala[] {
     let list = this.selectPublic(this.talas);
     if (query) {
-      list = searchFilter(list, query, (tala) => [tala.name_si, tala.name_en, tala.theka_si]);
+      list = searchFilter(list, query, (tala) => [
+        tala.name_si,
+        tala.name_en,
+        ...(tala.aliases_si || []),
+        tala.theka_si,
+      ]);
     }
     return list;
   }
@@ -395,14 +411,7 @@ class ContentRepository {
 
   // Quizzes & Exams
   public getQuizzes(): Quiz[] {
-    const publicLessonIds = new Set(this.getLessons().map((lesson) => lesson.id));
-    return this.quizzes.filter(
-      (quiz) =>
-        !!quiz.lessonId &&
-        publicLessonIds.has(quiz.lessonId) &&
-        quiz.questions.length > 0 &&
-        quiz.questions.every((question) => getRecordPublicationDecision(question).isPublic)
-    );
+    return this.quizzes.filter((quiz) => getQuizPublicationDecision(quiz).isPublic);
   }
 
   public getQuizById(id: string): Quiz | undefined {
@@ -434,6 +443,7 @@ class ContentRepository {
         ...this.summarize(this.learningPaths),
         public: this.getLearningPaths().length,
       },
+      quizzes: this.summarizeQuizzes(),
       exams: this.summarize(this.examPapers),
     };
   }

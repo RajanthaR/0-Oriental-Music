@@ -4,14 +4,37 @@
  * 100% browser-native Web Audio without recorded samples.
  */
 
-export type TablaStrokeKind = "rest" | "combined" | "bass" | "open" | "closed" | "fallback";
+export type TablaStrokeKind =
+  | "rest"
+  | "combined-open"
+  | "combined-closed"
+  | "bass"
+  | "open"
+  | "closed"
+  | "fallback";
+
+export interface PlannedTablaStroke {
+  bol: string;
+  kind: TablaStrokeKind;
+  delayMs: number;
+}
+
+export function expandTablaBol(bolName: string): string[] {
+  const clean = typeof bolName === "string" ? bolName.trim().toLowerCase() : "";
+  if (!clean || clean === "-" || clean === "s") return [];
+  const compoundCells: Record<string, string[]> = {
+    "ධන්න": ["ධ", "න", "න"],
+    "ධනක": ["ධ", "න", "ක"],
+    "තන්න": ["ත", "න", "න"],
+  };
+  return compoundCells[clean] ?? [clean];
+}
 
 export function classifyTablaBol(bolName: string): TablaStrokeKind {
   const clean = typeof bolName === "string" ? bolName.trim().toLowerCase() : "";
   if (!clean || clean === "-" || clean === "s") return "rest";
-  if (["dha", "ධා", "dhin", "ධින්", "ධී", "ධි", "ධ", "ධන්න", "ධනක"].includes(clean)) {
-    return "combined";
-  }
+  if (["dha", "ධා", "ධ"].includes(clean)) return "combined-open";
+  if (["dhin", "ධින්", "ධී", "ධි"].includes(clean)) return "combined-closed";
   if (["ge", "ගේ", "ගෙ", "ග", "ghe"].includes(clean)) return "bass";
   if (["na", "නා", "න", "ta", "තා", "ත", "නක"].includes(clean)) return "open";
   if (
@@ -38,9 +61,21 @@ export function classifyTablaBol(bolName: string): TablaStrokeKind {
   return "fallback";
 }
 
+export function planTablaBol(bolName: string, matraDurationMs: number = 500): PlannedTablaStroke[] {
+  const expanded = expandTablaBol(bolName);
+  if (expanded.length === 0) return [];
+  const subdivisionMs = Math.max(1, matraDurationMs) / expanded.length;
+  return expanded.map((bol, index) => ({
+    bol,
+    kind: classifyTablaBol(bol),
+    delayMs: Math.round(index * subdivisionMs),
+  }));
+}
+
 class TablaSynthEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
+  private scheduledTimers: number[] = [];
 
   private initContext() {
     if (!this.ctx) {
@@ -151,25 +186,45 @@ class TablaSynthEngine {
   /**
    * Play any standard Tabla Bol
    */
-  public playBol(bolName: string) {
-    if (typeof window === "undefined" || !bolName || typeof bolName !== "string") return;
-    const strokeKind = classifyTablaBol(bolName);
-    if (strokeKind === "rest") return;
-
-    this.initContext();
-
-    if (strokeKind === "combined") {
+  private playStroke(strokeKind: TablaStrokeKind) {
+    if (strokeKind === "combined-open") {
       this.playBayanBass(true, 0.65);
       this.playDayanOpen(293.66, 0.5);
+    } else if (strokeKind === "combined-closed") {
+      this.playBayanBass(false, 0.55);
+      this.playDayanClosed(293.66, 0.3);
     } else if (strokeKind === "bass") {
       this.playBayanBass(true, 0.6);
     } else if (strokeKind === "open") {
       this.playDayanOpen(293.66, 0.45);
     } else if (strokeKind === "closed") {
       this.playDayanClosed(293.66, 0.25);
-    } else {
+    } else if (strokeKind === "fallback") {
       this.playDayanClosed(260, 0.2);
     }
+  }
+
+  public cancelScheduledStrokes() {
+    if (typeof window === "undefined") return;
+    this.scheduledTimers.forEach((timer) => window.clearTimeout(timer));
+    this.scheduledTimers = [];
+  }
+
+  public playBol(bolName: string, matraDurationMs: number = 500) {
+    if (typeof window === "undefined" || !bolName || typeof bolName !== "string") return;
+    const plan = planTablaBol(bolName, matraDurationMs);
+    this.cancelScheduledStrokes();
+    if (plan.length === 0) return;
+
+    this.initContext();
+    plan.forEach((stroke) => {
+      if (stroke.delayMs === 0) {
+        this.playStroke(stroke.kind);
+        return;
+      }
+      const timer = window.setTimeout(() => this.playStroke(stroke.kind), stroke.delayMs);
+      this.scheduledTimers.push(timer);
+    });
   }
 }
 

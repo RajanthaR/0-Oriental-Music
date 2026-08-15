@@ -25,17 +25,18 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
   const timerRef = useRef<NodeJS.Timeout | number | null>(null);
 
   const currentBol = tala.bols.find((b) => b.matra === currentMatra) || tala.bols[0];
+  const matraDurationMs = (60 / bpm) * 1000;
 
   const stepNextMatra = useCallback(() => {
     setCurrentMatra((prev) => {
       const next = prev >= tala.matras ? 1 : prev + 1;
       const nextBol = tala.bols.find((b) => b.matra === next);
       if (nextBol && audioEnabled) {
-        tablaSynth.playBol(nextBol.bol_si);
+        tablaSynth.playBol(nextBol.bol_si, matraDurationMs);
       }
       return next;
     });
-  }, [tala.matras, tala.bols, audioEnabled]);
+  }, [tala.matras, tala.bols, audioEnabled, matraDurationMs]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -44,6 +45,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
         stepNextMatra();
       }, intervalMs);
     } else {
+      tablaSynth.cancelScheduledStrokes();
       if (timerRef.current) {
         clearInterval(timerRef.current as number);
         timerRef.current = null;
@@ -53,18 +55,22 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
       if (timerRef.current) {
         clearInterval(timerRef.current as number);
       }
+      tablaSynth.cancelScheduledStrokes();
     };
   }, [isPlaying, bpm, stepNextMatra]);
 
   const handleTogglePlay = () => {
     if (!isPlaying && audioEnabled) {
-      tablaSynth.playBol(currentBol.bol_si);
+      tablaSynth.playBol(currentBol.bol_si, matraDurationMs);
+    } else if (isPlaying) {
+      tablaSynth.cancelScheduledStrokes();
     }
     setIsPlaying(!isPlaying);
   };
 
   const handleReset = () => {
     setIsPlaying(false);
+    tablaSynth.cancelScheduledStrokes();
     setCurrentMatra(1);
   };
 
@@ -246,10 +252,8 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
         {/* Tempo Slider */}
         <div className="bg-surface-warm p-3 rounded-xl border border-border-light">
           <div className="flex items-center justify-between mb-1.5 font-semibold text-text-secondary">
-            <span>ලය / වේගය (Tempo): {bpm} BPM</span>
-            <span className="text-[11px] text-primary">
-              {bpm < 70 ? "විලම්බිත" : bpm < 140 ? "මධ්‍ය" : "ද්‍රුත"}
-            </span>
+            <span>යෙදුමේ පුහුණු වේගය: {bpm} BPM</span>
+            <span className="text-[11px] text-primary">වෙනස් කළ හැකි අගයකි</span>
           </div>
           <input
             type="range"
@@ -261,6 +265,9 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
             className="w-full accent-primary h-2 bg-white rounded-lg cursor-pointer"
             aria-label="තාලයේ වේගය (BPM)"
           />
+          <p className="mt-1.5 text-[11px] text-text-muted">
+            මෙය අභ්‍යාසයට පමණක් යොදාගන්නා යෙදුම් පෙරනිමියකි; මූලාශ්‍රයෙන් සනාථ කළ ලය වර්ගීකරණයක් නොවේ.
+          </p>
         </div>
 
         {/* Visual Mode Toggle */}

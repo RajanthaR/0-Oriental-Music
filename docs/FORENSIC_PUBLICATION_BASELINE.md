@@ -4,7 +4,7 @@ This is the Prompt 1 containment boundary for **ස්වර මඟ**. It is a s
 
 ## States
 
-- `public`: discoverable only when the record is scoped to Grades 6–11, has a known source ID, maps to exactly one supplied extracted document, cites an in-range page or bounded section, and has at least one A/B readable Sinhala evidence page.
+- `public`: discoverable only when the record is scoped to Grades 6–11, has a known source ID, maps to exactly one supplied extracted document, exact-matches any named PDF, cites only in-range pages, and every cited page has A/B readable Sinhala evidence.
 - `quarantined`: retained in the raw dataset for later correction, but excluded from public lists, search, selectors, metadata, counts, and direct dynamic routes. Known issue identifiers and all Grade 12–13/A/L records use this state.
 - `needs-review`: retained for audit but not publicly discoverable because the source document, page evidence, extraction quality, or grade scope is unresolved.
 - `unknown / unverified`: the only acceptable public value for metadata that is not established by the supplied corpus or a real review event. It is not a substitute publisher, licence, reviewer, or date.
