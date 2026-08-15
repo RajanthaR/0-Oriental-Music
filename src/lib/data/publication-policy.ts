@@ -120,21 +120,21 @@ export interface PublicationInput {
 }
 
 type SourceResolution =
-  | { status: "missing-source"; sourceId: string }
-  | { status: "missing-document"; source: SourceRecord }
-  | { status: "ambiguous-document"; source: SourceRecord; matches: SourceDocumentRecord[] }
-  | { status: "found"; source: SourceRecord; document: SourceDocumentRecord };
+  | { status: "missing-source" }
+  | { status: "missing-document" }
+  | { status: "ambiguous-document" }
+  | { status: "found"; document: SourceDocumentRecord };
 
 function resolveSourceDocument(sourceId: string): SourceResolution {
   const source = sourceRecords.find((record) => record.id === sourceId);
-  if (!source) return { status: "missing-source", sourceId };
+  if (!source) return { status: "missing-source" };
 
   const matches = sourceDocuments.filter(
     (document) => document.originalFilename === source.originalFilename
   );
-  if (matches.length === 0) return { status: "missing-document", source };
-  if (matches.length > 1) return { status: "ambiguous-document", source, matches };
-  return { status: "found", source, document: matches[0] };
+  if (matches.length === 0) return { status: "missing-document" };
+  if (matches.length > 1) return { status: "ambiguous-document" };
+  return { status: "found", document: matches[0] };
 }
 
 function numericPageReferences(pageOrSection: string): number[] {
@@ -374,10 +374,6 @@ function getGradeBands(value: PublicationRecordShape): string[] {
   }
 
   return Array.from(bands);
-}
-
-export function getRecordGradeBands(record: unknown): string[] {
-  return toPublicationInput(record).gradeBands;
 }
 
 function hasUnsupportedGrade(gradeBands: string[]): boolean {
