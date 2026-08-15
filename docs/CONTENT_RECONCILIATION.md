@@ -1,45 +1,46 @@
-# CONTENT_RECONCILIATION.md — Existing Content Audit & Action Log
+# CONTENT_RECONCILIATION.md — Historical reconciliation record and Prompt 1 correction
 
-This document records the comprehensive audit and reconciliation actions for all 101 content entities originally published in the MVP release of **ස්වර මඟ (Swara Maga)**.
+> **Prompt 1 status:** The older reconciliation claims below are retained as historical evidence, not as a current publication decision. The current machine-readable baseline is [`data/forensic-ledger.json`](../data/forensic-ledger.json), and public eligibility is enforced by [`src/lib/data/publication-policy.ts`](../src/lib/data/publication-policy.ts). The supplied checkout contains extracted Markdown and no original PDF files; no claim is accepted merely because an old record says `KEEP` or `Published`.
 
-Every published entity has been cross-checked against the 30 canonical source documents in `oriental_music_markdown/by-source/`.
+The previous report described 101 records as published and source-grounded. The current checkout independently recalculates that artifact as 101 records with 22 `KEEP`, 35 `REMAP_GRADE`, 43 `CORRECT`, and 1 `REWRITE`; all 101 carry a historical `Published` value. Those values remain audit inputs and are not evidence of a completed review.
+
+Prompt 1 contains unsupported Grade 12–13/A/L discovery, known raga/tala and citation issues, false review/source metadata, and incomplete dependencies. Those records are retained and quarantined or marked `needs-review`; this phase does not silently delete or musically rewrite them.
 
 ---
 
-## 1. Summary of Actions
+## 1. Historical action counts (not a publication verdict)
 
 | Action | Count | Description |
 |---|---:|---|
-| **`KEEP`** | 35 | Factually and pedagogically accurate; source citations verified against official Teacher Guides and Textbooks. |
-| **`CORRECT`** | 30 | Minor terminology or Sinhala Unicode adjustments (e.g. aligning with canonical NFC terminology, standardizing Pancha Turya labels). |
-| **`REMAP_GRADE`** | 33 | Content with unsupported Grade 12–13 labels remapped to exact source-supported Grades (6, 7, 8, 9, 10, or 11). |
-| **`REWRITE`** | 3 | Generic or high-level summaries rewritten to follow the 17-point structured lesson design and concrete source outcomes. |
+| **`KEEP`** | 22 | Historical action label only; source claim is not re-verified by Prompt 1. |
+| **`CORRECT`** | 43 | Historical action label only; before/after evidence is not a publication proof. |
+| **`REMAP_GRADE`** | 35 | Historical action label only; Grade 12–13 claims remain quarantined until exact source evidence exists. |
+| **`REWRITE`** | 1 | Historical action label only; content rewrite is outside Prompt 1 scope. |
 | **`SPLIT / MERGE`** | 0 | Canonical raga and tala entities unified with progressive disclosure views rather than duplicated. |
 | **`ARCHIVE`** | 0 | No unsupported topics required complete removal; all existing topics were grounded in canonical school units. |
-| **Total Entities** | **101** | **100% Accounted For** |
+| **Total historical records** | **101** | **No completion or publication percentage is implied.** |
 
 ---
 
 ## 2. Priority Corrections Applied
 
-### P0 — Curriculum Accuracy & Source Grounding
-- **Grade 12–13 Scope**: In accordance with the source-of-truth policy, all entities claiming A/L Grade 12–13 coverage without backing in the 30-document corpus have been remapped to exact Grades 6–11 or marked supplementary.
-- **Raga & Tala Attributes**: Verified that all Ragas (Bilawal, Bhupali, Yaman, Khamaj, Kafi, Bhimpalasi, Bhairav, Bhairavi) and Talas (Keharwa, Dadra, Trital, Jhaptal, Deepchandi, Rupak, Khemta, Lawani) match the exact Vadi/Samvadi, Jati, Thata, Matras, Vibhags, and Thekas specified in `grade_11_raga_identification.md`, `grade_10_musical_fundamentals.md`, `grade_11_music_textbook.md`, and `tabla.md`.
-- **Pancha Turya Instrument Taxonomy**: Reconciled the 5-fold classification (ආතත, විතත, විතතාතත, ඝන, සුෂිර) and 14 local instruments based on `grade_9_music_instruments.md`.
+### P0 — Current containment boundary
+- Grade 12–13 and A/L records are not public. The supplied 30-document source inventory does not include a verified Grade 12–13 source set.
+- Bhairav, Bilawal, Roopak, Lawani, Dadra, sound terminology, and the named exam/path records are retained in the forensic ledger and quarantined or held for review. No musical correction is claimed.
+- A/B/C/D page classifications describe extraction quality. They do not establish Vadi, Samvadi, Jati, Thata, matra, vibhag, theka, terminology, or curriculum truth.
 
-### P1 — Learning Quality & Prerequisites
-- **17-Point Structured Lesson Architecture**: All lessons enforce explicit prerequisites, diagnostic entrance questions with Sinhala explanations, interactive Web Audio practice linkages, and constructive feedback.
-- **Graduated Language**: Grade 6–8 explanations use simplified, age-appropriate Sinhala, while Grade 9–11 views progressively disclose advanced musicological attributes (e.g., Gana Samaya, Mukhyanga, Thana, Alankara).
+### P1 — Deferred content review
+- The 17-point lesson shape and pedagogical language remain implementation requirements, not proof that every record has passed SME, language, pedagogical, audio, accessibility, rights, and source review.
+- Learning paths are not public unless every lesson step is public and source-backed. Incomplete paths remain available for later remediation through their stable IDs.
 
-### P2 — Presentation & Mobile Usability
-- Structured notation tables and swara strips replace plain text blocks.
-- Viewports at 360px width are fully tested for zero horizontal overflow and 44px+ touch targets.
+### P2 — Evidence and QA boundary
+- Visual notation, image-only pages, and corrupt OCR require original-PDF/manual review. Prompt 1 does not claim 360px or release QA completion.
 
 ---
 
 ## 3. Detailed Reconciliation Entity Inventory
 
-Detailed machine-readable records are stored in [`data/content-reconciliation.json`](file:///z:/00Code/ANTIGRAVITY/Oriental-Music/data/content-reconciliation.json).
+Detailed historical records remain in [`data/content-reconciliation.json`](../data/content-reconciliation.json). The current issue-level ledger and source inventory are in [`data/forensic-ledger.json`](../data/forensic-ledger.json). Use the latter for current status and counts.
 
 Key entity mappings:
 - **Lessons (21)**: `les-intro-01` (KEEP), `les-swara-01` (KEEP), `les-swara-02` (KEEP), `les-saptaka-01` (KEEP), `les-alankara-01` (KEEP), `les-tala-basics` (KEEP), `les-tala-dadra` (KEEP), `les-tala-keherwa` (KEEP), `les-tala-teental` (KEEP), `les-thata-basics` (KEEP), `les-raga-bhairav` (REMAP_GRADE), `les-raga-yaman` (REMAP_GRADE), `les-vocal-posture` (KEEP), `les-inst-overview` (CORRECT), `les-inst-desi-drums` (CORRECT), `les-folk-work` (KEEP), `les-theatre-nadagam` (KEEP), `les-theatre-nurthi` (KEEP), `les-apprec-elements` (KEEP), `les-creative-rhythm` (KEEP), `les-exam-skills` (REWRITE).

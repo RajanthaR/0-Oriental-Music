@@ -16,7 +16,7 @@ export const Footer: React.FC = () => {
               <span className="text-lg font-bold text-white">ස්වර මඟ</span>
             </div>
             <p className="text-xs text-[#B8AEA3] leading-relaxed mb-4">
-              ශ්‍රී ලංකා පාසල් පෙරදිග සංගීතය (6–13 ශ්‍රේණි) විෂය නිර්දේශ නිපුණතා පදනම් කරගත් නොමිලේ විවෘත අධ්‍යාපනික ඉගෙනුම් වේදිකාව.
+              ශ්‍රී ලංකා පාසල් පෙරදිග සංගීතය (6–11 ශ්‍රේණි) සඳහා මූලාශ්‍ර සමාලෝචනයට යටත් නොමිලේ විවෘත අධ්‍යාපනික ඉගෙනුම් වේදිකාව.
             </p>
             <div className="flex items-center gap-1.5 text-xs text-amber-400 font-medium">
               <ShieldCheck className="w-4 h-4" />
@@ -86,7 +86,7 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <Link href="/exams" className="hover:text-amber-400 transition-colors">
-                  සා.පෙළ හා උ.පෙළ මාදිලි ප්‍රශ්න
+                  සා.පෙළ මාදිලි ප්‍රශ්න (සමාලෝචනයට යටත්)
                 </Link>
               </li>
               <li>

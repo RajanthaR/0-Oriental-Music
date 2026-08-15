@@ -2,9 +2,13 @@ import React from "react";
 import Link from "next/link";
 import { FileText, ShieldCheck, ExternalLink } from "lucide-react";
 import { repository } from "@/lib/data/repository";
+import { getSourceCorpusInventory } from "@/lib/data/publication-policy";
 
 export default function SourcesCatalogPage() {
   const sources = repository.getSources();
+  const inventory = getSourceCorpusInventory();
+  const publication = repository.getPublicationSummary();
+  const publicRecords = Object.values(publication).reduce((sum, item) => sum + item.public, 0);
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-8">
@@ -18,8 +22,14 @@ export default function SourcesCatalogPage() {
           විෂය නිර්දේශ මූලාශ්‍ර නාමාවලිය
         </h1>
         <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-          “ස්වර මඟ” වේදිකාවේ සෑම පාඩමක්, රාගයක් සහ තාලයක්ම සත්‍යාපනය කර ඇත්තේ ජාතික අධ්‍යාපන ආයතනය (NIE), අධ්‍යාපන ප්‍රකාශන දෙපාර්තමේන්තුව සහ ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තුවේ නිල ප්‍රකාශන මඟිනි.
+          මෙය මූලාශ්‍ර නාමාවලියක් පමණි. ප්‍රකාශන හිමිකම්, ප්‍රකාශක, වර්ෂය, ස්ථානය සහ සමාලෝචන තොරතුරු සනාථ වී නොමැති අගයන් ලෙස පෙන්වනු ලැබේ. පොදු අන්තර්ගතය සඳහා මූලාශ්‍ර ලේඛනය, නිශ්චිත පිටුව සහ පිටු-ගුණාත්මකභාවය එකට පරීක්ෂා කළ යුතුය.
         </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-text-secondary">
+          <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">මූලාශ්‍ර වාර්තා</span>{inventory.sourceRecords}</div>
+          <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">උපුටාගත් ලේඛන</span>{inventory.sourceDocuments}</div>
+          <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">පිටු</span>{inventory.sourcePages}</div>
+          <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">පොදු වාර්තා</span>{publicRecords}</div>
+        </div>
       </div>
 
       {/* Sources List */}
@@ -34,6 +44,10 @@ export default function SourcesCatalogPage() {
                 {src.id}
               </span>
               <span className="text-xs text-text-muted">{src.tier}</span>
+            </div>
+
+            <div className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+              සාක්ෂි තත්ත්වය: {src.evidenceState} / {src.evidenceQuality} · {src.status}
             </div>
 
             <h2 className="text-base sm:text-lg font-bold text-text">

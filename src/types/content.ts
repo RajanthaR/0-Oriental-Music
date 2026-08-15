@@ -27,7 +27,12 @@ export interface ReviewMetadata {
   lastVerifiedDate: string;
   changeNotes: string;
   license: string;
-  reuseStatus: "Verified Original" | "Curriculum Canonical" | "Public Domain" | "Synthetic Web Audio";
+  reuseStatus:
+    | "Verified Original"
+    | "Curriculum Canonical"
+    | "Public Domain"
+    | "Synthetic Web Audio"
+    | "Unknown / Unverified";
 }
 
 export interface KeyTerm {

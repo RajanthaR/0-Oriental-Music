@@ -36,13 +36,14 @@ export default function HomePage() {
     setStudentProgress({
       completedCount: p.completedLessonIds.length,
       streak: p.streakDays || 1,
-      lastLessonId: p.completedLessonIds[p.completedLessonIds.length - 1] || "les-intro-01",
+      lastLessonId: p.completedLessonIds[p.completedLessonIds.length - 1] || "les-swara-01",
     });
   }, []);
 
   const strands = repository.getStrands();
   const learningPaths = repository.getLearningPaths(selectedGrade);
   const featuredLessons = repository.getLessons({ gradeBand: selectedGrade }).slice(0, 4);
+  const continueLesson = repository.getLessonById(studentProgress.lastLessonId);
 
   return (
     <div className="w-full">
@@ -106,7 +107,6 @@ export default function HomePage() {
                 { id: "6-7" as GradeBandType, label: "6–7", desc: "ආරම්භක" },
                 { id: "8-9" as GradeBandType, label: "8–9", desc: "මධ්‍යම" },
                 { id: "10-11" as GradeBandType, label: "10–11", desc: "සා.පෙළ" },
-                { id: "12-13" as GradeBandType, label: "12–13", desc: "උ.පෙළ" },
               ].map((g) => (
                 <button
                   key={g.id}
@@ -143,13 +143,19 @@ export default function HomePage() {
               </div>
             </div>
 
-            <Link
-              href={`/lessons/${studentProgress.lastLessonId}`}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-accent hover:bg-accent-dark text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-sm transition-all"
-            >
-              <span>ඉගෙනීම ඉදිරියට ගෙන යන්න</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+            {continueLesson ? (
+              <Link
+                href={`/lessons/${continueLesson.id}`}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-accent hover:bg-accent-dark text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-sm transition-all"
+              >
+                <span>ඉගෙනීම ඉදිරියට ගෙන යන්න</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            ) : (
+              <span className="w-full sm:w-auto text-center text-xs font-bold text-amber-900 bg-amber-100 border border-amber-200 px-5 py-2.5 rounded-xl">
+                මූලාශ්‍ර සමාලෝචනය අවසන් වූ පසු පාඩම් ලබාගත හැක
+              </span>
+            )}
           </div>
         </div>
       </section>
@@ -218,6 +224,11 @@ export default function HomePage() {
               </div>
             </div>
           ))}
+          {learningPaths.length === 0 && (
+            <div className="md:col-span-3 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950">
+              මෙම ශ්‍රේණි කාණ්ඩයට අදාළ ඉගෙනුම් මාර්ග මූලාශ්‍ර සමාලෝචනය අවසන් වන තෙක් පොදු ප්‍රවේශයට ලබා නොදේ.
+            </div>
+          )}
         </div>
       </section>
 
@@ -276,6 +287,11 @@ export default function HomePage() {
               </div>
             </Link>
           ))}
+          {strands.length === 0 && (
+            <div className="sm:col-span-2 lg:col-span-3 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950">
+              මූලාශ්‍ර සාක්ෂි සහ ප්‍රකාශන සමාලෝචනය අවසන් වූ පසු විෂය ධාරා සිතියම මෙහි පෙන්වනු ලැබේ.
+            </div>
+          )}
         </div>
       </section>
 
@@ -290,7 +306,7 @@ export default function HomePage() {
                 <span>විභාග පෙරහුරු මධ්‍යස්ථානය</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-black mb-2">
-                සාමාන්‍ය පෙළ හා උසස් පෙළ ආදර්ශ ප්‍රශ්න පත්‍ර
+                සාමාන්‍ය පෙළ (10–11) විභාග අභ්‍යාසය
               </h3>
               <p className="text-xs sm:text-sm text-[#F7E6E8] leading-relaxed mb-6">
                 විභාග දෙපාර්තමේන්තු ඇගයීම් වාර්තා පදනම් කරගත් බහුවරණ, ව්‍යුහගත සහ ප්‍රස්තාර ප්‍රශ්න රටා සඳහා ලකුණු දීමේ මාර්ගෝපදේශ සහිතව පුහුණු වන්න.

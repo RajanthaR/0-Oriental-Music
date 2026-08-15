@@ -32,7 +32,7 @@ export default function LearningPathsPage() {
       {/* Grade Filters */}
       <div className="flex flex-wrap items-center gap-2 mb-8 border-b border-border-light pb-4">
         <span className="text-xs font-bold text-text-secondary mr-2">ශ්‍රේණි පෙරහන:</span>
-        {(["all", "6-7", "8-9", "10-11", "12-13"] as const).map((grade) => (
+        {(["all", "6-7", "8-9", "10-11"] as const).map((grade) => (
           <button
             key={grade}
             type="button"

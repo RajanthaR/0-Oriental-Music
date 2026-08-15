@@ -1,0 +1,575 @@
+{
+  "schemaVersion": "p01.1",
+  "generatedDate": "2026-08-15",
+  "phase": "Prompt 1 / publication containment and source baseline",
+  "authority": "Current checkout at base 6e62a3ad2d9621b8790d35af3358b08fafceaa57",
+  "evidencePolicy": {
+    "publicGradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "publicEligibility": "A claim is discoverable only when its grade scope is within 6-11, its source ID maps to exactly one supplied extracted document, its exact page evidence is in range, and at least one cited page is an A/B readable Sinhala page.",
+    "reviewBoundary": "Markdown extraction is evidence with limits. C/D, image-only, corrupt-font, visual, ambiguous, and missing-PDF cases remain needs-review until original-PDF/manual review.",
+    "metadataBoundary": "Publisher, year, place, licence, reviewer, review date, and Published state are not accepted as evidence unless a real source or review event establishes them."
+  },
+  "issueSchema": {
+    "entityOrPath": "Required human-readable display locator; machine navigation uses evidence[].path and evidence[].locator.",
+    "requiredIssueFields": [
+      "id",
+      "severity",
+      "entityOrPath",
+      "currentClaim",
+      "evidence",
+      "disposition",
+      "publicVisibility",
+      "confidence",
+      "evidenceBasis",
+      "status"
+    ],
+    "optionalIssueFields": [
+      "confidenceScope"
+    ],
+    "requiredEvidenceFields": [
+      "path",
+      "locator"
+    ],
+    "optionalEvidenceFields": [
+      "exactSection",
+      "exactPageOrSection"
+    ],
+    "severityValues": [
+      "P0",
+      "P1",
+      "P2"
+    ],
+    "publicVisibilityValues": [
+      "contained",
+      "quarantined",
+      "not-public"
+    ],
+    "confidenceValues": [
+      "confirmed",
+      "needs-review"
+    ],
+    "evidenceBasisValues": [
+      "metadata-inventory",
+      "review-required",
+      "claim-comparison-missing",
+      "citation-contradiction",
+      "metadata-comparison",
+      "canonical-inventory",
+      "cross-artifact",
+      "cross-entity",
+      "canonical-inspection",
+      "image-only",
+      "corrupt-font",
+      "cross-file",
+      "runtime-inspection"
+    ],
+    "statusValues": [
+      "contained",
+      "needs-review"
+    ]
+  },
+  "inventory": {
+    "sourceMarkdownFilesInBySource": 30,
+    "sourceMarkdownFilesAllArtifacts": 66,
+    "originalPdfFilesInCheckout": 0,
+    "sourceDocuments": 30,
+    "sourcePages": 1023,
+    "sourceDocumentReviewStatus": {
+      "Source Triaged": 16,
+      "Review Required": 12,
+      "Image Only / Gaps": 2
+    },
+    "sourcePageQuality": {
+      "A": 397,
+      "B": 190,
+      "C": 33,
+      "D": 403,
+      "pagesContainingSinhalaText": 895,
+      "pagesWithoutSinhalaText": 128
+    },
+    "rawContentCounts": {
+      "lessons": 21,
+      "ragas": 8,
+      "talas": 8,
+      "instruments": 10,
+      "culturalTraditions": 7,
+      "theatreTraditions": 4,
+      "glossary": 43,
+      "learningPaths": 9,
+      "quizzes": 7,
+      "exams": 2
+    },
+    "rawCompletedReviewMetadata": {
+      "recordsClaimingPublished": 69,
+      "recordsUsingSwaraMagaReviewer": 69,
+      "recordsWith2026ReviewDates": 69
+    },
+    "rawGradeScope": {
+      "recordsContainingGrades12To13Claims": 34,
+      "legacyReconciliationRecords": 101,
+      "legacyReconciliationActions": {
+        "KEEP": 22,
+        "REMAP_GRADE": 35,
+        "CORRECT": 43,
+        "REWRITE": 1
+      },
+      "legacyReconciliationPublishedRecords": 101
+    },
+    "legacyCoverageSnapshot": {
+      "canonicalSourcesClaimed": 21,
+      "structuredLessonsClaimed": 21,
+      "canonicalRagasClaimed": 8,
+      "canonicalTalasClaimed": 8,
+      "sourceQualityAClaimed": 0,
+      "sourceQualityBClaimed": 0,
+      "sourceQualityCClaimed": 0,
+      "sourceQualityDClaimed": 0
+    }
+  },
+  "issues": [
+    {
+      "id": "P01-GRADE-SCOPE-001",
+      "severity": "P0",
+      "entityOrPath": "public routes, selectors, metadata, data/curriculum-map.json, src/data/exam-papers.json",
+      "currentClaim": "The application presents Grades 12-13 and A/L content even though the supplied source corpus is scoped to Grades 6-11.",
+      "evidence": [
+        {
+          "path": "README.md",
+          "locator": "line 2 and line 4",
+          "exactSection": "Grades 6-13 / 13 ශ්‍රේණිය (උසස් පෙළ)"
+        },
+        {
+          "path": "src/app/page.tsx",
+          "locator": "grade selector",
+          "exactSection": "12-13 / උ.පෙළ"
+        },
+        {
+          "path": "src/data/exam-papers.json",
+          "locator": "exam-al-model-01.partA_MCQ and partB_Structured",
+          "exactSection": "question gradeBands 12-13"
+        },
+        {
+          "path": "data/source-documents.json",
+          "locator": "all 30 extracted documents",
+          "exactSection": "no supplied Grade 12-13 source document"
+        }
+      ],
+      "disposition": "central publication policy and public-surface containment",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "status": "contained",
+      "evidenceBasis": "metadata-inventory"
+    },
+    {
+      "id": "P01-RAGA-BHAIRAV-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/ragas.json:raga-bhairav and src/data/lessons.json:les-raga-bhairav",
+      "currentClaim": "Bhairav is presented as a published Grade 10-11 raga with a page 56 citation.",
+      "evidence": [
+        {
+          "path": "src/data/ragas.json",
+          "locator": "raga-bhairav.sourceReference",
+          "exactPageOrSection": "පිටුව 56; sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
+        },
+        {
+          "path": "src/data/lessons.json",
+          "locator": "les-raga-bhairav.sourceReference",
+          "exactPageOrSection": "පිටුව 56 (භෛරව් රාග ඒකකය)"
+        },
+        {
+          "path": "data/source-documents.json",
+          "locator": "Music sd.pdf document",
+          "exactSection": "Review Required; cross-grade mapping is not verified"
+        }
+      ],
+      "disposition": "quarantine until raga facts and source mapping are corrected against the original PDF",
+      "publicVisibility": "quarantined",
+      "confidence": "confirmed",
+      "confidenceScope": "current claim only; musical correction needs SME review",
+      "status": "contained",
+      "evidenceBasis": "review-required"
+    },
+    {
+      "id": "P01-TALA-ROOPAK-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/talas.json:tala-roopak",
+      "currentClaim": "Roopak is presented as a published Grade 10-11 seven-matra tala with a page 65 citation.",
+      "evidence": [
+        {
+          "path": "src/data/talas.json",
+          "locator": "tala-roopak.sourceReference",
+          "exactPageOrSection": "පිටුව 65 (රූපක් තාලය)"
+        },
+        {
+          "path": "data/source-documents.json",
+          "locator": "SRC-NIE-G1011-TG filename mapping",
+          "exactSection": "Music sd.pdf, Review Required, 15 pages"
+        }
+      ],
+      "disposition": "quarantine until the tala structure and source page are verified",
+      "publicVisibility": "quarantined",
+      "confidence": "confirmed",
+      "confidenceScope": "current claim only; tala correction needs SME review",
+      "status": "contained",
+      "evidenceBasis": "review-required"
+    },
+    {
+      "id": "P01-RAGA-BILAWAL-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/ragas.json:raga-bilawal",
+      "currentClaim": "Bilawal is presented as a published Grade 6-11 raga, including an Alhaiya Bilawal label and an incomplete arohana.",
+      "evidence": [
+        {
+          "path": "src/data/ragas.json",
+          "locator": "raga-bilawal fields",
+          "exactPageOrSection": "පිටුව 38; sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
+        },
+        {
+          "path": "data/source-page-quality.json",
+          "locator": "grade_11_raga_identification pages 1-2",
+          "exactSection": "A-quality extracted pages still require claim-level comparison"
+        }
+      ],
+      "disposition": "quarantine until the name, swara sequence, and page evidence are manually reconciled",
+      "publicVisibility": "quarantined",
+      "confidence": "confirmed",
+      "confidenceScope": "current claim only; correction not independently verified",
+      "status": "contained",
+      "evidenceBasis": "claim-comparison-missing"
+    },
+    {
+      "id": "P01-TALA-LAWANI-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/talas.json:tala-lawani",
+      "currentClaim": "Lawani is presented as a published Grade 10-11 eight-matra tala using a mixed Grade 10 and Grade 11 citation.",
+      "evidence": [
+        {
+          "path": "src/data/talas.json",
+          "locator": "tala-lawani.sourceReference",
+          "exactPageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 3; grade_11_music_textbook.md පිටුව 47"
+        },
+        {
+          "path": "data/source-documents.json",
+          "locator": "SRC-EPD-TB-G11",
+          "exactSection": "source filename maps to s11tim173.pdf; cited Grade 10 page is a different document"
+        }
+      ],
+      "disposition": "quarantine until the framing and cross-document citation are verified",
+      "publicVisibility": "quarantined",
+      "confidence": "confirmed",
+      "confidenceScope": "citation contradiction",
+      "status": "contained",
+      "evidenceBasis": "citation-contradiction"
+    },
+    {
+      "id": "P01-SOUND-TERMINOLOGY-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/lessons.json:les-intro-01 and src/data/glossary.json:term-nada, term-sound, term-ahata-nada, term-anahata-nada",
+      "currentClaim": "Sound, nada, ahata-nada, and anahata-nada claims are published with Grade 6 or cross-grade citations.",
+      "evidence": [
+        {
+          "path": "src/data/lessons.json",
+          "locator": "les-intro-01.sourceReference",
+          "exactPageOrSection": "1 වන ඒකකය: නාදය හා සංගීතය (පිටු 10-15)"
+        },
+        {
+          "path": "src/data/glossary.json",
+          "locator": "term-nada through term-anahata-nada",
+          "exactSection": "pages 10-14 and 12"
+        },
+        {
+          "path": "data/source-documents.json",
+          "locator": "SG06_emus_tim.pdf and Music sd.pdf",
+          "exactSection": "Review Required"
+        }
+      ],
+      "disposition": "quarantine until terminology and exact page evidence pass language and SME review",
+      "publicVisibility": "quarantined",
+      "confidence": "confirmed",
+      "confidenceScope": "current claim only; semantic correction needs review",
+      "status": "contained",
+      "evidenceBasis": "review-required"
+    },
+    {
+      "id": "P01-TALA-DADRA-CITE-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/talas.json:tala-dadra and src/data/lessons.json:les-tala-dadra",
+      "currentClaim": "Dadra is presented as published with a Grade 7 page 34 citation and a second unrelated filename/page.",
+      "evidence": [
+        {
+          "path": "src/data/talas.json",
+          "locator": "tala-dadra.sourceReference",
+          "exactPageOrSection": "පිටුව 34; sg10_emus_chap1_mulikanga.pdf පිටුව 6"
+        },
+        {
+          "path": "data/source-documents.json",
+          "locator": "SRC-NIE-G07-TG",
+          "exactSection": "Music sd.pdf is Review Required and does not establish the second filename"
+        }
+      ],
+      "disposition": "quarantine until source-document and page-level citation are reconciled",
+      "publicVisibility": "quarantined",
+      "confidence": "confirmed",
+      "confidenceScope": "citation contradiction",
+      "status": "contained",
+      "evidenceBasis": "citation-contradiction"
+    },
+    {
+      "id": "P01-SOURCE-METADATA-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/sources.json and data/source-manifest.json",
+      "currentClaim": "Source records display verified publishers, years, locations, licences, tiers, and statuses.",
+      "evidence": [
+        {
+          "path": "src/data/sources.json",
+          "locator": "all 21 source records",
+          "exactSection": "status Verified and populated publisher/year/location/license fields"
+        },
+        {
+          "path": "data/source-documents.json",
+          "locator": "30 extracted documents",
+          "exactSection": "reviewStatus is Source Triaged, Review Required, or Image Only / Gaps; it does not establish all metadata"
+        }
+      ],
+      "disposition": "sanitize public source views and retain raw metadata only as untrusted audit input",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "status": "contained",
+      "evidenceBasis": "metadata-comparison"
+    },
+    {
+      "id": "P01-REVIEW-METADATA-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/lessons.json, ragas.json, talas.json, instruments.json, cultural-traditions.json, theatre-traditions.json, learning-paths.json, exam-papers.json",
+      "currentClaim": "69 records are marked Published with the same Swara Maga reviewer and August 2026 review dates.",
+      "evidence": [
+        {
+          "path": "src/data",
+          "locator": "all reviewMetadata-bearing canonical arrays",
+          "exactSection": "69 records use the same reviewer string and Published status"
+        },
+        {
+          "path": "data/forensic-ledger.json",
+          "locator": "inventory.rawCompletedReviewMetadata",
+          "exactSection": "69 records"
+        }
+      ],
+      "disposition": "replace public review metadata with explicit unknown/unverified state; do not treat raw values as a review event",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "status": "contained",
+      "evidenceBasis": "canonical-inventory"
+    },
+    {
+      "id": "P01-ADMIN-COUNTS-001",
+      "severity": "P1",
+      "entityOrPath": "src/app/admin/page.tsx and data/content-coverage.json",
+      "currentClaim": "The admin dashboard can report that all content is 100% correct, while coverage data reports zero quality pages and the old reconciliation report reports 101 published entities.",
+      "evidence": [
+        {
+          "path": "src/app/admin/page.tsx",
+          "locator": "validation summary",
+          "exactSection": "100% ක් නිවැරදිව පරීක්ෂාව සමත් වී ඇත"
+        },
+        {
+          "path": "data/content-coverage.json",
+          "locator": "sourceQualityMetrics",
+          "exactSection": "all A/B/C/D counts are 0"
+        },
+        {
+          "path": "data/content-reconciliation.json",
+          "locator": "array length and publicationStatus",
+          "exactSection": "101 records, all Published"
+        }
+      ],
+      "disposition": "derive counters from the forensic baseline and state that source/content review remains open",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "status": "contained",
+      "evidenceBasis": "cross-artifact"
+    },
+    {
+      "id": "P01-LEARNING-PATH-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/learning-paths.json and src/app/learning-paths",
+      "currentClaim": "Nine completed/published paths are discoverable, including paths whose steps point to unsupported or quarantined lessons.",
+      "evidence": [
+        {
+          "path": "src/data/learning-paths.json",
+          "locator": "all 9 path records",
+          "exactSection": "Published reviewMetadata and lesson step references"
+        },
+        {
+          "path": "src/data/lessons.json",
+          "locator": "les-intro-01, les-tala-dadra, les-raga-bhairav, les-exam-skills",
+          "exactSection": "known quarantined step targets"
+        }
+      ],
+      "disposition": "publish a path only when every step is public and source-backed; retain incomplete paths for later remediation",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "status": "contained",
+      "evidenceBasis": "cross-entity"
+    },
+    {
+      "id": "P01-CURRICULUM-COVERAGE-001",
+      "severity": "P1",
+      "entityOrPath": "data/content-coverage.json, data/curriculum-map.json, src/app/curriculum-map",
+      "currentClaim": "Twenty competencies and grade-level lesson counts are covered and published, while page-quality metrics are all zero.",
+      "evidence": [
+        {
+          "path": "data/content-coverage.json",
+          "locator": "overview, coverageByGrade, sourceQualityMetrics",
+          "exactSection": "20 competencies, grade lesson counts, and zero A/B/C/D pages"
+        },
+        {
+          "path": "data/curriculum-map.json",
+          "locator": "20 competency records",
+          "exactSection": "coverageStatus Covered and editorialStatus Published"
+        }
+      ],
+      "disposition": "make the public map derive from the contained repository and label the raw map as unverified evidence",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "cross-artifact contradiction",
+      "status": "contained",
+      "evidenceBasis": "cross-artifact"
+    },
+    {
+      "id": "P01-EXAM-LABEL-001",
+      "severity": "P0",
+      "entityOrPath": "src/data/exam-papers.json and src/app/exams",
+      "currentClaim": "An A/L paper is labelled with top-level gradeBand 10-11 but contains 12-13 questions and is discoverable through an A/L filter.",
+      "evidence": [
+        {
+          "path": "src/data/exam-papers.json",
+          "locator": "exam-al-model-01",
+          "exactSection": "title A/L; gradeBand 10-11; questions 12-13"
+        },
+        {
+          "path": "src/app/exams/page.tsx",
+          "locator": "grade filters and card label",
+          "exactSection": "12-13 and A/L branches"
+        }
+      ],
+      "disposition": "quarantine the paper and remove the A/L selector, label, metadata, and homepage copy",
+      "publicVisibility": "quarantined",
+      "confidence": "confirmed",
+      "status": "contained",
+      "evidenceBasis": "canonical-inspection"
+    },
+    {
+      "id": "P01-IMAGE-ONLY-001",
+      "severity": "P2",
+      "entityOrPath": "oriental_music_markdown/by-source/children_songs.md and grade_7_music.md",
+      "currentClaim": "Image-only textbook pages can be treated as ordinary extracted source text.",
+      "evidence": [
+        {
+          "path": "data/source-documents.json",
+          "locator": "DOC-CHILDREN_SONGS and DOC-GRADE_7_MUSIC",
+          "exactSection": "Image Only / Gaps; zero Sinhala characters"
+        },
+        {
+          "path": "data/source-page-quality.json",
+          "locator": "children_songs and grade_7_music pages",
+          "exactSection": "confidence D"
+        }
+      ],
+      "disposition": "retain as explicit needs-review placeholders; require original PDF visual/manual review",
+      "publicVisibility": "not-public",
+      "confidence": "confirmed",
+      "status": "needs-review",
+      "evidenceBasis": "image-only"
+    },
+    {
+      "id": "P01-OCR-CORRUPTION-001",
+      "severity": "P2",
+      "entityOrPath": "oriental_music_markdown/by-source/oriental_music_2018.md and source-page-quality.json",
+      "currentClaim": "Corrupt or legacy-font extracted text can support factual claims without manual comparison.",
+      "evidence": [
+        {
+          "path": "data/source-documents.json",
+          "locator": "DOC-ORIENTAL_MUSIC_2018",
+          "exactSection": "legacy font mapping / Review Required"
+        },
+        {
+          "path": "data/source-page-quality.json",
+          "locator": "oriental_music_2018 pages",
+          "exactSection": "confidence D"
+        }
+      ],
+      "disposition": "keep facts as needs-review unless independently supported by readable pages and record the alternate evidence",
+      "publicVisibility": "not-public",
+      "confidence": "confirmed",
+      "status": "needs-review",
+      "evidenceBasis": "corrupt-font"
+    },
+    {
+      "id": "P01-SOURCE-MAPPING-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/sources.json, data/source-documents.json, and SourceReference.pageOrSection values",
+      "currentClaim": "Every source ID and page string identifies the document and page used by the claim.",
+      "evidence": [
+        {
+          "path": "src/data/sources.json",
+          "locator": "SRC-NIE-G07-TG, SRC-NIE-G1011-TG, SRC-DOE-TB records",
+          "exactSection": "filename reuse and cross-grade mappings"
+        },
+        {
+          "path": "src/data/talas.json",
+          "locator": "tala-dadra and tala-lawani",
+          "exactSection": "mixed filename/page citations"
+        }
+      ],
+      "disposition": "require exact filename mapping, page range, and readable-page quality before public eligibility",
+      "publicVisibility": "quarantined",
+      "confidence": "confirmed",
+      "status": "contained",
+      "evidenceBasis": "cross-file"
+    },
+    {
+      "id": "P01-DIRECT-ROUTE-001",
+      "severity": "P0",
+      "entityOrPath": "src/lib/data/repository.ts and dynamic public routes",
+      "currentClaim": "A direct ID route can load a raw record even when list/discovery filtering would omit it.",
+      "evidence": [
+        {
+          "path": "src/lib/data/repository.ts",
+          "locator": "getLessonById/getRagaById/getTalaById/getExamPaperById",
+          "exactSection": "raw find() calls before containment"
+        },
+        {
+          "path": "src/app/lessons/[id]/page.tsx",
+          "locator": "repository.getLessonById",
+          "exactSection": "dynamic route loads by ID"
+        }
+      ],
+      "disposition": "make all public-by-default ID lookups pass through the same typed publication policy",
+      "publicVisibility": "quarantined",
+      "confidence": "confirmed",
+      "confidenceScope": "implementation defect",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    }
+  ],
+  "publicBaseline": {
+    "state": "source-backed but not fully reviewed",
+    "publicGradeBands": [
+      "6-7",
+      "8-9",
+      "10-11"
+    ],
+    "quarantinePreservesRawIdentifiers": true,
+    "promotionRequires": [
+      "original PDF or an accepted source-quality exception",
+      "claim-level before/after correction entry",
+      "exact page or bounded section evidence",
+      "SME and Sinhala review records",
+      "regression tests and final publication decision"
+    ]
+  }
+}

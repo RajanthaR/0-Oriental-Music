@@ -24,14 +24,14 @@ export default function ExamPracticeCenterPage() {
           විභාග අභ්‍යාස සහ මාදිලි ප්‍රශ්න පත්‍ර
         </h1>
         <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-          ශ්‍රී ලංකා විභාග දෙපාර්තමේන්තුවේ ඇගයීම් වාර්තා සහ ලකුණු දීමේ පටිපාටි පදනම් කරගත්, සාමාන්‍ය පෙළ හා උසස් පෙළ ආදර්ශ ප්‍රශ්න පත්‍ර.
+          මූලාශ්‍ර සමාලෝචනය අවසන් වූ 10–11 ශ්‍රේණි අභ්‍යාස පමණක් මෙහි පෙන්වනු ලැබේ. දැනට පවතින ප්‍රශ්න පත්‍ර සත්‍යාපනය අවසන් වන තෙක් ප්‍රකාශයට පත් නොකෙරේ.
         </p>
       </div>
 
       {/* Grade Filters */}
       <div className="flex flex-wrap items-center gap-2 border-b border-border-light pb-4">
         <span className="text-xs font-bold text-text-secondary mr-2">විභාග මට්ටම:</span>
-        {(["all", "10-11", "12-13"] as const).map((grade) => (
+        {(["all", "10-11"] as const).map((grade) => (
           <button
             key={grade}
             type="button"
@@ -46,13 +46,18 @@ export default function ExamPracticeCenterPage() {
               ? "සියලු විභාග"
               : grade === "10-11"
               ? "අ.පො.ස. (සා.පෙළ) - 10-11 ශ්‍රේණි"
-              : "අ.පො.ස. (උ.පෙළ) - 12-13 ශ්‍රේණි"}
+              : "10–11 ශ්‍රේණි"}
           </button>
         ))}
       </div>
 
       {/* Exam Papers Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {examPapers.length === 0 && (
+          <div className="md:col-span-2 bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl p-6 text-center text-sm font-bold">
+            මෙම මට්ටම සඳහා දැනට විභාග අභ්‍යාස අඩංගු නොවේ.
+          </div>
+        )}
         {examPapers.map((paper) => (
           <div
             key={paper.id}
@@ -61,7 +66,7 @@ export default function ExamPracticeCenterPage() {
             <div>
               <div className="flex items-center justify-between gap-2 mb-3">
                 <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200">
-                  {paper.gradeBand === "10-11" ? "සාමාන්‍ය පෙළ (O/L)" : "උසස් පෙළ (A/L)"}
+                  සාමාන්‍ය පෙළ (O/L)
                 </span>
                 <span className="text-xs text-text-muted font-medium flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" /> මිනිත්තු {paper.timeLimitMinutes}

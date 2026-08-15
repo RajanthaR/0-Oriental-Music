@@ -1,7 +1,7 @@
 {
   "name": "swara-maga-oriental-music",
   "version": "1.0.0",
-  "description": "ස්වර මඟ - Sri Lankan School Oriental Music Learning Platform (Grades 6-13)",
+  "description": "ස්වර මඟ - Sri Lankan School Oriental Music Learning Platform (public scope: Grades 6-11)",
   "private": true,
   "scripts": {
     "dev": "next dev",

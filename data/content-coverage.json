@@ -1,68 +1,94 @@
 {
   "metadata": {
     "generatedDate": "2026-08-15",
-    "version": "2.0.0-canonical",
-    "targetCurriculum": "Sri Lankan School Oriental Music (Grades 6–11)",
-    "authoritativePublisher": "National Institute of Education (NIE) / Department of Educational Publications / Department of Examinations"
+    "version": "p01.1-forensic-baseline",
+    "canonicalArtifact": "data/forensic-ledger.json",
+    "targetCurriculum": "Sri Lankan School Oriental Music (public scope: Grades 6-11 only)",
+    "authoritativePublisher": "නොදනී / සනාථ වී නැත",
+    "publicationState": "source-backed baseline; not fully reviewed"
   },
   "overview": {
-    "totalCanonicalSources": 21,
-    "totalIndexedSourcePages": 1023,
-    "totalCurriculumCompetencies": 20,
-    "totalStructuredLessons": 21,
-    "totalCanonicalRagas": 8,
-    "totalCanonicalTalas": 8,
-    "totalInstruments": 10,
-    "totalCulturalTraditions": 7,
-    "totalTheatreTraditions": 4,
-    "totalGlossaryTerms": 43,
-    "totalConceptSpinePaths": 9
+    "totalIndexedSourcePages": 1023
   },
-  "coverageByGrade": {
-    "grade6": {
-      "competenciesCovered": 4,
-      "lessons": 9,
-      "primaryFocus": "නාදය, සප්ත ස්වර (ස රි ග ම ප ධ නි), සරල අලංකාර 7, කහර්වා/දාදරා මූලික අත්පුඩි, ජන ක්‍රීඩා ගී"
-    },
-    "grade7": {
-      "competenciesCovered": 3,
-      "lessons": 9,
-      "primaryFocus": "කෝමල ස්වර 4, තීව්‍ර මධ්‍යම, සප්තක 3 ස්වර 12, දාද්‍රා/කෙහර්වා ඨේකා, වයලීන වාදනය හා සුසර ක්‍රම"
-    },
-    "grade8": {
-      "competenciesCovered": 3,
-      "lessons": 16,
-      "primaryFocus": "බිලාවල් හා භූපාලි රාග, ත්‍රීතාල් (මාත්‍රා 16), නාඩගම් හා නූර්ති ඉතිහාසය, කෙත හා බැඳි ගැමි ගී"
-    },
-    "grade9": {
-      "competenciesCovered": 3,
-      "lessons": 16,
-      "primaryFocus": "ඛමාජ්, කාෆි, භිම්පලාසි රාග, පංචතූර්ය භාණ්ඩ 14 වර්ගීකරණය, කෝලම් රංග සම්ප්‍රදාය"
-    },
-    "grade10": {
-      "competenciesCovered": 4,
-      "lessons": 19,
-      "primaryFocus": "භෛරව් හා යමන් රාග, ජප්තාලය, දීප්චන්දි, රූපක්, ලාවනී, ඛෙම්ටා, ජන ගී වර්ගීකරණය, ධ්වනි විද්‍යාව"
-    },
-    "grade11": {
-      "competenciesCovered": 3,
-      "lessons": 19,
-      "primaryFocus": "රාග 7 පූර්ණ සමාලෝචනය, තානාලංකාර, සියලු තාල ප්‍රස්තාරගත කිරීම, පරිගණක සංගීතය සහ MIDI, O/L විභාග පුහුණුව"
+  "publicScope": {
+    "gradeBands": ["6-7", "8-9", "10-11"],
+    "unsupportedGradeBands": ["12-13"],
+    "publicCountsAreComputedBy": "src/lib/data/repository.ts#getPublicationSummary (applying src/lib/data/publication-policy.ts)",
+    "publicCounts": {
+      "lessons": 0,
+      "ragas": 1,
+      "talas": 0,
+      "instruments": 2,
+      "culturalTraditions": 0,
+      "theatreTraditions": 0,
+      "glossary": 0,
+      "learningPaths": 0,
+      "exams": 0
     }
   },
-  "sourceQualityMetrics": {
-    "gradeAPagesCount": 0,
-    "gradeBPagesCount": 0,
-    "gradeCPagesCount": 0,
-    "gradeDPagesCount": 0,
-    "verifiedUsablePagePercent": "0.0%"
+  "rawContentCounts": {
+    "lessons": 21,
+    "ragas": 8,
+    "talas": 8,
+    "instruments": 10,
+    "culturalTraditions": 7,
+    "theatreTraditions": 4,
+    "glossary": 43,
+    "learningPaths": 9,
+    "exams": 2,
+    "quizzes": 7
+  },
+  "sourcePageQuality": {
+    "A": 397,
+    "B": 190,
+    "C": 33,
+    "D": 403,
+    "pagesContainingSinhalaText": 895,
+    "pagesWithoutSinhalaText": 128,
+    "abExtractionQualityPercent": 57.4,
+    "interpretation": "A/B counts describe extraction quality only; they do not prove a musical claim."
+  },
+  "sourceDocumentReviewStatus": {
+    "Source Triaged": 16,
+    "Review Required": 12,
+    "Image Only / Gaps": 2
+  },
+  "legacyReconciliationSnapshot": {
+    "recordCount": 101,
+    "actionCounts": {
+      "KEEP": 22,
+      "REMAP_GRADE": 35,
+      "CORRECT": 43,
+      "REWRITE": 1
+    },
+    "recordsClaimingPublished": 101,
+    "interpretation": "Retained as an untrusted historical reconciliation artifact; it is not a publication decision."
   },
   "pedagogicalValidation": {
-    "allLessonsMeet17PointSchema": true,
-    "allLessonsCiteCanonicalSources": true,
-    "allGoalsStartWithStandardPrefix": true,
-    "allFeedbackEncouragingAndNonPunitive": true,
-    "zeroStreamingOrRedistributedAudioFiles": true,
-    "localInBrowserWebAudioSynthesisOnly": true
+    "status": "not-assessed",
+    "lessonSchemaAssessment": {
+      "status": "not-assessed",
+      "note": "Not independently established in Prompt 1."
+    },
+    "lessonSourceEvidenceAssessment": {
+      "status": "not-assessed",
+      "note": "Claim-level page evidence is still being reviewed."
+    },
+    "lessonGoalPrefixAssessment": {
+      "status": "not-assessed",
+      "note": "Not a source-truth decision in this containment phase."
+    },
+    "lessonFeedbackAssessment": {
+      "status": "not-assessed",
+      "note": "Not assessed in this containment phase."
+    },
+    "audioDistributionPolicyAssessment": {
+      "status": "not-assessed",
+      "note": "The no-streaming and no-redistributed-recordings policy remains documented; release readiness is not claimed."
+    },
+    "clientSideWebAudioSynthesisAssessment": {
+      "status": "not-assessed",
+      "note": "The browser-only Web Audio synthesis policy remains documented; release readiness is not claimed."
+    }
   }
 }
