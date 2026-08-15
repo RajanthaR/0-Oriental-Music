@@ -138,7 +138,7 @@ export default function AdminReviewDashboardPage() {
                 ස්වයංක්‍රීය මූලාශ්‍ර හා පාරදත්ත සත්‍යාපන වාර්තාව
               </h2>
               <span className="text-xs text-text-muted">
-                {`ප්‍රකාශන සීමා වාර්තාව: ${repository.getPublicationSummary().lessons.public} පොදු පාඩම්, ${repository.getPublicationSummary().lessons.quarantined} quarantine, ${repository.getPublicationSummary().lessons.needsReview} needs-review. සම්පූර්ණ සත්‍යාපනය ප්‍රකාශ කර නැත.`}
+                {`ප්‍රකාශන සීමා වාර්තාව: ${repository.getPublicationSummary().lessons.public} පොදු පාඩම්, ${repository.getPublicationSummary().lessons.quarantined} ප්‍රකාශනයෙන් වෙන් කළ පාඩම්, ${repository.getPublicationSummary().lessons.needsReview} සමාලෝචනය අවශ්‍ය පාඩම්. සම්පූර්ණ සත්‍යාපනය ප්‍රකාශ කර නැත.`}
               </span>
             </div>
           </div>
