@@ -159,7 +159,7 @@ export interface Tala {
   id: string;
   name_si: string;
   name_en: string;
-  aliases_si?: string[];
+  aliases_si: string[];
   matras: number;
   vibhagCount: number;
   vibhagStructure: number[];
@@ -244,6 +244,7 @@ export interface GlossaryTerm {
   term_en: string;
   transliteration: string;
   category_si: "ස්වර හා ශ්‍රැති" | "ලය හා තාල" | "රාග ශාස්ත්‍රය" | "වාද්‍ය භාණ්ඩ" | "දේශීය සංගීතය" | "නාට්‍ය සංගීතය" | "ශබ්දය හා ධ්වනි විද්‍යාව" | "සාමාන්‍ය දැනුම";
+  gradeBands: GradeBandType[];
   definition_si: string;
   detailedNotes_si?: string;
   relatedTermIds?: string[];
@@ -318,7 +319,7 @@ export interface Question {
 export interface Quiz {
   id: string;
   title_si: string;
-  lessonId?: string;
+  lessonId: string;
   questions: Question[];
   passingScorePercent: number;
 }

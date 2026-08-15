@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "generatedDate": "2026-08-15",
-    "version": "p01.1-forensic-baseline",
+    "generatedDate": "2026-08-16",
+    "version": "p02.1-whole-entity-closeout",
     "canonicalArtifact": "data/forensic-ledger.json",
     "targetCurriculum": "Sri Lankan School Oriental Music (public scope: Grades 6-11 only)",
     "authoritativePublisher": "නොදනී / සනාථ වී නැත",
@@ -15,15 +15,15 @@
     "unsupportedGradeBands": ["12-13"],
     "publicCountsAreComputedBy": "src/lib/data/repository.ts#getPublicationSummary (applying src/lib/data/publication-policy.ts)",
     "publicCounts": {
-      "lessons": 2,
+      "lessons": 1,
       "ragas": 7,
-      "talas": 7,
+      "talas": 1,
       "instruments": 0,
       "culturalTraditions": 0,
       "theatreTraditions": 0,
       "glossary": 5,
       "learningPaths": 0,
-      "quizzes": 2,
+      "quizzes": 1,
       "exams": 0
     }
   },

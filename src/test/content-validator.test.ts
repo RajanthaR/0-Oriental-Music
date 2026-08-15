@@ -1,12 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { validateCatalogIdentityContracts, validateContent } from "@/lib/validation/content-validator";
 import { repository } from "@/lib/data/repository";
+import talasData from "@/data/talas.json";
 import type { Raga, Tala } from "@/types/content";
 
 describe("Content Validation Suite", () => {
   const lessons = repository.getLessons();
   const ragas = repository.getRagas();
-  const talas = repository.getTalas();
+  const publicTalas = repository.getTalas();
+  const talas = talasData as unknown as Tala[];
   const instruments = repository.getInstruments();
   const culturalTraditions = repository.getCulturalTraditions();
   const theatreTraditions = repository.getTheatreTraditions();
@@ -15,7 +17,7 @@ describe("Content Validation Suite", () => {
     const report = validateContent(
       lessons,
       ragas,
-      talas,
+      publicTalas,
       instruments,
       culturalTraditions,
       theatreTraditions
@@ -40,7 +42,7 @@ describe("Content Validation Suite", () => {
   });
 
   it("should ensure all talas have bols matching their matra count", () => {
-    talas.forEach((t) => {
+    publicTalas.forEach((t) => {
       expect(t.bols.length).toBe(t.matras);
     });
   });
@@ -193,5 +195,69 @@ describe("Content Validation Suite", () => {
       "Glossary.term_si",
       "Terminology.knownVariants",
     ]));
+  });
+
+  it("returns structural issues for null and primitive catalog entries without throwing", () => {
+    const malformedCatalogs = [
+      { type: "Raga", records: [null, "text", 42] },
+      { type: "Tala", records: [null, false] },
+    ];
+    expect(() => validateCatalogIdentityContracts(malformedCatalogs, [null, "term"] as unknown[], [42] as unknown[])).not.toThrow();
+    const issues = validateCatalogIdentityContracts(malformedCatalogs, [null, "term"] as unknown[], [42] as unknown[]);
+    expect(issues.some((issue) => issue.field === "record")).toBe(true);
+    expect(issues.some((issue) => issue.entityType === "Glossary")).toBe(true);
+    expect(issues.some((issue) => issue.entityType === "Terminology")).toBe(true);
+  });
+
+  it("rejects empty raga descents and invalid sample-phrase swaras", () => {
+    const emptyDescent = structuredClone(ragas[0]) as Raga;
+    emptyDescent.avarohana_swaras = [];
+    const invalidPhrase = structuredClone(ragas[1]) as Raga;
+    invalidPhrase.samplePhrases = [{ name_si: "mutation", swaras: ["INVALID"] }];
+    const report = validateContent(
+      lessons,
+      [emptyDescent, invalidPhrase, ...ragas.slice(2)],
+      publicTalas,
+      instruments,
+      culturalTraditions,
+      theatreTraditions
+    );
+    expect(report.issues.some((issue) => issue.entityId === emptyDescent.id && issue.field === "avarohana_swaras")).toBe(true);
+    expect(report.issues.some((issue) => issue.entityId === invalidPhrase.id && issue.field === "samplePhrases.swaras")).toBe(true);
+  });
+
+  it("rejects canonical-as-alias, same-record duplicate, and cross-record tala identities", () => {
+    const canonicalAlias = structuredClone(talas[0]) as Tala;
+    canonicalAlias.aliases_si = [canonicalAlias.name_si];
+    const repeatedAlias = structuredClone(talas[1]) as Tala;
+    repeatedAlias.aliases_si = ["කෙහර්වා", "කෙහර්වා"];
+    const crossRecord = structuredClone(talas[2]) as Tala;
+    crossRecord.aliases_si = [talas[0].name_si];
+    const report = validateContent(
+      lessons,
+      ragas,
+      [canonicalAlias, repeatedAlias, crossRecord, ...talas.slice(3)],
+      instruments,
+      culturalTraditions,
+      theatreTraditions
+    );
+    const aliasIssues = report.issues.filter((issue) => issue.field === "aliases_si");
+    expect(aliasIssues.some((issue) => issue.message.toLowerCase().includes("canonical"))).toBe(true);
+    expect(aliasIssues.some((issue) => issue.message.toLowerCase().includes("duplicate"))).toBe(true);
+    expect(aliasIssues.some((issue) => issue.message.toLowerCase().includes("collides"))).toBe(true);
+  });
+
+  it("requires the runtime tala alias and quiz parent contracts", () => {
+    const missingAliases = structuredClone(talas[0]) as unknown as Record<string, unknown>;
+    delete missingAliases.aliases_si;
+    const report = validateContent(
+      lessons,
+      ragas,
+      [missingAliases, ...talas.slice(1)] as unknown as Tala[],
+      instruments,
+      culturalTraditions,
+      theatreTraditions
+    );
+    expect(report.issues.some((issue) => issue.entityId === talas[0].id && issue.field === "aliases_si")).toBe(true);
   });
 });

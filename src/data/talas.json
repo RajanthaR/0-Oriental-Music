@@ -3,7 +3,7 @@
     "id": "tala-dadra",
     "name_si": "දාදරා තාලය",
     "name_en": "Dadra Tala",
-    "aliases_si": ["දාද්‍රා තාලය"],
+    "aliases_si": [],
     "matras": 6,
     "vibhagCount": 2,
     "vibhagStructure": [
@@ -207,9 +207,9 @@
   },
   {
     "id": "tala-teental",
-    "name_si": "ත්‍රීතාල් තාලය",
+    "name_si": "ත්‍රිතාල් තාලය",
     "name_en": "Teental (Tritala)",
-    "aliases_si": ["ත්‍රීතාලය", "තීන්තාල් තාලය"],
+    "aliases_si": ["ත්‍රීතාල් තාලය", "ත්‍රීතාලය", "තීන්තාල් තාලය"],
     "matras": 16,
     "vibhagCount": 4,
     "vibhagStructure": [
@@ -395,9 +395,9 @@
   },
   {
     "id": "tala-jhaptal",
-    "name_si": "ජප්තාල් තාලය",
+    "name_si": "ජප් තාලය",
     "name_en": "Jhaptal",
-    "aliases_si": ["ජප්තාලය"],
+    "aliases_si": ["ජප්තාල් තාලය"],
     "matras": 10,
     "vibhagCount": 4,
     "vibhagStructure": [
@@ -701,6 +701,7 @@
     "id": "tala-roopak",
     "name_si": "රූපක් තාලය",
     "name_en": "Roopak Tala",
+    "aliases_si": [],
     "matras": 7,
     "vibhagCount": 3,
     "vibhagStructure": [

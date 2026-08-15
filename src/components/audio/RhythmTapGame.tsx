@@ -25,6 +25,7 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
   const beatIntervalMs = (60 / bpm) * 1000;
   const expectedBeatTimesRef = useRef<number[]>([]);
   const tapTimesRef = useRef<number[]>([]);
+  const accuracyListRef = useRef<number[]>([]);
   const startTimeRef = useRef<number>(0);
   const timerRef = useRef<NodeJS.Timeout | number | null>(null);
 
@@ -42,7 +43,7 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
     }
 
     let accurateCount = 0;
-    accuracyList.forEach((diff) => {
+    accuracyListRef.current.forEach((diff) => {
       if (Math.abs(diff) < 180) accurateCount++;
     });
 
@@ -60,13 +61,14 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
     }
 
     if (onComplete) onComplete(scorePercent);
-  }, [accuracyList, onComplete, totalBeats]);
+  }, [onComplete, totalBeats]);
 
   useEffect(() => {
     if (isPlaying) {
       startTimeRef.current = Date.now();
       expectedBeatTimesRef.current = [];
       tapTimesRef.current = [];
+      accuracyListRef.current = [];
       setAccuracyList([]);
       setCurrentBeat(0);
       setIsFinished(false);
@@ -102,7 +104,11 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
     const expected = expectedBeatTimesRef.current[expectedBeatTimesRef.current.length - 1];
     if (expected) {
       const diff = now - expected;
-      setAccuracyList((prev) => [...prev, diff]);
+      setAccuracyList((prev) => {
+        const next = [...prev, diff];
+        accuracyListRef.current = next;
+        return next;
+      });
 
       if (Math.abs(diff) < 90) {
         setFeedbackText("නියමයි! පරිපූර්ණ ස්පන්දනයක්! 🎯");
@@ -129,6 +135,7 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
   const handleReset = () => {
     setIsPlaying(false);
     setCurrentBeat(0);
+    accuracyListRef.current = [];
     setAccuracyList([]);
     setIsFinished(false);
     setFeedbackText("ආරම්භ කිරීමට 'අරඹන්න' ඔබන්න");

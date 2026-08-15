@@ -30,15 +30,16 @@ const DEFAULT_CHALLENGES: EarTrainingChallenge[] = [
   },
   {
     id: "ear-02",
-    title_si: "තාල රිද්ම හඳුනාගැනීම (Tala Identification)",
-    type: "tala",
-    targetItem: "tala-dadra",
+    title_si: "ස්වර හඳුනාගැනීම (Swara Identification)",
+    type: "swara",
+    targetItem: "P",
     options_si: [
-      { id: "o1", text_si: "දාදරා තාලය (මාත්‍රා 6)", value: "tala-dadra" },
-      { id: "o2", text_si: "කෙහෙර්වා තාලය (මාත්‍රා 8)", value: "tala-keherwa" },
-      { id: "o3", text_si: "ලාවනී තාලය (මාත්‍රා 8)", value: "tala-lawani" },
+      { id: "o1", text_si: "ස (ෂඩ්ජ)", value: "S" },
+      { id: "o2", text_si: "ග (ගාන්ධාර)", value: "G" },
+      { id: "o3", text_si: "ම (මධ්‍යම)", value: "M" },
+      { id: "o4", text_si: "ප (පඤ්චම)", value: "P" },
     ],
-    explanation_si: "මාත්‍රා 3 බැගින් වූ විභාග 2 කින් සමන්විත දාදරා තාලයේ ථේකාවයි.",
+    explanation_si: "වාදනය වූයේ පඤ්චම (ප) ස්වරයයි.",
   },
 ];
 
@@ -54,12 +55,7 @@ export const EarTrainingModule: React.FC = () => {
     if (challenge.type === "swara") {
       swaraSynth.playSwaraTone(challenge.targetItem, 0.9, 261.63, "harmonium");
     } else if (challenge.type === "tala") {
-      // Play 1 cycle of dadra
-      ["ධා", "ධී", "නා", "ධා", "තී", "නා"].forEach((bol, i) => {
-        setTimeout(() => {
-          tablaSynth.playBol(bol);
-        }, i * 450);
-      });
+      tablaSynth.playBol(challenge.targetItem);
     }
   };
 

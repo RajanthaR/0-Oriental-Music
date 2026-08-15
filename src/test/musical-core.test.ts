@@ -121,18 +121,19 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
   });
 
   describe("Talas Core Validation", () => {
-    it("models Lawani with 2-matra vibhags (8 matras: 2+2+2+2, X 2 0 3)", () => {
-      const lawani = repository.getTalas().find((t) => t.id === "tala-lawani");
+    it("retains Lawani's 2+2+2+2 structure only in raw audit data", () => {
+      const lawani = talasData.find((t) => t.id === "tala-lawani");
       expect(lawani).toBeDefined();
       expect(lawani?.matras).toBe(8);
       expect(lawani?.vibhagCount).toBe(4);
       expect(lawani?.vibhagStructure).toEqual([2, 2, 2, 2]);
       expect(lawani?.bols.length).toBe(8);
       expect(lawani?.sourceReference.sourceId).toBe("SRC-EPD-TB-G10");
+      expect(repository.getTalaById("tala-lawani")).toBeUndefined();
     });
 
-    it("models Dadra with 6 matras, 2 vibhags (3+3), X and 0 with Grade 10 citation", () => {
-      const dadra = repository.getTalas().find((t) => t.id === "tala-dadra");
+    it("retains Dadra's Grade 10 structure only in raw audit data", () => {
+      const dadra = talasData.find((t) => t.id === "tala-dadra");
       expect(dadra).toBeDefined();
       expect(dadra?.matras).toBe(6);
       expect(dadra?.vibhagCount).toBe(2);
@@ -140,26 +141,14 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       expect(dadra?.bols.length).toBe(6);
       expect(dadra?.sourceReference.sourceId).toBe("SRC-EPD-TB-G10");
       expect(dadra?.sourceReference.pageOrSection).toContain("පිටුව 6");
+      expect(repository.getTalaById("tala-dadra")).toBeUndefined();
     });
 
-    it("publishes exactly the 7 prescribed school talas and quarantines Roopak", () => {
+    it("publishes only Khemta under the whole-entity evidence policy", () => {
       const publicTalas = repository.getTalas();
-      expect(publicTalas.length).toBe(7);
-
-      const publicIds = publicTalas.map((t) => t.id);
-      expect(publicIds).toEqual(
-        expect.arrayContaining([
-          "tala-dadra",
-          "tala-keherwa",
-          "tala-teental",
-          "tala-jhaptal",
-          "tala-deepchandi",
-          "tala-lawani",
-          "tala-khemta",
-        ])
-      );
-      expect(publicIds).not.toContain("tala-roopak");
-      expect(repository.getTalaById("tala-roopak")).toBeUndefined();
+      expect(publicTalas.map((tala) => tala.id)).toEqual(["tala-khemta"]);
+      ["tala-dadra", "tala-keherwa", "tala-teental", "tala-jhaptal", "tala-deepchandi", "tala-lawani", "tala-roopak"]
+        .forEach((id) => expect(repository.getTalaById(id)).toBeUndefined());
     });
 
     it("enforces vibhag and bol length consistency across all public talas", () => {
@@ -172,8 +161,8 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       });
     });
 
-    it("locks every public tala to exact Grade 10 structures and bol cells", () => {
-      expect(repository.getTalas().map((tala) => tala.id).sort()).toEqual(Object.keys(expectedTalas).sort());
+    it("locks the only public tala to its exact readable Grade 10 compound cells", () => {
+      expect(repository.getTalas().map((tala) => tala.id)).toEqual(["tala-khemta"]);
       repository.getTalas().forEach((tala) => {
         const expected = expectedTalas[tala.id as keyof typeof expectedTalas];
         const marks = tala.bols
@@ -202,9 +191,7 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       });
 
       const publicLawani = repository.getTalaById("tala-lawani");
-      expect(publicLawani).toBeDefined();
-      expect(publicLawani).not.toHaveProperty("context_si");
-      expect(publicLawani).not.toHaveProperty("contextSourceReference");
+      expect(publicLawani).toBeUndefined();
     });
   });
 
@@ -252,12 +239,13 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       expect(serializedLesson).not.toContain("අනාහත");
     });
 
-    it("aligns public acoustics and Dadra quizzes with their remediated source evidence", () => {
+    it("publishes the acoustics quiz while retaining the Dadra quiz as quarantined raw audit data", () => {
       const acousticsQuiz = repository.getQuizById("quiz-les-intro-01");
-      const dadraQuiz = repository.getQuizById("quiz-les-tala-dadra");
+      const rawDadraQuiz = quizzesData.find((quiz) => quiz.id === "quiz-les-tala-dadra");
 
       expect(acousticsQuiz).toBeDefined();
-      expect(dadraQuiz).toBeDefined();
+      expect(rawDadraQuiz).toBeDefined();
+      expect(repository.getQuizById("quiz-les-tala-dadra")).toBeUndefined();
 
       acousticsQuiz?.questions.forEach((question) => {
         expect(question.gradeBands).toEqual(["10-11"]);
@@ -266,7 +254,7 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       });
       expect(JSON.stringify(acousticsQuiz)).not.toMatch(/ආහත|අනාහත/);
 
-      dadraQuiz?.questions.forEach((question) => {
+      rawDadraQuiz?.questions.forEach((question) => {
         expect(question.sourceReference.sourceId).toBe("SRC-EPD-TB-G10");
         expect(question.sourceReference.pageOrSection).toContain("පිටුව 6");
         expect(question.sourceReference.sourceId).not.toBe("SRC-NIE-G07-TG");

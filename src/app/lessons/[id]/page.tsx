@@ -84,6 +84,9 @@ export default function LessonDetailPage() {
   };
 
   const strand = repository.getStrandById(lesson.strandId);
+  const practiceTala = lesson.guidedPractice.interactiveTool === "tala-visualizer"
+    ? repository.getTalaById(lesson.guidedPractice.targetTalaId || "") || repository.getTalas()[0]
+    : undefined;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
@@ -317,12 +320,13 @@ export default function LessonDetailPage() {
           )}
 
           {lesson.guidedPractice.interactiveTool === "tala-visualizer" && (
-            <TalaVisualizer
-              tala={
-                repository.getTalaById(lesson.guidedPractice.targetTalaId || "tala-dadra") ||
-                repository.getTalas()[0]
-              }
-            />
+            practiceTala ? (
+              <TalaVisualizer tala={practiceTala} />
+            ) : (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950">
+                මෙම අභ්‍යාසයට අවශ්‍ය තාලය මූලාශ්‍ර සමාලෝචනය අවසන් වන තෙක් ප්‍රසිද්ධ භාවිතයට නොමැත.
+              </div>
+            )
           )}
 
           {lesson.guidedPractice.interactiveTool === "rhythm-tap" && (

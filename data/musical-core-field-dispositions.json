@@ -1,0 +1,948 @@
+{
+  "version": 1,
+  "requiredFields": [
+    "context",
+    "theka",
+    "bols"
+  ],
+  "policy": "whole-entity-quarantine",
+  "talas": [
+    {
+      "talaId": "tala-dadra",
+      "context": {
+        "status": "verified",
+        "scope": "not-claimed",
+        "quality": "N/A",
+        "issueId": "P02-TALA-CONTEXT-001"
+      },
+      "theka": {
+        "status": "needs-review",
+        "value": "ධා ධී නා | ධා තී නා",
+        "sourceReference": {
+          "sourceId": "SRC-EPD-TB-G10",
+          "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
+        },
+        "quality": "A",
+        "issueId": "P02-TALA-BOL-EVIDENCE-001"
+      },
+      "bols": [
+        {
+          "matra": 1,
+          "status": "needs-review",
+          "value": "ධා",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-001"
+        },
+        {
+          "matra": 2,
+          "status": "needs-review",
+          "value": "ධී",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-001"
+        },
+        {
+          "matra": 3,
+          "status": "needs-review",
+          "value": "නා",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-001"
+        },
+        {
+          "matra": 4,
+          "status": "needs-review",
+          "value": "ධා",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-001"
+        },
+        {
+          "matra": 5,
+          "status": "needs-review",
+          "value": "තී",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-001"
+        },
+        {
+          "matra": 6,
+          "status": "needs-review",
+          "value": "නා",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-001"
+        }
+      ]
+    },
+    {
+      "talaId": "tala-keherwa",
+      "context": {
+        "status": "verified",
+        "scope": "not-claimed",
+        "quality": "N/A",
+        "issueId": "P02-TALA-CONTEXT-001"
+      },
+      "theka": {
+        "status": "needs-review",
+        "value": "ධා ගේ න ත | න ක ධ න",
+        "sourceReference": {
+          "sourceId": "SRC-EPD-TB-G10",
+          "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+        },
+        "quality": "A",
+        "issueId": "P02-TALA-BOL-EVIDENCE-002"
+      },
+      "bols": [
+        {
+          "matra": 1,
+          "status": "needs-review",
+          "value": "ධා",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-002"
+        },
+        {
+          "matra": 2,
+          "status": "needs-review",
+          "value": "ගේ",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-002"
+        },
+        {
+          "matra": 3,
+          "status": "needs-review",
+          "value": "න",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-002"
+        },
+        {
+          "matra": 4,
+          "status": "needs-review",
+          "value": "ත",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-002"
+        },
+        {
+          "matra": 5,
+          "status": "needs-review",
+          "value": "න",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-002"
+        },
+        {
+          "matra": 6,
+          "status": "needs-review",
+          "value": "ක",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-002"
+        },
+        {
+          "matra": 7,
+          "status": "needs-review",
+          "value": "ධ",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-002"
+        },
+        {
+          "matra": 8,
+          "status": "needs-review",
+          "value": "න",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-BOL-EVIDENCE-002"
+        }
+      ]
+    },
+    {
+      "talaId": "tala-teental",
+      "context": {
+        "status": "verified",
+        "scope": "not-claimed",
+        "quality": "N/A",
+        "issueId": "P02-TALA-CONTEXT-001"
+      },
+      "theka": {
+        "status": "needs-review",
+        "value": "ධා ධින් ධින් ධා | ධා ධින් ධින් ධා | ධා තින් තින් තා | තා ධින් ධින් ධා",
+        "sourceReference": {
+          "sourceId": "SRC-EPD-TB-G10",
+          "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+        },
+        "quality": "A",
+        "issueId": "P02-TALA-BOL-EVIDENCE-003"
+      },
+      "bols": [
+        {
+          "matra": 1,
+          "status": "needs-review",
+          "value": "ධා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 2,
+          "status": "needs-review",
+          "value": "ධින්",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 3,
+          "status": "needs-review",
+          "value": "ධින්",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 4,
+          "status": "needs-review",
+          "value": "ධා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 5,
+          "status": "needs-review",
+          "value": "ධා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 6,
+          "status": "needs-review",
+          "value": "ධින්",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 7,
+          "status": "needs-review",
+          "value": "ධින්",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 8,
+          "status": "needs-review",
+          "value": "ධා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 9,
+          "status": "needs-review",
+          "value": "ධා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 10,
+          "status": "needs-review",
+          "value": "තින්",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 11,
+          "status": "needs-review",
+          "value": "තින්",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 12,
+          "status": "needs-review",
+          "value": "තා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 13,
+          "status": "needs-review",
+          "value": "තා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 14,
+          "status": "needs-review",
+          "value": "ධින්",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 15,
+          "status": "needs-review",
+          "value": "ධින්",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 16,
+          "status": "needs-review",
+          "value": "ධා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-003",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
+          },
+          "quality": "A"
+        }
+      ]
+    },
+    {
+      "talaId": "tala-jhaptal",
+      "context": {
+        "status": "verified",
+        "scope": "not-claimed",
+        "quality": "N/A",
+        "issueId": "P02-TALA-CONTEXT-001"
+      },
+      "theka": {
+        "status": "needs-review",
+        "value": "ධී නා | ධී ධී නා | තී නා | ධී ධී නා",
+        "sourceReference": {
+          "sourceId": "SRC-EPD-TB-G10",
+          "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6"
+        },
+        "quality": "A",
+        "issueId": "P02-TALA-BOL-EVIDENCE-004"
+      },
+      "bols": [
+        {
+          "matra": 1,
+          "status": "needs-review",
+          "value": "ධී",
+          "issueId": "P02-TALA-BOL-EVIDENCE-004",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 2,
+          "status": "needs-review",
+          "value": "නා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-004",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 3,
+          "status": "needs-review",
+          "value": "ධී",
+          "issueId": "P02-TALA-BOL-EVIDENCE-004",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 4,
+          "status": "needs-review",
+          "value": "ධී",
+          "issueId": "P02-TALA-BOL-EVIDENCE-004",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 5,
+          "status": "needs-review",
+          "value": "නා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-004",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 6,
+          "status": "needs-review",
+          "value": "තී",
+          "issueId": "P02-TALA-BOL-EVIDENCE-004",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 7,
+          "status": "needs-review",
+          "value": "නා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-004",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 8,
+          "status": "needs-review",
+          "value": "ධී",
+          "issueId": "P02-TALA-BOL-EVIDENCE-004",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 9,
+          "status": "needs-review",
+          "value": "ධී",
+          "issueId": "P02-TALA-BOL-EVIDENCE-004",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 10,
+          "status": "needs-review",
+          "value": "නා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-004",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6"
+          },
+          "quality": "A"
+        }
+      ]
+    },
+    {
+      "talaId": "tala-deepchandi",
+      "context": {
+        "status": "verified",
+        "scope": "not-claimed",
+        "quality": "N/A",
+        "issueId": "P02-TALA-CONTEXT-001"
+      },
+      "theka": {
+        "status": "needs-review",
+        "value": "ධා ධින් - | ධා ධා ධින් - | තා තින් - | ධා ධා ධින් -",
+        "sourceReference": {
+          "sourceId": "SRC-EPD-TB-G10",
+          "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+        },
+        "quality": "A",
+        "issueId": "P02-TALA-BOL-EVIDENCE-005"
+      },
+      "bols": [
+        {
+          "matra": 1,
+          "status": "needs-review",
+          "value": "ධා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 2,
+          "status": "needs-review",
+          "value": "ධින්",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 3,
+          "status": "needs-review",
+          "value": "-",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 4,
+          "status": "needs-review",
+          "value": "ධා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 5,
+          "status": "needs-review",
+          "value": "ධා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 6,
+          "status": "needs-review",
+          "value": "ධින්",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 7,
+          "status": "needs-review",
+          "value": "-",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 8,
+          "status": "needs-review",
+          "value": "තා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 9,
+          "status": "needs-review",
+          "value": "තින්",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 10,
+          "status": "needs-review",
+          "value": "-",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 11,
+          "status": "needs-review",
+          "value": "ධා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 12,
+          "status": "needs-review",
+          "value": "ධා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 13,
+          "status": "needs-review",
+          "value": "ධින්",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 14,
+          "status": "needs-review",
+          "value": "-",
+          "issueId": "P02-TALA-BOL-EVIDENCE-005",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
+          },
+          "quality": "A"
+        }
+      ]
+    },
+    {
+      "talaId": "tala-roopak",
+      "context": {
+        "status": "needs-review",
+        "quality": "missing",
+        "issueId": "P02-TALA-ROOPAK-001"
+      },
+      "theka": {
+        "status": "needs-review",
+        "quality": "missing",
+        "issueId": "P02-TALA-ROOPAK-001"
+      },
+      "bols": [
+        {
+          "matra": 1,
+          "status": "needs-review",
+          "quality": "missing",
+          "issueId": "P02-TALA-ROOPAK-001"
+        },
+        {
+          "matra": 2,
+          "status": "needs-review",
+          "quality": "missing",
+          "issueId": "P02-TALA-ROOPAK-001"
+        },
+        {
+          "matra": 3,
+          "status": "needs-review",
+          "quality": "missing",
+          "issueId": "P02-TALA-ROOPAK-001"
+        },
+        {
+          "matra": 4,
+          "status": "needs-review",
+          "quality": "missing",
+          "issueId": "P02-TALA-ROOPAK-001"
+        },
+        {
+          "matra": 5,
+          "status": "needs-review",
+          "quality": "missing",
+          "issueId": "P02-TALA-ROOPAK-001"
+        },
+        {
+          "matra": 6,
+          "status": "needs-review",
+          "quality": "missing",
+          "issueId": "P02-TALA-ROOPAK-001"
+        },
+        {
+          "matra": 7,
+          "status": "needs-review",
+          "quality": "missing",
+          "issueId": "P02-TALA-ROOPAK-001"
+        }
+      ]
+    },
+    {
+      "talaId": "tala-lawani",
+      "context": {
+        "status": "needs-review",
+        "sourceReference": {
+          "sourceId": "SRC-EPD-TB-G11",
+          "pageOrSection": "s11tim173.pdf පිටුව 24"
+        },
+        "quality": "A",
+        "issueId": "P02-TALA-LAWANI-CONTEXT-001"
+      },
+      "theka": {
+        "status": "needs-review",
+        "value": "ධා ගේ | න ත | න ක | ධ න",
+        "sourceReference": {
+          "sourceId": "SRC-EPD-TB-G10",
+          "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+        },
+        "quality": "A",
+        "issueId": "P02-TALA-BOL-EVIDENCE-006"
+      },
+      "bols": [
+        {
+          "matra": 1,
+          "status": "needs-review",
+          "value": "ධා",
+          "issueId": "P02-TALA-BOL-EVIDENCE-006",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 2,
+          "status": "needs-review",
+          "value": "ගේ",
+          "issueId": "P02-TALA-BOL-EVIDENCE-006",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 3,
+          "status": "needs-review",
+          "value": "න",
+          "issueId": "P02-TALA-BOL-EVIDENCE-006",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 4,
+          "status": "needs-review",
+          "value": "ත",
+          "issueId": "P02-TALA-BOL-EVIDENCE-006",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 5,
+          "status": "needs-review",
+          "value": "න",
+          "issueId": "P02-TALA-BOL-EVIDENCE-006",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 6,
+          "status": "needs-review",
+          "value": "ක",
+          "issueId": "P02-TALA-BOL-EVIDENCE-006",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 7,
+          "status": "needs-review",
+          "value": "ධ",
+          "issueId": "P02-TALA-BOL-EVIDENCE-006",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A"
+        },
+        {
+          "matra": 8,
+          "status": "needs-review",
+          "value": "න",
+          "issueId": "P02-TALA-BOL-EVIDENCE-006",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
+          },
+          "quality": "A"
+        }
+      ]
+    },
+    {
+      "talaId": "tala-khemta",
+      "context": {
+        "status": "verified",
+        "scope": "claim",
+        "sourceReference": {
+          "sourceId": "SRC-EPD-TB-G10",
+          "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 7"
+        },
+        "quality": "A",
+        "issueId": "P02-TALA-KHEMTA-001"
+      },
+      "theka": {
+        "status": "verified",
+        "value": "ධන්න ධනක | තන්න ධනක",
+        "sourceReference": {
+          "sourceId": "SRC-EPD-TB-G10",
+          "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 7"
+        },
+        "quality": "A",
+        "issueId": "P02-TALA-KHEMTA-001"
+      },
+      "bols": [
+        {
+          "matra": 1,
+          "status": "verified",
+          "value": "ධන්න",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 7"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-KHEMTA-001"
+        },
+        {
+          "matra": 2,
+          "status": "verified",
+          "value": "ධනක",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 7"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-KHEMTA-001"
+        },
+        {
+          "matra": 3,
+          "status": "verified",
+          "value": "තන්න",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 7"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-KHEMTA-001"
+        },
+        {
+          "matra": 4,
+          "status": "verified",
+          "value": "ධනක",
+          "sourceReference": {
+            "sourceId": "SRC-EPD-TB-G10",
+            "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 7"
+          },
+          "quality": "A",
+          "issueId": "P02-TALA-KHEMTA-001"
+        }
+      ]
+    }
+  ]
+}

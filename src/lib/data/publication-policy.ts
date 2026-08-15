@@ -1,8 +1,11 @@
 import type { ReviewMetadata, SourceReference } from "@/types/content";
 import sourcesData from "@/data/sources.json";
 import lessonsData from "@/data/lessons.json";
+import ragasData from "@/data/ragas.json";
+import talasData from "@/data/talas.json";
 import sourceDocumentsData from "../../../data/source-documents.json";
 import sourcePageQualityData from "../../../data/source-page-quality.json";
+import musicalCoreFieldDispositionsData from "../../../data/musical-core-field-dispositions.json";
 
 export const UNKNOWN_PROVENANCE = "නොදනී / සනාථ වී නැත";
 
@@ -30,6 +33,9 @@ export type PublicationReasonCode =
   | "parent-lesson-unavailable"
   | "empty-question-set"
   | "nested-question-unpublishable"
+  | "unpaired-context-claim"
+  | "field-disposition-needs-review"
+  | "dependent-entity-unavailable"
   | SourceEvidenceFailureCode;
 
 export type SourceEvidenceReasonCode = SourceEvidenceFailureCode | "supportable";
@@ -52,6 +58,14 @@ export interface PublicationDecision {
   reasonCodes: PublicationReasonCode[];
   sourceEvidence: SourceEvidenceDecision;
   reviewState: "needs-review";
+  nestedDispositions: NestedPublicationDisposition[];
+  withheldFields: string[];
+}
+
+export interface NestedPublicationDisposition {
+  path: string;
+  isPublic: boolean;
+  reasonCodes: PublicationReasonCode[];
 }
 
 export interface SourceDocumentSummary {
@@ -72,6 +86,7 @@ export const KNOWN_QUARANTINED_ENTITY_IDS = new Set([
   "les-exam-skills",
   "raga-bhairav",
   "tala-roopak",
+  "tala-lawani",
   "exam-al-model-01",
   "path-exam-prep",
   "term-sound",
@@ -119,6 +134,39 @@ type PublicationRecordShape = {
   sourceReference?: unknown;
 };
 
+export type TalaFieldDispositionStatus = "verified" | "needs-review";
+
+export interface TalaFieldDisposition {
+  talaId: string;
+  context: TalaFieldDispositionField;
+  theka: TalaFieldDispositionField;
+  bols: TalaBolFieldDisposition[];
+  allRequiredFieldsVerified: boolean;
+}
+
+export interface TalaFieldDispositionField {
+  status: TalaFieldDispositionStatus;
+  value?: string;
+  sourceReference?: SourceReference;
+  quality: EvidenceQuality | "N/A";
+  issueId: string;
+  scope?: "claim" | "not-claimed";
+}
+
+export interface TalaBolFieldDisposition extends TalaFieldDispositionField {
+  matra: number;
+}
+
+const talaFieldDispositions = musicalCoreFieldDispositionsData as {
+  requiredFields: string[];
+  talas: Array<{
+    talaId: string;
+    context: TalaFieldDispositionField;
+    theka: TalaFieldDispositionField;
+    bols: TalaBolFieldDisposition[];
+  }>;
+};
+
 export interface ContextClaimPublicationDecision {
   present: boolean;
   isPublic: boolean;
@@ -150,33 +198,67 @@ function resolveSourceDocument(sourceId: string): SourceResolution {
   return { status: "found", document: matches[0] };
 }
 
-function explicitPageReferences(pageOrSection: string): number[] {
-  const pages = new Set<number>();
-  const clausePattern = /(?:පිටුව|පිටු|pdf\s*pages?|pages?)\s*([0-9]+(?:\s*[-–]\s*[0-9]+)?(?:\s*,\s*[0-9]+(?:\s*[-–]\s*[0-9]+)?)*)/gi;
+type LocatorParseResult = {
+  pageNumbers: number[];
+  mismatchedDocument: boolean;
+  malformed: boolean;
+};
 
-  let match: RegExpExecArray | null;
-  while ((match = clausePattern.exec(pageOrSection)) !== null) {
-    for (const token of match[1].split(",")) {
-      const [startText, endText] = token.trim().split(/\s*[-–]\s*/);
-      const start = Number(startText);
-      const end = endText ? Number(endText) : start;
-      if (!Number.isInteger(start) || !Number.isInteger(end) || start < 1 || end < start) continue;
-      for (let page = start; page <= end && page - start <= 1000; page += 1) pages.add(page);
-    }
+function parseSourceLocator(pageOrSection: string, expectedFilename: string): LocatorParseResult {
+  if (/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/.test(pageOrSection) || /[\uFF0E\uFE52\uFF61]/.test(pageOrSection)) {
+    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
   }
 
-  return Array.from(pages).sort((a, b) => a - b);
+  const pdfTokens = Array.from(pageOrSection.matchAll(/[A-Za-z0-9_ .-]+\.pdf/gi))
+    .map((match) => match[0].trim())
+    .filter(Boolean);
+  const normalizedExpected = expectedFilename.trim().toLocaleLowerCase();
+  if (pdfTokens.length > 0 && (
+    pdfTokens.length !== 1 ||
+    pdfTokens[0].toLocaleLowerCase() !== normalizedExpected
+  )) {
+    return { pageNumbers: [], mismatchedDocument: true, malformed: false };
+  }
+
+  const pageClausePattern = /(?:පිටුව|පිටු|pdf\s*pages?|pages?)\s+([0-9]+(?:\s*[-–]\s*[0-9]+)?(?:\s*,\s*[0-9]+(?:\s*[-–]\s*[0-9]+)?)*)\b/gi;
+  const pageClauseMatches = Array.from(pageOrSection.matchAll(pageClausePattern));
+  const pageWordCount = Array.from(pageOrSection.matchAll(/(?:පිටුව|පිටු|pdf\s*pages?|pages?)/gi)).length;
+  if (pageClauseMatches.length !== 1 || pageWordCount !== 1) {
+    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
+  }
+
+  const pageClause = pageClauseMatches[0][1];
+  const pages = new Set<number>();
+  for (const token of pageClause.split(",")) {
+    const range = token.trim().split(/\s*[-–]\s*/);
+    const start = Number(range[0]);
+    const end = range[1] === undefined ? start : Number(range[1]);
+    if (!Number.isInteger(start) || !Number.isInteger(end) || start < 1 || end < start || end - start > 1000) {
+      return { pageNumbers: [], mismatchedDocument: false, malformed: true };
+    }
+    for (let page = start; page <= end; page += 1) pages.add(page);
+  }
+
+  const clauseEnd = (pageClauseMatches[0].index ?? 0) + pageClauseMatches[0][0].length;
+  const trailing = pageOrSection.slice(clauseEnd);
+  if (
+    /(?:පිටුව|පිටු|pdf\s*pages?|pages?)/i.test(trailing) ||
+    /^\s*[.\-–]|^\s*[A-Za-z0-9]/.test(trailing)
+  ) {
+    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
+  }
+
+  return {
+    pageNumbers: Array.from(pages).sort((a, b) => a - b),
+    mismatchedDocument: false,
+    malformed: false,
+  };
 }
 
-function hasMismatchedPdfReference(locator: string, expectedFilename: string): boolean {
-  const pdfOccurrences = Array.from(locator.matchAll(/\.pdf/gi));
-  if (pdfOccurrences.length === 0) return false;
-  if (pdfOccurrences.length !== 1) return true;
-  const end = (pdfOccurrences[0].index ?? 0) + pdfOccurrences[0][0].length;
-  const beforePdf = locator.slice(0, end);
-  const candidate = beforePdf.slice(beforePdf.lastIndexOf(";") + 1).trim();
-  return candidate.toLocaleLowerCase() !== expectedFilename.trim().toLocaleLowerCase();
+function explicitPageReferences(pageOrSection: string, expectedFilename: string): LocatorParseResult {
+  return parseSourceLocator(pageOrSection, expectedFilename);
 }
+
 
 function qualityForPages(documentSlug: string, pageNumbers: number[]): EvidenceQuality {
   const qualities = sourcePageQuality
@@ -246,7 +328,7 @@ function getGradeBands(value: PublicationRecordShape): string[] {
     });
   }
 
-  const questionFields: Array<"partA_MCQ" | "partB_Structured"> = ["partA_MCQ", "partB_Structured"];
+  const questionFields: Array<"questions" | "partA_MCQ" | "partB_Structured"> = ["questions", "partA_MCQ", "partB_Structured"];
   questionFields.forEach((field) => {
     const questions = value[field];
     if (!Array.isArray(questions)) return;
@@ -259,28 +341,6 @@ function getGradeBands(value: PublicationRecordShape): string[] {
       });
     });
   });
-
-  const isQuestionShape = typeof value.type === "string" && typeof value.prompt_si === "string";
-
-  if (bands.size === 0 && !isQuestionShape) {
-    const reference = resolveRecordSourceReference(value);
-    if (reference && typeof reference === "object") {
-      const sourceId = reference.sourceId;
-      if (typeof sourceId === "string") {
-        const source = sourceRecords.find((record) => record.id === sourceId);
-        source?.grades.forEach((band) => bands.add(band));
-      }
-    }
-  }
-
-  if (bands.size === 0 && !isQuestionShape && typeof value.lessonId === "string") {
-    const parent = (lessonsData as unknown as Array<{ id: string; gradeBands?: string[] }>).find(
-      (l) => l.id === value.lessonId
-    );
-    if (parent && Array.isArray(parent.gradeBands)) {
-      parent.gradeBands.forEach((band) => bands.add(band));
-    }
-  }
 
   return Array.from(bands);
 }
@@ -371,7 +431,8 @@ export function evaluateSourceReference(
   }
 
   const document = resolution.document;
-  if (hasMismatchedPdfReference(reference.pageOrSection, document.originalFilename)) {
+  const locator = explicitPageReferences(reference.pageOrSection, document.originalFilename);
+  if (locator.mismatchedDocument) {
     return {
       sourceId: reference.sourceId,
       documentId: document.id,
@@ -384,24 +445,11 @@ export function evaluateSourceReference(
     };
   }
 
-  const pageNumbers = explicitPageReferences(reference.pageOrSection);
+  const pageNumbers = locator.pageNumbers;
   const inRangePages = pageNumbers.filter((page) => page <= document.pageCount);
   const quality = qualityForPages(document.slug, inRangePages);
 
-  if (document.reviewStatus !== "Source Triaged") {
-    return {
-      sourceId: reference.sourceId,
-      documentId: document.id,
-      documentSlug: document.slug,
-      pageNumbers: inRangePages,
-      quality,
-      supportable: false,
-      reasonCode: "source-document-needs-review",
-      reason: `The extracted document is ${document.reviewStatus}; source triage is not complete.`,
-    };
-  }
-
-  if (pageNumbers.length === 0) {
+  if (locator.malformed || pageNumbers.length === 0) {
     return {
       sourceId: reference.sourceId,
       documentId: document.id,
@@ -424,6 +472,19 @@ export function evaluateSourceReference(
       supportable: false,
       reasonCode: "page-out-of-range",
       reason: "At least one cited page number falls outside the extracted document page range.",
+    };
+  }
+
+  if (document.reviewStatus !== "Source Triaged") {
+    return {
+      sourceId: reference.sourceId,
+      documentId: document.id,
+      documentSlug: document.slug,
+      pageNumbers: inRangePages,
+      quality,
+      supportable: false,
+      reasonCode: "source-document-needs-review",
+      reason: `The extracted document is ${document.reviewStatus}; source triage is not complete.`,
     };
   }
 
@@ -484,6 +545,87 @@ function gradeScopeMatchesSource(gradeBands: string[], sourceId: string | undefi
   return gradeBands.every((band) => bandContainsSourceGrade(band, source.grades));
 }
 
+export function getTalaFieldDisposition(talaId: string): TalaFieldDisposition | undefined {
+  const entry = talaFieldDispositions.talas.find((candidate) => candidate.talaId === talaId);
+  if (!entry) return undefined;
+  const tala = (talasData as Array<{
+    id: string;
+    context_si?: string;
+    contextSourceReference?: SourceReference;
+    theka_si: string;
+    bols: Array<{ matra: number; bol_si: string }>;
+  }>).find((candidate) => candidate.id === talaId);
+  const hasExactEvidence = (field: TalaFieldDispositionField): boolean =>
+    field.quality === "A" || field.quality === "B"
+      ? evaluateSourceReference(field.sourceReference).supportable
+      : false;
+  const contextVerified = entry.context.status === "verified" && (
+    entry.context.scope === "not-claimed"
+      ? !tala?.context_si && !tala?.contextSourceReference && entry.context.quality === "N/A"
+      : Boolean(
+          tala?.context_si &&
+          tala.contextSourceReference &&
+          entry.context.sourceReference?.sourceId === tala.contextSourceReference.sourceId &&
+          entry.context.sourceReference.pageOrSection === tala.contextSourceReference.pageOrSection &&
+          hasExactEvidence(entry.context)
+        )
+  );
+  const allRequiredFieldsVerified =
+    Boolean(tala) &&
+    contextVerified &&
+    entry.theka.status === "verified" &&
+    entry.theka.value === tala?.theka_si &&
+    hasExactEvidence(entry.theka) &&
+    entry.bols.length > 0 &&
+    entry.bols.every((bol, index) =>
+      bol.status === "verified" &&
+      bol.matra === index + 1 &&
+      bol.matra === tala?.bols[index]?.matra &&
+      bol.value === tala?.bols[index]?.bol_si &&
+      hasExactEvidence(bol)
+    ) &&
+    tala?.bols.length === entry.bols.length;
+  return { ...entry, allRequiredFieldsVerified };
+}
+
+function collectDependencyDispositions(
+  value: unknown,
+  path: string,
+  seen: WeakSet<object>,
+  results: NestedPublicationDisposition[]
+): void {
+  if (!value || typeof value !== "object") return;
+  if (seen.has(value)) return;
+  seen.add(value);
+
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => collectDependencyDispositions(item, `${path}[${index}]`, seen, results));
+    return;
+  }
+
+  Object.entries(value as Record<string, unknown>).forEach(([key, child]) => {
+    const childPath = path ? `${path}.${key}` : key;
+    if (typeof child === "string") {
+      const dependency = ["talaId", "targetTalaId", "audioTalaId"].includes(key)
+        ? (talasData as Array<{ id: string }>).find((candidate) => candidate.id === child)
+        : ["ragaId", "targetRagaId", "selectedRagaId"].includes(key)
+        ? (ragasData as Array<{ id: string }>).find((candidate) => candidate.id === child)
+        : undefined;
+      if (dependency) {
+        const decision = getRecordPublicationDecision(dependency);
+        if (!decision.isPublic) {
+          results.push({
+            path: childPath,
+            isPublic: false,
+            reasonCodes: ["dependent-entity-unavailable"],
+          });
+        }
+      }
+    }
+    collectDependencyDispositions(child, childPath, seen, results);
+  });
+}
+
 export function getPublicationDecision(input: PublicationInput): PublicationDecision {
   const { id, gradeBands, sourceReference } = input;
   const sourceEvidence = evaluateSourceReference(sourceReference);
@@ -515,39 +657,88 @@ export function getPublicationDecision(input: PublicationInput): PublicationDeci
     reasonCodes: Array.from(new Set(reasonCodes)),
     sourceEvidence,
     reviewState: "needs-review",
+    nestedDispositions: [],
+    withheldFields: [],
   };
 }
 
 export function getRecordPublicationDecision(record: unknown): PublicationDecision {
   const value = getRecordShape(record);
   const baseDecision = getPublicationDecision(toPublicationInput(record));
-  if (!Array.isArray(value.questions)) return baseDecision;
-
   const reasonCodes = new Set(baseDecision.reasonCodes);
+  const nestedDispositions = [...baseDecision.nestedDispositions];
+  const withheldFields = [...baseDecision.withheldFields];
+
+  const contextDecision = getContextClaimPublicationDecision(record);
+  if (contextDecision.present && !contextDecision.isPublic) {
+    if (contextDecision.reasonCode === "no-context-claim" || contextDecision.reasonCode === "unpaired-context-claim") {
+      reasonCodes.add("unpaired-context-claim");
+    } else if (contextDecision.reasonCode !== "supportable") {
+      reasonCodes.add(contextDecision.reasonCode);
+    }
+    withheldFields.push("context_si", "contextSourceReference");
+  }
+
+  const recordId = typeof value.id === "string" ? value.id : "";
+  const isTalaRecord = (talasData as Array<{ id: string }>).some((tala) => tala.id === recordId);
+  const talaDisposition = getTalaFieldDisposition(recordId);
+  if (isTalaRecord && (!talaDisposition || !talaDisposition.allRequiredFieldsVerified)) {
+    reasonCodes.add("field-disposition-needs-review");
+    withheldFields.push("context", "theka", "bols");
+  }
+
+  collectDependencyDispositions(record, "", new WeakSet<object>(), nestedDispositions);
+  if (nestedDispositions.some((disposition) => !disposition.isPublic)) {
+    reasonCodes.add("dependent-entity-unavailable");
+  }
+
+  if (!Array.isArray(value.questions)) {
+    const hasBlockingReason = reasonCodes.size > baseDecision.reasonCodes.length;
+    const quarantined = baseDecision.state === "quarantined";
+    const isPublic = baseDecision.isPublic && !hasBlockingReason;
+    return {
+      ...baseDecision,
+      state: quarantined ? "quarantined" : isPublic ? "public" : "needs-review",
+      isPublic,
+      reasonCodes: Array.from(reasonCodes),
+      nestedDispositions,
+      withheldFields: Array.from(new Set(withheldFields)),
+    };
+  }
+
   const parent = typeof value.lessonId === "string"
     ? (lessonsData as unknown as Array<{ id: string }>).find((lesson) => lesson.id === value.lessonId)
     : undefined;
   const parentIsPublic = !!parent && getRecordPublicationDecision(parent).isPublic;
   if (!parentIsPublic) reasonCodes.add("parent-lesson-unavailable");
-  if (value.questions.length === 0) reasonCodes.add("empty-question-set");
+  if (!Array.isArray(value.questions) || value.questions.length === 0) reasonCodes.add("empty-question-set");
 
-  const questionsArePublic = value.questions.length > 0 && value.questions.every((question) => {
+  const questionsArePublic = value.questions.length > 0 && value.questions.every((question, index) => {
     const questionShape = getRecordShape(question);
     const hasExplicitGrades =
       Array.isArray(questionShape.gradeBands) &&
       questionShape.gradeBands.length > 0 &&
       questionShape.gradeBands.every((band) => typeof band === "string");
     const hasDirectSource = isSourceReference(questionShape.sourceReference);
-    return hasExplicitGrades && hasDirectSource && getRecordPublicationDecision(question).isPublic;
+    const decision = getRecordPublicationDecision(question);
+    nestedDispositions.push({
+      path: `questions[${index}]`,
+      isPublic: decision.isPublic,
+      reasonCodes: decision.reasonCodes,
+    });
+    return hasExplicitGrades && hasDirectSource && decision.isPublic;
   });
   if (!questionsArePublic) reasonCodes.add("nested-question-unpublishable");
 
-  const isPublic = baseDecision.isPublic && parentIsPublic && questionsArePublic;
+  const isPublic = baseDecision.isPublic && parentIsPublic && questionsArePublic &&
+    !nestedDispositions.some((disposition) => !disposition.isPublic);
   return {
     ...baseDecision,
     state: isPublic ? "public" : baseDecision.state === "quarantined" ? "quarantined" : "needs-review",
     isPublic,
     reasonCodes: Array.from(reasonCodes),
+    nestedDispositions,
+    withheldFields: Array.from(new Set(withheldFields)),
   };
 }
 
@@ -560,13 +751,24 @@ export function getContextClaimPublicationDecision(record: unknown): ContextClai
   const contextSourceReference: SourceReference | undefined = hasReference
     ? (value.contextSourceReference as SourceReference)
     : undefined;
-  const present = hasContext || value.contextSourceReference !== undefined;
+  const present = hasContext || (
+    value.contextSourceReference !== undefined && value.contextSourceReference !== null
+  );
   const sourceEvidence = evaluateSourceReference(contextSourceReference);
   if (!present) {
     return { present: false, isPublic: false, reasonCode: "no-context-claim", sourceEvidence };
   }
   if (!hasContext || !hasReference) {
     return { present: true, isPublic: false, reasonCode: "unpaired-context-claim", sourceEvidence };
+  }
+  const declaredGrades = getGradeBands(value);
+  if (!gradeScopeMatchesSource(declaredGrades, contextSourceReference?.sourceId)) {
+    return {
+      present: true,
+      isPublic: false,
+      reasonCode: "source-grade-mismatch",
+      sourceEvidence,
+    };
   }
   return {
     present: true,

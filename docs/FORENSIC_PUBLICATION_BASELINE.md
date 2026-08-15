@@ -2,9 +2,15 @@
 
 This is the Prompt 1 containment boundary for **ස්වර මඟ**. It is a source-safety control, not a declaration that the musical content is correct or that the platform is production-ready.
 
+## Phase 2 closeout supersession
+
+Phase 2 keeps the Prompt 1 fail-closed boundary and applies the selected **Option 2 whole-entity quarantine** rule to musical-core entities. Any unsupported required learner-visible or playable field withholds the whole public entity and its reverse dependencies; source-attributed raw/audit values are retained separately. Lawani remains nonpublic until its required Sri Lankan school-system context and playable fields are supportable.
+
+The current public projection contains 1 acoustics lesson, 7 Grade 11-evidenced ragas, 1 Tala (Khemta), 5 acoustics glossary terms, and 1 acoustics quiz. Public learning paths, exam papers, instruments, cultural traditions, and theatre traditions remain empty under this bounded evidence policy. These counts describe the current projection only; they do not establish curriculum completeness.
+
 ## States
 
-- `public`: discoverable only when the record is scoped to Grades 6–11, has a known source ID, maps to exactly one supplied extracted document, exact-matches any named PDF, cites only in-range pages, and every cited page has A/B readable Sinhala evidence.
+- `public`: discoverable only when the record carries its own explicit Grades 6–11 scope, has a known source ID, maps to exactly one supplied extracted document, exact-matches any named PDF, cites only in-range pages, every cited page has A/B readable Sinhala evidence, all required field dispositions are verified, and every public dependency is available.
 - `quarantined`: retained in the raw dataset for later correction, but excluded from public lists, search, selectors, metadata, counts, and direct dynamic routes. Known issue identifiers and all Grade 12–13/A/L records use this state.
 - `needs-review`: retained for audit but not publicly discoverable because the source document, page evidence, extraction quality, or grade scope is unresolved.
 - `unknown / unverified`: the only acceptable public value for metadata that is not established by the supplied corpus or a real review event. It is not a substitute publisher, licence, reviewer, or date.
@@ -25,4 +31,4 @@ The machine-readable issue ledger is [`data/forensic-ledger.json`](../data/foren
 
 ## Scope intentionally deferred
 
-This phase does not rewrite raga, tala, acoustics, instrument, folk, theatre, lesson, or curriculum claims. It does not add Grades 12–13 sources, deploy, merge, or claim production readiness. The unresolved source and visual-review queue is recorded in the ledger and correction log.
+Phase 2 does not add Grades 12–13/A/L sources or content, reconstruct the curriculum map, add Phase 3 content, redesign the UI, deploy, merge, or claim production readiness. The unresolved original-PDF/visual bol review, Lawani context, source metadata, and later-phase content queues remain recorded in the ledger, field disposition registry, and correction log.

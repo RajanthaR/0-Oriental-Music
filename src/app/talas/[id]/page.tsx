@@ -18,7 +18,8 @@ export default function TalaDetailPage() {
   if (!tala) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-xl font-bold text-text mb-4">තාලය හමු නොවීය.</h2>
+        <h2 className="text-xl font-bold text-text mb-4">මෙම තාලය ප්‍රසිද්ධ භාවිතයට නොමැත හෝ හමු නොවීය.</h2>
+        <p className="mb-4 text-sm text-text-secondary">මූලාශ්‍ර සාක්ෂිය සම්පූර්ණ වන තෙක් අසනාථ තාල ප්‍රදර්ශනය නොකෙරේ.</p>
         <Link href="/talas" className="text-primary underline text-sm">
           සියලු තාල වෙත ආපසු යන්න
         </Link>

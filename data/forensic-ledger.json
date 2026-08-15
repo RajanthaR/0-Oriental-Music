@@ -1,15 +1,27 @@
 {
-  "schemaVersion": "p01.1",
-  "generatedDate": "2026-08-15",
-  "phase": "Prompt 1 / publication containment and source baseline",
-  "authority": "Current checkout at base 6e62a3ad2d9621b8790d35af3358b08fafceaa57",
+  "schemaVersion": "p02.1",
+  "generatedDate": "2026-08-16",
+  "phase": "Phase 2 closeout / canonical musical-core containment",
+  "authority": "Historical baseline and audited-through evidence only; no stored SHA claims to identify the live checkout.",
+  "historicalBaseline": {
+    "phase": "Prompt 1 / publication containment and source baseline",
+    "baseSha": "6e62a3ad2d9621b8790d35af3358b08fafceaa57"
+  },
+  "auditedThrough": {
+    "phase": "Phase 2 p02r4 findings input",
+    "baseSha": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "reviewedHead": "97c0c138b2b90ac27516a3c8c3716361ac537981",
+    "reviewRunId": "20260815-235819-p02r4",
+    "status": "Findings input only; not acceptance evidence"
+  },
+  "issueCountBaseline": 26,
   "evidencePolicy": {
     "publicGradeBands": [
       "6-7",
       "8-9",
       "10-11"
     ],
-    "publicEligibility": "A claim is discoverable only when its grade scope is within 6-11, its source ID maps to exactly one supplied extracted document, its named PDF exactly matches that document when present, its exact page evidence is in range, and every cited page is an A/B readable Sinhala page.",
+    "publicEligibility": "A claim is discoverable only when the record declares its own Grades 6-11 scope, its source ID maps to exactly one supplied extracted document, its named PDF exactly matches that document when present, its exact page evidence is in range, every cited page is an A/B readable Sinhala page, every required field disposition is verified, and every required public dependency is available.",
     "reviewBoundary": "Markdown extraction is evidence with limits. C/D, image-only, corrupt-font, visual, ambiguous, and missing-PDF cases remain needs-review until original-PDF/manual review.",
     "metadataBoundary": "Publisher, year, place, licence, reviewer, review date, and Published state are not accepted as evidence unless a real source or review event establishes them."
   },
@@ -250,7 +262,7 @@
       "id": "P01-TALA-LAWANI-001",
       "severity": "P1",
       "entityOrPath": "src/data/talas.json:tala-lawani",
-      "currentClaim": "Lawani was previously presented with mixed cross-document citations and generic framing. Phase 2 models its Grade 10 structure separately; the raw Grade 11 school-context statement remains needs-review and is withheld from the public projection.",
+      "currentClaim": "Lawani has mixed cross-document evidence. Its required Grade 11 school context remains Review Required and the extracted Grade 10 bol cells cannot establish a learner-visible playable entity without original-PDF review.",
       "evidence": [
         {
           "path": "src/data/talas.json",
@@ -268,12 +280,12 @@
           "exactSection": "full field-level audit matrix"
         }
       ],
-      "disposition": "publish the independently supported Grade 10 structure with 8 matras and 2+2+2+2 vibhagas; retain the Grade 11 context in raw audit data but strip it from the public projection until source-document triage is complete",
-      "publicVisibility": "contained",
-      "confidence": "confirmed",
-      "confidenceScope": "structure confirmed from DOC-GRADE_10_MUSICAL_FUNDAMENTALS pages 3 and 6 (A); context text occurs on DOC-GRADE_11_MUSIC_TEXTBOOK page 24 (A extraction) but that document remains Review Required",
-      "status": "contained",
-      "evidenceBasis": "canonical-inspection"
+      "disposition": "quarantine the whole Lawani entity from directories, routes, search, quizzes, learning paths, audio, and summaries; retain the raw Grade 10 structure and Grade 11 context only for audit and later original-PDF/SME review",
+      "publicVisibility": "quarantined",
+      "confidence": "needs-review",
+      "confidenceScope": "Grade 10 pages 3 and 6 are readable extraction, but normalized bol cells and the required Grade 11 school context remain unresolved",
+      "status": "needs-review",
+      "evidenceBasis": "review-required"
     },
     {
       "id": "P01-SOUND-TERMINOLOGY-001",
@@ -308,7 +320,7 @@
       "id": "P01-TALA-DADRA-CITE-001",
       "severity": "P1",
       "entityOrPath": "src/data/talas.json:tala-dadra and src/data/lessons.json:les-tala-dadra",
-      "currentClaim": "Dadra tala and lesson previously cited unverified Grade 7 pages. Phase 2 uses the singular Grade 10 fundamentals source for the public structure, name, bols, and lesson.",
+      "currentClaim": "Dadra tala and lesson previously cited unverified Grade 7 pages. Grade 10 page 6 establishes a source location, but the extracted bol glyph cells are not accepted as a learner-visible playable entity without original-PDF review.",
       "evidence": [
         {
           "path": "src/data/talas.json",
@@ -326,12 +338,12 @@
           "exactSection": "full field-level audit matrix"
         }
       ],
-      "disposition": "remediated with the singular Grade 10 fundamentals citation; canonical name is දාදරා and the prior දාද්‍රා form is retained only as an explicit editorial/search alias",
-      "publicVisibility": "contained",
-      "confidence": "confirmed",
-      "confidenceScope": "remediated and bounded to DOC-GRADE_10_MUSICAL_FUNDAMENTALS page 6",
-      "status": "contained",
-      "evidenceBasis": "canonical-inspection"
+      "disposition": "retain the raw Dadra record and exact Grade 10 locator for audit, but quarantine the whole tala and every dependent lesson or quiz until the original bol cells are manually verified",
+      "publicVisibility": "quarantined",
+      "confidence": "needs-review",
+      "confidenceScope": "bounded to DOC-GRADE_10_MUSICAL_FUNDAMENTALS page 6; normalized bol cells remain unaccepted",
+      "status": "needs-review",
+      "evidenceBasis": "review-required"
     },
     {
       "id": "P02-QUIZ-SYNC-001",
@@ -394,8 +406,8 @@
         },
         {
           "path": "src/data/talas.json",
-          "locator": "seven public tala gradeBands",
-          "exactPageOrSection": "SRC-EPD-TB-G10 Grade 10, PDF Pages 2-7"
+          "locator": "one public Khemta gradeBand plus seven raw quarantined tala gradeBands",
+          "exactPageOrSection": "SRC-EPD-TB-G10 Grade 10, PDF Page 7 supports public Khemta; Pages 2-6 remain raw audit locators for quarantined talas"
         },
         {
           "path": "src/data/lessons.json and src/data/quizzes.json",
@@ -437,33 +449,33 @@
           "exactPageOrSection": "SRC-EPD-TB-G10 PDF Pages 2, 4-5 establish දීප්චන්ද්; Grade 11 දීප්චන්දි remains retrieval-only and needs-review"
         }
       ],
-      "disposition": "restore exact source cells and four-matra Khemta structure; use Grade 10 දීප්චන්ද් as canonical; keep Grade 11 දීප්චන්දි retrieval-only pending triage; expand compound cells for application audio and disclose timing/BPM as non-curricular practice defaults",
+      "disposition": "publish only Khemta's readable four-matra compound cells; retain the Grade 10 spellings and all other normalized tala structures as raw audit data under whole-entity quarantine; keep Grade 11 දීප්චන්දි retrieval-only",
       "publicVisibility": "contained",
-      "confidence": "confirmed",
-      "confidenceScope": "Grade 10 pages 3, 6-7; normalized glyphs retain original-PDF review boundary",
-      "status": "contained",
-      "evidenceBasis": "canonical-inspection"
+      "confidence": "needs-review",
+      "confidenceScope": "Khemta is bounded to Grade 10 page 7; all other normalized bol glyphs require original-PDF/manual review",
+      "status": "needs-review",
+      "evidenceBasis": "review-required"
     },
     {
       "id": "P02-STATIC-QUARANTINE-001",
       "severity": "P1",
       "entityOrPath": "src/components/audio/EarTrainingModule.tsx and src/app/search/page.tsx",
-      "currentClaim": "Static public practice/search copy exposed quarantined Roopak and Bhairav even though repository and direct-route gates contained those records.",
+      "currentClaim": "Static public practice/search copy exposed quarantined Roopak, Bhairav, Dadra, and Lawani even though repository and direct-route gates contained those records.",
       "evidence": [
         {
           "path": "src/components/audio/EarTrainingModule.tsx",
           "locator": "DEFAULT_CHALLENGES tala options",
-          "exactSection": "Roopak removed; public Lawani used as the distractor"
+          "exactSection": "the unsupported Tala challenge was removed; the module now uses only source-supported swara exercises"
         },
         {
           "path": "src/app/search/page.tsx",
           "locator": "placeholder and quick samples",
-          "exactSection": "Bhairav removed from static discovery suggestions"
+          "exactSection": "Bhairav, Dadra, and Lawani are absent from static discovery suggestions"
         },
         {
           "path": "src/test/components.test.tsx",
           "locator": "static quarantine regression",
-          "exactSection": "public EarTraining and Search UI contain neither Roopak nor Bhairav claims"
+          "exactSection": "public EarTraining and Search UI contain no Roopak, Bhairav, Dadra, or Lawani claims"
         }
       ],
       "disposition": "remove quarantined static claims and regression-lock public UI copy independently of repository filtering",
@@ -501,7 +513,7 @@
       "id": "P02-AUDIO-OWNERSHIP-001",
       "severity": "P1",
       "entityOrPath": "src/lib/audio/tabla.ts and src/components/audio/TalaVisualizer.tsx",
-      "currentClaim": "A singleton scheduled-timer list allowed one mounted audio activity to cancel another activity's pending compound Khemta strokes.",
+      "currentClaim": "Playback previously mixed singleton scheduling with a visualizer effect cleanup that could immediately cancel Start and allowed lifecycle changes to affect pending compound strokes.",
       "evidence": [
         {
           "path": "src/lib/audio/tabla.ts",
@@ -511,12 +523,17 @@
         {
           "path": "src/components/audio/TalaVisualizer.tsx",
           "locator": "playbackCancelRef",
-          "exactSection": "stop, reset, replay, and unmount cancel only the visualizer's own session"
+          "exactSection": "Start retains its handle; tick replacement, Stop, Reset, audio-off, tala change, BPM change, and unmount cancel only the visualizer's own session"
         },
         {
           "path": "src/test/musical-core.test.ts",
           "locator": "scheduled tabla playback ownership regression",
           "exactSection": "interleaved owner cancellation leaves the other owner's delayed strokes executable"
+        },
+        {
+          "path": "src/test/components.test.tsx",
+          "locator": "TalaVisualizer lifecycle and hydration regressions",
+          "exactSection": "Start/tick/Stop/Reset/audio-off/tala-change/unmount and co-mounted isolation are interaction-tested"
         }
       ],
       "disposition": "replace global cancellation with caller-owned scheduling handles and regression-lock independent playback sessions",
@@ -589,6 +606,11 @@
           "path": "data/source-documents.json",
           "locator": "30 extracted documents",
           "exactSection": "reviewStatus is Source Triaged, Review Required, or Image Only / Gaps; it does not establish all metadata"
+        },
+        {
+          "path": "data/source-manifest.json and SOURCES.md",
+          "locator": "four selected Phase 2 source rows",
+          "exactSection": "exact filenames and grades retained; publisher/year/place/licence/tier/URL are unknown or omitted and unsupported topics are absent"
         }
       ],
       "disposition": "replace unsupported raw metadata on the four Phase 2 selected source records with explicit unknown/unverified values; retain stable IDs and filenames only for link/progress compatibility",

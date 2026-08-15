@@ -57,7 +57,7 @@ export default function SearchPage() {
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="උදා: බිලාවල්, Yaman, ත්‍රීතාල්, තාරතාවය..."
+            placeholder="උදා: බිලාවල්, Yaman, ඛෙම්ටෝ, තාරතාවය..."
             className="w-full bg-surface-warm border-2 border-border focus:border-accent rounded-2xl pl-12 pr-4 py-3.5 text-sm sm:text-base text-text focus:outline-none"
           />
         </div>
@@ -65,7 +65,7 @@ export default function SearchPage() {
         {/* Quick Sample Queries */}
         <div className="flex flex-wrap items-center gap-2 mt-3 text-xs">
           <span className="text-text-muted font-bold">ඉක්මන් සෙවුම්:</span>
-          {["බිලාවල්", "දාදරා", "යමන්", "ලාවනී", "තාරතාවය", "මාත්‍රා"].map((sample) => (
+          {["බිලාවල්", "යමන්", "ඛෙම්ටෝ", "තාරතාවය", "නාදය", "ස්වර"].map((sample) => (
             <button
               key={sample}
               type="button"
@@ -87,7 +87,16 @@ export default function SearchPage() {
 
         {results.length === 0 ? (
           <div className="bg-white rounded-3xl p-8 border border-border shadow-warm-sm text-center text-xs text-text-muted">
-            කිසිදු ප්‍රතිඵලයක් හමු නොවීය. කරුණාකර වෙනත් වචනයක් යොදා බලන්න.
+            <p>කිසිදු ප්‍රතිඵලයක් හමු නොවීය. කරුණාකර වෙනත් වචනයක් යොදා බලන්න.</p>
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="mt-4 rounded-xl bg-primary px-4 py-2 font-bold text-white"
+              >
+                සෙවුම හිස් කරන්න
+              </button>
+            )}
           </div>
         ) : (
           results.map((item) => {

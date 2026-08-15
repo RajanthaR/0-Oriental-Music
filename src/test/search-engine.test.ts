@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { searchIndex, normalizeSinhalaText } from "@/lib/search/search-engine";
+import { searchFilter, searchIndex, normalizeSinhalaText } from "@/lib/search/search-engine";
 
 describe("Search Engine & Sinhala Normalizer Suite", () => {
   it("should normalize Sinhala characters, diacritics, and rakaransaya variations", () => {
@@ -8,9 +8,9 @@ describe("Search Engine & Sinhala Normalizer Suite", () => {
     expect(normalizeSinhalaText("දාද්‍රා")).toBe("දාදරා");
   });
 
-  it("should match Sinhala query with rakaransaya to canonical Dadra", () => {
+  it("keeps the Dadra retrieval spelling contained when the tala is quarantined", () => {
     const rakaransayaResults = searchIndex.search("දාද්‍රා");
-    expect(rakaransayaResults.some((result) => result.id === "tala-dadra")).toBe(true);
+    expect(rakaransayaResults.some((result) => result.id === "tala-dadra")).toBe(false);
   });
 
   it("should not discover quarantined Bhairav or Roopak claims", () => {
@@ -21,16 +21,18 @@ describe("Search Engine & Sinhala Normalizer Suite", () => {
     expect(roopakResults.some((result) => result.id === "tala-roopak")).toBe(false);
   });
 
-  it("should discover remediated Dadra, Bilawal, and Lawani entities", () => {
+  it("should discover the evidence-supported Khemta and Bilawal entities", () => {
     const dadraResults = searchIndex.search("dadra");
-    expect(dadraResults.some((result) => result.id === "tala-dadra")).toBe(true);
-    expect(dadraResults.some((result) => result.id === "les-tala-dadra")).toBe(true);
+    expect(dadraResults.some((result) => result.id === "tala-dadra" || result.id === "les-tala-dadra")).toBe(false);
 
     const bilawalResults = searchIndex.search("bilawal");
     expect(bilawalResults.some((result) => result.id === "raga-bilawal")).toBe(true);
 
     const lawaniResults = searchIndex.search("lawani");
-    expect(lawaniResults.some((result) => result.id === "tala-lawani")).toBe(true);
+    expect(lawaniResults.some((result) => result.id === "tala-lawani")).toBe(false);
+
+    const khemtaResults = searchIndex.search("khemta");
+    expect(khemtaResults.some((result) => result.id === "tala-khemta")).toBe(true);
   });
 
   it("should discover canonical musical entities and acoustics terms via English transliterations", () => {
@@ -47,12 +49,28 @@ describe("Search Engine & Sinhala Normalizer Suite", () => {
     expect(bhimpalasiResults.some((result) => result.id === "raga-bhimpalasi")).toBe(true);
 
     const deepchandiResults = searchIndex.search("deepchandi");
-    expect(deepchandiResults.some((result) => result.id === "tala-deepchandi")).toBe(true);
+    expect(deepchandiResults.some((result) => result.id === "tala-deepchandi")).toBe(false);
     const gradeElevenSpellingResults = searchIndex.search("දීප්චන්දි");
-    expect(gradeElevenSpellingResults.some((result) => result.id === "tala-deepchandi")).toBe(true);
+    expect(gradeElevenSpellingResults.some((result) => result.id === "tala-deepchandi")).toBe(false);
 
-    const khemtaResults = searchIndex.search("khemta");
-    expect(khemtaResults.some((result) => result.id === "tala-khemta")).toBe(true);
+  });
+
+  it("preserves the Grade 11 Deepchandi spelling as retrieval-only behavior", () => {
+    const syntheticPublicFixture = [{ id: "tala-deepchandi", name_si: "දීප්චන්ද් තාලය" }];
+    const results = searchFilter(
+      syntheticPublicFixture,
+      "දීප්චන්දි",
+      (item) => [item.name_si]
+    );
+    expect(results).toEqual(syntheticPublicFixture);
+    expect(searchIndex.search("දීප්චන්දි").some((result) => result.id === "tala-deepchandi")).toBe(false);
+  });
+
+  it("does not throw or expose inherited object properties for hostile lookup keys", () => {
+    expect(() => searchIndex.search("__proto__")).not.toThrow();
+    expect(() => searchIndex.search("constructor")).not.toThrow();
+    expect(searchIndex.search("__proto__")).toEqual([]);
+    expect(searchIndex.search("constructor")).toEqual([]);
   });
 
   it("should keep search results inside the publication boundary", () => {

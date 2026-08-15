@@ -309,7 +309,7 @@ class ContentRepository {
       list = searchFilter(list, query, (tala) => [
         tala.name_si,
         tala.name_en,
-        ...(tala.aliases_si || []),
+        ...tala.aliases_si,
         tala.theka_si,
       ]);
     }
@@ -411,7 +411,9 @@ class ContentRepository {
 
   // Quizzes & Exams
   public getQuizzes(): Quiz[] {
-    return this.quizzes.filter((quiz) => getQuizPublicationDecision(quiz).isPublic);
+    return this.quizzes
+      .filter((quiz) => getQuizPublicationDecision(quiz).isPublic)
+      .map((quiz) => sanitizePublicRecord(quiz));
   }
 
   public getQuizById(id: string): Quiz | undefined {

@@ -11,6 +11,14 @@ export interface TalaVisualizerProps {
   showTablaAudioToggle?: boolean;
 }
 
+export function getCircularBeatStyle(index: number, matras: number, radius = 80): { transform: string } {
+  const angle = (index / matras) * 2 * Math.PI - Math.PI / 2;
+  const round = (value: number) => Math.round(value * 1_000_000) / 1_000_000;
+  return {
+    transform: `translate(${round(Math.cos(angle) * radius)}px, ${round(Math.sin(angle) * radius)}px)`,
+  };
+}
+
 export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
   tala,
   initialBpm,
@@ -22,63 +30,102 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [visualMode, setVisualMode] = useState<"circular" | "linear">("circular");
 
-  const timerRef = useRef<NodeJS.Timeout | number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const playbackCancelRef = useRef<(() => void) | null>(null);
+  const currentMatraRef = useRef(1);
+  const activeTalaIdRef = useRef(tala.id);
+  const previousBpmRef = useRef(bpm);
 
   const currentBol = tala.bols.find((b) => b.matra === currentMatra) || tala.bols[0];
   const matraDurationMs = (60 / bpm) * 1000;
 
+  const stopTimer = useCallback(() => {
+    if (timerRef.current !== null) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const cancelPlayback = useCallback(() => {
+    const cancel = playbackCancelRef.current;
+    playbackCancelRef.current = null;
+    cancel?.();
+  }, []);
+
+  const selectMatra = useCallback((matra: number) => {
+    currentMatraRef.current = matra;
+    setCurrentMatra(matra);
+  }, []);
+
+  const playMatra = useCallback((matra: number) => {
+    cancelPlayback();
+    if (!audioEnabled) return;
+    const bol = tala.bols.find((candidate) => candidate.matra === matra);
+    if (bol) playbackCancelRef.current = tablaSynth.playBol(bol.bol_si, matraDurationMs);
+  }, [audioEnabled, cancelPlayback, matraDurationMs, tala.bols]);
+
   const stepNextMatra = useCallback(() => {
-    setCurrentMatra((prev) => {
-      const next = prev >= tala.matras ? 1 : prev + 1;
-      const nextBol = tala.bols.find((b) => b.matra === next);
-      if (nextBol && audioEnabled) {
-        playbackCancelRef.current?.();
-        playbackCancelRef.current = tablaSynth.playBol(nextBol.bol_si, matraDurationMs);
-      }
-      return next;
-    });
-  }, [tala.matras, tala.bols, audioEnabled, matraDurationMs]);
+    const next = currentMatraRef.current >= tala.matras ? 1 : currentMatraRef.current + 1;
+    selectMatra(next);
+    playMatra(next);
+  }, [playMatra, selectMatra, tala.matras]);
 
   useEffect(() => {
-    if (isPlaying) {
-      const intervalMs = (60 / bpm) * 1000;
-      timerRef.current = setInterval(() => {
-        stepNextMatra();
-      }, intervalMs);
-    } else {
-      playbackCancelRef.current?.();
-      playbackCancelRef.current = null;
-      if (timerRef.current) {
-        clearInterval(timerRef.current as number);
-        timerRef.current = null;
-      }
+    if (!isPlaying) {
+      stopTimer();
+      return;
     }
+    const timer = setInterval(stepNextMatra, matraDurationMs);
+    timerRef.current = timer;
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current as number);
-      }
-      playbackCancelRef.current?.();
-      playbackCancelRef.current = null;
+      clearInterval(timer);
+      if (timerRef.current === timer) timerRef.current = null;
     };
-  }, [isPlaying, bpm, stepNextMatra]);
+  }, [isPlaying, matraDurationMs, stepNextMatra, stopTimer]);
+
+  useEffect(() => {
+    if (previousBpmRef.current !== bpm) {
+      if (isPlaying) cancelPlayback();
+      previousBpmRef.current = bpm;
+    }
+  }, [bpm, cancelPlayback, isPlaying]);
+
+  useEffect(() => {
+    if (activeTalaIdRef.current === tala.id) return;
+    activeTalaIdRef.current = tala.id;
+    setIsPlaying(false);
+    stopTimer();
+    cancelPlayback();
+    selectMatra(1);
+    setBpm(initialBpm || tala.practiceTempoBpm?.thah_bpm || 75);
+  }, [cancelPlayback, initialBpm, selectMatra, stopTimer, tala.id, tala.practiceTempoBpm?.thah_bpm]);
+
+  useEffect(() => () => {
+    stopTimer();
+    cancelPlayback();
+  }, [cancelPlayback, stopTimer]);
 
   const handleTogglePlay = () => {
-    if (!isPlaying && audioEnabled) {
-      playbackCancelRef.current?.();
-      playbackCancelRef.current = tablaSynth.playBol(currentBol.bol_si, matraDurationMs);
-    } else if (isPlaying) {
-      playbackCancelRef.current?.();
-      playbackCancelRef.current = null;
+    if (isPlaying) {
+      setIsPlaying(false);
+      stopTimer();
+      cancelPlayback();
+      return;
     }
-    setIsPlaying(!isPlaying);
+    playMatra(currentMatraRef.current);
+    setIsPlaying(true);
   };
 
   const handleReset = () => {
     setIsPlaying(false);
-    playbackCancelRef.current?.();
-    playbackCancelRef.current = null;
-    setCurrentMatra(1);
+    stopTimer();
+    cancelPlayback();
+    selectMatra(1);
+  };
+
+  const handleAudioToggle = () => {
+    if (audioEnabled) cancelPlayback();
+    setAudioEnabled(!audioEnabled);
   };
 
   return (
@@ -98,7 +145,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
           {showTablaAudioToggle && (
             <button
               type="button"
-              onClick={() => setAudioEnabled(!audioEnabled)}
+              onClick={handleAudioToggle}
               className={`p-2 rounded-lg border transition-all ${
                 audioEnabled
                   ? "bg-primary-50 text-primary border-primary-200"
@@ -106,6 +153,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
               }`}
               title={audioEnabled ? "තබ්ලා නාදය නිහඬ කරන්න" : "තබ්ලා නාදය සක්‍රිය කරන්න"}
               aria-label="තබ්ලා නාදය පාලනය"
+              aria-pressed={audioEnabled}
             >
               {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </button>
@@ -170,18 +218,12 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
 
             {/* Circular Beat Dots */}
             {tala.bols.map((bol, idx) => {
-              const angle = (idx / tala.matras) * 2 * Math.PI - Math.PI / 2;
-              const radius = 80; // px
-              const x = Math.cos(angle) * radius;
-              const y = Math.sin(angle) * radius;
               const isCurrent = bol.matra === currentMatra;
 
               return (
                 <div
                   key={bol.matra}
-                  style={{
-                    transform: `translate(${x}px, ${y}px)`,
-                  }}
+                  style={getCircularBeatStyle(idx, tala.matras)}
                   className={`
                     absolute w-8 h-8 rounded-full flex flex-col items-center justify-center text-[10px] font-bold transition-all
                     ${

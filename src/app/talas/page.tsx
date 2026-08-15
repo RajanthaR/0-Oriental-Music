@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import { Feather, Activity, ArrowRight, Play, Search } from "lucide-react";
+import { Activity, Search } from "lucide-react";
 import { repository } from "@/lib/data/repository";
+import { TalaDirectoryResults } from "@/components/tala/TalaDirectoryResults";
 
 export default function TalasDirectoryPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const allTalas = repository.getTalas();
   const talas = repository.getTalas(searchQuery);
 
   return (
@@ -21,7 +22,7 @@ export default function TalasDirectoryPage() {
           ලය හා තාල නාමාවලිය
         </h1>
         <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-          මාත්‍රා, විභාග, තාළි/ඛාලි සහ ථේකාවන් සහිත උත්තර භාරතීය ප්‍රමුඛ තාල සජීවී දෘශ්‍යකාරකය සහ තබ්ලා නාද සමඟ ප්‍රගුණ කරන්න.
+          මූලාශ්‍ර සාක්ෂියෙන් සනාථ වූ මාත්‍රා, විභාග, තාළි/ඛාලි සහ ථේකා පමණක් සජීවී දෘශ්‍යකාරකය සහ තබ්ලා නාද සමඟ පුහුණු වන්න.
         </p>
       </div>
 
@@ -39,48 +40,7 @@ export default function TalasDirectoryPage() {
         </div>
       </div>
 
-      {/* Talas Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {talas.map((tala) => (
-          <Link
-            key={tala.id}
-            href={`/talas/${tala.id}`}
-            className="bg-white rounded-3xl p-6 border border-border shadow-warm-md hover:shadow-warm-lg hover:border-accent/60 transition-all flex flex-col justify-between group"
-          >
-            <div>
-              <div className="flex items-center justify-between gap-2 mb-3">
-                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-primary-50 text-primary">
-                  මාත්‍රා {tala.matras}
-                </span>
-                <span className="text-xs text-text-muted font-medium">
-                  විභාග {tala.vibhagCount} ({tala.vibhagStructure.join("+")})
-                </span>
-              </div>
-
-              <h2 className="text-lg sm:text-xl font-bold text-text group-hover:text-primary transition-colors mb-2">
-                {tala.name_si}
-              </h2>
-
-              <div className="space-y-1 text-xs text-text-secondary mb-4 bg-surface-warm p-3.5 rounded-2xl border border-border-light">
-                <span className="font-bold text-text block mb-1">ථේකාව (Theka):</span>
-                <p className="font-mono text-xs text-primary font-semibold">
-                  {tala.theka_si}
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-border-light flex items-center justify-between text-xs">
-              <span className="text-text-muted font-medium">
-                ශ්‍රේණි කාණ්ඩය: {tala.gradeBands.join(", ")}
-              </span>
-              <span className="font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                <span>දෘශ්‍යකාරකය බලන්න</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </span>
-            </div>
-          </Link>
-        ))}
-      </div>
+      <TalaDirectoryResults allTalas={allTalas} talas={talas} onClearSearch={() => setSearchQuery("")} />
     </div>
   );
 }

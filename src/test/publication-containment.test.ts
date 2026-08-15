@@ -2,12 +2,14 @@ import { describe, expect, it } from "vitest";
 import coverageData from "../../data/content-coverage.json";
 import ragasData from "@/data/ragas.json";
 import talasData from "@/data/talas.json";
+import musicalCoreFieldDispositions from "../../data/musical-core-field-dispositions.json";
 import { repository } from "@/lib/data/repository";
 import {
   evaluateSourceReference,
   getContextClaimPublicationDecision,
   getRecordPublicationDecision,
   getSourceCorpusInventory,
+  getTalaFieldDisposition,
   KNOWN_QUARANTINED_ENTITY_IDS,
   UNKNOWN_PROVENANCE,
 } from "@/lib/data/publication-policy";
@@ -16,6 +18,7 @@ import {
   validateCoverageSnapshot,
   validateForensicInventory,
   validateForensicLedger,
+  validateMusicalCoreFieldDispositions,
   validatePublicBoundary,
   validatePublicCollection,
 } from "@/lib/validation/content-validator";
@@ -54,10 +57,11 @@ describe("Prompt 1 publication containment", () => {
 
     // Remediated Phase 2 records are public and verified
     expect(repository.getLessonById("les-intro-01")).toBeDefined();
-    expect(repository.getLessonById("les-tala-dadra")).toBeDefined();
+    expect(repository.getLessonById("les-tala-dadra")).toBeUndefined();
     expect(repository.getRagaById("raga-bilawal")).toBeDefined();
-    expect(repository.getTalaById("tala-dadra")).toBeDefined();
-    expect(repository.getTalaById("tala-lawani")).toBeDefined();
+    expect(repository.getTalaById("tala-dadra")).toBeUndefined();
+    expect(repository.getTalaById("tala-lawani")).toBeUndefined();
+    expect(repository.getTalaById("tala-khemta")).toBeDefined();
   });
 
   it("prevents CMS review status updates from leaking quarantined records into public getters", () => {
@@ -203,7 +207,7 @@ describe("Prompt 1 publication containment", () => {
     });
   });
 
-  it("keeps Lawani's supported core public while withholding unsupported nested context", () => {
+  it("quarantines Lawani as a whole entity while its required context is unresolved", () => {
     const rawLawani = talasData.find((tala) => tala.id === "tala-lawani");
     expect(rawLawani).toBeDefined();
     expect(getContextClaimPublicationDecision(rawLawani)).toMatchObject({
@@ -212,14 +216,44 @@ describe("Prompt 1 publication containment", () => {
       reasonCode: "source-document-needs-review",
     });
 
-    const publicLawani = repository.getTalaById("tala-lawani");
-    expect(publicLawani).toBeDefined();
-    expect(publicLawani).not.toHaveProperty("context_si");
-    expect(publicLawani).not.toHaveProperty("contextSourceReference");
+    expect(repository.getTalaById("tala-lawani")).toBeUndefined();
+    expect(getRecordPublicationDecision(rawLawani)).toMatchObject({
+      isPublic: false,
+      state: "quarantined",
+    });
 
     const publicKhemta = repository.getTalaById("tala-khemta");
-    expect(publicKhemta).toHaveProperty("context_si");
+    expect(publicKhemta).toBeDefined();
     expect(getContextClaimPublicationDecision(publicKhemta).isPublic).toBe(true);
+  });
+
+  it("preserves the historical baseline without claiming a stored SHA is the current checkout", () => {
+    expect(validateForensicLedger()).toEqual({ isValid: true, issues: [] });
+    const staleHeader = structuredClone(forensicLedgerData) as unknown as Record<string, unknown>;
+    staleHeader.phase = "Prompt 1 / publication containment and source baseline";
+    staleHeader.authority = "Current checkout at base 6e62a3ad2d9621b8790d35af3358b08fafceaa57";
+    staleHeader.auditedThrough = { phase: "Phase 2" };
+    const result = validateForensicLedger(staleHeader);
+    expect(result.isValid).toBe(false);
+    expect(result.issues.map((issue) => issue.field)).toEqual(expect.arrayContaining([
+      "phase",
+      "authority",
+      "auditedThrough",
+    ]));
+  });
+
+  it("keeps unsupported musical and acoustics claims out of every public projection", () => {
+    const publicProjection = JSON.stringify({
+      lessons: repository.getLessons(),
+      ragas: repository.getRagas(),
+      talas: repository.getTalas(),
+      glossary: repository.getGlossary(),
+      learningPaths: repository.getLearningPaths(),
+      quizzes: repository.getQuizzes(),
+      exams: repository.getExamPapers(),
+    });
+    expect(publicProjection).not.toMatch(/භෛරව්(?:\s|["'])|රූපක්|"tala-roopak"|"raga-bhairav"/);
+    expect(publicProjection).not.toMatch(/Frequency\s*-\s*Hz|හර්ට්ස්|\bHz\b|වයලීන හා බටනලා|මූලික ථාට රාගය/);
   });
 
   it("requires every cited page to contain readable A/B Sinhala evidence", () => {
@@ -234,7 +268,7 @@ describe("Prompt 1 publication containment", () => {
   });
 
   it("requires each public grade band to contain a grade established by its source", () => {
-    const rawDadra = structuredClone(repository.getTalaById("tala-dadra"));
+    const rawDadra = structuredClone(talasData.find((tala) => tala.id === "tala-dadra"));
     expect(rawDadra).toBeDefined();
     if (!rawDadra) return;
     rawDadra.gradeBands = ["6-7", "10-11"];
@@ -263,5 +297,147 @@ describe("Prompt 1 publication containment", () => {
     }
     expect(repository.getQuizById(quiz.id)).toBeDefined();
     expect(repository.getPublicationSummary().quizzes.public).toBe(repository.getQuizzes().length);
+  });
+
+  it("fails closed when canonical grade scope is missing instead of inferring it", () => {
+    const bilawal = structuredClone(ragasData.find((raga) => raga.id === "raga-bilawal"));
+    expect(bilawal).toBeDefined();
+    if (!bilawal) return;
+    delete (bilawal as { gradeBands?: unknown }).gradeBands;
+    const decision = getRecordPublicationDecision(bilawal);
+    expect(decision.isPublic).toBe(false);
+    expect(decision.gradeBands).toEqual([]);
+    expect(decision.reasonCodes).toContain("missing-grade-scope");
+    expect(decision.reasonCodes).not.toContain("source-grade-mismatch");
+  });
+
+  it("composes malformed, wrong-grade, and review-required context into parent publication", () => {
+    const khemta = talasData.find((tala) => tala.id === "tala-khemta");
+    expect(khemta).toBeDefined();
+    if (!khemta) return;
+
+    const malformed = structuredClone(khemta) as Record<string, unknown>;
+    malformed.context_si = { text: "not learner text" };
+    expect(getRecordPublicationDecision(malformed).isPublic).toBe(false);
+    expect(getRecordPublicationDecision(malformed).reasonCodes).toContain("unpaired-context-claim");
+
+    const wrongGrade = structuredClone(khemta) as Record<string, unknown>;
+    wrongGrade.context_si = "සන්දර්භය";
+    wrongGrade.contextSourceReference = {
+      sourceId: "SRC-G07-VIOLIN",
+      pageOrSection: "sg7_emus_chap2.1.2_violin.pdf පිටුව 1",
+    };
+    expect(getRecordPublicationDecision(wrongGrade).isPublic).toBe(false);
+    expect(getRecordPublicationDecision(wrongGrade).reasonCodes).toContain("source-grade-mismatch");
+
+    const referenceOnly = structuredClone(khemta) as Record<string, unknown>;
+    delete referenceOnly.context_si;
+    expect(getRecordPublicationDecision(referenceOnly).reasonCodes).toContain("unpaired-context-claim");
+  });
+
+  it("requires every tala disposition row and quarantines any incomplete playable evidence", () => {
+    const registry = musicalCoreFieldDispositions.talas;
+    expect(registry).toHaveLength(talasData.length);
+    talasData.forEach((tala) => {
+      const disposition = getTalaFieldDisposition(tala.id);
+      expect(disposition).toBeDefined();
+      expect(disposition?.context).toBeDefined();
+      expect(disposition?.theka).toBeDefined();
+      expect(disposition?.bols).toHaveLength(tala.bols.length);
+    });
+    expect(getTalaFieldDisposition("tala-khemta")?.allRequiredFieldsVerified).toBe(true);
+    ["tala-dadra", "tala-keherwa", "tala-teental", "tala-jhaptal", "tala-deepchandi", "tala-lawani", "tala-roopak"]
+      .forEach((id) => {
+        expect(getTalaFieldDisposition(id)?.allRequiredFieldsVerified).toBe(false);
+        expect(repository.getTalaById(id)).toBeUndefined();
+      });
+    expect(repository.getPublicationSummary().talas.public).toBe(1);
+    expect(validateMusicalCoreFieldDispositions()).toEqual({ isValid: true, issues: [] });
+  });
+
+  it("rejects missing field evidence and registry values that drift from raw audit data", () => {
+    const mutated = structuredClone(musicalCoreFieldDispositions) as typeof musicalCoreFieldDispositions;
+    const khemta = mutated.talas.find((entry) => entry.talaId === "tala-khemta");
+    expect(khemta).toBeDefined();
+    if (!khemta) return;
+    delete (khemta.bols[0] as { sourceReference?: unknown }).sourceReference;
+    (khemta.bols[1] as { value?: string }).value = "invented";
+    const result = validateMusicalCoreFieldDispositions(talasData, mutated);
+    expect(result.isValid).toBe(false);
+    expect(result.issues.map((issue) => issue.field)).toEqual(expect.arrayContaining([
+      "bols[0].sourceReference",
+      "bols[1].value",
+    ]));
+  });
+
+  it("fails the runtime Tala projection closed when a verified registry value drifts", () => {
+    const khemta = musicalCoreFieldDispositions.talas.find((entry) => entry.talaId === "tala-khemta");
+    expect(khemta).toBeDefined();
+    if (!khemta) return;
+    const firstBol = khemta.bols[0] as { value?: string };
+    const originalValue = firstBol.value;
+    try {
+      firstBol.value = "invented";
+      expect(getTalaFieldDisposition("tala-khemta")?.allRequiredFieldsVerified).toBe(false);
+      expect(getRecordPublicationDecision(talasData.find((tala) => tala.id === "tala-khemta"))).toMatchObject({
+        isPublic: false,
+        reasonCodes: expect.arrayContaining(["field-disposition-needs-review"]),
+      });
+    } finally {
+      firstBol.value = originalValue;
+    }
+  });
+
+  it("rejects strict locator confusables, malformed numbers, and unconsumed clauses", () => {
+    const locators = [
+      "sg10_emus_chap8_nadaya.wrong\u200Bpdf පිටුව 2",
+      "sg10_emus_chap8_nadaya\uFF0Epdf පිටුව 2",
+      "sg10_emus_chap8_nadaya.pdf පිටුව 2.5",
+      "sg10_emus_chap8_nadaya.pdf පිටුව 2abc",
+      "sg10_emus_chap8_nadaya.pdf පිටුව 2; පිටුව -999",
+      "sg10_emus_chap8_nadaya.pdf පිටුව 2; page II",
+      "sg10_emus_chap8_nadaya.pdf පිටුව 2 trailing page 3",
+    ];
+    locators.forEach((pageOrSection) => {
+      expect(evaluateSourceReference({ sourceId: "SRC-G10-NADA", pageOrSection })).toMatchObject({
+        supportable: false,
+      });
+    });
+    expect(evaluateSourceReference({
+      sourceId: "SRC-G10-NADA",
+      pageOrSection: "sg10_emus_chap8_nadaya.pdf පිටු 2-4",
+    }).supportable).toBe(true);
+    expect(evaluateSourceReference({
+      sourceId: "SRC-EPD-TB-G11",
+      pageOrSection: "s11tim173.pdf පිටුව 24 trailing page 99",
+    }).reasonCode).toBe("missing-page-evidence");
+  });
+
+  it("quarantines records that reverse-depend on an unavailable raga", () => {
+    const dependent = {
+      id: "synthetic-raga-dependent",
+      gradeBands: ["10-11"],
+      sourceReference: {
+        sourceId: "SRC-G11-RAGA-ID",
+        pageOrSection: "sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 1",
+      },
+      selectedRagaId: "raga-bhairav",
+    };
+    expect(getRecordPublicationDecision(dependent)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["dependent-entity-unavailable"]),
+    });
+  });
+
+  it("keeps missing quiz parent grades and parent identity non-public", () => {
+    const quiz = structuredClone(quizzesData.find((item) => item.id === "quiz-les-intro-01"));
+    expect(quiz).toBeDefined();
+    if (!quiz) return;
+    delete (quiz as { lessonId?: unknown }).lessonId;
+    expect(getRecordPublicationDecision(quiz).isPublic).toBe(false);
+    expect(getRecordPublicationDecision(quiz).reasonCodes).toContain("parent-lesson-unavailable");
+    delete (quiz.questions[0] as { gradeBands?: unknown }).gradeBands;
+    expect(getRecordPublicationDecision(quiz).isPublic).toBe(false);
+    expect(getRecordPublicationDecision(quiz).reasonCodes).toContain("nested-question-unpublishable");
   });
 });

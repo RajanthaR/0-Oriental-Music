@@ -1,4 +1,4 @@
-import { Lesson, Raga, Tala, Instrument, CulturalTradition, TheatreTradition } from "@/types/content";
+import { Lesson, Raga, Tala, Instrument, CulturalTradition, TheatreTradition, SourceReference } from "@/types/content";
 import sourcesData from "@/data/sources.json";
 import lessonsData from "@/data/lessons.json";
 import ragasData from "@/data/ragas.json";
@@ -16,7 +16,9 @@ import sourcePageQualityData from "../../../data/source-page-quality.json";
 import reconciliationData from "../../../data/content-reconciliation.json";
 import forensicLedgerData from "../../../data/forensic-ledger.json";
 import coverageData from "../../../data/content-coverage.json";
+import musicalCoreFieldDispositionsData from "../../../data/musical-core-field-dispositions.json";
 import {
+  evaluateSourceReference,
   getRecordPublicationDecision,
   UNKNOWN_PROVENANCE,
 } from "@/lib/data/publication-policy";
@@ -37,8 +39,13 @@ export interface PublicationValidationResult {
   issues: ValidationIssue[];
 }
 
-type IdentityRecord = {
+export type IdentityRecord = {
   id?: unknown;
+  name_si?: unknown;
+  name_en?: unknown;
+  aliases_si?: unknown;
+  title_si?: unknown;
+  title_en?: unknown;
   term_si?: unknown;
   term_en?: unknown;
   transliteration?: unknown;
@@ -49,51 +56,302 @@ const identityKey = (value: string) =>
   normalizeSinhalaText(value).replace(/[\s()|,.'’\-–—/]/g, "");
 
 export function validateCatalogIdentityContracts(
-  catalogs: Array<{ type: string; records: IdentityRecord[] }>,
-  glossaryRecords: IdentityRecord[],
-  terminologyRecords: IdentityRecord[]
+  catalogs: Array<{ type: string; records: unknown[] }>,
+  glossaryRecords: unknown[],
+  terminologyRecords: unknown[]
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
+  const issueFor = (type: string, entityId: string, field: string, message: string): void => {
+    issues.push({ entityType: type, entityId, field, message, severity: "error" });
+  };
+  const objectRecords = (type: string, records: unknown[]): Array<{ record: Record<string, unknown>; index: number }> => {
+    const result: Array<{ record: Record<string, unknown>; index: number }> = [];
+    records.forEach((candidate, index) => {
+      if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
+        issueFor(type, String(index), "record", `${type} record must be a non-null object`);
+        return;
+      }
+      result.push({ record: candidate as Record<string, unknown>, index });
+    });
+    return result;
+  };
+
   catalogs.forEach(({ type, records }) => {
     const ids = new Set<string>();
-    records.forEach((record) => {
-      if (typeof record.id !== "string" || !record.id.trim() || ids.has(record.id)) {
-        issues.push({ entityType: type, entityId: String(record.id ?? ""), field: "id", message: `Duplicate or missing ${type} ID`, severity: "error" });
-      } else ids.add(record.id);
+    objectRecords(type, Array.isArray(records) ? records : []).forEach(({ record, index }) => {
+      const id = typeof record.id === "string" ? record.id.trim() : "";
+      if (!id || ids.has(id)) {
+        issueFor(type, id || String(index), "id", `Duplicate or missing ${type} ID`);
+      } else ids.add(id);
     });
   });
 
-  const validateTerms = (type: "Glossary" | "Terminology", records: IdentityRecord[]) => {
-    const identities = new Map<string, string>();
-    records.forEach((record) => {
+  const sharedTermIdentities = new Map<string, string>();
+  const validateTerms = (type: "Glossary" | "Terminology", records: unknown[]) => {
+    const identities = new Map<string, { id: string; canonical: boolean }>();
+    objectRecords(type, Array.isArray(records) ? records : []).forEach(({ record }) => {
       const id = typeof record.id === "string" ? record.id : "";
       const canonical = typeof record.term_si === "string" ? record.term_si.trim() : "";
       if (!canonical) {
-        issues.push({ entityType: type, entityId: id, field: "term_si", message: `${type} canonical term is missing`, severity: "error" });
+        issueFor(type, id, "term_si", `${type} canonical term is missing`);
       }
       const sharedVariants = [record.term_en, record.transliteration]
         .filter((variant): variant is string => typeof variant === "string" && !!variant.trim());
-      const variants = type === "Terminology"
+      const variants: unknown[] = type === "Terminology"
         ? [...sharedVariants, ...(Array.isArray(record.knownVariants) ? record.knownVariants : [])]
         : sharedVariants;
       if (type === "Terminology" && (!Array.isArray(record.knownVariants) || variants.some((variant) => typeof variant !== "string" || !variant.trim()))) {
-        issues.push({ entityType: type, entityId: id, field: "knownVariants", message: "Terminology variants must be non-empty strings", severity: "error" });
+        issueFor(type, id, "knownVariants", "Terminology variants must be non-empty strings");
       }
-      [canonical, ...variants.filter((variant): variant is string => typeof variant === "string")]
-        .filter(Boolean)
-        .forEach((name) => {
-          const key = identityKey(name);
-          const existing = identities.get(key);
-          if (existing && existing !== id) {
-            issues.push({ entityType: type, entityId: id, field: type === "Terminology" ? "knownVariants" : "term_si", message: `Search-equivalent ${type.toLowerCase()} identity collides with '${existing}'`, severity: "error" });
-          } else identities.set(key, id);
-        });
+      const variantNames = variants.filter((variant): variant is string => typeof variant === "string" && !!variant.trim());
+      [{ name: canonical, canonical: true }, ...variantNames.map((name) => ({ name, canonical: false }))]
+        .filter(({ name }) => !!name)
+        .forEach(({ name, canonical: isCanonical }) => {
+           const key = identityKey(name);
+           const existing = identities.get(key);
+           if (existing && existing.id !== id) {
+             issueFor(type, id, isCanonical ? "term_si" : type === "Terminology" ? "knownVariants" : "term_en", `Search-equivalent ${type.toLowerCase()} identity collides with '${existing.id}'`);
+           } else if (!existing) {
+             identities.set(key, { id, canonical: isCanonical });
+           }
+           const sharedOwner = sharedTermIdentities.get(key);
+           if (sharedOwner && sharedOwner !== id) {
+             issueFor(type, id, type === "Terminology" ? "knownVariants" : "term_si", `Search-equivalent terminology/glossary identity collides with '${sharedOwner}'`);
+           } else {
+             sharedTermIdentities.set(key, id);
+           }
+         });
     });
   };
 
   validateTerms("Glossary", glossaryRecords);
   validateTerms("Terminology", terminologyRecords);
+
+  const identityFields = ["name_si", "name_en", "aliases_si", "title_si", "title_en"] as const;
+  catalogs.forEach(({ type, records }) => {
+    const owners = new Map<string, { id: string; canonical: boolean }>();
+    objectRecords(type, Array.isArray(records) ? records : []).forEach(({ record, index }) => {
+      const id = typeof record.id === "string" ? record.id : String(index);
+      const canonicalValues = identityFields
+        .filter((field) => field === "name_si" || field === "name_en" || field === "title_si" || field === "title_en")
+        .flatMap((field) => typeof record[field] === "string" ? [record[field] as string] : []);
+      const aliases = Array.isArray(record.aliases_si) ? record.aliases_si : [];
+      if (record.aliases_si !== undefined && !Array.isArray(record.aliases_si)) {
+        issueFor(type, id, "aliases_si", "Aliases must be an array of non-empty strings");
+      }
+      const local = new Map<string, { name: string; canonical: boolean }>();
+      [...canonicalValues.map((name) => ({ name, canonical: true })), ...aliases.map((name) => ({ name, canonical: false }))]
+        .forEach(({ name, canonical }) => {
+          if (typeof name !== "string" || !name.trim()) {
+            issueFor(type, id, "aliases_si", "Identity values must be non-empty strings");
+            return;
+          }
+          const key = identityKey(name);
+          const localExisting = local.get(key);
+          if (localExisting) {
+            issueFor(type, id, "aliases_si", localExisting.canonical !== canonical
+              ? `Canonical identity '${name}' must not also be an alias`
+              : `Duplicate identity '${name}' within one record`);
+          } else {
+            local.set(key, { name, canonical });
+          }
+          const existing = owners.get(key);
+          if (existing && existing.id !== id) {
+            issueFor(type, id, "aliases_si", `Search-equivalent identity '${name}' collides with '${existing.id}'`);
+          } else if (!existing) {
+            owners.set(key, { id, canonical });
+          }
+        });
+    });
+  });
   return issues;
+}
+
+export const SELECTED_PHASE_2_SOURCE_IDS = [
+  "SRC-EPD-TB-G10",
+  "SRC-EPD-TB-G11",
+  "SRC-G10-NADA",
+  "SRC-G11-RAGA-ID",
+] as const;
+
+export function validateSelectedSourceMetadata(
+  runtimeSources: unknown,
+  manifestSources: unknown,
+  sourceDocuments: unknown,
+  humanCatalog: unknown
+): PublicationValidationResult {
+  const issues: ValidationIssue[] = [];
+  const addIssue = (id: string, field: string, message: string) => issues.push({
+    entityType: "SourceMetadata",
+    entityId: id,
+    field,
+    message,
+    severity: "error" as const,
+  });
+  const records = (value: unknown): Record<string, unknown>[] =>
+    Array.isArray(value) ? value.filter(isRecord) : [];
+  const runtime = records(runtimeSources);
+  const manifest = records(manifestSources);
+  const documents = records(sourceDocuments);
+  const humanText = typeof humanCatalog === "string" ? humanCatalog : "";
+  const sharedFields = [
+    "title",
+    "originalFilename",
+    "grades",
+    "year",
+    "language",
+    "tier",
+    "location",
+    "status",
+    "license",
+  ] as const;
+
+  SELECTED_PHASE_2_SOURCE_IDS.forEach((id) => {
+    const runtimeRecord = runtime.find((entry) => entry.id === id);
+    const manifestRecord = manifest.find((entry) => entry.id === id);
+    if (!runtimeRecord || !manifestRecord) {
+      addIssue(id, "id", "Selected Phase 2 source must exist in both JSON catalogs");
+      return;
+    }
+    const filename = runtimeRecord.originalFilename;
+    const document = typeof filename === "string"
+      ? documents.find((entry) => entry.originalFilename === filename)
+      : undefined;
+    if (!document) {
+      addIssue(id, "originalFilename", "Selected source must resolve to exactly one extracted document filename");
+    }
+    sharedFields.forEach((field) => {
+      if (JSON.stringify(runtimeRecord[field]) !== JSON.stringify(manifestRecord[field])) {
+        addIssue(id, field, `Runtime and manifest source metadata disagree for '${field}'`);
+      }
+    });
+    ["publisher", "year", "location", "license"].forEach((field) => {
+      if (runtimeRecord[field] !== UNKNOWN_PROVENANCE || manifestRecord[field] !== UNKNOWN_PROVENANCE) {
+        addIssue(id, field, `Unsupported '${field}' metadata must remain explicitly unknown`);
+      }
+    });
+    if (runtimeRecord.tier !== "Unverified source metadata" || manifestRecord.tier !== "Unverified source metadata") {
+      addIssue(id, "tier", "Selected source tier must remain unverified");
+    }
+    if (runtimeRecord.url !== undefined || manifestRecord.url !== undefined) {
+      addIssue(id, "url", "Selected source URL is not established by the supplied corpus");
+    }
+    if (runtimeRecord.topics !== undefined || manifestRecord.topics !== undefined) {
+      addIssue(id, "topics", "Selected source topics must come only from extracted-document triage");
+    }
+    if (document) {
+      const grades = Array.isArray(runtimeRecord.grades) ? runtimeRecord.grades : [];
+      if (typeof document.statedGrade !== "string" || !grades.includes(document.statedGrade)) {
+        addIssue(id, "grades", "Selected source grade must match the extracted document");
+      }
+      const expectedStatus = document.reviewStatus === "Review Required"
+        ? "Review Required"
+        : "Source identity triaged; metadata unverified";
+      if (runtimeRecord.status !== expectedStatus) {
+        addIssue(id, "status", "Selected source status must reflect extracted-document triage");
+      }
+    }
+    const humanRow = humanText.split(/\r?\n/).find((line) => line.includes(`\`${id}\``)) || "";
+    if (!humanRow || typeof filename !== "string" || !humanRow.includes(filename) || !humanRow.includes(UNKNOWN_PROVENANCE)) {
+      addIssue(id, "SOURCES.md", "Human source row must retain the exact filename and explicit unknown metadata");
+    }
+    if (/භෛරව්|Bhairav|edupub|Canonical School Source|Educational Reference|\|\s*20(?:19|20)\s*\|/.test(humanRow)) {
+      addIssue(id, "SOURCES.md", "Human source row contains an unsupported topic or provenance claim");
+    }
+  });
+
+  return { isValid: issues.length === 0, issues };
+}
+
+export function validateMusicalCoreFieldDispositions(
+  rawTalas: unknown[] = talasData as unknown[],
+  registryInput: unknown = musicalCoreFieldDispositionsData
+): PublicationValidationResult {
+  const issues: ValidationIssue[] = [];
+  const registry = isRecord(registryInput) ? registryInput : {};
+  const entries = asUnknownArray(registry.talas).filter(isRecord) as Array<{
+    talaId: string;
+    context: { status: string; scope?: string; sourceReference?: unknown; quality?: string; issueId?: string };
+    theka: { status: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string };
+    bols: Array<{ matra: number; status: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string }>;
+  }>;
+  if (registry.policy !== "whole-entity-quarantine" || JSON.stringify(registry.requiredFields) !== JSON.stringify(["context", "theka", "bols"])) {
+    issues.push({ entityType: "TalaFieldDisposition", entityId: "registry", field: "policy", message: "Registry must require context, theka, and bols under whole-entity quarantine", severity: "error" });
+  }
+  const entryById = new Map(entries.map((entry) => [entry.talaId, entry]));
+  if (entryById.size !== entries.length) {
+    issues.push({ entityType: "TalaFieldDisposition", entityId: "registry", field: "talaId", message: "Registry tala IDs must be unique", severity: "error" });
+  }
+  const hasExactEvidence = (reference: unknown, status: string): boolean => {
+    if (!isRecord(reference) || typeof reference.sourceId !== "string" || typeof reference.pageOrSection !== "string") return false;
+    const decision = evaluateSourceReference(reference as unknown as SourceReference);
+    if (status === "verified") return decision.supportable;
+    return !!decision.documentId && decision.pageNumbers.length > 0 && [
+      "supportable",
+      "source-document-needs-review",
+      "low-quality-page-evidence",
+    ].includes(decision.reasonCode);
+  };
+  const seen = new Set<string>();
+  asUnknownArray(rawTalas).forEach((candidate, index) => {
+    if (!isRecord(candidate) || typeof candidate.id !== "string") {
+      issues.push({ entityType: "TalaFieldDisposition", entityId: String(index), field: "talaId", message: "Disposition input must identify a tala", severity: "error" });
+      return;
+    }
+    const id = candidate.id;
+    const entry = entryById.get(id);
+    if (!entry) {
+      issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: "record", message: "Every tala must have a closed-world field disposition", severity: "error" });
+      return;
+    }
+    seen.add(id);
+    if (!entry.context || !entry.theka || !Array.isArray(entry.bols)) {
+      issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: "fields", message: "Context, theka, and bols disposition rows are required", severity: "error" });
+      return;
+    }
+    ["context", "theka"].forEach((field) => {
+      const value = entry[field as "context" | "theka"];
+      if (value.status !== "verified" && value.status !== "needs-review") {
+        issues.push({ entityType: "TalaFieldDisposition", entityId: id, field, message: "Disposition status must be verified or needs-review", severity: "error" });
+      }
+      if (!value.quality || !value.issueId) {
+        issues.push({ entityType: "TalaFieldDisposition", entityId: id, field, message: "Every disposition requires quality and forensic issue anchors", severity: "error" });
+      }
+      const contextScope = field === "context" ? entry.context.scope : undefined;
+      const evidenceRequired = value.quality !== "missing" && !(field === "context" && contextScope === "not-claimed");
+      if (evidenceRequired && !hasExactEvidence(value.sourceReference, value.status)) {
+        issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `${field}.sourceReference`, message: "Readable disposition fields require exact supportable source evidence", severity: "error" });
+      }
+    });
+    if (entry.theka.quality !== "missing" && entry.theka.value !== candidate.theka_si) {
+      issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: "theka.value", message: "Theka disposition must preserve the raw auditable value", severity: "error" });
+    }
+    const rawBols = Array.isArray(candidate.bols) ? candidate.bols : [];
+    if (entry.bols.length !== rawBols.length) {
+      issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: "bols", message: "Disposition must enumerate every raw tala bol cell", severity: "error" });
+    }
+    entry.bols.forEach((bol, bolIndex) => {
+      if (bol.matra !== bolIndex + 1 || (bol.status !== "verified" && bol.status !== "needs-review")) {
+        issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}]`, message: "Bol disposition must preserve sequential matra and status", severity: "error" });
+      }
+      const rawBol = isRecord(rawBols[bolIndex]) ? rawBols[bolIndex] : undefined;
+      if (bol.quality !== "missing" && bol.value !== rawBol?.bol_si) {
+        issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}].value`, message: "Bol disposition must preserve the raw auditable cell", severity: "error" });
+      }
+      if (!bol.quality || !bol.issueId) {
+        issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}]`, message: "Every bol disposition requires quality and forensic issue anchors", severity: "error" });
+      }
+      if (bol.quality !== "missing" && !hasExactEvidence(bol.sourceReference, bol.status)) {
+        issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}].sourceReference`, message: "Readable bol fields require exact supportable source evidence", severity: "error" });
+      }
+    });
+  });
+  entries.forEach((entry) => {
+    if (!seen.has(entry.talaId)) {
+      issues.push({ entityType: "TalaFieldDisposition", entityId: entry.talaId, field: "record", message: "Disposition contains an entity absent from the raw tala catalog", severity: "error" });
+    }
+  });
+  return { isValid: issues.length === 0, issues };
 }
 
 type BaselineLedger = {
@@ -415,6 +673,29 @@ export function validateForensicLedger(
 ): PublicationValidationResult {
   const issues: ValidationIssue[] = [];
   const ledger = (ledgerInput || {}) as Record<string, unknown>;
+  const historicalBaseline = isRecord(ledger.historicalBaseline) ? ledger.historicalBaseline : {};
+  const auditedThrough = isRecord(ledger.auditedThrough) ? ledger.auditedThrough : {};
+  if (typeof ledger.phase !== "string" || !ledger.phase.startsWith("Phase 2 closeout")) {
+    issues.push(baselineIssue("forensic-ledger", "header", "phase", "Ledger header must identify the Phase 2 closeout scope."));
+  }
+  if (typeof ledger.authority !== "string" || /current checkout/i.test(ledger.authority)) {
+    issues.push(baselineIssue("forensic-ledger", "header", "authority", "Ledger authority must not claim a stored SHA is the current checkout."));
+  }
+  if (
+    historicalBaseline.phase !== "Prompt 1 / publication containment and source baseline" ||
+    historicalBaseline.baseSha !== "6e62a3ad2d9621b8790d35af3358b08fafceaa57"
+  ) {
+    issues.push(baselineIssue("forensic-ledger", "header", "historicalBaseline", "Prompt 1 baseline phase and base SHA must remain immutable historical metadata."));
+  }
+  if (
+    auditedThrough.phase !== "Phase 2 p02r4 findings input" ||
+    auditedThrough.baseSha !== "beba1479f473b3413b3f2de48a27c558e1937c6f" ||
+    auditedThrough.reviewedHead !== "97c0c138b2b90ac27516a3c8c3716361ac537981" ||
+    auditedThrough.reviewRunId !== "20260815-235819-p02r4" ||
+    auditedThrough.status !== "Findings input only; not acceptance evidence"
+  ) {
+    issues.push(baselineIssue("forensic-ledger", "header", "auditedThrough", "Latest audited Phase 2 findings-input scope must be explicit and must not claim acceptance."));
+  }
   const schema = (ledger.issueSchema || {}) as {
     requiredIssueFields?: string[];
     optionalIssueFields?: string[];
@@ -457,6 +738,9 @@ export function validateForensicLedger(
   }
 
   const seenIssueIds = new Set<string>();
+  if (ledger.issueCountBaseline !== ledgerIssues.length) {
+    issues.push(baselineIssue("forensic-ledger", "issues", "issueCountBaseline", "Ledger issue count baseline must remain synchronized."));
+  }
 
   ledgerIssues.forEach((issue, index) => {
     if (!issue || typeof issue !== "object") {
@@ -528,41 +812,79 @@ export function validateForensicLedger(
   };
 }
 
+function asUnknownArray(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+function entityId(value: unknown, index: number): string {
+  return isRecord(value) && typeof value.id === "string" ? value.id : String(index);
+}
+
 export function validateContent(
-  lessons: Lesson[],
-  ragas: Raga[],
-  talas: Tala[],
-  instruments: Instrument[],
-  culturalTraditions: CulturalTradition[],
-  theatreTraditions: TheatreTradition[]
+  lessons: unknown,
+  ragas: unknown,
+  talas: unknown,
+  instruments: unknown,
+  culturalTraditions: unknown,
+  theatreTraditions: unknown
 ): { isValid: boolean; issues: ValidationIssue[] } {
   const issues: ValidationIssue[] = [];
   const validSourceIds = new Set(sourcesData.map((s) => s.id));
+  const structuralRecords = (type: string, value: unknown): Record<string, unknown>[] => {
+    return asUnknownArray(value).flatMap((candidate, index) => {
+      if (!isRecord(candidate)) {
+        issues.push({
+          entityType: type,
+          entityId: String(index),
+          field: "record",
+          message: `${type} record must be a non-null object`,
+          severity: "error",
+        });
+        return [];
+      }
+      return [candidate];
+    });
+  };
+  const lessonRecords = structuralRecords("Lesson", lessons) as unknown as Lesson[];
+  const ragaRecords = structuralRecords("Raga", ragas) as unknown as Raga[];
+  const talaRecords = structuralRecords("Tala", talas) as unknown as Tala[];
+  const instrumentRecords = structuralRecords("Instrument", instruments) as unknown as Instrument[];
+  const culturalRecords = structuralRecords("CulturalTradition", culturalTraditions) as unknown as CulturalTradition[];
+  const theatreRecords = structuralRecords("TheatreTradition", theatreTraditions) as unknown as TheatreTradition[];
   const allEntities = [
-    ...lessons.map((item) => ({ type: "Lesson", item })),
-    ...ragas.map((item) => ({ type: "Raga", item })),
-    ...talas.map((item) => ({ type: "Tala", item })),
-    ...instruments.map((item) => ({ type: "Instrument", item })),
-    ...culturalTraditions.map((item) => ({ type: "CulturalTradition", item })),
-    ...theatreTraditions.map((item) => ({ type: "TheatreTradition", item })),
+    ...lessonRecords.map((item) => ({ type: "Lesson", item })),
+    ...ragaRecords.map((item) => ({ type: "Raga", item })),
+    ...talaRecords.map((item) => ({ type: "Tala", item })),
+    ...instrumentRecords.map((item) => ({ type: "Instrument", item })),
+    ...culturalRecords.map((item) => ({ type: "CulturalTradition", item })),
+    ...theatreRecords.map((item) => ({ type: "TheatreTradition", item })),
   ];
   const seenIds = new Set<string>();
   allEntities.forEach(({ type, item }) => {
-    if (seenIds.has(item.id)) {
+    const id = typeof item.id === "string" ? item.id : "";
+    if (!id) {
+      issues.push({ entityType: type, entityId: "", field: "id", message: `${type} ID is missing`, severity: "error" });
+      return;
+    }
+    if (seenIds.has(id)) {
       issues.push({
         entityType: type,
-        entityId: item.id,
+        entityId: id,
         field: "id",
-        message: `Duplicate canonical content ID '${item.id}'`,
+        message: `Duplicate canonical content ID '${id}'`,
         severity: "error",
       });
     }
-    seenIds.add(item.id);
+    seenIds.add(id);
   });
 
   // Validate Lessons
-  lessons.forEach((l) => {
-    if (!l.title_si || !l.title_si.trim()) {
+  lessonRecords.forEach((l) => {
+    if (typeof l.title_si !== "string" || !l.title_si.trim()) {
       issues.push({
         entityType: "Lesson",
         entityId: l.id,
@@ -572,7 +894,7 @@ export function validateContent(
       });
     }
 
-    if (!l.learningGoal_si || !l.learningGoal_si.startsWith("මෙම පාඩම අවසානයේ ඔබට")) {
+    if (typeof l.learningGoal_si !== "string" || !l.learningGoal_si.startsWith("මෙම පාඩම අවසානයේ ඔබට")) {
       issues.push({
         entityType: "Lesson",
         entityId: l.id,
@@ -582,7 +904,7 @@ export function validateContent(
       });
     }
 
-    if (!l.sourceReference || !l.sourceReference.sourceId) {
+    if (!l.sourceReference || typeof l.sourceReference.sourceId !== "string" || !l.sourceReference.sourceId) {
       issues.push({
         entityType: "Lesson",
         entityId: l.id,
@@ -600,7 +922,7 @@ export function validateContent(
       });
     }
 
-    if (!l.reviewMetadata || !l.reviewMetadata.reviewer) {
+    if (!l.reviewMetadata || typeof l.reviewMetadata.reviewer !== "string" || !l.reviewMetadata.reviewer) {
       issues.push({
         entityType: "Lesson",
         entityId: l.id,
@@ -622,8 +944,8 @@ export function validateContent(
   });
 
   // Validate Ragas
-  ragas.forEach((r) => {
-    if (!r.arohana_swaras || r.arohana_swaras.length === 0) {
+  ragaRecords.forEach((r) => {
+    if (!Array.isArray(r.arohana_swaras) || r.arohana_swaras.length === 0) {
       issues.push({
         entityType: "Raga",
         entityId: r.id,
@@ -635,8 +957,17 @@ export function validateContent(
     const validSwaras = new Set(["S", "r", "R", "g", "G", "M", "m", "P", "d", "D", "n", "N", "S'", ".r", ".R", ".g", ".G", ".M", ".m", ".P", ".d", ".D", ".n", ".N"]);
     const arohana = Array.isArray(r.arohana_swaras) ? r.arohana_swaras : [];
     const avarohana = Array.isArray(r.avarohana_swaras) ? r.avarohana_swaras : [];
+    if (!Array.isArray(r.avarohana_swaras) || r.avarohana_swaras.length === 0) {
+      issues.push({
+        entityType: "Raga",
+        entityId: r.id,
+        field: "avarohana_swaras",
+        message: "Raga must have non-empty avarohana_swaras array",
+        severity: "error",
+      });
+    }
     [...arohana, ...avarohana].forEach((swara) => {
-      if (!validSwaras.has(swara)) {
+      if (typeof swara !== "string" || !validSwaras.has(swara)) {
         issues.push({
           entityType: "Raga",
           entityId: r.id,
@@ -646,7 +977,11 @@ export function validateContent(
         });
       }
     });
-    if (!r.arohana_si?.trim() || !r.avarohana_si?.trim() || !r.pakad_si?.trim()) {
+    if (
+      typeof r.arohana_si !== "string" || !r.arohana_si.trim() ||
+      typeof r.avarohana_si !== "string" || !r.avarohana_si.trim() ||
+      typeof r.pakad_si !== "string" || !r.pakad_si.trim()
+    ) {
       issues.push({
         entityType: "Raga",
         entityId: r.id,
@@ -655,7 +990,7 @@ export function validateContent(
         severity: "error",
       });
     }
-    if (!r.sourceReference || !r.sourceReference.sourceId) {
+    if (!r.sourceReference || typeof r.sourceReference.sourceId !== "string" || !r.sourceReference.sourceId) {
       issues.push({
         entityType: "Raga",
         entityId: r.id,
@@ -672,10 +1007,43 @@ export function validateContent(
         severity: "error",
       });
     }
+    if (!Array.isArray(r.samplePhrases)) {
+      issues.push({
+        entityType: "Raga",
+        entityId: r.id,
+        field: "samplePhrases",
+        message: "Raga samplePhrases must be an array",
+        severity: "error",
+      });
+    } else {
+      r.samplePhrases.forEach((phrase, phraseIndex) => {
+        if (!phrase || typeof phrase !== "object" || !Array.isArray(phrase.swaras)) {
+          issues.push({
+            entityType: "Raga",
+            entityId: r.id,
+            field: "samplePhrases.swaras",
+            message: `Sample phrase ${phraseIndex} must contain a swaras array`,
+            severity: "error",
+          });
+          return;
+        }
+        phrase.swaras.forEach((swara) => {
+          if (typeof swara !== "string" || !validSwaras.has(swara)) {
+            issues.push({
+              entityType: "Raga",
+              entityId: r.id,
+              field: "samplePhrases.swaras",
+              message: `Unknown sample phrase swara '${String(swara)}'`,
+              severity: "error",
+            });
+          }
+        });
+      });
+    }
   });
 
   // Validate Talas
-  talas.forEach((t) => {
+  talaRecords.forEach((t) => {
     const vibhagStructure = Array.isArray(t.vibhagStructure) ? t.vibhagStructure : [];
     const bols = Array.isArray(t.bols) ? t.bols : [];
     const validVibhagStructure =
@@ -765,8 +1133,8 @@ export function validateContent(
     }
   });
 
-  const normalizedTalaNames = new Map<string, string>();
-  talas.forEach((tala) => {
+  const normalizedTalaNames = new Map<string, { id: string; canonical: boolean }>();
+  talaRecords.forEach((tala) => {
     if (typeof tala.name_si !== "string" || !tala.name_si.trim()) {
       issues.push({ entityType: "Tala", entityId: tala.id, field: "name_si", message: "Tala canonical name is missing", severity: "error" });
     }
@@ -774,27 +1142,42 @@ export function validateContent(
       issues.push({ entityType: "Tala", entityId: tala.id, field: "aliases_si", message: "Tala aliases must be an array of non-empty strings", severity: "error" });
     }
     const names = [
-      ...(typeof tala.name_si === "string" ? [tala.name_si] : []),
-      ...(Array.isArray(tala.aliases_si) ? tala.aliases_si.filter((name): name is string => typeof name === "string") : []),
+      ...(typeof tala.name_si === "string" ? [{ name: tala.name_si, canonical: true }] : []),
+      ...(Array.isArray(tala.aliases_si) ? tala.aliases_si.filter((name): name is string => typeof name === "string").map((name) => ({ name, canonical: false })) : []),
     ];
-    names.forEach((name) => {
+    const seenWithinRecord = new Map<string, { canonical: boolean }>();
+    names.forEach(({ name, canonical }) => {
       const normalized = identityKey(name);
-      const existing = normalizedTalaNames.get(normalized);
-      if (existing && existing !== tala.id) {
+      const localExisting = seenWithinRecord.get(normalized);
+      if (localExisting) {
         issues.push({
           entityType: "Tala",
           entityId: tala.id,
           field: "aliases_si",
-          message: `Normalized tala name/alias '${name}' collides with '${existing}'`,
+          message: localExisting.canonical !== canonical
+            ? `Canonical identity '${name}' must not also be a tala alias`
+            : `Duplicate identity '${name}' within one tala record`,
           severity: "error",
         });
       } else {
-        normalizedTalaNames.set(normalized, tala.id);
+        seenWithinRecord.set(normalized, { canonical });
+      }
+      const existing = normalizedTalaNames.get(normalized);
+      if (existing && existing.id !== tala.id) {
+        issues.push({
+          entityType: "Tala",
+          entityId: tala.id,
+          field: "aliases_si",
+          message: `Normalized tala name/alias '${name}' collides with '${existing.id}'`,
+          severity: "error",
+        });
+      } else {
+        normalizedTalaNames.set(normalized, { id: tala.id, canonical });
       }
     });
   });
 
-  const rawCatalogs: Array<{ type: string; records: Array<{ id?: unknown }> }> = [
+  const rawCatalogs: Array<{ type: string; records: unknown[] }> = [
     { type: "Lesson", records: lessonsData },
     { type: "Raga", records: ragasData },
     { type: "Tala", records: talasData },

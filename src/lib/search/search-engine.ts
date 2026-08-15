@@ -18,7 +18,7 @@ export interface SearchResultItem {
 }
 
 // Transliteration map for English phonetic queries
-const TRANSLITERATION_MAP: Record<string, string> = {
+const TRANSLITERATION_MAP: Record<string, string> = Object.assign(Object.create(null) as Record<string, string>, {
   swara: "ස්වර",
   shruti: "ශ්‍රැති",
   sruti: "ශ්‍රැති",
@@ -67,14 +67,14 @@ const TRANSLITERATION_MAP: Record<string, string> = {
   karaththa: "කරත්ත",
   paruwa: "පාරු",
   raban: "රබන්",
-};
+});
 
 // Retrieval-only source variant. The Grade 11 extraction uses දීප්චන්දි, but
 // that document remains Review Required; keep the Grade 10 form canonical.
-const SOURCE_QUERY_VARIANTS: Record<string, string> = {
+const SOURCE_QUERY_VARIANTS: Record<string, string> = Object.assign(Object.create(null) as Record<string, string>, {
   "දීප්චන්දි": "දීප්චන්ද්",
   "දීප්චන්දි තාලය": "දීප්චන්ද් තාලය",
-};
+});
 
 export function searchFilter<T>(
   items: T[],
@@ -84,8 +84,13 @@ export function searchFilter<T>(
   if (!query || !query.trim()) return items;
 
   const rawQ = query.trim().toLowerCase();
-  const normalizedQ = normalizeSinhalaText(SOURCE_QUERY_VARIANTS[rawQ] || rawQ);
-  const transliterated = TRANSLITERATION_MAP[rawQ] || "";
+  const variant = Object.prototype.hasOwnProperty.call(SOURCE_QUERY_VARIANTS, rawQ)
+    ? SOURCE_QUERY_VARIANTS[rawQ]
+    : undefined;
+  const transliterated = Object.prototype.hasOwnProperty.call(TRANSLITERATION_MAP, rawQ)
+    ? TRANSLITERATION_MAP[rawQ]
+    : "";
+  const normalizedQ = normalizeSinhalaText(variant || rawQ);
   const normalizedTrans = normalizeSinhalaText(transliterated);
 
   return items.filter((item) => {
