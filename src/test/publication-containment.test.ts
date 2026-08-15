@@ -11,9 +11,11 @@ import {
 import {
   validateCoverageSnapshot,
   validateForensicInventory,
+  validateForensicLedger,
   validatePublicBoundary,
   validatePublicCollection,
 } from "@/lib/validation/content-validator";
+import forensicLedgerData from "../../data/forensic-ledger.json";
 
 describe("Prompt 1 publication containment", () => {
   it("keeps unsupported grades and named quarantined entities out of public data", () => {
@@ -74,7 +76,28 @@ describe("Prompt 1 publication containment", () => {
       expect(summary[entityType].public).toBe(count);
     });
     expect(validateForensicInventory()).toMatchObject({ isValid: true, issues: [] });
+    expect(validateForensicLedger()).toMatchObject({ isValid: true, issues: [] });
     expect(getSourceCorpusInventory()).toMatchObject({ sourceDocuments: 30, sourcePages: 1023 });
+  });
+
+  it("enforces the forensic ledger schema contract and rejects invalid issues or evidence", () => {
+    const invalidLedger = structuredClone(forensicLedgerData) as typeof forensicLedgerData;
+    const firstIssue = invalidLedger.issues[0] as Record<string, unknown>;
+
+    // Corrupt an issue
+    delete firstIssue.evidenceBasis;
+    firstIssue.unknownProperty = "unexpected";
+    firstIssue.severity = "P99";
+    (firstIssue.evidence as Array<Record<string, unknown>>)[0].unknownEvidenceField = "unexpected";
+
+    const result = validateForensicLedger(invalidLedger);
+    expect(result.isValid).toBe(false);
+    expect(result.issues.map((i) => i.field)).toEqual(expect.arrayContaining([
+      "evidenceBasis",
+      "unknownProperty",
+      "severity",
+      "unknownEvidenceField",
+    ]));
   });
 
   it("detects drift in every mirrored forensic coverage section", () => {

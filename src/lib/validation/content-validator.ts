@@ -35,6 +35,17 @@ export interface PublicationValidationResult {
 }
 
 type BaselineLedger = {
+  issueSchema: {
+    requiredIssueFields: string[];
+    optionalIssueFields?: string[];
+    requiredEvidenceFields: string[];
+    optionalEvidenceFields?: string[];
+    severityValues: string[];
+    publicVisibilityValues: string[];
+    confidenceValues: string[];
+    evidenceBasisValues: string[];
+    statusValues: string[];
+  };
   inventory: {
     sourceDocuments: number;
     sourcePages: number;
@@ -48,6 +59,26 @@ type BaselineLedger = {
       legacyReconciliationPublishedRecords: number;
     };
   };
+  issues?: Array<{
+    id: string;
+    severity: string;
+    entityOrPath: string;
+    currentClaim: string;
+    evidence: Array<{
+      path: string;
+      locator: string;
+      exactSection?: string;
+      exactPageOrSection?: string;
+      [key: string]: unknown;
+    }>;
+    disposition: string;
+    publicVisibility: string;
+    confidence: string;
+    confidenceScope?: string;
+    evidenceBasis: string;
+    status: string;
+    [key: string]: unknown;
+  }>;
 };
 
 type CoverageSnapshot = {
@@ -300,6 +331,114 @@ export function validateForensicInventory(): PublicationValidationResult {
   });
 
   issues.push(...validateCoverageSnapshot(coverageData).issues);
+  issues.push(...validateForensicLedger(baselineLedger).issues);
+
+  return {
+    isValid: issues.every((issue) => issue.severity !== "error"),
+    issues,
+  };
+}
+
+/**
+ * Validate that every issue and evidence entry in forensic-ledger.json adheres
+ * to the explicit schema contract, uses allowed enumerated values, and provides
+ * complete path/locator fields.
+ */
+export function validateForensicLedger(
+  ledgerInput: unknown = forensicLedgerData
+): PublicationValidationResult {
+  const issues: ValidationIssue[] = [];
+  const ledger = (ledgerInput || {}) as Record<string, unknown>;
+  const schema = (ledger.issueSchema || {}) as {
+    requiredIssueFields?: string[];
+    optionalIssueFields?: string[];
+    requiredEvidenceFields?: string[];
+    optionalEvidenceFields?: string[];
+    severityValues?: string[];
+    publicVisibilityValues?: string[];
+    confidenceValues?: string[];
+    evidenceBasisValues?: string[];
+    statusValues?: string[];
+  };
+
+  const requiredIssueFields = schema.requiredIssueFields || [];
+  const optionalIssueFields = schema.optionalIssueFields || [];
+  const allowedIssueFields = new Set([...requiredIssueFields, ...optionalIssueFields]);
+
+  const requiredEvidenceFields = schema.requiredEvidenceFields || [];
+  const optionalEvidenceFields = schema.optionalEvidenceFields || [];
+  const allowedEvidenceFields = new Set([...requiredEvidenceFields, ...optionalEvidenceFields]);
+
+  const severitySet = new Set(schema.severityValues || []);
+  const visibilitySet = new Set(schema.publicVisibilityValues || []);
+  const confidenceSet = new Set(schema.confidenceValues || []);
+  const basisSet = new Set(schema.evidenceBasisValues || []);
+  const statusSet = new Set(schema.statusValues || []);
+
+  if (!Array.isArray(schema.requiredIssueFields) || schema.requiredIssueFields.length === 0) {
+    issues.push(baselineIssue("forensic-ledger", "issueSchema", "requiredIssueFields", "Schema must define requiredIssueFields."));
+  }
+  if (!Array.isArray(schema.requiredEvidenceFields) || schema.requiredEvidenceFields.length === 0) {
+    issues.push(baselineIssue("forensic-ledger", "issueSchema", "requiredEvidenceFields", "Schema must define requiredEvidenceFields."));
+  }
+  if (!Array.isArray(schema.evidenceBasisValues) || schema.evidenceBasisValues.length === 0) {
+    issues.push(baselineIssue("forensic-ledger", "issueSchema", "evidenceBasisValues", "Schema must define evidenceBasisValues."));
+  }
+
+  const ledgerIssues = Array.isArray(ledger.issues) ? (ledger.issues as Array<Record<string, unknown>>) : [];
+  if (ledgerIssues.length === 0) {
+    issues.push(baselineIssue("forensic-ledger", "issues", "length", "Forensic ledger must contain at least one issue entry."));
+  }
+
+  ledgerIssues.forEach((issue, index) => {
+    const issueId = typeof issue.id === "string" ? issue.id : `issue-${index}`;
+
+    requiredIssueFields.forEach((field) => {
+      if (issue[field] === undefined || issue[field] === null || issue[field] === "") {
+        issues.push(baselineIssue("forensic-ledger", issueId, field, `Issue is missing required field '${field}'.`));
+      }
+    });
+
+    Object.keys(issue).forEach((field) => {
+      if (!allowedIssueFields.has(field)) {
+        issues.push(baselineIssue("forensic-ledger", issueId, field, `Unknown field '${field}' on issue object.`));
+      }
+    });
+
+    if (issue.severity && !severitySet.has(issue.severity as string)) {
+      issues.push(baselineIssue("forensic-ledger", issueId, "severity", `Invalid severity '${issue.severity}'.`));
+    }
+    if (issue.publicVisibility && !visibilitySet.has(issue.publicVisibility as string)) {
+      issues.push(baselineIssue("forensic-ledger", issueId, "publicVisibility", `Invalid publicVisibility '${issue.publicVisibility}'.`));
+    }
+    if (issue.confidence && !confidenceSet.has(issue.confidence as string)) {
+      issues.push(baselineIssue("forensic-ledger", issueId, "confidence", `Invalid confidence '${issue.confidence}'.`));
+    }
+    if (issue.evidenceBasis && !basisSet.has(issue.evidenceBasis as string)) {
+      issues.push(baselineIssue("forensic-ledger", issueId, "evidenceBasis", `Invalid evidenceBasis '${issue.evidenceBasis}'.`));
+    }
+    if (issue.status && !statusSet.has(issue.status as string)) {
+      issues.push(baselineIssue("forensic-ledger", issueId, "status", `Invalid status '${issue.status}'.`));
+    }
+
+    if (!Array.isArray(issue.evidence) || issue.evidence.length === 0) {
+      issues.push(baselineIssue("forensic-ledger", issueId, "evidence", "Issue must have a non-empty evidence array."));
+    } else {
+      (issue.evidence as Array<Record<string, unknown>>).forEach((entry, eIndex) => {
+        const entryLocator = typeof entry.locator === "string" ? entry.locator : `entry-${eIndex}`;
+        requiredEvidenceFields.forEach((field) => {
+          if (!entry[field] || typeof entry[field] !== "string" || !entry[field].trim()) {
+            issues.push(baselineIssue("forensic-ledger", `${issueId}.evidence[${eIndex}]`, field, `Evidence entry '${entryLocator}' missing required field '${field}'.`));
+          }
+        });
+        Object.keys(entry).forEach((field) => {
+          if (!allowedEvidenceFields.has(field)) {
+            issues.push(baselineIssue("forensic-ledger", `${issueId}.evidence[${eIndex}]`, field, `Unknown field '${field}' on evidence entry.`));
+          }
+        });
+      });
+    }
+  });
 
   return {
     isValid: issues.every((issue) => issue.severity !== "error"),
