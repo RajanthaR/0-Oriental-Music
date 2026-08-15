@@ -80,16 +80,16 @@ describe("Prompt 1 publication containment", () => {
   it("detects drift in every mirrored forensic coverage section", () => {
     const driftedCoverage = structuredClone(coverageData) as unknown as {
       rawContentCounts: Record<string, number>;
-      sourceQualityMetrics: Record<string, number>;
-      sourceDocumentStates: Record<string, number>;
+      sourcePageQuality: Record<string, number>;
+      sourceDocumentReviewStatus: Record<string, number>;
       legacyReconciliationSnapshot: {
         actionCounts: Record<string, number>;
       };
       publicScope: { publicCounts: Record<string, number> };
     };
     driftedCoverage.rawContentCounts.ragas += 1;
-    driftedCoverage.sourceQualityMetrics.gradeBPagesCount += 1;
-    driftedCoverage.sourceDocumentStates["Review Required"] += 1;
+    driftedCoverage.sourcePageQuality.B += 1;
+    driftedCoverage.sourceDocumentReviewStatus["Review Required"] += 1;
     driftedCoverage.legacyReconciliationSnapshot.actionCounts.REMAP_GRADE += 1;
     driftedCoverage.publicScope.publicCounts.ragas += 1;
 
@@ -97,8 +97,8 @@ describe("Prompt 1 publication containment", () => {
     expect(result.isValid).toBe(false);
     expect(result.issues.map((issue) => issue.field)).toEqual(expect.arrayContaining([
       "rawContentCounts.ragas",
-      "sourceQualityMetrics.gradeBPagesCount",
-      "sourceDocumentStates.Review Required",
+      "sourcePageQuality.B",
+      "sourceDocumentReviewStatus.Review Required",
       "legacyReconciliationSnapshot.actionCounts.REMAP_GRADE",
       "publicScope.publicCounts.ragas",
     ]));

@@ -38,17 +38,17 @@
     "exams": 2,
     "quizzes": 7
   },
-  "sourceQualityMetrics": {
-    "gradeAPagesCount": 397,
-    "gradeBPagesCount": 190,
-    "gradeCPagesCount": 33,
-    "gradeDPagesCount": 403,
-    "pagesContainingSinhalaTextCount": 895,
-    "pagesWithoutSinhalaTextCount": 128,
-    "gradeABExtractionQualityPercent": 57.4,
+  "sourcePageQuality": {
+    "A": 397,
+    "B": 190,
+    "C": 33,
+    "D": 403,
+    "pagesContainingSinhalaText": 895,
+    "pagesWithoutSinhalaText": 128,
+    "abExtractionQualityPercent": 57.4,
     "interpretation": "A/B counts describe extraction quality only; they do not prove a musical claim."
   },
-  "sourceDocumentStates": {
+  "sourceDocumentReviewStatus": {
     "Source Triaged": 16,
     "Review Required": 12,
     "Image Only / Gaps": 2

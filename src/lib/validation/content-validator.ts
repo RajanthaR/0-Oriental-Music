@@ -53,8 +53,8 @@ type BaselineLedger = {
 type CoverageSnapshot = {
   overview?: Record<string, number>;
   rawContentCounts?: Record<string, number>;
-  sourceQualityMetrics?: Record<string, number | string>;
-  sourceDocumentStates?: Record<string, number>;
+  sourcePageQuality?: Record<string, number | string>;
+  sourceDocumentReviewStatus?: Record<string, number>;
   legacyReconciliationSnapshot?: {
     recordCount?: number;
     actionCounts?: Record<string, number>;
@@ -90,26 +90,18 @@ export function validateCoverageSnapshot(
       issues.push(baselineIssue("generated-doc", "content-coverage", `rawContentCounts.${entityType}`, "Generated raw-content count does not agree with forensic-ledger.json."));
     }
   });
-  const coverageQualityFields: Record<string, string> = {
-    A: "gradeAPagesCount",
-    B: "gradeBPagesCount",
-    C: "gradeCPagesCount",
-    D: "gradeDPagesCount",
-    pagesContainingSinhalaText: "pagesContainingSinhalaTextCount",
-    pagesWithoutSinhalaText: "pagesWithoutSinhalaTextCount",
-  };
-  Object.entries(coverageQualityFields).forEach(([ledgerField, coverageField]) => {
-    if (coverage.sourceQualityMetrics?.[coverageField] !== expected.sourcePageQuality[ledgerField]) {
-      issues.push(baselineIssue("generated-doc", "content-coverage", `sourceQualityMetrics.${coverageField}`, "Generated source-quality count does not agree with forensic-ledger.json."));
+  Object.entries(expected.sourcePageQuality).forEach(([qualityField, count]) => {
+    if (coverage.sourcePageQuality?.[qualityField] !== count) {
+      issues.push(baselineIssue("generated-doc", "content-coverage", `sourcePageQuality.${qualityField}`, "Generated source-quality count does not agree with forensic-ledger.json."));
     }
   });
   const expectedGradeABPercent = Number((((expected.sourcePageQuality.A + expected.sourcePageQuality.B) / expected.sourcePages) * 100).toFixed(1));
-  if (coverage.sourceQualityMetrics?.gradeABExtractionQualityPercent !== expectedGradeABPercent) {
-    issues.push(baselineIssue("generated-doc", "content-coverage", "sourceQualityMetrics.gradeABExtractionQualityPercent", "Generated A/B extraction percentage does not agree with forensic-ledger.json."));
+  if (coverage.sourcePageQuality?.abExtractionQualityPercent !== expectedGradeABPercent) {
+    issues.push(baselineIssue("generated-doc", "content-coverage", "sourcePageQuality.abExtractionQualityPercent", "Generated A/B extraction percentage does not agree with forensic-ledger.json."));
   }
   Object.entries(expected.sourceDocumentReviewStatus).forEach(([status, count]) => {
-    if (coverage.sourceDocumentStates?.[status] !== count) {
-      issues.push(baselineIssue("generated-doc", "content-coverage", `sourceDocumentStates.${status}`, "Generated source-document state count does not agree with forensic-ledger.json."));
+    if (coverage.sourceDocumentReviewStatus?.[status] !== count) {
+      issues.push(baselineIssue("generated-doc", "content-coverage", `sourceDocumentReviewStatus.${status}`, "Generated source-document review-status count does not agree with forensic-ledger.json."));
     }
   });
   if (coverage.legacyReconciliationSnapshot?.recordCount !== expected.rawGradeScope.legacyReconciliationRecords) {
