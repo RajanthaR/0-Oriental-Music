@@ -10,18 +10,32 @@ import { TalaVisualizer } from "@/components/audio/TalaVisualizer";
 import { RhythmTapGame } from "@/components/audio/RhythmTapGame";
 import { repository } from "@/lib/data/repository";
 import { EarTrainingModule } from "@/components/audio/EarTrainingModule";
+import { NotationArranger } from "@/components/audio/NotationArranger";
 import SearchPage from "@/app/search/page";
 import { TalaDirectoryResults } from "@/components/tala/TalaDirectoryResults";
 import talasData from "@/data/talas.json";
-import type { Tala } from "@/types/content";
+import type { Quiz, Tala } from "@/types/content";
 
 const audioMocks = vi.hoisted(() => ({
   playBol: vi.fn(),
+  playSwaraTone: vi.fn(),
+  playSequence: vi.fn(),
 }));
 
 vi.mock("@/lib/audio/tabla", () => ({
   tablaSynth: audioMocks,
 }));
+
+vi.mock("@/lib/audio/synth", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@/lib/audio/synth")>();
+  return {
+    ...original,
+    swaraSynth: {
+      playSwaraTone: audioMocks.playSwaraTone,
+      playSequence: audioMocks.playSequence,
+    },
+  };
+});
 
 const getKhemtaFixture = (): Tala => {
   const tala = (talasData as Tala[]).find((candidate) => candidate.id === "tala-khemta");
@@ -34,6 +48,8 @@ const readyCancel = (cancel: ReturnType<typeof vi.fn> = vi.fn()) =>
 
 afterEach(() => {
   audioMocks.playBol.mockReset();
+  audioMocks.playSwaraTone.mockReset().mockResolvedValue(true);
+  audioMocks.playSequence.mockReset().mockResolvedValue(true);
   vi.useRealTimers();
 });
 
@@ -309,9 +325,11 @@ describe("Interactive Audio & Quiz Components Suite", () => {
 
   it("requires an explicit learner ordering instead of auto-passing the format", () => {
     const onComplete = vi.fn();
-    render(<QuizRunner quiz={{
+    const quiz: Quiz = {
       id: "ordering-regression",
       title_si: "පිළිවෙළ",
+      lessonId: "les-intro-01",
+      gradeBands: ["10-11"],
       passingScorePercent: 70,
       questions: [{
         id: "q-order",
@@ -327,11 +345,62 @@ describe("Interactive Audio & Quiz Components Suite", () => {
         explanation_si: "පළමු අයිතමය පෙර යෙදේ.",
         sourceReference: { sourceId: "SRC-G10-NADA", pageOrSection: "sg10_emus_chap8_nadaya.pdf පිටුව 2" },
       }],
-    }} onComplete={onComplete} />);
+    };
+    const firstRun = render(<QuizRunner quiz={quiz} onComplete={onComplete} />);
+    fireEvent.click(screen.getByRole("button", { name: "පිළිතුර පරීක්ෂා කරන්න" }));
+    fireEvent.click(screen.getByRole("button", { name: "ප්‍රතිඵලය බලන්න" }));
+    expect(onComplete).toHaveBeenLastCalledWith(0, 1, false);
+    firstRun.unmount();
+
+    render(<QuizRunner quiz={quiz} onComplete={onComplete} />);
     fireEvent.click(screen.getByRole("button", { name: "පළමු ඉහළට ගෙනයන්න" }));
     fireEvent.click(screen.getByRole("button", { name: "පිළිතුර පරීක්ෂා කරන්න" }));
     fireEvent.click(screen.getByRole("button", { name: "ප්‍රතිඵලය බලන්න" }));
     expect(onComplete).toHaveBeenCalledWith(1, 1, true);
+  });
+
+  it("shows localized fallback feedback for unavailable public audio controls", async () => {
+    audioMocks.playSwaraTone.mockResolvedValue(false);
+    const keyboard = render(<SwaraKeyboard />);
+    fireEvent.click(screen.getByRole("button", { name: "ස (ෂඩ්ජ) ස්වරය" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("නාදය ආරම්භ කළ නොහැක");
+    keyboard.unmount();
+
+    const arranger = render(<NotationArranger />);
+    fireEvent.click(screen.getByRole("button", { name: "ස" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("නාදය ආරම්භ කළ නොහැක");
+    arranger.unmount();
+
+    render(<EarTrainingModule />);
+    fireEvent.click(screen.getByRole("button", { name: /නාදය අසන්න/ }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("නාදය ආරම්භ කළ නොහැක");
+  });
+
+  it("finishes the rhythm game once and cancels owned playback on reset", () => {
+    vi.useFakeTimers();
+    const cancels: Array<ReturnType<typeof vi.fn>> = [];
+    audioMocks.playBol.mockImplementation(() => {
+      const cancel = vi.fn();
+      cancels.push(cancel);
+      return readyCancel(cancel);
+    });
+    const onComplete = vi.fn();
+    render(<RhythmTapGame bpm={120} totalBeats={1} onComplete={onComplete} />);
+    fireEvent.click(screen.getByRole("button", { name: "අරඹන්න" }));
+    act(() => { vi.advanceTimersByTime(500); });
+    expect(cancels).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "නැවත මුලට" }));
+    expect(cancels[0]).toHaveBeenCalledTimes(1);
+    act(() => { vi.advanceTimersByTime(3000); });
+    expect(onComplete).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "අරඹන්න" }));
+    act(() => { vi.advanceTimersByTime(500); });
+    fireEvent.click(screen.getByRole("button", { name: "තාල පහරට තට්ටු කරන්න" }));
+    act(() => { vi.advanceTimersByTime(1000); });
+    expect(onComplete).toHaveBeenCalledTimes(1);
+    act(() => { vi.advanceTimersByTime(3000); });
+    expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
   it("does not advertise quarantined Bhairav or Roopak claims in static public UI", () => {

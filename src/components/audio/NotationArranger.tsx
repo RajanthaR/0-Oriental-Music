@@ -21,6 +21,7 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
   const [arrangedItems, setArrangedItems] = useState<string[]>([]);
   const [isEvaluated, setIsEvaluated] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [audioUnavailable, setAudioUnavailable] = useState(false);
 
   const handleSelectItem = (item: string, idx: number) => {
     // Play tone if it's a swara
@@ -28,7 +29,9 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
     if (["ස", "රි", "ග", "ම", "ප", "ධ", "නි"].includes(clean)) {
       const swaraMap: Record<string, string> = { "ස": "S", "රි": "R", "ග": "G", "ම": "M", "ප": "P", "ධ": "D", "නි": "N" };
       if (swaraMap[clean]) {
-        swaraSynth.playSwaraTone(swaraMap[clean]);
+        void swaraSynth.playSwaraTone(swaraMap[clean]).then((played) => {
+          if (!played) setAudioUnavailable(true);
+        });
       }
     }
 
@@ -82,6 +85,12 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
           නැවත
         </button>
       </div>
+
+      {audioUnavailable && (
+        <p role="alert" className="mb-3 text-xs font-semibold text-primary">
+          මෙම උපාංගයේ නාදය ආරම්භ කළ නොහැක. සලකුණු අනුව අභ්‍යාසය දිගටම කරන්න.
+        </p>
+      )}
 
       {/* Drop / Arranged Sequence Area */}
       <div className="min-h-[70px] bg-surface-warm border-2 border-dashed border-border rounded-xl p-3 mb-4 flex flex-wrap items-center gap-2">

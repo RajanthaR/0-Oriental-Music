@@ -6,6 +6,9 @@ describe("Search Engine & Sinhala Normalizer Suite", () => {
     expect(normalizeSinhalaText("ශඩ්ජ")).toBe("සඩ්ජ");
     expect(normalizeSinhalaText("ලක්ෂණ")).toBe("ලක්සන");
     expect(normalizeSinhalaText("දාද්‍රා")).toBe("දාදරා");
+    expect(normalizeSinhalaText("නා\u200Eදය")).toBe(normalizeSinhalaText("නාදය"));
+    expect(normalizeSinhalaText("නා\u202Eදය")).toBe(normalizeSinhalaText("නාදය"));
+    expect(normalizeSinhalaText("නා\u2066දය")).toBe(normalizeSinhalaText("නාදය"));
   });
 
   it("keeps the Dadra retrieval spelling contained when the tala is quarantined", () => {

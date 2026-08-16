@@ -59,7 +59,7 @@ export function getSwaraFrequency(swaraNotation: string, rootFreq: number = DEFA
   return safeRootFreq * Math.pow(2, totalSemitones / 12);
 }
 
-class SwaraSynthEngine {
+export class SwaraSynthEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
 
@@ -76,8 +76,16 @@ class SwaraSynthEngine {
       if (this.ctx.state === "suspended") await this.ctx.resume();
       return this.ctx.state !== "closed";
     } catch {
+      const failedContext = this.ctx;
       this.ctx = null;
       this.masterGain = null;
+      if (failedContext && failedContext.state !== "closed") {
+        try {
+          await failedContext.close();
+        } catch {
+          // The context is already unusable; clearing the references is the fail-closed path.
+        }
+      }
       return false;
     }
   }

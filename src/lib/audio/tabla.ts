@@ -98,7 +98,7 @@ export function planTablaBol(bolName: string, matraDurationMs: number = 500): Pl
   }));
 }
 
-class TablaSynthEngine {
+export class TablaSynthEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
 
@@ -115,8 +115,16 @@ class TablaSynthEngine {
       if (this.ctx.state === "suspended") await this.ctx.resume();
       return this.ctx.state !== "closed";
     } catch {
+      const failedContext = this.ctx;
       this.ctx = null;
       this.masterGain = null;
+      if (failedContext && failedContext.state !== "closed") {
+        try {
+          await failedContext.close();
+        } catch {
+          // The context is already unusable; clearing the references is the fail-closed path.
+        }
+      }
       return false;
     }
   }
@@ -240,7 +248,9 @@ class TablaSynthEngine {
     matraDurationMs: number = 500,
     onUnavailable?: () => void
   ): TablaPlaybackHandle {
+    let cancelled = false;
     const unavailable = () => {
+      if (cancelled) return false;
       onUnavailable?.();
       return false;
     };
@@ -250,11 +260,10 @@ class TablaSynthEngine {
     const plan = planTablaBol(bolName, matraDurationMs);
     if (plan.length === 0) return createPlaybackHandle(() => undefined, Promise.resolve(true));
 
-    let cancelled = false;
     let cancelScheduled: () => void = () => undefined;
     const ready = this.initContext().then((available) => {
+      if (cancelled) return false;
       if (!available) return unavailable();
-      if (cancelled) return true;
       cancelScheduled = scheduleTablaPlan(plan, (stroke) => {
         if (cancelled) return;
         try {
@@ -267,7 +276,7 @@ class TablaSynthEngine {
         clear: (timer) => window.clearTimeout(timer),
       });
       return true;
-    }).catch(unavailable);
+    }).catch(() => unavailable());
 
     return createPlaybackHandle(() => {
       cancelled = true;

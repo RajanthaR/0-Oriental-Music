@@ -289,14 +289,33 @@ export function validateMusicalCoreFieldDispositions(
       ? forensicLedgerData.issues.filter(isRecord).map((issue) => issue.id).filter((id): id is string => typeof id === "string")
       : []
   );
-  const issueCatalog = asUnknownArray(registry.issueCatalog).filter(isRecord);
-  const issueCatalogIds = new Set(issueCatalog.map((issue) => issue.id).filter((id): id is string => typeof id === "string"));
+  const rawIssueCatalog = asUnknownArray(registry.issueCatalog);
+  const issueCatalog = rawIssueCatalog.filter(isRecord);
+  const issueCatalogIds = new Set<string>();
+  rawIssueCatalog.forEach((candidate, index) => {
+    if (!isRecord(candidate)) {
+      issues.push({ entityType: "TalaFieldDisposition", entityId: String(index), field: "issueCatalog", message: "Disposition issue catalog entries must be objects", severity: "error" });
+      return;
+    }
+    if (typeof candidate.id === "string") {
+      if (issueCatalogIds.has(candidate.id)) {
+        issues.push({ entityType: "TalaFieldDisposition", entityId: candidate.id, field: "issueCatalog", message: "Disposition issue catalog IDs must be unique", severity: "error" });
+      }
+      issueCatalogIds.add(candidate.id);
+    }
+  });
   issueCatalog.forEach((issue, index) => {
     if (typeof issue.id !== "string" || typeof issue.ledgerIssueId !== "string" || !ledgerIssueIds.has(issue.ledgerIssueId)) {
       issues.push({ entityType: "TalaFieldDisposition", entityId: typeof issue.id === "string" ? issue.id : String(index), field: "issueCatalog", message: "Disposition issue catalog entries must resolve to a forensic-ledger issue", severity: "error" });
     }
   });
-  const entries = asUnknownArray(registry.talas).filter(isRecord) as Array<{
+  const rawEntries = asUnknownArray(registry.talas);
+  rawEntries.forEach((candidate, index) => {
+    if (!isRecord(candidate)) {
+      issues.push({ entityType: "TalaFieldDisposition", entityId: String(index), field: "talas", message: "Disposition tala rows must be objects", severity: "error" });
+    }
+  });
+  const entries = rawEntries.filter(isRecord) as Array<{
     talaId: string;
     context: { status: string; scope?: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string };
     theka: { status: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string };

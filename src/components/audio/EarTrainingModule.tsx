@@ -48,14 +48,17 @@ export const EarTrainingModule: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
+  const [audioUnavailable, setAudioUnavailable] = useState(false);
 
   const challenge = DEFAULT_CHALLENGES[currentIndex];
 
-  const handlePlayMystery = () => {
+  const handlePlayMystery = async () => {
     if (challenge.type === "swara") {
-      swaraSynth.playSwaraTone(challenge.targetItem, 0.9, 261.63, "harmonium");
+      const played = await swaraSynth.playSwaraTone(challenge.targetItem, 0.9, 261.63, "harmonium");
+      if (!played) setAudioUnavailable(true);
     } else if (challenge.type === "tala") {
-      tablaSynth.playBol(challenge.targetItem);
+      const handle = tablaSynth.playBol(challenge.targetItem, 500, () => setAudioUnavailable(true));
+      if (!(await handle.ready)) setAudioUnavailable(true);
     }
   };
 
@@ -97,6 +100,12 @@ export const EarTrainingModule: React.FC = () => {
           ලකුණු: {score}
         </span>
       </div>
+
+      {audioUnavailable && (
+        <p role="alert" className="mb-3 text-xs font-semibold text-primary">
+          මෙම උපාංගයේ නාදය ආරම්භ කළ නොහැක. පසුව නැවත උත්සාහ කරන්න.
+        </p>
+      )}
 
       {/* Mystery Sound Play Button Box */}
       <div className="bg-surface-warm rounded-2xl p-6 mb-5 border border-border-light flex flex-col items-center justify-center">

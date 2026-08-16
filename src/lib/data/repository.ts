@@ -33,6 +33,7 @@ import {
   UNKNOWN_PROVENANCE,
   PUBLIC_GRADE_BANDS,
   sanitizePublicRecord,
+  sanitizeReviewRecord,
   type SourceDocumentSummary,
 } from "@/lib/data/publication-policy";
 
@@ -185,7 +186,7 @@ class ContentRepository {
   }
 
   private selectForReview<T extends { id: string }>(items: T[]): T[] {
-    return items.map((item) => sanitizePublicRecord(item));
+    return items.map((item) => sanitizeReviewRecord(item));
   }
 
   private summarize<T extends { id: string }>(items: T[]): PublicationCollectionSummary {

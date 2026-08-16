@@ -5,10 +5,16 @@ import ragasData from "@/data/ragas.json";
 import talasData from "@/data/talas.json";
 import quizzesData from "@/data/quizzes.json";
 import examPapersData from "@/data/exam-papers.json";
+import instrumentsData from "@/data/instruments.json";
+import culturalTraditionsData from "@/data/cultural-traditions.json";
+import theatreTraditionsData from "@/data/theatre-traditions.json";
+import glossaryData from "@/data/glossary.json";
+import learningPathsData from "@/data/learning-paths.json";
 import sourceDocumentsData from "../../../data/source-documents.json";
 import sourcePageQualityData from "../../../data/source-page-quality.json";
 import musicalCoreFieldDispositionsData from "../../../data/musical-core-field-dispositions.json";
 import { isSafePracticeBpm } from "@/lib/audio/tempo";
+import { normalizeSinhalaText } from "@/lib/search/normalize-sinhala";
 
 export const UNKNOWN_PROVENANCE = "නොදනී / සනාථ වී නැත";
 
@@ -39,6 +45,7 @@ export type PublicationReasonCode =
   | "unpaired-context-claim"
   | "field-disposition-needs-review"
   | "dependent-entity-unavailable"
+  | "dependency-cycle"
   | "malformed-record"
   | SourceEvidenceFailureCode;
 
@@ -128,6 +135,7 @@ type SourceRecord = {
 const sourceRecords = sourcesData as SourceRecord[];
 
 type PublicationRecordShape = {
+  [key: string]: unknown;
   id?: unknown;
   lessonId?: unknown;
   gradeBand?: unknown;
@@ -295,16 +303,7 @@ function isSourceReference(value: unknown): value is SourceReference {
 }
 
 function resolveRecordSourceReference(value: PublicationRecordShape): SourceReference | undefined {
-  if (isSourceReference(value.sourceReference)) return value.sourceReference;
-  if (typeof value.lessonId === "string") {
-    const parent = (lessonsData as unknown as Array<{ id: string; sourceReference?: SourceReference }>).find(
-      (l) => l.id === value.lessonId
-    );
-    if (parent && isSourceReference(parent.sourceReference)) {
-      return parent.sourceReference;
-    }
-  }
-  return undefined;
+  return isSourceReference(value.sourceReference) ? value.sourceReference : undefined;
 }
 
 export function toPublicationInput(record: unknown): PublicationInput {
@@ -553,15 +552,26 @@ function hasCanonicalQuestionShape(question: unknown): boolean {
       optionIds.add(candidate.id);
     }
     if (!isStringArray(value.correctAnswerIds) || !value.correctAnswerIds.every((id) => optionIds.has(id))) return false;
+    if (new Set(value.correctAnswerIds).size !== value.correctAnswerIds.length) return false;
     if ((value.type === "mcq" || value.type === "true-false") && value.correctAnswerIds.length !== 1) return false;
+    if (value.type === "true-false" && value.options_si.length !== 2) return false;
     return true;
   }
 
   if (value.type === "matching") {
-    return Array.isArray(value.matchingPairs) && value.matchingPairs.length > 0 && value.matchingPairs.every((pair) => {
+    if (!Array.isArray(value.matchingPairs) || value.matchingPairs.length === 0) return false;
+    const left = new Set<string>();
+    const right = new Set<string>();
+    return value.matchingPairs.every((pair) => {
       if (!pair || typeof pair !== "object" || Array.isArray(pair)) return false;
       const candidate = pair as Record<string, unknown>;
-      return isNonBlankString(candidate.left_si) && isNonBlankString(candidate.right_si);
+      if (!isNonBlankString(candidate.left_si) || !isNonBlankString(candidate.right_si)) return false;
+      const leftKey = normalizeSinhalaText(candidate.left_si);
+      const rightKey = normalizeSinhalaText(candidate.right_si);
+      if (!leftKey || !rightKey || left.has(leftKey) || right.has(rightKey)) return false;
+      left.add(leftKey);
+      right.add(rightKey);
+      return true;
     });
   }
 
@@ -580,7 +590,32 @@ function hasCanonicalQuestionShape(question: unknown): boolean {
     return Array.from(indexes).sort((a, b) => a - b).every((index, position) => index === position);
   }
 
-  return value.type === "short-answer" && isStringArray(value.correctShortAnswer_si);
+  return value.type === "short-answer" && isStringArray(value.correctShortAnswer_si) &&
+    new Set(value.correctShortAnswer_si.map(normalizeSinhalaText)).size === value.correctShortAnswer_si.length;
+}
+
+const VALID_SWARA_TOKENS = new Set(["S", "r", "R", "g", "G", "M", "m", "P", "d", "D", "n", "N"]);
+
+function isValidSwaraToken(value: unknown): value is string {
+  if (!isNonBlankString(value)) return false;
+  const hasMandra = value.startsWith(".");
+  const hasTara = value.endsWith("'");
+  if (hasMandra && hasTara) return false;
+  const core = value.replace(/^\./, "").replace(/'$/, "");
+  return VALID_SWARA_TOKENS.has(core) && `${hasMandra ? "." : ""}${core}${hasTara ? "'" : ""}` === value;
+}
+
+function hasUniqueQuestionIds(groups: unknown[]): boolean {
+  const ids = new Set<string>();
+  for (const group of groups) {
+    if (!Array.isArray(group)) return false;
+    for (const question of group) {
+      const id = getRecordShape(question).id;
+      if (!isNonBlankString(id) || ids.has(id)) return false;
+      ids.add(id);
+    }
+  }
+  return true;
 }
 
 function hasSafeTalaStructure(tala: Record<string, unknown>): boolean {
@@ -710,12 +745,20 @@ function collectDependencyDispositions(
       return;
     }
     const dependency = (lessonsData as Array<{ id: string }>).find((candidate) => candidate.id === dependencyId);
-    const isPublic = Boolean(dependency && getRecordPublicationDecisionInternal(dependency, decisionStack).isPublic);
+    const dependencyDecision = dependency
+      ? getRecordPublicationDecisionInternal(dependency, decisionStack)
+      : undefined;
+    const isPublic = Boolean(dependencyDecision?.isPublic);
     results.push({
       path: dependencyPath,
       isPublic,
       blocking,
-      reasonCodes: isPublic ? [] : ["dependent-entity-unavailable"],
+      reasonCodes: isPublic
+        ? []
+        : Array.from(new Set<PublicationReasonCode>([
+            ...(dependencyDecision?.reasonCodes ?? []),
+            "dependent-entity-unavailable",
+          ])),
     });
   };
 
@@ -794,25 +837,69 @@ function hasCanonicalRuntimeShape(value: PublicationRecordShape): boolean {
   }
   if ((ragasData as Array<{ id: string }>).some((record) => record.id === id)) {
     const raga = value as Record<string, unknown>;
-    return typeof raga.name_si === "string" && typeof raga.name_en === "string" &&
-      Array.isArray(raga.arohana_swaras) && raga.arohana_swaras.length > 0 &&
-      Array.isArray(raga.avarohana_swaras) && raga.avarohana_swaras.length > 0;
+    return ["name_si", "name_en", "thata_si", "arohana_si", "avarohana_si", "vadi_si", "samvadi_si", "jati_si"]
+      .every((field) => isNonBlankString(raga[field])) &&
+      Array.isArray(raga.arohana_swaras) && raga.arohana_swaras.length > 0 && raga.arohana_swaras.every(isValidSwaraToken) &&
+      Array.isArray(raga.avarohana_swaras) && raga.avarohana_swaras.length > 0 && raga.avarohana_swaras.every(isValidSwaraToken) &&
+      Array.isArray(raga.samplePhrases) && raga.samplePhrases.length > 0 && raga.samplePhrases.every((phrase) => {
+        if (!phrase || typeof phrase !== "object" || Array.isArray(phrase)) return false;
+        const candidate = phrase as Record<string, unknown>;
+        return isNonBlankString(candidate.name_si) && Array.isArray(candidate.swaras) &&
+          candidate.swaras.length > 0 && candidate.swaras.every(isValidSwaraToken);
+      }) && isSourceReference(raga.sourceReference);
   }
   if ((lessonsData as Array<{ id: string }>).some((record) => record.id === id)) {
     const lesson = value as Record<string, unknown>;
-    return typeof lesson.title_si === "string" && typeof lesson.learningGoal_si === "string" &&
-      Array.isArray(lesson.contentSections);
+    return ["strandId", "title_si", "slug", "summary_si", "learningGoal_si", "quizId"]
+      .every((field) => isNonBlankString(lesson[field])) &&
+      Number.isFinite(lesson.estimatedMinutes) && (lesson.estimatedMinutes as number) > 0 &&
+      Array.isArray(lesson.prerequisites) && lesson.prerequisites.every(isNonBlankString) &&
+      Array.isArray(lesson.contentSections) && lesson.contentSections.length > 0 &&
+      isSourceReference(lesson.sourceReference);
   }
   if ((quizzesData as Array<{ id: string }>).some((record) => record.id === id)) {
     return isNonBlankString(value.lessonId) && isCanonicalGradeBandArray(value.gradeBands) &&
-      Array.isArray(value.questions) && value.questions.length > 0 && value.questions.every(hasCanonicalQuestionShape);
+      Number.isFinite(value.passingScorePercent) && (value.passingScorePercent as number) >= 1 &&
+      (value.passingScorePercent as number) <= 100 &&
+      Array.isArray(value.questions) && value.questions.length > 0 && value.questions.every(hasCanonicalQuestionShape) &&
+      hasUniqueQuestionIds([value.questions]);
   }
   if ((examPapersData as Array<{ id: string }>).some((record) => record.id === id)) {
     return isPublicGradeBand(String(value.gradeBand ?? "")) &&
       Array.isArray(value.partA_MCQ) && value.partA_MCQ.length > 0 && value.partA_MCQ.every(hasCanonicalQuestionShape) &&
-      Array.isArray(value.partB_Structured) && value.partB_Structured.length > 0 && value.partB_Structured.every(hasCanonicalQuestionShape);
+      Array.isArray(value.partB_Structured) && value.partB_Structured.length > 0 && value.partB_Structured.every(hasCanonicalQuestionShape) &&
+      hasUniqueQuestionIds([value.partA_MCQ, value.partB_Structured]) && isSourceReference(value.sourceReference);
   }
-  return true;
+  if ((instrumentsData as Array<{ id: string }>).some((record) => record.id === id)) {
+    return ["name_si", "name_en", "category_si", "origin_si", "construction_si", "soundProduction_si", "playingPosition_si", "musicalRole_si"]
+      .every((field) => isNonBlankString(value[field])) && isSourceReference(value.sourceReference);
+  }
+  if ((culturalTraditionsData as Array<{ id: string }>).some((record) => record.id === id)) {
+    return ["title_si", "title_en", "category_si", "description_si", "musicalStyle_si", "socialContext_si"]
+      .every((field) => isNonBlankString(value[field])) && Array.isArray(value.verseExamples_si) &&
+      value.verseExamples_si.length > 0 && isSourceReference(value.sourceReference);
+  }
+  if ((theatreTraditionsData as Array<{ id: string }>).some((record) => record.id === id)) {
+    return ["title_si", "title_en", "type_si", "historicalBackground_si", "musicalCharacteristics_si"]
+      .every((field) => isNonBlankString(value[field])) && isStringArray(value.instruments_si) &&
+      Array.isArray(value.featuredSongs_si) && isSourceReference(value.sourceReference);
+  }
+  if ((glossaryData as Array<{ id: string }>).some((record) => record.id === id)) {
+    return ["term_si", "term_en", "transliteration", "category_si", "definition_si"]
+      .every((field) => isNonBlankString(value[field])) && isSourceReference(value.sourceReference);
+  }
+  if ((learningPathsData as Array<{ id: string }>).some((record) => record.id === id)) {
+    return ["title_si", "title_en", "goalStatement_si", "description_si", "difficulty", "masteryQuizId"]
+      .every((field) => isNonBlankString(value[field])) &&
+      Number.isFinite(value.estimatedHours) && (value.estimatedHours as number) > 0 &&
+      Array.isArray(value.steps) && value.steps.length > 0 && value.steps.every((step, index) => {
+        if (!step || typeof step !== "object" || Array.isArray(step)) return false;
+        const candidate = step as Record<string, unknown>;
+        return candidate.stepNumber === index + 1 && isNonBlankString(candidate.lessonId) &&
+          isNonBlankString(candidate.checkpointType) && typeof candidate.requiredForNext === "boolean";
+      }) && isSourceReference(value.sourceReference);
+  }
+  return false;
 }
 
 export function getPublicationDecision(input: PublicationInput): PublicationDecision {
@@ -820,7 +907,9 @@ export function getPublicationDecision(input: PublicationInput): PublicationDeci
   const sourceEvidence = evaluateSourceReference(sourceReference);
   const reasonCodes: PublicationReasonCode[] = [];
 
-  if (hasUnsupportedGrade(gradeBands)) reasonCodes.push("unsupported-grade");
+  if (hasUnsupportedGrade(gradeBands) || (gradeBands.length > 0 && !hasPublicGrade(gradeBands))) {
+    reasonCodes.push("unsupported-grade");
+  }
   if (KNOWN_QUARANTINED_ENTITY_IDS.has(id)) reasonCodes.push("known-forensic-issue");
   if (gradeBands.length === 0) reasonCodes.push("missing-grade-scope");
   if (gradeBands.length > 0 && !gradeScopeMatchesSource(gradeBands, sourceReference?.sourceId)) {
@@ -851,18 +940,52 @@ export function getPublicationDecision(input: PublicationInput): PublicationDeci
   };
 }
 
+function getQuizContainerPublicationDecision(record: unknown): PublicationDecision {
+  const value = getRecordShape(record);
+  const id = isNonBlankString(value.id) ? value.id : "";
+  const gradeBands = getGradeBands(value);
+  const reasonCodes: PublicationReasonCode[] = [];
+  if (gradeBands.length === 0) reasonCodes.push("missing-grade-scope");
+  if (!hasPublicGrade(gradeBands)) reasonCodes.push("unsupported-grade");
+  if (KNOWN_QUARANTINED_ENTITY_IDS.has(id)) reasonCodes.push("known-forensic-issue");
+  const isPublic = hasPublicGrade(gradeBands) && !KNOWN_QUARANTINED_ENTITY_IDS.has(id);
+  return {
+    state: KNOWN_QUARANTINED_ENTITY_IDS.has(id) ? "quarantined" : isPublic ? "public" : "needs-review",
+    isPublic,
+    gradeBands,
+    reasonCodes: Array.from(new Set(reasonCodes)),
+    sourceEvidence: evaluateSourceReference(undefined),
+    reviewState: "needs-review",
+    nestedDispositions: [],
+    withheldFields: [],
+  };
+}
+
 function getRecordPublicationDecisionInternal(record: unknown, decisionStack: Set<string>): PublicationDecision {
   const value = getRecordShape(record);
-  const baseDecision = getPublicationDecision(toPublicationInput(record));
+  const recordId = typeof value.id === "string" ? value.id : "";
+  const isQuiz = (quizzesData as Array<{ id: string }>).some((quiz) => quiz.id === recordId);
+  const baseDecision = isQuiz
+    ? getQuizContainerPublicationDecision(record)
+    : getPublicationDecision(toPublicationInput(record));
   const reasonCodes = new Set(baseDecision.reasonCodes);
   const nestedDispositions = [...baseDecision.nestedDispositions];
   const withheldFields = [...baseDecision.withheldFields];
-  const recordId = typeof value.id === "string" ? value.id : "";
-  if (recordId && decisionStack.has(recordId)) return baseDecision;
+  if (recordId && decisionStack.has(recordId)) {
+    return {
+      ...baseDecision,
+      state: "needs-review",
+      isPublic: false,
+      reasonCodes: Array.from(new Set<PublicationReasonCode>([...baseDecision.reasonCodes, "dependency-cycle"])),
+    };
+  }
   if (recordId) decisionStack.add(recordId);
 
   const hasValidRuntimeShape = hasCanonicalRuntimeShape(value);
   if (!hasValidRuntimeShape) reasonCodes.add("malformed-record");
+  if (Array.isArray(value.gradeBands) && !isCanonicalGradeBandArray(value.gradeBands)) {
+    reasonCodes.add("unsupported-grade");
+  }
 
   const contextDecision = getContextClaimPublicationDecision(record);
   if (contextDecision.present && !contextDecision.isPublic) {
@@ -888,8 +1011,10 @@ function getRecordPublicationDecisionInternal(record: unknown, decisionStack: Se
   if (hasBlockingDependency) {
     reasonCodes.add("dependent-entity-unavailable");
   }
+  if (nestedDispositions.some((disposition) => disposition.reasonCodes.includes("dependency-cycle"))) {
+    reasonCodes.add("dependency-cycle");
+  }
 
-  const isQuiz = (quizzesData as Array<{ id: string }>).some((quiz) => quiz.id === recordId);
   const isExam = (examPapersData as Array<{ id: string }>).some((paper) => paper.id === recordId);
   if (!isQuiz && !isExam) {
     const quarantined = baseDecision.state === "quarantined";
@@ -912,7 +1037,10 @@ function getRecordPublicationDecisionInternal(record: unknown, decisionStack: Se
   const parent = isQuiz && typeof value.lessonId === "string"
     ? (lessonsData as unknown as Array<{ id: string }>).find((lesson) => lesson.id === value.lessonId)
     : undefined;
-  const parentIsPublic = !isQuiz || (!!parent && getRecordPublicationDecisionInternal(parent, decisionStack).isPublic);
+  const parentIsActiveBacklink = isQuiz && typeof value.lessonId === "string" && decisionStack.has(value.lessonId);
+  const parentIsPublic = !isQuiz || (!!parent && (
+    parentIsActiveBacklink || getRecordPublicationDecisionInternal(parent, decisionStack).isPublic
+  ));
   if (isQuiz && !parentIsPublic) reasonCodes.add("parent-lesson-unavailable");
   const nestedGroups = isQuiz
     ? [{ path: "questions", items: value.questions }]
@@ -929,7 +1057,7 @@ function getRecordPublicationDecisionInternal(record: unknown, decisionStack: Se
     const hasExplicitGrades = isCanonicalGradeBandArray(questionShape.gradeBands);
     const hasDirectSource = isSourceReference(questionShape.sourceReference);
     const hasValidQuestionShape = hasCanonicalQuestionShape(question);
-    const decision = getRecordPublicationDecisionInternal(question, decisionStack);
+    const decision = getPublicationDecision(toPublicationInput(question));
     nestedDispositions.push({
       path: `${group.path}[${index}]`,
       isPublic: decision.isPublic,
@@ -1011,9 +1139,19 @@ export function createUnverifiedReviewMetadata(): ReviewMetadata {
   };
 }
 
+function cloneJsonRecord<T>(value: T): T {
+  if (Array.isArray(value)) return value.map((item) => cloneJsonRecord(item)) as T;
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, cloneJsonRecord(item)])
+    ) as T;
+  }
+  return value;
+}
+
 export function sanitizePublicRecord<T>(record: T, suppliedDecision?: PublicationDecision): T {
   if (!record || typeof record !== "object") return record;
-  const value = { ...(record as Record<string, unknown>) };
+  const value = cloneJsonRecord(record) as Record<string, unknown>;
   if ("reviewMetadata" in value) {
     value.reviewMetadata = createUnverifiedReviewMetadata();
   }
@@ -1029,6 +1167,14 @@ export function sanitizePublicRecord<T>(record: T, suppliedDecision?: Publicatio
     if (disposition.path === "nextRecommendedLessonId") delete value.nextRecommendedLessonId;
     if (disposition.path === "quizId") delete value.quizId;
   });
+  return value as T;
+}
+
+export function sanitizeReviewRecord<T>(record: T): T {
+  if (!record || typeof record !== "object") return record;
+  const value = cloneJsonRecord(record) as Record<string, unknown>;
+  if ("reviewMetadata" in value) value.reviewMetadata = createUnverifiedReviewMetadata();
+  if ("published" in value) value.published = false;
   return value as T;
 }
 

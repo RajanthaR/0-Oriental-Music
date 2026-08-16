@@ -6,8 +6,9 @@ it is not acceptance evidence for this closeout. The controlling closeout plan
 is `docs/plans/2026-08-16-001-fix-phase-2-pr-merge-ready-plan.md`.
 
 The closeout uses the authorized whole-entity quarantine decision. A tala is
-not public or playable when a required learner-visible context, theka, or bol
-field is absent, ambiguous, or marked `needs-review`. Raw records and their
+not public or playable when a required learner-visible context, structure,
+hand action, practice configuration, theka, or bol field is absent, ambiguous,
+or marked `needs-review`. Raw records and their
 field evidence remain available to forensic tooling. The original PDFs are not
 present in this checkout, so unreadable extraction glyphs are not reconstructed
 from musical memory.
@@ -62,8 +63,9 @@ throwing validator inputs, exam nested claims and display typing, same-record
 term collisions, audio-off phase continuity, same-ID Tala replacement, missing
 transition assertions, disposition issue-ID referential integrity, and the
 runtime canonical-shape gate. The separate RhythmTapGame completion-timer
-report was classified as pre-existing and is retained as residual risk rather
-than Phase 2 acceptance evidence. This cycle is not final acceptance; a clean
+report was initially classified as pre-existing. The follow-up review later
+closed it with exactly-once and reset-cancellation regressions, so it is no
+longer a residual risk. This cycle is not final acceptance; a clean
 full rereview against the same base remains mandatory.
 
 ## Quarantine boundary

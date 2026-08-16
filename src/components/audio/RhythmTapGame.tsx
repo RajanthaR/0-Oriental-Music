@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { tablaSynth } from "@/lib/audio/tabla";
+import { tablaSynth, type TablaPlaybackHandle } from "@/lib/audio/tabla";
 import { normalizePracticeBpm } from "@/lib/audio/tempo";
 import { Play, Square, RotateCcw, Award, Sparkles, Touchpad } from "lucide-react";
 
@@ -32,13 +32,25 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
   const startTimeRef = useRef<number>(0);
   const timerRef = useRef<NodeJS.Timeout | number | null>(null);
   const finishTimerRef = useRef<NodeJS.Timeout | number | null>(null);
+  const playbackHandlesRef = useRef<Set<TablaPlaybackHandle>>(new Set());
+
+  const trackPlayback = useCallback((handle: TablaPlaybackHandle) => {
+    playbackHandlesRef.current.add(handle);
+    void handle.ready;
+  }, []);
+
+  const clearPlayback = useCallback(() => {
+    playbackHandlesRef.current.forEach((cancel) => cancel());
+    playbackHandlesRef.current.clear();
+  }, []);
 
   const clearTimers = useCallback(() => {
     if (timerRef.current !== null) clearInterval(timerRef.current as number);
     if (finishTimerRef.current !== null) clearTimeout(finishTimerRef.current as number);
     timerRef.current = null;
     finishTimerRef.current = null;
-  }, []);
+    clearPlayback();
+  }, [clearPlayback]);
 
   const handleFinish = useCallback(() => {
     setIsPlaying(false);
@@ -93,7 +105,7 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
           setFeedbackText("මෙම උපාංගයේ තබ්ලා නාදය ආරම්භ කළ නොහැක. දෘශ්‍ය ස්පන්දනයට අනුව පුහුණු වන්න.");
           setFeedbackColor("text-primary");
         });
-        void handle.ready;
+        trackPlayback(handle);
 
         if (beatCount >= safeTotalBeats) {
           if (timerRef.current !== null) clearInterval(timerRef.current as number);
@@ -105,7 +117,7 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
       clearTimers();
     }
     return clearTimers;
-  }, [isPlaying, safeTotalBeats, beatIntervalMs, clearTimers, handleFinish]);
+  }, [isPlaying, safeTotalBeats, beatIntervalMs, clearTimers, handleFinish, trackPlayback]);
 
   const handleTap = () => {
     if (!isPlaying) return;
@@ -115,7 +127,7 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
       setFeedbackText("මෙම උපාංගයේ තබ්ලා නාදය ආරම්භ කළ නොහැක. දෘශ්‍ය ස්පන්දනයට අනුව පුහුණු වන්න.");
       setFeedbackColor("text-primary");
     });
-    void handle.ready;
+    trackPlayback(handle);
 
     // Find closest expected beat
     const expected = expectedBeatTimesRef.current[expectedBeatTimesRef.current.length - 1];

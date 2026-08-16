@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { SWARA_SEMITONES, swaraSynth, getSwaraFrequency } from "@/lib/audio/synth";
+import { describe, it, expect, vi } from "vitest";
+import { SWARA_SEMITONES, SwaraSynthEngine, swaraSynth, getSwaraFrequency } from "@/lib/audio/synth";
 import { ROOT_PITCHES } from "@/lib/audio/tanpura";
-import { tablaSynth } from "@/lib/audio/tabla";
+import { TablaSynthEngine, tablaSynth } from "@/lib/audio/tabla";
 import { normalizePracticeBpm } from "@/lib/audio/tempo";
 
 describe("Audio Synthesis Engine & Tuning Suite", () => {
@@ -72,5 +72,42 @@ describe("Audio Synthesis Engine & Tuning Suite", () => {
     expect(normalizePracticeBpm(-1, 80)).toBe(80);
     expect(normalizePracticeBpm(Number.POSITIVE_INFINITY, 80)).toBe(80);
     expect(normalizePracticeBpm(9999, 80)).toBe(80);
+  });
+
+  it("closes rejected AudioContexts and suppresses callbacks after cancellation", async () => {
+    const originalAudioContext = window.AudioContext;
+    const close = vi.fn().mockResolvedValue(undefined);
+    class RejectingAudioContext {
+      state = "suspended";
+      currentTime = 0;
+      destination = {};
+      createGain() {
+        return {
+          gain: { setValueAtTime: vi.fn() },
+          connect: vi.fn(),
+        };
+      }
+      resume(): Promise<void> { return Promise.reject(new Error("blocked")); }
+      close() { return close(); }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: RejectingAudioContext });
+    await expect(new SwaraSynthEngine().playSwaraTone("S")).resolves.toBe(false);
+    await expect(new TablaSynthEngine().playBol("ධා").ready).resolves.toBe(false);
+    expect(close).toHaveBeenCalledTimes(2);
+
+    let releaseResume: (() => void) | undefined;
+    class DeferredAudioContext extends RejectingAudioContext {
+      resume() {
+        return new Promise<void>((resolve) => { releaseResume = resolve; });
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: DeferredAudioContext });
+    const unavailable = vi.fn();
+    const handle = new TablaSynthEngine().playBol("ධා", 500, unavailable);
+    handle();
+    releaseResume?.();
+    await expect(handle.ready).resolves.toBe(false);
+    expect(unavailable).not.toHaveBeenCalled();
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
   });
 });

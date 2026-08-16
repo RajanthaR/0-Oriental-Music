@@ -16,6 +16,8 @@ import {
 } from "@/lib/data/publication-policy";
 import quizzesData from "@/data/quizzes.json";
 import examPapersData from "@/data/exam-papers.json";
+import lessonsData from "@/data/lessons.json";
+import glossaryData from "@/data/glossary.json";
 import {
   validateCoverageSnapshot,
   validateForensicInventory,
@@ -498,9 +500,102 @@ describe("Prompt 1 publication containment", () => {
       (bilawal as unknown as { gradeBands: unknown }).gradeBands = gradeBands;
       expect(getRecordPublicationDecision(bilawal)).toMatchObject({
         isPublic: false,
-        reasonCodes: expect.arrayContaining(["malformed-record"]),
+        reasonCodes: expect.arrayContaining(["malformed-record", "unsupported-grade"]),
       });
     }
+  });
+
+  it("requires direct provenance instead of borrowing a parent lesson source", () => {
+    const synthetic = {
+      id: "synthetic-parent-linked-record",
+      lessonId: "les-intro-01",
+      gradeBands: ["10-11"],
+    };
+    expect(getRecordPublicationDecision(synthetic)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["missing-source-reference", "malformed-record"]),
+    });
+  });
+
+  it("fails closed for unknown kinds and malformed known records", () => {
+    const bilawal = structuredClone(ragasData.find((raga) => raga.id === "raga-bilawal"));
+    const nada = structuredClone(glossaryData.find((term) => term.id === "term-nada"));
+    expect(bilawal).toBeDefined();
+    expect(nada).toBeDefined();
+    if (!bilawal || !nada) return;
+    bilawal.arohana_swaras[0] = "INVALID";
+    delete (nada as { definition_si?: unknown }).definition_si;
+    expect(getRecordPublicationDecision(bilawal).reasonCodes).toContain("malformed-record");
+    expect(getRecordPublicationDecision(nada).reasonCodes).toContain("malformed-record");
+  });
+
+  it("rejects malformed quiz thresholds and impossible question identities", () => {
+    const canonical = quizzesData.find((item) => item.id === "quiz-les-intro-01");
+    expect(canonical).toBeDefined();
+    if (!canonical) return;
+    for (const threshold of [-1, 0, 101, Number.NaN, "75"]) {
+      const quiz = structuredClone(canonical) as unknown as Record<string, unknown>;
+      quiz.passingScorePercent = threshold;
+      expect(getRecordPublicationDecision(quiz).reasonCodes).toContain("malformed-record");
+    }
+
+    const duplicateAnswers = structuredClone(canonical) as unknown as Record<string, unknown>;
+    const duplicateAnswerQuestion = (duplicateAnswers.questions as Array<Record<string, unknown>>)[0];
+    const answerId = (duplicateAnswerQuestion.correctAnswerIds as string[])[0];
+    duplicateAnswerQuestion.correctAnswerIds = [
+      answerId,
+      answerId,
+    ];
+    expect(getRecordPublicationDecision(duplicateAnswers).isPublic).toBe(false);
+
+    const duplicateQuestionIds = structuredClone(canonical);
+    duplicateQuestionIds.questions[1].id = duplicateQuestionIds.questions[0].id;
+    expect(getRecordPublicationDecision(duplicateQuestionIds).isPublic).toBe(false);
+
+    const matching = structuredClone(canonical) as unknown as Record<string, unknown>;
+    const first = (matching.questions as Array<Record<string, unknown>>)[0];
+    first.type = "matching";
+    delete first.options_si;
+    delete first.correctAnswerIds;
+    first.matchingPairs = [
+      { left_si: "නාදය", right_si: "පළමු" },
+      { left_si: "ණාදය", right_si: "දෙවන" },
+    ];
+    expect(getRecordPublicationDecision(matching).isPublic).toBe(false);
+  });
+
+  it("fails blocking lesson cycles closed while allowing the quiz parent backlink", () => {
+    const first = lessonsData.find((lesson) => lesson.id === "les-intro-01");
+    const second = lessonsData.find((lesson) => lesson.id === "les-swara-01");
+    expect(first).toBeDefined();
+    expect(second).toBeDefined();
+    if (!first || !second) return;
+    const firstPrerequisites = [...first.prerequisites];
+    const secondPrerequisites = [...second.prerequisites];
+    try {
+      first.prerequisites = [first.id];
+      expect(getRecordPublicationDecision(first).reasonCodes).toContain("dependency-cycle");
+      first.prerequisites = [second.id];
+      second.prerequisites = [first.id];
+      expect(getRecordPublicationDecision(first).reasonCodes).toContain("dependent-entity-unavailable");
+    } finally {
+      first.prerequisites = firstPrerequisites;
+      second.prerequisites = secondPrerequisites;
+    }
+    expect(getRecordPublicationDecision(quizzesData.find((quiz) => quiz.id === "quiz-les-intro-01")).isPublic).toBe(true);
+  });
+
+  it("returns detached public projections and complete review records", () => {
+    const first = repository.getRagaById("raga-bilawal");
+    expect(first).toBeDefined();
+    if (!first) return;
+    first.gradeBands.splice(0, first.gradeBands.length);
+    expect(repository.getRagaById("raga-bilawal")?.gradeBands).toEqual(["10-11"]);
+    const reviewLesson = repository.getLessons({ visibility: "review" }).find((lesson) => lesson.id === "les-intro-01");
+    expect(reviewLesson?.quizId).toBe("quiz-les-intro-01");
+    expect(reviewLesson?.nextRecommendedLessonId).toBe(
+      lessonsData.find((lesson) => lesson.id === "les-intro-01")?.nextRecommendedLessonId
+    );
   });
 
   it("rejects malformed or unsupported nested question discriminators", () => {
@@ -595,5 +690,15 @@ describe("Prompt 1 publication containment", () => {
     const result = validateMusicalCoreFieldDispositions(talasData, mutated);
     expect(result.isValid).toBe(false);
     expect(result.issues.some((issue) => issue.field === "context.issueId")).toBe(true);
+  });
+
+  it("rejects malformed and duplicate field-disposition registry rows", () => {
+    const malformed = structuredClone(musicalCoreFieldDispositions) as unknown as Record<string, unknown>;
+    (malformed.talas as unknown[]).push(null);
+    (malformed.issueCatalog as unknown[]).push(structuredClone((malformed.issueCatalog as unknown[])[0]));
+    const result = validateMusicalCoreFieldDispositions(talasData, malformed);
+    expect(result.isValid).toBe(false);
+    expect(result.issues.some((issue) => issue.field === "talas")).toBe(true);
+    expect(result.issues.some((issue) => issue.message.includes("IDs must be unique"))).toBe(true);
   });
 });

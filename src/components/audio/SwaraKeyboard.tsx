@@ -41,6 +41,7 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
   const [timbre, setTimbre] = useState<"harmonium" | "flute" | "pure">("harmonium");
   const [playingKey, setPlayingKey] = useState<string | null>(null);
   const [isPlayingScale, setIsPlayingScale] = useState(false);
+  const [audioUnavailable, setAudioUnavailable] = useState(false);
 
   const getFullNoteSymbol = useCallback((baseKey: string) => {
     if (saptaka === "mandra") {
@@ -57,7 +58,9 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
   const handlePlayNote = useCallback((baseKey: string) => {
     const fullNote = getFullNoteSymbol(baseKey);
     setPlayingKey(baseKey);
-    swaraSynth.playSwaraTone(fullNote, 0.7, 261.63, timbre);
+    void swaraSynth.playSwaraTone(fullNote, 0.7, 261.63, timbre).then((played) => {
+      if (!played) setAudioUnavailable(true);
+    });
     if (onNotePlay) {
       onNotePlay(fullNote);
     }
@@ -90,7 +93,11 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
       const note = scale[i];
       const baseKey = note.replace(/[.̣'̇]/g, "");
       setPlayingKey(baseKey);
-      swaraSynth.playSwaraTone(note, 0.5, 261.63, timbre);
+      const played = await swaraSynth.playSwaraTone(note, 0.5, 261.63, timbre);
+      if (!played) {
+        setAudioUnavailable(true);
+        break;
+      }
       await new Promise((r) => setTimeout(r, 550));
     }
     setPlayingKey(null);
@@ -174,6 +181,12 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
           </div>
         )}
       </div>
+
+      {audioUnavailable && (
+        <p role="alert" className="mb-3 text-xs font-semibold text-primary">
+          මෙම උපාංගයේ නාදය ආරම්භ කළ නොහැක. දෘශ්‍ය ස්වර සලකුණු අනුව පුහුණු වන්න.
+        </p>
+      )}
 
       {/* Keyboard Display */}
       <div className="relative overflow-x-auto pb-2 pt-1">
