@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import coverageData from "../../data/content-coverage.json";
 import ragasData from "@/data/ragas.json";
 import talasData from "@/data/talas.json";
+import sourcesData from "@/data/sources.json";
 import musicalCoreFieldDispositions from "../../data/musical-core-field-dispositions.json";
 import { repository } from "@/lib/data/repository";
 import {
@@ -9,10 +10,12 @@ import {
   formatPublicSourceReference,
   getContextClaimPublicationDecision,
   getRecordPublicationDecision,
+  getPublicationDecision,
   getSourceCorpusInventory,
   getTalaFieldDisposition,
   KNOWN_QUARANTINED_ENTITY_IDS,
   UNKNOWN_PROVENANCE,
+  sanitizePublicRecord,
 } from "@/lib/data/publication-policy";
 import quizzesData from "@/data/quizzes.json";
 import examPapersData from "@/data/exam-papers.json";
@@ -101,6 +104,90 @@ describe("Prompt 1 publication containment", () => {
       raw.title_si = originalTitle;
       raw.reviewMetadata = originalMetadata;
     }
+  });
+
+  it("keeps partial and mismatched publication decisions fail closed", () => {
+    const partial = {
+      id: "synthetic-partial",
+      gradeBands: ["10-11"],
+      sourceReference: {
+        sourceId: "SRC-G10-NADA",
+        pageOrSection: "sg10_emus_chap8_nadaya.pdf පිටුව 2",
+      },
+    };
+    expect(getPublicationDecision(partial)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["unknown-record-kind", "malformed-record"]),
+    });
+
+    const validLesson = lessonsData.find((lesson) => lesson.id === "les-intro-01");
+    expect(validLesson).toBeDefined();
+    if (!validLesson) return;
+    const publicDecision = getRecordPublicationDecision(validLesson);
+    expect(publicDecision.isPublic).toBe(true);
+    const malformed = structuredClone(validLesson) as Record<string, unknown>;
+    delete malformed.title_si;
+    expect(sanitizePublicRecord(malformed)).toEqual({});
+  });
+
+  it("fails closed after a previously trusted raw record becomes accessor-backed", () => {
+    const candidate = structuredClone(ragasData[0]) as Record<string, unknown>;
+    expect(getRecordPublicationDecision(candidate).isPublic).toBe(true);
+    let getterCalls = 0;
+    Object.defineProperty(candidate, "id", {
+      enumerable: true,
+      configurable: true,
+      get() {
+        getterCalls += 1;
+        throw new Error("hostile id getter");
+      },
+    });
+    expect(getRecordPublicationDecision(candidate)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["malformed-record"]),
+    });
+    expect(getterCalls).toBe(0);
+  });
+
+  it("quarantines dependent claims when a source ID becomes ambiguous", () => {
+    const sourceCatalog = sourcesData as unknown as Array<Record<string, unknown>>;
+    const originalLength = sourceCatalog.length;
+    try {
+      const bilawal = ragasData.find((raga) => raga.id === "raga-bilawal");
+      expect(bilawal).toBeDefined();
+      if (!bilawal) return;
+      const sourceId = bilawal.sourceReference.sourceId;
+      const source = sourceCatalog.find((candidate) => candidate.id === sourceId);
+      expect(source).toBeDefined();
+      if (!source) return;
+      const duplicate = structuredClone(source);
+      sourceCatalog.push(duplicate);
+      expect(getRecordPublicationDecision(bilawal)).toMatchObject({
+        isPublic: false,
+        reasonCodes: expect.arrayContaining(["ambiguous-source-record"]),
+      });
+    } finally {
+      sourceCatalog.splice(originalLength);
+    }
+  });
+
+  it("returns structured failures rather than throwing for malformed validator inputs", () => {
+    expect(() => validatePublicCollection("Raga", null)).not.toThrow();
+    expect(validatePublicCollection("Raga", null)).toMatchObject({ isValid: false });
+    expect(() => validatePublicBoundary(null)).not.toThrow();
+    expect(validatePublicBoundary(null)).toMatchObject({ isValid: false });
+    expect(() => validateForensicLedger(null)).not.toThrow();
+    expect(validateForensicLedger(null)).toMatchObject({ isValid: false });
+    expect(() => validateCoverageSnapshot(null)).not.toThrow();
+    expect(validateCoverageSnapshot(null)).toMatchObject({ isValid: false });
+
+    const hostile = new Proxy(structuredClone(ragasData[0]) as Record<string, unknown>, {
+      ownKeys() {
+        throw new Error("hostile ownKeys");
+      },
+    });
+    expect(() => validatePublicCollection("Raga", [hostile])).not.toThrow();
+    expect(validatePublicCollection("Raga", [hostile])).toMatchObject({ isValid: false });
   });
 
   it("does not expose the old A/L selector scope through repository data", () => {

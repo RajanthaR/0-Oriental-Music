@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { SWARA_SEMITONES, SwaraSynthEngine, swaraSynth, getSwaraFrequency } from "@/lib/audio/synth";
 import { ROOT_PITCHES } from "@/lib/audio/tanpura";
-import { TablaSynthEngine, tablaSynth } from "@/lib/audio/tabla";
+import { TablaSynthEngine, tablaSynth, planTablaBol, scheduleTablaPlan } from "@/lib/audio/tabla";
 import { normalizePracticeBpm } from "@/lib/audio/tempo";
 
 describe("Audio Synthesis Engine & Tuning Suite", () => {
@@ -72,6 +72,42 @@ describe("Audio Synthesis Engine & Tuning Suite", () => {
     expect(normalizePracticeBpm(-1, 80)).toBe(80);
     expect(normalizePracticeBpm(Number.POSITIVE_INFINITY, 80)).toBe(80);
     expect(normalizePracticeBpm(9999, 80)).toBe(80);
+  });
+
+  it("rolls back a Tabla schedule when registration fails after earlier timers", () => {
+    const cleared: number[] = [];
+    let nextTimer = 1;
+    const timerApi = {
+      set: (callback: () => void) => {
+        if (nextTimer === 2) throw new Error("timer registration failed");
+        return nextTimer++;
+      },
+      clear: (timer: number) => { cleared.push(timer); },
+    };
+
+    expect(() => scheduleTablaPlan(
+      planTablaBol("ධනක", 600),
+      () => undefined,
+      timerApi,
+    )).toThrow("timer registration failed");
+    expect(cleared).toEqual([1]);
+  });
+
+  it("swallows a throwing Tabla unavailable observer after completing cleanup", async () => {
+    const originalAudioContext = window.AudioContext;
+    class ThrowingAudioContext {
+      constructor() { throw new Error("audio unavailable"); }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: ThrowingAudioContext });
+    try {
+      const onUnavailable = vi.fn(() => { throw new Error("observer failed"); });
+      const handle = new TablaSynthEngine().playBol("ධා", 500, onUnavailable);
+      await expect(handle.ready).resolves.toBe(false);
+      await expect(handle.finished).resolves.toBeUndefined();
+      expect(onUnavailable).toHaveBeenCalledTimes(1);
+    } finally {
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
+    }
   });
 
   it("closes rejected AudioContexts and suppresses callbacks after cancellation", async () => {
@@ -307,6 +343,18 @@ describe("Audio Synthesis Engine & Tuning Suite", () => {
       vi.useRealTimers();
       Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
     }
+  });
+
+  it("defers the first sequence callback until the caller owns the handle", async () => {
+    const steps: string[] = [];
+    let handle: ReturnType<SwaraSynthEngine["playSequenceHandle"]> | undefined;
+    handle = new SwaraSynthEngine().playSequenceHandle(["S", "R"], 0.5, (_index, swara) => {
+      steps.push(swara);
+      handle?.();
+    });
+
+    await expect(handle.ready).resolves.toBe(false);
+    expect(steps).toEqual(["S"]);
   });
 
   it("rolls back partially constructed Swara and Tabla graphs", async () => {

@@ -291,13 +291,20 @@ export type QuestionType =
   | "audio-id"
   | "notation-id";
 
+/** Question discriminators that have a learner-facing QuizRunner renderer. */
+export type RenderableQuestionType = Exclude<QuestionType, "audio-id" | "notation-id">;
+
 export interface AnswerOption {
   id: string;
   text_si: string;
   isCorrect?: boolean;
 }
 
-export interface Question {
+/**
+ * Raw/forensic question shape. The source corpus may retain question types
+ * whose public renderer is not implemented yet.
+ */
+export interface RawQuestion {
   id: string;
   type: QuestionType;
   gradeBands: GradeBandType[];
@@ -318,6 +325,13 @@ export interface Question {
   sourceReference: SourceReference;
 }
 
+/** Public/UI question union. Unsupported forensic-only variants are excluded. */
+export type Question = {
+  [Type in RenderableQuestionType]: Omit<RawQuestion, "type"> & { type: Type };
+}[RenderableQuestionType];
+
+export type ForensicQuestion = RawQuestion;
+
 export interface Quiz {
   id: string;
   title_si: string;
@@ -326,6 +340,8 @@ export interface Quiz {
   questions: Question[];
   passingScorePercent: number;
 }
+
+export type RawQuiz = Omit<Quiz, "questions"> & { questions: RawQuestion[] };
 
 export interface ExamPaper {
   id: string;
@@ -338,6 +354,11 @@ export interface ExamPaper {
   sourceReference: SourceReference;
   reviewMetadata: ReviewMetadata;
 }
+
+export type RawExamPaper = Omit<ExamPaper, "partA_MCQ" | "partB_Structured"> & {
+  partA_MCQ: RawQuestion[];
+  partB_Structured: RawQuestion[];
+};
 
 export interface TeacherAssignment {
   id: string;

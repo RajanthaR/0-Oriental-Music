@@ -931,12 +931,12 @@
         {
           "path": "src/lib/validation/content-contracts.ts",
           "locator": "isReviewMetadata / isLesson / projectPublicRecord",
-          "exactSection": "content-contracts.ts:336,611,960 - complete raw metadata validation and allowlisted safe projection"
+          "exactSection": "content-contracts.ts:327,602,950 - complete raw metadata validation and allowlisted safe projection"
         },
         {
           "path": "src/test/content-contracts.test.ts",
           "locator": "lesson review metadata mutation",
-          "exactSection": "content-contracts.test.ts:172 and publication-containment.test.ts:81 - missing metadata returns malformed-record and cannot publish"
+          "exactSection": "content-contracts.test.ts:241 and publication-containment.test.ts:84 - missing metadata returns malformed-record and cannot publish"
         }
       ],
       "disposition": "require valid raw review metadata before publication, report malformed forensic input, and synthesize explicit unverified metadata only in bounded review/public projections",
@@ -955,12 +955,12 @@
         {
           "path": "src/lib/validation/content-contracts.ts",
           "locator": "finite union constants and entity-specific validators",
-          "exactSection": "content-contracts.ts:22,474,611-676 - dependency-free finite-domain membership checks"
+          "exactSection": "content-contracts.ts:25,474,602-676 - dependency-free finite-domain membership checks"
         },
         {
           "path": "src/test/content-contracts.test.ts",
           "locator": "invalid finite-domain mutation matrix",
-          "exactSection": "content-contracts.test.ts:203,230 - invalid nonblank values fail their complete runtime contracts"
+          "exactSection": "content-contracts.test.ts:241,268 - invalid nonblank values fail their complete runtime contracts"
         }
       ],
       "disposition": "centralize finite domains in dependency-free contracts and fail every unsupported literal closed before source or dependency evaluation",
@@ -979,12 +979,12 @@
         {
           "path": "src/lib/validation/content-contracts.ts",
           "locator": "identifyContentKind / validateContentRecord",
-          "exactSection": "content-contracts.ts:611-683,783 - closed known-kind classifier and complete entity/nested contract table"
+          "exactSection": "content-contracts.ts:602-702,772 - closed known-kind classifier and complete entity/nested contract table"
         },
         {
           "path": "src/test/content-contracts.test.ts",
           "locator": "canonical entity and malformed-field tables",
-          "exactSection": "content-contracts.test.ts:63,135,172 - every imported record and nested required field is exercised as unknown runtime input"
+          "exactSection": "content-contracts.test.ts:101,241,351 - every imported record and nested required field is exercised as unknown runtime input"
         }
       ],
       "disposition": "treat all imported catalogs as unknown arrays, reject unknown or ambiguous kinds, and use the same complete contract for validation, publication, repository reads, and allowlisted projections",
@@ -1003,12 +1003,12 @@
         {
           "path": "src/lib/validation/content-contracts.ts",
           "locator": "inspectGraph / projectPublicRecord / cloneBoundedJson",
-          "exactSection": "content-contracts.ts:829,960 - iterative own-property traversal and projection with depth 256 and 10000 unique-node budgets"
+          "exactSection": "content-contracts.ts:819,950 - iterative own-property traversal and projection with depth 256 and 10000 unique-node budgets"
         },
         {
           "path": "src/test/content-contracts.test.ts",
           "locator": "shared DAG, cycle, depth, width, sparse-array, and oversized-collection cases",
-          "exactSection": "content-contracts.test.ts:313,361,391 - shared DAG, hostile graph, at-limit, and projection regressions"
+          "exactSection": "content-contracts.test.ts:351,368 - shared DAG, hostile graph, at-limit, and projection regressions"
         }
       ],
       "disposition": "replace recursive JSON walking with bounded iterative traversal; count shared DAG nodes once and reject cycles, sparse arrays, depth overflow, node overflow, and oversized containers as malformed-record",
@@ -1056,7 +1056,7 @@
         {
           "path": "src/test/synth.test.ts and src/test/components.test.tsx",
           "locator": "initialization, active-node, delay, StrictMode, replacement, unmount, and co-mounted ownership regressions",
-          "exactSection": "synth.test.ts:163 and components.test.tsx:392,455,476 - no later note, callback, unavailable state, or cross-caller cancellation"
+          "exactSection": "synth.test.ts:199,293 and components.test.tsx:413,570,604 - no later note, callback, unavailable state, or cross-caller cancellation"
         }
       ],
       "disposition": "introduce caller-owned Swara handles, keep Promise wrappers for compatibility, and migrate every current page/component consumer to replacement and unmount cleanup without autoplay",

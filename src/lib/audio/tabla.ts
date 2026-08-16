@@ -49,11 +49,32 @@ export function scheduleTablaPlan<TTimer>(
   timerApi: TablaTimerApi<TTimer>
 ): () => void {
   const timers: TTimer[] = [];
-  plan.forEach((stroke) => {
-    if (stroke.delayMs === 0) onStroke(stroke);
-    else timers.push(timerApi.set(() => onStroke(stroke), stroke.delayMs));
-  });
-  return () => timers.forEach((timer) => timerApi.clear(timer));
+  const cancel = () => {
+    // A timer implementation is outside this module's control. Best effort
+    // cleanup is deliberately isolated per timer so one throwing clear does
+    // not prevent the remaining registrations from being reclaimed.
+    timers.splice(0).forEach((timer) => {
+      try {
+        timerApi.clear(timer);
+      } catch {
+        // The timer may already have fired or the host may be tearing down.
+      }
+    });
+  };
+
+  try {
+    plan.forEach((stroke) => {
+      if (stroke.delayMs === 0) onStroke(stroke);
+      else timers.push(timerApi.set(() => onStroke(stroke), stroke.delayMs));
+    });
+  } catch (error) {
+    // Registration is transactional: if an immediate callback or a later
+    // timer registration fails, no earlier timer may survive the failed plan.
+    cancel();
+    throw error;
+  }
+
+  return cancel;
 }
 
 export function expandTablaBol(bolName: string): string[] {
@@ -391,10 +412,32 @@ export class TablaSynthEngine {
       if (cancelled || unavailableReported) return false;
       failed = true;
       unavailableReported = true;
-      onUnavailable?.();
-      cancelScheduled();
-      pendingDelayed.current = 0;
-      finishIfIdle(pendingDelayed, activeStrokes);
+      // Observer/UI callbacks are not allowed to break the ownership
+      // contract. Always tear down scheduled work and active nodes even when
+      // the callback itself throws, and never leak that observer error to the
+      // promise chain or the browser event loop.
+      try {
+        onUnavailable?.();
+      } catch {
+        // Treat observer failure as an unavailable audio result.
+      } finally {
+        try {
+          cancelScheduled();
+        } catch {
+          // Scheduling cleanup is best effort; individual timer clears are
+          // guarded by scheduleTablaPlan as well.
+        }
+        pendingDelayed.current = 0;
+        activeStrokes.forEach((stroke) => {
+          try {
+            stroke.cancel();
+          } catch {
+            // A partially created stroke must not block the remaining cleanup.
+          }
+        });
+        activeStrokes.clear();
+        finishIfIdle(pendingDelayed, activeStrokes);
+      }
       return false;
     };
     if (typeof window === "undefined" || !bolName || typeof bolName !== "string") {

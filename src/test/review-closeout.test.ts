@@ -4,6 +4,7 @@ import ragasData from "@/data/ragas.json";
 import quizzesData from "@/data/quizzes.json";
 import { repository } from "@/lib/data/repository";
 import { UNKNOWN_PROVENANCE } from "@/lib/data/publication-policy";
+import type { Question, QuestionType, RenderableQuestionType } from "@/types/content";
 
 type RawRecord = Record<string, unknown>;
 
@@ -30,6 +31,45 @@ function completeReviewMetadata(): RawRecord {
 }
 
 describe("Phase 2 final contract closeout", () => {
+  it("memoizes publication summaries and invalidates the memo after a CMS mutation", () => {
+    const first = repository.getPublicationSummary();
+    expect(repository.getPublicationSummary()).toBe(first);
+
+    const lesson = findRawRecord(rawLessons, "les-intro-01");
+    const originalMetadata = structuredClone(lesson.reviewMetadata);
+    const originalPublished = lesson.published;
+    try {
+      expect(repository.updateLessonReviewStatus("les-intro-01", "Needs Revision", false)).toBe(true);
+      expect(repository.getPublicationSummary()).not.toBe(first);
+    } finally {
+      lesson.reviewMetadata = originalMetadata;
+      lesson.published = originalPublished;
+    }
+  });
+
+  it("keeps raw forensic question variants separate from the renderable UI union", () => {
+    const renderableTypes = [
+      "mcq",
+      "multi-select",
+      "matching",
+      "ordering",
+      "true-false",
+      "short-answer",
+    ] as const satisfies readonly RenderableQuestionType[];
+    const forensicOnlyType: QuestionType = "audio-id";
+    expect(renderableTypes).toHaveLength(6);
+    expect(renderableTypes).not.toContain(forensicOnlyType as RenderableQuestionType);
+
+    // @ts-expect-error forensic-only audio questions are not renderable UI questions.
+    const rejectedAudioType: Question["type"] = "audio-id";
+    // @ts-expect-error forensic-only notation questions are not renderable UI questions.
+    const rejectedNotationType: Question["type"] = "notation-id";
+    expect([rejectedAudioType, rejectedNotationType]).toEqual(["audio-id", "notation-id"]);
+
+    const firstQuestion = (rawQuizzes[0].questions as RawRecord[])[0] as unknown as Question;
+    expect(renderableTypes).toContain(firstQuestion.type as RenderableQuestionType);
+  });
+
   it("rejects both CMS publication entry points when raw metadata is synthesized or incomplete", () => {
     const lesson = findRawRecord(rawLessons, "les-intro-01");
     const originalMetadata = structuredClone(lesson.reviewMetadata);
@@ -44,6 +84,23 @@ describe("Phase 2 final contract closeout", () => {
       expect(repository.updateLessonReviewStatus("les-intro-01", "Needs Revision", false)).toBe(true);
       expect((lesson.reviewMetadata as RawRecord).reviewer).toBe(UNKNOWN_PROVENANCE);
       expect((lesson.reviewMetadata as RawRecord).license).toBe(UNKNOWN_PROVENANCE);
+    } finally {
+      lesson.reviewMetadata = originalMetadata;
+      lesson.published = originalPublished;
+    }
+  });
+
+  it("rejects every CMS status/published mismatch without changing raw state", () => {
+    const lesson = findRawRecord(rawLessons, "les-intro-01");
+    const originalMetadata = structuredClone(lesson.reviewMetadata);
+    const originalPublished = lesson.published;
+    try {
+      lesson.reviewMetadata = completeReviewMetadata();
+      lesson.published = false;
+      expect(repository.updateLessonReviewStatus("les-intro-01", "Published", false)).toBe(false);
+      expect(repository.updateLessonReviewStatus("les-intro-01", "Rights & Source Verification", true)).toBe(false);
+      expect(lesson.reviewMetadata).toEqual(completeReviewMetadata());
+      expect(lesson.published).toBe(false);
     } finally {
       lesson.reviewMetadata = originalMetadata;
       lesson.published = originalPublished;

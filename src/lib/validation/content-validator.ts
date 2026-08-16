@@ -66,9 +66,9 @@ const identityKey = (value: string) =>
   normalizeSinhalaText(value).replace(/[\s()|,.'’\-–—/]/g, "");
 
 export function validateCatalogIdentityContracts(
-  catalogs: Array<{ type: string; records: unknown[] }>,
-  glossaryRecords: unknown[],
-  terminologyRecords: unknown[]
+  catalogs: unknown,
+  glossaryRecords: unknown,
+  terminologyRecords: unknown
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const issueFor = (type: string, entityId: string, field: string, message: string): void => {
@@ -91,9 +91,21 @@ export function validateCatalogIdentityContracts(
     return result;
   };
 
-  catalogs.forEach(({ type, records }) => {
+  const catalogEntries = Array.isArray(catalogs) ? catalogs : [];
+  if (!Array.isArray(catalogs)) {
+    issueFor("Catalog", "catalog", "catalogs", "Catalog collection must be an array");
+  }
+  catalogEntries.forEach((entry, entryIndex) => {
+    const entryRecord = isRecord(entry) ? entry : undefined;
+    const rawType = readOwnDataField(entryRecord, "type");
+    const type = typeof rawType === "string" ? rawType : `Catalog-${entryIndex}`;
+    const records = readOwnDataField(entryRecord, "records");
+    if (!Array.isArray(records)) {
+      issueFor(type, "catalog", "records", "Catalog records must be an array");
+      return;
+    }
     const ids = new Set<string>();
-    objectRecords(type, Array.isArray(records) ? records : []).forEach(({ record, index }) => {
+    objectRecords(type, records).forEach(({ record, index }) => {
       const rawId = readOwnDataField(record, "id");
       const id = typeof rawId === "string" ? rawId.trim() : "";
       if (!id || ids.has(id)) {
@@ -154,11 +166,15 @@ export function validateCatalogIdentityContracts(
     });
   };
 
-  validateTerms("Glossary", glossaryRecords);
-  validateTerms("Terminology", terminologyRecords);
+  validateTerms("Glossary", Array.isArray(glossaryRecords) ? glossaryRecords : []);
+  validateTerms("Terminology", Array.isArray(terminologyRecords) ? terminologyRecords : []);
 
   const identityFields = ["name_si", "name_en", "aliases_si", "title_si", "title_en"] as const;
-  catalogs.forEach(({ type, records }) => {
+  catalogEntries.forEach((entry, entryIndex) => {
+    const entryRecord = isRecord(entry) ? entry : undefined;
+    const rawType = readOwnDataField(entryRecord, "type");
+    const type = typeof rawType === "string" ? rawType : `Catalog-${entryIndex}`;
+    const records = readOwnDataField(entryRecord, "records");
     const owners = new Map<string, { id: string; canonical: boolean }>();
     objectRecords(type, Array.isArray(records) ? records : []).forEach(({ record, index }) => {
       const id = typeof record.id === "string" ? record.id : String(index);
@@ -502,7 +518,14 @@ export function validateCoverageSnapshot(
   coverageInput: unknown
 ): PublicationValidationResult {
   const issues: ValidationIssue[] = [];
-  const coverage = coverageInput as CoverageSnapshot;
+  const safeCoverage = cloneBoundedRecord(coverageInput);
+  if (!safeCoverage || !isRecord(safeCoverage)) {
+    return {
+      isValid: false,
+      issues: [baselineIssue("generated-doc", "content-coverage", "record", "Coverage snapshot must be a bounded plain-data object.")],
+    };
+  }
+  const coverage = safeCoverage as CoverageSnapshot;
   const expected = baselineLedger.inventory;
 
   if (coverage.overview?.totalIndexedSourcePages !== expected.sourcePages) {
@@ -558,13 +581,21 @@ export function validateCoverageSnapshot(
  */
 export function validatePublicCollection(
   entityType: string,
-  records: unknown[]
+  records: unknown
 ): PublicationValidationResult {
   const issues: ValidationIssue[] = [];
 
+  if (!Array.isArray(records)) {
+    return {
+      isValid: false,
+      issues: [baselineIssue(entityType, "catalog", "records", "Public collection must be an array.")],
+    };
+  }
+
   records.forEach((record, index) => {
-    const value = (record || {}) as Record<string, unknown>;
-    const id = typeof value.id === "string" ? value.id : `${entityType}-${index}`;
+    const value = cloneBoundedRecord(record);
+    const idValue = readOwnDataField(value, "id");
+    const id = typeof idValue === "string" ? idValue : `${entityType}-${index}`;
     const decision = getRecordPublicationDecision(record);
     const gradeBands = decision.gradeBands;
 
@@ -592,19 +623,23 @@ export function validatePublicCollection(
       );
     }
 
-    if (value.published === true) {
+    if (readOwnDataField(value, "published") === true) {
       issues.push(baselineIssue(entityType, id, "published", "A public record still claims published=true."));
     }
 
-    const reviewMetadata = value.reviewMetadata as Record<string, unknown> | undefined;
+    const reviewMetadata = readOwnDataField(value, "reviewMetadata");
     if (reviewMetadata) {
-      if (reviewMetadata.status === "Published") {
+      const reviewStatus = readOwnDataField(reviewMetadata, "status");
+      const reviewer = readOwnDataField(reviewMetadata, "reviewer");
+      const reviewDate = readOwnDataField(reviewMetadata, "reviewDate");
+      const lastVerifiedDate = readOwnDataField(reviewMetadata, "lastVerifiedDate");
+      if (reviewStatus === "Published") {
         issues.push(baselineIssue(entityType, id, "reviewMetadata.status", "A public record still claims a completed Published review."));
       }
-      if (reviewMetadata.reviewer !== UNKNOWN_PROVENANCE) {
+      if (reviewer !== UNKNOWN_PROVENANCE) {
         issues.push(baselineIssue(entityType, id, "reviewMetadata.reviewer", "A public record exposes an unverified reviewer identity."));
       }
-      if (reviewMetadata.reviewDate !== UNKNOWN_PROVENANCE || reviewMetadata.lastVerifiedDate !== UNKNOWN_PROVENANCE) {
+      if (reviewDate !== UNKNOWN_PROVENANCE || lastVerifiedDate !== UNKNOWN_PROVENANCE) {
         issues.push(baselineIssue(entityType, id, "reviewMetadata.reviewDate", "A public record exposes an unverified review date."));
       }
     }
@@ -617,9 +652,16 @@ export function validatePublicCollection(
 }
 
 export function validatePublicBoundary(
-  collections: Record<string, unknown[]>
+  collections: unknown
 ): PublicationValidationResult {
-  const issues = Object.entries(collections).flatMap(([entityType, records]) =>
+  const safeCollections = cloneBoundedRecord(collections);
+  if (!safeCollections || !isRecord(safeCollections)) {
+    return {
+      isValid: false,
+      issues: [baselineIssue("public-boundary", "collections", "record", "Public collection map must be a bounded plain-data object.")],
+    };
+  }
+  const issues = Object.entries(safeCollections).flatMap(([entityType, records]) =>
     validatePublicCollection(entityType, records).issues
   );
   return {
@@ -744,7 +786,14 @@ export function validateForensicLedger(
   ledgerInput: unknown = forensicLedgerData
 ): PublicationValidationResult {
   const issues: ValidationIssue[] = [];
-  const ledger = (ledgerInput || {}) as Record<string, unknown>;
+  const safeLedger = cloneBoundedRecord(ledgerInput);
+  if (!safeLedger || !isRecord(safeLedger)) {
+    return {
+      isValid: false,
+      issues: [baselineIssue("forensic-ledger", "ledger", "record", "Forensic ledger must be a bounded plain-data object.")],
+    };
+  }
+  const ledger = safeLedger as Record<string, unknown>;
   const historicalBaseline = isRecord(ledger.historicalBaseline) ? ledger.historicalBaseline : {};
   const auditedThrough = isRecord(ledger.auditedThrough) ? ledger.auditedThrough : {};
   if (typeof ledger.phase !== "string" || !ledger.phase.startsWith("Phase 2 closeout")) {

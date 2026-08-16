@@ -5,7 +5,9 @@ import { Quiz, Question } from "@/types/content";
 import { CheckCircle2, XCircle, Award, RotateCcw, ArrowRight, ArrowUp, ArrowDown, Sparkles } from "lucide-react";
 import { ProgressStorage } from "@/lib/storage/progress-storage";
 
-export type QuizRunnerQuiz = Pick<Quiz, "id" | "title_si" | "questions" | "passingScorePercent">;
+export type QuizRunnerQuiz = Omit<Pick<Quiz, "id" | "title_si" | "questions" | "passingScorePercent">, "questions"> & {
+  questions: Question[];
+};
 
 export interface QuizRunnerProps {
   quiz: QuizRunnerQuiz;

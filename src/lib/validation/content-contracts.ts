@@ -163,8 +163,6 @@ export interface GraphSafetyResult {
 }
 
 const DANGEROUS_JSON_KEYS = new Set(["__proto__", "prototype", "constructor"]);
-const SAFE_SNAPSHOT_OBJECTS = new WeakSet<object>();
-const VERIFIED_PLAIN_OBJECTS = new WeakSet<object>();
 
 type SafeOwnEntry = { key: string; value: unknown };
 type SafeOwnEntries = {
@@ -222,7 +220,6 @@ function safeOwnEntries(value: object): SafeOwnEntries | undefined {
             Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
         entries.push({ key: String(index), value: descriptor.value });
       }
-      VERIFIED_PLAIN_OBJECTS.add(value);
       return { isArray: true, length, entries };
     }
 
@@ -234,7 +231,6 @@ function safeOwnEntries(value: object): SafeOwnEntries | undefined {
           Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
       entries.push({ key, value: descriptor.value });
     }
-    VERIFIED_PLAIN_OBJECTS.add(value);
     return { isArray: false, length: entries.length, entries };
   } catch {
     return undefined;
@@ -244,7 +240,6 @@ function safeOwnEntries(value: object): SafeOwnEntries | undefined {
 function hasPlainDataShape(value: unknown): value is Record<string, unknown> {
   if (value === null || typeof value !== "object") return false;
   try {
-    if (SAFE_SNAPSHOT_OBJECTS.has(value) || VERIFIED_PLAIN_OBJECTS.has(value)) return !Array.isArray(value);
     return !Array.isArray(value) && safeOwnEntries(value)?.isArray === false;
   } catch {
     return false;
@@ -259,7 +254,6 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
 export function readOwnDataField(value: unknown, field: string): unknown {
   if (typeof field !== "string" || DANGEROUS_JSON_KEYS.has(field) || value === null || typeof value !== "object") return undefined;
   try {
-    if (SAFE_SNAPSHOT_OBJECTS.has(value) || VERIFIED_PLAIN_OBJECTS.has(value)) return Object.prototype.hasOwnProperty.call(value, field) ? (value as Record<string, unknown>)[field] : undefined;
     const entries = safeOwnEntries(value);
     return entries?.entries.find((entry) => entry.key === field)?.value;
   } catch {
@@ -268,9 +262,6 @@ export function readOwnDataField(value: unknown, field: string): unknown {
 }
 
 function hasOwn(value: Record<string, unknown>, field: string): boolean {
-  if (SAFE_SNAPSHOT_OBJECTS.has(value) || VERIFIED_PLAIN_OBJECTS.has(value)) {
-    try { return Object.prototype.hasOwnProperty.call(value, field); } catch { return false; }
-  }
   return readOwnDataField(value, field) !== undefined || (() => {
     try {
       return safeOwnEntries(value)?.entries.some((entry) => entry.key === field) ?? false;
@@ -739,7 +730,6 @@ function captureSafeSnapshot<T>(value: T, knownGraphSafety?: GraphSafetyResult):
     }];
     seen.set(value as object, root as object);
     colors.set(value as object, 1);
-    SAFE_SNAPSHOT_OBJECTS.add(root as object);
     let nodes = 1;
     while (stack.length > 0) {
       const current = stack[stack.length - 1];
@@ -769,7 +759,6 @@ function captureSafeSnapshot<T>(value: T, knownGraphSafety?: GraphSafetyResult):
       const target = childEntries.isArray ? [] : {};
       seen.set(child, target);
       colors.set(child, 1);
-      SAFE_SNAPSHOT_OBJECTS.add(target);
       nodes += 1;
       (current.target as Record<string, unknown>)[entry.key] = target;
       stack.push({ source: child, target, depth: childDepth, entries: childEntries.entries, index: 0 });
@@ -783,13 +772,14 @@ function captureSafeSnapshot<T>(value: T, knownGraphSafety?: GraphSafetyResult):
 export function validateContentRecord(
   value: unknown,
   expectedKind?: ContentEntityKind,
-  knownGraphSafety?: GraphSafetyResult
+  knownGraphSafety?: GraphSafetyResult,
+  knownSnapshot?: unknown
 ): ContentContractResult {
   try {
     if (knownGraphSafety && !knownGraphSafety.safe) {
       return { kind: expectedKind, isValid: false, issues: [{ field: "record", message: `Unsafe object graph: ${knownGraphSafety.reason ?? "unknown"}.` }] };
     }
-    const snapshot = captureSafeSnapshot(value);
+    const snapshot = knownSnapshot === undefined ? captureSafeSnapshot(value, knownGraphSafety) : knownSnapshot;
     if (snapshot === undefined) {
       return { kind: expectedKind, isValid: false, issues: [{ field: "record", message: "Record is not a safe plain-data snapshot." }] };
     }

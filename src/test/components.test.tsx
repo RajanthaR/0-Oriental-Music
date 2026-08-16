@@ -12,11 +12,15 @@ import { repository } from "@/lib/data/repository";
 import { EarTrainingModule } from "@/components/audio/EarTrainingModule";
 import { NotationArranger } from "@/components/audio/NotationArranger";
 import InstrumentDetailPage from "@/app/instruments/[id]/page";
+import LessonDetailPage from "@/app/lessons/[id]/page";
+import RagaDetailPage from "@/app/ragas/[id]/page";
 import SearchPage from "@/app/search/page";
 import { TalaDirectoryResults } from "@/components/tala/TalaDirectoryResults";
 import talasData from "@/data/talas.json";
 import instrumentsData from "@/data/instruments.json";
 import type { Quiz, Tala } from "@/types/content";
+
+const routeParams = vi.hoisted(() => ({ id: "inst-tabla" }));
 
 const audioMocks = vi.hoisted(() => ({
   playBol: vi.fn(),
@@ -44,7 +48,7 @@ vi.mock("@/lib/audio/synth", async (importOriginal) => {
 });
 
 vi.mock("next/navigation", () => ({
-  useParams: () => ({ id: "inst-tabla" }),
+  useParams: () => routeParams,
 }));
 
 const getKhemtaFixture = (): Tala => {
@@ -56,7 +60,24 @@ const getKhemtaFixture = (): Tala => {
 const readyCancel = (cancel: ReturnType<typeof vi.fn> = vi.fn()) =>
   Object.assign(cancel, { ready: Promise.resolve(true) });
 
+const deferredPlayback = () => {
+  let resolveReady!: (played: boolean) => void;
+  let resolveFinished!: () => void;
+  const ready = new Promise<boolean>((resolve) => { resolveReady = resolve; });
+  const finished = new Promise<void>((resolve) => { resolveFinished = resolve; });
+  const cancel = vi.fn(() => {
+    resolveReady(false);
+    resolveFinished();
+  });
+  return {
+    handle: Object.assign(cancel, { ready, finished }),
+    resolveReady,
+    resolveFinished,
+  };
+};
+
 afterEach(() => {
+  routeParams.id = "inst-tabla";
   audioMocks.playBol.mockReset();
   audioMocks.playSwaraTone.mockReset().mockResolvedValue(true);
   audioMocks.playSequence.mockReset().mockResolvedValue(true);
@@ -527,6 +548,102 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     view.unmount();
     instrumentLookup.mockRestore();
     sourceLookup.mockRestore();
+  });
+
+  it.each([
+    {
+      label: "lesson",
+      id: "les-intro-01",
+      replacementId: "missing-lesson",
+      page: () => <LessonDetailPage />,
+      button: "ආදර්ශනයට සවන් දෙන්න",
+      canPlayReplacement: false,
+    },
+    {
+      label: "raga",
+      id: "raga-bilawal",
+      replacementId: "raga-bhupali",
+      page: () => <RagaDetailPage />,
+      button: "ආරෝහණය අසන්න",
+      canPlayReplacement: true,
+    },
+  ])("owns $label page sequence through replacement and unmount", async ({ id, replacementId, page, button, canPlayReplacement }) => {
+    routeParams.id = id;
+    const first = deferredPlayback();
+    const second = deferredPlayback();
+    audioMocks.playSequenceHandle
+      .mockReturnValueOnce(first.handle)
+      .mockReturnValueOnce(second.handle);
+
+    const view = render(page());
+    fireEvent.click(screen.getAllByRole("button", { name: button })[0]);
+    expect(audioMocks.playSequenceHandle).toHaveBeenCalledTimes(1);
+
+    routeParams.id = replacementId;
+    view.rerender(page());
+    expect(first.handle).toHaveBeenCalledTimes(1);
+
+    if (canPlayReplacement) {
+      fireEvent.click(screen.getAllByRole("button", { name: button })[0]);
+      expect(audioMocks.playSequenceHandle).toHaveBeenCalledTimes(2);
+    }
+    view.unmount();
+    if (canPlayReplacement) expect(second.handle).toHaveBeenCalledTimes(1);
+
+    first.resolveReady(false);
+    first.resolveFinished();
+    second.resolveReady(false);
+    second.resolveFinished();
+    await act(async () => Promise.resolve());
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  it.each([
+    { id: "inst-flute", timbre: "flute" },
+    { id: "inst-harmonium", timbre: "harmonium" },
+  ])("owns instrument $id sequence until finished and unmount", async ({ id, timbre }) => {
+    const fixture = (instrumentsData as Array<Record<string, unknown>>).find(
+      (instrument) => instrument.id === "inst-harmonium"
+    );
+    expect(fixture).toBeDefined();
+    const instrumentLookup = vi.spyOn(repository, "getInstrumentById").mockImplementation((candidateId) => (
+      fixture ? { ...fixture, id: candidateId } as never : undefined
+    ));
+    routeParams.id = id;
+    const playback = deferredPlayback();
+    audioMocks.playSequenceHandle.mockReturnValue(playback.handle);
+    const view = render(<InstrumentDetailPage />);
+    fireEvent.click(screen.getByRole("button", { name: "ආදර්ශ නාද රටාව අසන්න" }));
+    expect(audioMocks.playSequenceHandle).toHaveBeenCalledWith(
+      expect.any(Array),
+      expect.any(Number),
+      undefined,
+      261.63,
+      timbre,
+    );
+    playback.resolveReady(true);
+    await act(async () => Promise.resolve());
+    view.unmount();
+    expect(playback.handle).toHaveBeenCalledTimes(1);
+    playback.resolveFinished();
+    instrumentLookup.mockRestore();
+  });
+
+  it("owns instrument Tabla timers and handles through delayed failure and unmount", async () => {
+    vi.useFakeTimers();
+    const tabla = (instrumentsData as Array<{ id: string }>).find((instrument) => instrument.id === "inst-tabla");
+    const instrumentLookup = vi.spyOn(repository, "getInstrumentById").mockReturnValue(tabla as never);
+    routeParams.id = "inst-tabla";
+    const playback = deferredPlayback();
+    audioMocks.playBol.mockReturnValue(playback.handle);
+    const view = render(<InstrumentDetailPage />);
+    fireEvent.click(screen.getByRole("button", { name: "ආදර්ශ නාද රටාව අසන්න" }));
+    await act(async () => { vi.advanceTimersByTime(0); });
+    expect(audioMocks.playBol).toHaveBeenCalledTimes(1);
+    view.unmount();
+    expect(playback.handle).toHaveBeenCalledTimes(1);
+    await act(async () => Promise.resolve());
+    instrumentLookup.mockRestore();
   });
 
   it("keeps arranger and ear-training Swara ownership isolated", async () => {

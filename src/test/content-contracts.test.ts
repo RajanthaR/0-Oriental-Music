@@ -59,6 +59,44 @@ const expectedLegacyContractDebt: Partial<Record<ContentEntityKind, readonly str
 
 const expectedLegacyQuestionDebt = ["q-swara-var-01", "q-swara-var-02", "q-swara-var-03"];
 
+function assertProjectionRetainsNestedFields(raw: unknown, projected: unknown, path: string): void {
+  if (raw === null || typeof raw !== "object") return;
+  expect(projected, `${path} projection container`).toBeDefined();
+  expect(Array.isArray(projected), `${path} array shape`).toBe(Array.isArray(raw));
+  if (Array.isArray(raw)) {
+    expect((projected as unknown[]).length, `${path} array length`).toBe(raw.length);
+    raw.forEach((item, index) => assertProjectionRetainsNestedFields(item, (projected as unknown[])[index], `${path}[${index}]`));
+    return;
+  }
+  const projectedRecord = projected as Record<string, unknown>;
+  for (const key of Object.keys(raw)) {
+    expect(Object.prototype.hasOwnProperty.call(projectedRecord, key), `${path}.${key} retained`).toBe(true);
+    assertProjectionRetainsNestedFields((raw as Record<string, unknown>)[key], projectedRecord[key], `${path}.${key}`);
+  }
+}
+
+function addNestedProjectionExtras(value: unknown, isRoot = true): void {
+  if (!value || typeof value !== "object") return;
+  if (Array.isArray(value)) {
+    value.forEach((item) => addNestedProjectionExtras(item, false));
+    return;
+  }
+  const record = value as Record<string, unknown>;
+  if (!isRoot) record.__nestedUntrusted = "withheld";
+  Object.values(record).forEach((child) => addNestedProjectionExtras(child, false));
+}
+
+function expectNoNestedProjectionExtras(value: unknown, path = "projection"): void {
+  if (!value || typeof value !== "object") return;
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => expectNoNestedProjectionExtras(item, `${path}[${index}]`));
+    return;
+  }
+  const record = value as Record<string, unknown>;
+  expect(record.__nestedUntrusted, `${path} extra`).toBeUndefined();
+  Object.entries(record).forEach(([key, child]) => expectNoNestedProjectionExtras(child, `${path}.${key}`));
+}
+
 describe("closed runtime content contracts", () => {
   it("validates every imported catalog record, nested question, and allowlisted projection", () => {
     for (const [kind, records] of canonicalCatalogs) {
@@ -308,6 +346,23 @@ describe("closed runtime content contracts", () => {
     expect(projection.reviewMetadata).toMatchObject({ status: "Needs Revision" });
     (projection.gradeBands as string[]).push("12-13");
     expect(candidate.gradeBands).toEqual(["10-11"]);
+  });
+
+  it("covers every nested projection allowlist field and strips nested extras", () => {
+    const allRecords: Array<[ContentEntityKind, unknown]> = canonicalCatalogs.flatMap(([kind, records]) =>
+      records.map((record) => [kind, record] as [ContentEntityKind, unknown])
+    );
+    allRecords.push(...canonicalQuestions.map((question) => ["question", question] as [ContentEntityKind, unknown]));
+
+    for (const [kind, record] of allRecords) {
+      if (!validateContentRecord(record, kind).isValid) continue;
+      const candidate = structuredClone(record);
+      addNestedProjectionExtras(candidate);
+      const projection = projectPublicRecord(candidate, kind);
+      expect(projection, `${kind} projection`).toBeDefined();
+      assertProjectionRetainsNestedFields(record, projection, kind);
+      expectNoNestedProjectionExtras(projection);
+    }
   });
 
   it("accepts shared DAGs but rejects cycles and graph budget overruns", () => {

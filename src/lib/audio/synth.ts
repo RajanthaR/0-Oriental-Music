@@ -384,7 +384,7 @@ export class SwaraSynthEngine {
       activeTones.forEach((tone) => tone());
     };
 
-    void (async () => {
+    const runSequence = async () => {
       try {
         for (let index = 0; index < swaras.length; index += 1) {
           if (cancelled) {
@@ -439,7 +439,13 @@ export class SwaraSynthEngine {
         resolveReady(false);
         maybeFinishSequence();
       }
-    })();
+    };
+
+    // Do not start the loop until the caller has received and can register
+    // the returned ownership handle. This closes the re-entrant onStep race:
+    // a synchronous callback can no longer run before the caller can cancel
+    // the sequence during mount/replacement/unmount.
+    void Promise.resolve().then(runSequence);
 
     return createPlaybackHandle(() => {
       if (cancelled) return;
