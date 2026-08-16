@@ -76,27 +76,48 @@ const SOURCE_QUERY_VARIANTS: Record<string, string> = Object.assign(Object.creat
   "දීප්චන්දි තාලය": "දීප්චන්ද් තාලය",
 });
 
+type SearchQueryClassification =
+  | { kind: "featured" }
+  | { kind: "none" }
+  | { kind: "search"; raw: string; normalized: string; transliterated: string };
+
+function classifySearchQuery(query: unknown): SearchQueryClassification {
+  // Repository/search callers may omit the optional query. Treat that same as
+  // a genuine blank input; other non-string runtime values are hostile.
+  if (query === undefined) return { kind: "featured" };
+  if (typeof query !== "string") return { kind: "none" };
+  if (!query.trim()) return { kind: "featured" };
+
+  const raw = query.trim().toLowerCase();
+  const variant = Object.prototype.hasOwnProperty.call(SOURCE_QUERY_VARIANTS, raw)
+    ? SOURCE_QUERY_VARIANTS[raw]
+    : undefined;
+  const transliterated = Object.prototype.hasOwnProperty.call(TRANSLITERATION_MAP, raw)
+    ? TRANSLITERATION_MAP[raw]
+    : "";
+  const normalized = normalizeSinhalaText(variant || raw);
+  const normalizedTransliterated = normalizeSinhalaText(transliterated);
+
+  // A non-empty string made only of bidi/zero-width controls must not become
+  // `includes("")`, which would expose the entire public catalog.
+  if (!normalized && !normalizedTransliterated) return { kind: "none" };
+
+  return {
+    kind: "search",
+    raw,
+    normalized,
+    transliterated: normalizedTransliterated,
+  };
+}
+
 export function searchFilter<T>(
   items: T[],
-  query: string,
+  query: unknown,
   extractFields: (item: T) => string[]
 ): T[] {
-  if (!query || !query.trim()) return items;
-
-  const rawQ = query.trim().toLowerCase();
-  const variant = Object.prototype.hasOwnProperty.call(SOURCE_QUERY_VARIANTS, rawQ)
-    ? SOURCE_QUERY_VARIANTS[rawQ]
-    : undefined;
-  const transliterated = Object.prototype.hasOwnProperty.call(TRANSLITERATION_MAP, rawQ)
-    ? TRANSLITERATION_MAP[rawQ]
-    : "";
-  const normalizedQ = normalizeSinhalaText(variant || rawQ);
-  const normalizedTrans = normalizeSinhalaText(transliterated);
-
-  // A non-empty query made only of bidi/zero-width controls must not become
-  // `includes("")`, which would expose the entire public catalog. Preserve
-  // the existing featured-result behavior only for genuinely empty input.
-  if (!normalizedQ && !normalizedTrans) return [];
+  const classification = classifySearchQuery(query);
+  if (classification.kind === "featured") return items;
+  if (classification.kind === "none") return [];
 
   return items.filter((item) => {
     const fields = extractFields(item);
@@ -104,17 +125,18 @@ export function searchFilter<T>(
       if (!field) return false;
       const normField = normalizeSinhalaText(field);
       return (
-        normField.includes(normalizedQ) ||
-        (normalizedTrans && normField.includes(normalizedTrans)) ||
-        field.toLowerCase().includes(rawQ)
+        normField.includes(classification.normalized) ||
+        (classification.transliterated && normField.includes(classification.transliterated)) ||
+        field.toLowerCase().includes(classification.raw)
       );
     });
   });
 }
 
 class SearchIndex {
-  public search(query: string): SearchResultItem[] {
-    if (!query || !query.trim()) {
+  public search(query?: unknown): SearchResultItem[] {
+    const classification = classifySearchQuery(query);
+    if (classification.kind === "featured") {
       // Return top featured
       const lessons = repository.getLessons().slice(0, 4);
       return lessons.map((l) => ({
@@ -126,11 +148,19 @@ class SearchIndex {
         gradeBand: l.gradeBands.join(", "),
       }));
     }
+    if (classification.kind === "none") return [];
 
     const results: SearchResultItem[] = [];
+    const searchQuery = classification.raw;
+    const catalogs = repository.getPublicSearchCatalogs();
 
     // Search Lessons
-    const lessons = repository.getLessons({ query });
+    const lessons = searchFilter(catalogs.lessons, searchQuery, (lesson) => [
+      lesson.title_si,
+      lesson.title_en || "",
+      lesson.summary_si,
+      lesson.learningGoal_si,
+    ]);
     lessons.forEach((l) => {
       results.push({
         id: l.id,
@@ -143,7 +173,14 @@ class SearchIndex {
     });
 
     // Search Ragas
-    const ragas = repository.getRagas(query);
+    const ragas = searchFilter(catalogs.ragas, searchQuery, (raga) => [
+      raga.name_si,
+      raga.name_en,
+      raga.thata_si,
+      raga.vadi_si,
+      raga.samvadi_si,
+      raga.time_si,
+    ]);
     ragas.forEach((r) => {
       results.push({
         id: r.id,
@@ -156,7 +193,12 @@ class SearchIndex {
     });
 
     // Search Talas
-    const talas = repository.getTalas(query);
+    const talas = searchFilter(catalogs.talas, searchQuery, (tala) => [
+      tala.name_si,
+      tala.name_en,
+      ...tala.aliases_si,
+      tala.theka_si,
+    ]);
     talas.forEach((t) => {
       results.push({
         id: t.id,
@@ -170,7 +212,13 @@ class SearchIndex {
     });
 
     // Search Instruments
-    const instruments = repository.getInstruments(query);
+    const instruments = searchFilter(catalogs.instruments, searchQuery, (instrument) => [
+      instrument.name_si,
+      instrument.name_en,
+      instrument.category_si,
+      instrument.origin_si,
+      instrument.construction_si,
+    ]);
     instruments.forEach((inst) => {
       results.push({
         id: inst.id,
@@ -184,7 +232,13 @@ class SearchIndex {
     });
 
     // Search Glossary
-    const glossary = repository.getGlossary(query);
+    const glossary = searchFilter(catalogs.glossary, searchQuery, (term) => [
+      term.term_si,
+      term.term_en,
+      term.transliteration,
+      term.definition_si,
+      term.category_si,
+    ]);
     glossary.forEach((g) => {
       results.push({
         id: g.id,
@@ -196,7 +250,12 @@ class SearchIndex {
     });
 
     // Search Cultural Traditions
-    const traditions = repository.getCulturalTraditions(query);
+    const traditions = searchFilter(catalogs.culturalTraditions, searchQuery, (tradition) => [
+      tradition.title_si,
+      tradition.title_en,
+      tradition.category_si,
+      tradition.description_si,
+    ]);
     traditions.forEach((tr) => {
       results.push({
         id: tr.id,

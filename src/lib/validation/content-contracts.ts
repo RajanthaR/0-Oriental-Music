@@ -331,6 +331,21 @@ export function isReviewMetadata(value: unknown): boolean {
     isOneOf(REVIEW_STATUSES, read(value, "status")) && isOneOf(REUSE_STATUSES, read(value, "reuseStatus"));
 }
 
+/**
+ * Publication state is a contract invariant, not a UI hint.  A lesson may
+ * only carry published=true when its review metadata explicitly says
+ * Published, and a Published status may not be hidden behind published=false.
+ */
+export function isPublicationStateConsistent(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  const published = read(value, "published");
+  const metadata = read(value, "reviewMetadata");
+  const status = isRecord(metadata) ? read(metadata, "status") : undefined;
+  return typeof published === "boolean" &&
+    typeof status === "string" &&
+    published === (status === "Published");
+}
+
 function hasRequiredStrings(value: Record<string, unknown>, fields: readonly string[]): boolean {
   return fields.every((field) => hasOwn(value, field) && isNonBlankString(read(value, field)));
 }
@@ -808,6 +823,9 @@ export function validateContentRecord(
     if (REQUIRED_METADATA_KINDS.has(kind) && !isReviewMetadata(read(snapshot, "reviewMetadata"))) {
       issues.push({ field: "reviewMetadata", message: "Metadata-bearing records require a complete, finite reviewMetadata object." });
     }
+    if (kind === "lesson" && !isPublicationStateConsistent(snapshot)) {
+      issues.push({ field: "published", message: "Lesson published flag must agree with reviewMetadata.status." });
+    }
     if (!valid) issues.push({ field: "record", message: `Record does not satisfy the complete ${kind} runtime contract.` });
     return { kind, isValid: valid && issues.length === 0, issues };
   } catch {
@@ -875,7 +893,7 @@ const PUBLIC_FIELDS: Record<ContentEntityKind, readonly string[]> = {
   "learning-path": ["id", "title_si", "title_en", "goalStatement_si", "description_si", "gradeBands", "difficulty", "estimatedHours", "diagnosticQuestion", "steps", "masteryQuizId", "nextRecommendedPathId", "sourceReference", "reviewMetadata"],
   quiz: ["id", "title_si", "lessonId", "gradeBands", "questions", "passingScorePercent"],
   "exam-paper": ["id", "title_si", "gradeBand", "timeLimitMinutes", "instructions_si", "partA_MCQ", "partB_Structured", "sourceReference", "reviewMetadata"],
-  question: ["id", "type", "gradeBands", "difficulty", "strandId", "prompt_si", "options_si", "correctAnswerIds", "matchingPairs", "orderingItems", "correctShortAnswer_si", "audioNotes", "audioTalaId", "diagramSvg", "explanation_si", "markingPoints_si", "sourceReference"],
+  question: ["id", "type", "gradeBands", "difficulty", "strandId", "prompt_si", "options_si", "correctAnswerIds", "matchingPairs", "orderingItems", "correctShortAnswer_si", "explanation_si", "markingPoints_si", "sourceReference"],
   source: ["id", "title", "originalFilename", "publisher", "grades", "year", "language", "tier", "location", "status", "license", "url"],
 };
 
@@ -950,6 +968,9 @@ function nestedProjectionKind(parent: ProjectionKind, field: string): Projection
 export function projectPublicRecord(value: unknown, kind: ContentEntityKind): unknown | undefined {
   const snapshot = captureSafeSnapshot(value);
   if (!snapshot || !isRecord(snapshot)) return undefined;
+  const inferredKind = identifyContentKind(snapshot);
+  if (!inferredKind || inferredKind !== kind) return undefined;
+  if (kind === "question" && !isPublicQuestionType(read(snapshot, "type"))) return undefined;
   const root: Record<string, unknown> = {};
   const seen = new WeakMap<object, Map<ProjectionKind, unknown>>();
   let projectedNodes = 1;
@@ -1022,6 +1043,14 @@ export function projectPublicRecord(value: unknown, kind: ContentEntityKind): un
     if (current.kind === "lesson" || current.kind === "raga" || current.kind === "tala" || current.kind === "instrument" || current.kind === "cultural-tradition" || current.kind === "theatre-tradition" || current.kind === "learning-path" || current.kind === "exam-paper") {
       if (Object.prototype.hasOwnProperty.call(current.source, "published")) current.target.published = false;
     }
+  }
+  if (kind === "source") {
+    root.publisher = UNKNOWN_PROVENANCE;
+    root.year = UNKNOWN_PROVENANCE;
+    root.location = UNKNOWN_PROVENANCE;
+    root.license = UNKNOWN_PROVENANCE;
+    root.tier = "මූලාශ්‍ර වාර්තාව (සනාථ නොකළ)";
+    root.status = "Unverified / source review pending";
   }
   return root;
 }

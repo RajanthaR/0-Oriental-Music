@@ -369,7 +369,7 @@ describe("Interactive Audio & Quiz Components Suite", () => {
         type: "ordering",
         gradeBands: ["10-11"],
         difficulty: "පහසු",
-        strandId: "fundamentals",
+        strandId: "strand-fundamentals",
         prompt_si: "නිවැරදි පිළිවෙළ සකසන්න",
         orderingItems: [
           { id: "first", text_si: "පළමු", correctIndex: 0 },
@@ -704,6 +704,82 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
     act(() => { vi.advanceTimersByTime(3000); });
     expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps an active rhythm session when only the completion callback changes", () => {
+    vi.useFakeTimers();
+    audioMocks.playBol.mockImplementation(() => readyCancel());
+    const firstComplete = vi.fn();
+    const secondComplete = vi.fn();
+    const view = render(<RhythmTapGame bpm={120} totalBeats={3} onComplete={firstComplete} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "අරඹන්න" }));
+    act(() => { vi.advanceTimersByTime(500); });
+    expect(screen.getByText("ස්පන්දනය: 1 / 3")).toBeInTheDocument();
+
+    view.rerender(<RhythmTapGame bpm={120} totalBeats={3} onComplete={secondComplete} />);
+    act(() => { vi.advanceTimersByTime(500); });
+    expect(screen.getByText("ස්පන්දනය: 2 / 3")).toBeInTheDocument();
+    view.unmount();
+  });
+
+  it("removes completed rhythm playback handles before reset", async () => {
+    vi.useFakeTimers();
+    let resolveFinished!: () => void;
+    const finished = new Promise<void>((resolve) => { resolveFinished = resolve; });
+    const completedCancel = vi.fn();
+    audioMocks.playBol
+      .mockReturnValueOnce(Object.assign(completedCancel, { ready: Promise.resolve(true), finished }))
+      .mockImplementation(() => readyCancel());
+
+    const view = render(<RhythmTapGame bpm={120} totalBeats={1} />);
+    fireEvent.click(screen.getByRole("button", { name: "අරඹන්න" }));
+    act(() => { vi.advanceTimersByTime(500); });
+    await act(async () => {
+      resolveFinished();
+      await Promise.resolve();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "නැවත මුලට" }));
+    expect(completedCancel).not.toHaveBeenCalled();
+    view.unmount();
+  });
+
+  it("suppresses stale Tala unavailable callbacks after reset and replacement", () => {
+    const unavailableCallbacks: Array<() => void> = [];
+    audioMocks.playBol.mockImplementation((_bol, _duration, onUnavailable) => {
+      unavailableCallbacks.push(onUnavailable ?? (() => undefined));
+      return readyCancel();
+    });
+    const tala = getKhemtaFixture();
+    render(<TalaVisualizer tala={tala} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
+    fireEvent.click(screen.getByRole("button", { name: "නවත්වන්න" }));
+    act(() => { unavailableCallbacks[0](); });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
+    act(() => { unavailableCallbacks[0](); });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    act(() => { unavailableCallbacks[1](); });
+    expect(screen.getByRole("status")).toHaveTextContent("තබ්ලා නාදය ආරම්භ කළ නොහැක");
+  });
+
+  it("suppresses stale Rhythm unavailable callbacks after reset", () => {
+    vi.useFakeTimers();
+    const unavailableCallbacks: Array<() => void> = [];
+    audioMocks.playBol.mockImplementation((_bol, _duration, onUnavailable) => {
+      unavailableCallbacks.push(onUnavailable ?? (() => undefined));
+      return readyCancel();
+    });
+    render(<RhythmTapGame bpm={120} totalBeats={1} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "අරඹන්න" }));
+    act(() => { vi.advanceTimersByTime(500); });
+    fireEvent.click(screen.getByRole("button", { name: "නැවත මුලට" }));
+    act(() => { unavailableCallbacks[0](); });
+    expect(screen.queryByText("මෙම උපාංගයේ තබ්ලා නාදය ආරම්භ කළ නොහැක. දෘශ්‍ය ස්පන්දනයට අනුව පුහුණු වන්න.")).not.toBeInTheDocument();
   });
 
   it("does not advertise quarantined Bhairav or Roopak claims in static public UI", () => {

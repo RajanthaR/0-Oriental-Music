@@ -4,6 +4,12 @@ import React, { useState } from "react";
 import { Quiz, Question } from "@/types/content";
 import { CheckCircle2, XCircle, Award, RotateCcw, ArrowRight, ArrowUp, ArrowDown, Sparkles } from "lucide-react";
 import { ProgressStorage } from "@/lib/storage/progress-storage";
+import {
+  isNonBlankString,
+  isRecord,
+  projectPublicRecord,
+  validateContentRecord,
+} from "@/lib/validation/content-contracts";
 
 export type QuizRunnerQuiz = Omit<Pick<Quiz, "id" | "title_si" | "questions" | "passingScorePercent">, "questions"> & {
   questions: Question[];
@@ -12,6 +18,58 @@ export type QuizRunnerQuiz = Omit<Pick<Quiz, "id" | "title_si" | "questions" | "
 export interface QuizRunnerProps {
   quiz: QuizRunnerQuiz;
   onComplete?: (score: number, maxScore: number, passed: boolean) => void;
+}
+
+function isDenseArray(value: unknown): value is unknown[] {
+  if (!Array.isArray(value)) return false;
+  try {
+    for (let index = 0; index < value.length; index += 1) {
+      if (!Object.prototype.hasOwnProperty.call(value, index)) return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function getUsableQuiz(quiz: unknown): QuizRunnerQuiz | null {
+  try {
+    if (!isRecord(quiz) || !isNonBlankString(quiz.id) || !isNonBlankString(quiz.title_si) ||
+      typeof quiz.passingScorePercent !== "number" || !Number.isFinite(quiz.passingScorePercent) ||
+      quiz.passingScorePercent < 0 || quiz.passingScorePercent > 100) {
+      return null;
+    }
+
+    const rawQuestions = quiz.questions;
+    if (!isDenseArray(rawQuestions) || rawQuestions.length === 0) return null;
+
+    const questions: Question[] = [];
+    for (let index = 0; index < rawQuestions.length; index += 1) {
+      const candidate = rawQuestions[index];
+      if (!validateContentRecord(candidate, "question").isValid) return null;
+      const projected = projectPublicRecord(candidate, "question");
+      if (!projected) return null;
+      questions.push(projected as Question);
+    }
+
+    return {
+      id: quiz.id,
+      title_si: quiz.title_si,
+      passingScorePercent: quiz.passingScorePercent,
+      questions,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function QuizUnavailable() {
+  return (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center text-sm text-amber-950" role="alert">
+      <p className="font-bold">මෙම ප්‍රශ්නාවලිය දැනට ලබා ගත නොහැක.</p>
+      <p className="mt-2 text-xs">හොඳ උත්සාහයක්! අන්තර්ගත සමාලෝචනය අවසන් වූ පසු නැවත උත්සාහ කරන්න.</p>
+    </div>
+  );
 }
 
 export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
@@ -24,8 +82,12 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
   const [scoreCount, setScoreCount] = useState(0);
 
-  const question: Question = quiz.questions[currentIdx];
-  const totalQuestions = quiz.questions.length;
+  const usableQuiz = getUsableQuiz(quiz);
+  if (!usableQuiz) return <QuizUnavailable />;
+
+  const question = usableQuiz.questions[currentIdx];
+  const totalQuestions = usableQuiz.questions.length;
+  if (!question) return <QuizUnavailable />;
 
   const handleSelectMCQ = (optId: string) => {
     if (isSubmitted) return;
@@ -47,7 +109,9 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
   };
 
   const getOrderingIds = (target: Question): string[] =>
-    orderedItems[target.id] ?? [...(target.orderingItems ?? [])].reverse().map((item) => item.id);
+    target.type === "ordering"
+      ? orderedItems[target.id] ?? [...target.orderingItems].reverse().map((item) => item.id)
+      : [];
 
   const moveOrderingItem = (itemId: string, direction: -1 | 1) => {
     if (isSubmitted) return;
@@ -103,8 +167,8 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
     } else {
       setIsQuizCompleted(true);
       const finalScore = scoreCount;
-      const passed = (finalScore / totalQuestions) * 100 >= (quiz.passingScorePercent || 70);
-      ProgressStorage.recordQuizAttempt(quiz.id, finalScore, totalQuestions, passed);
+      const passed = (finalScore / totalQuestions) * 100 >= (usableQuiz.passingScorePercent || 70);
+      ProgressStorage.recordQuizAttempt(usableQuiz.id, finalScore, totalQuestions, passed);
       if (onComplete) onComplete(finalScore, totalQuestions, passed);
     }
   };
@@ -122,7 +186,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
 
   if (isQuizCompleted) {
     const percent = Math.round((scoreCount / totalQuestions) * 100);
-    const passed = percent >= (quiz.passingScorePercent || 70);
+    const passed = percent >= (usableQuiz.passingScorePercent || 70);
 
     return (
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-border shadow-warm-lg text-center max-w-lg mx-auto">
@@ -160,7 +224,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
       <div className="flex items-center justify-between border-b border-border-light pb-3 mb-4">
         <div>
           <span className="text-xs font-bold text-accent uppercase tracking-wider block mb-0.5">
-            ප්‍රශ්නාවලිය ({quiz.title_si})
+            ප්‍රශ්නාවලිය ({usableQuiz.title_si})
           </span>
           <span className="text-xs text-text-muted">
             ප්‍රශ්න {currentIdx + 1} / {totalQuestions}

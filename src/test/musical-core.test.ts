@@ -313,7 +313,13 @@ describe("Canonical Musical Core (Phase 2 Forensic Remediation)", () => {
       const timerApi = {
         set: (callback: () => void, delayMs: number) => {
           const timer = nextTimer++;
-          activeTimers.set(timer, { callback, delayMs });
+          activeTimers.set(timer, {
+            callback: () => {
+              activeTimers.delete(timer);
+              callback();
+            },
+            delayMs,
+          });
           return timer;
         },
         clear: (timer: number) => { activeTimers.delete(timer); },

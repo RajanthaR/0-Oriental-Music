@@ -93,6 +93,41 @@ describe("Audio Synthesis Engine & Tuning Suite", () => {
     expect(cleared).toEqual([1]);
   });
 
+  it("cancels remaining Tabla timers when a delayed stroke callback fails", () => {
+    const callbacks = new Map<number, () => void>();
+    const cleared: number[] = [];
+    let nextTimer = 0;
+    const timerApi = {
+      set: (callback: () => void) => {
+        const timer = nextTimer++;
+        callbacks.set(timer, callback);
+        return timer;
+      },
+      clear: (timer: number) => {
+        cleared.push(timer);
+        callbacks.delete(timer);
+      },
+    };
+
+    scheduleTablaPlan(
+      [
+        { bol: "පළමු", kind: "open", delayMs: 100 },
+        { bol: "දෙවන", kind: "open", delayMs: 200 },
+        { bol: "තෙවන", kind: "open", delayMs: 300 },
+      ],
+      (stroke) => {
+        if (stroke.bol === "පළමු") throw new Error("stroke callback failed");
+      },
+      timerApi,
+    );
+
+    expect(() => callbacks.get(0)?.()).toThrow("stroke callback failed");
+    expect(cleared).toEqual([1, 2]);
+    expect(callbacks.has(1)).toBe(false);
+    expect(callbacks.has(2)).toBe(false);
+    expect(() => callbacks.get(0)?.()).not.toThrow();
+  });
+
   it("swallows a throwing Tabla unavailable observer after completing cleanup", async () => {
     const originalAudioContext = window.AudioContext;
     class ThrowingAudioContext {

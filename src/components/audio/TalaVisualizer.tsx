@@ -36,6 +36,8 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
   const playbackCancelRef = useRef<(() => void) | null>(null);
   const currentMatraRef = useRef(1);
   const audioEnabledRef = useRef(audioEnabled);
+  const mountedRef = useRef(true);
+  const playbackGenerationRef = useRef(0);
   const playbackSignature = JSON.stringify({
     id: tala.id,
     matras: tala.matras,
@@ -57,6 +59,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
   }, []);
 
   const cancelPlayback = useCallback(() => {
+    playbackGenerationRef.current += 1;
     const cancel = playbackCancelRef.current;
     playbackCancelRef.current = null;
     cancel?.();
@@ -72,9 +75,21 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
     if (!audioEnabledRef.current) return;
     const bol = tala.bols.find((candidate) => candidate.matra === matra);
     if (bol) {
-      const handle = tablaSynth.playBol(bol.bol_si, matraDurationMs, () => setAudioError(true));
+      const generation = playbackGenerationRef.current;
+      let unavailableReported = false;
+      const reportUnavailable = () => {
+        if (unavailableReported || !mountedRef.current || playbackGenerationRef.current !== generation) return;
+        unavailableReported = true;
+        setAudioError(true);
+      };
+      const handle = tablaSynth.playBol(bol.bol_si, matraDurationMs, reportUnavailable);
       playbackCancelRef.current = handle;
-      void handle.ready;
+      void Promise.resolve(handle.ready).then(
+        (available) => {
+          if (!available) reportUnavailable();
+        },
+        reportUnavailable,
+      );
     }
   }, [cancelPlayback, matraDurationMs, tala.bols]);
 
@@ -111,12 +126,17 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
     stopTimer();
     cancelPlayback();
     selectMatra(1);
+    setAudioError(false);
     setBpm(normalizePracticeBpm(initialBpm, tala.practiceTempoBpm?.thah_bpm));
   }, [cancelPlayback, initialBpm, playbackSignature, selectMatra, stopTimer, tala.practiceTempoBpm?.thah_bpm]);
 
-  useEffect(() => () => {
-    stopTimer();
-    cancelPlayback();
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      stopTimer();
+      cancelPlayback();
+    };
   }, [cancelPlayback, stopTimer]);
 
   const handleTogglePlay = () => {

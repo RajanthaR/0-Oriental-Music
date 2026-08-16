@@ -19,6 +19,7 @@ import coverageData from "../../../data/content-coverage.json";
 import musicalCoreFieldDispositionsData from "../../../data/musical-core-field-dispositions.json";
 import {
   evaluateSourceReference,
+  createPublicationEvaluationContext,
   getRecordPublicationDecision,
   UNKNOWN_PROVENANCE,
 } from "@/lib/data/publication-policy";
@@ -234,8 +235,10 @@ export function validateSelectedSourceMetadata(
     message,
     severity: "error" as const,
   });
-  const records = (value: unknown): Record<string, unknown>[] =>
-    Array.isArray(value) ? value.filter(isRecord) : [];
+  const records = (value: unknown): Record<string, unknown>[] => {
+    const snapshot = cloneBoundedRecord(value);
+    return Array.isArray(snapshot) ? snapshot.filter(isRecord) : [];
+  };
   const runtime = records(runtimeSources);
   const manifest = records(manifestSources);
   const documents = records(sourceDocuments);
@@ -253,47 +256,59 @@ export function validateSelectedSourceMetadata(
   ] as const;
 
   SELECTED_PHASE_2_SOURCE_IDS.forEach((id) => {
-    const runtimeRecord = runtime.find((entry) => entry.id === id);
-    const manifestRecord = manifest.find((entry) => entry.id === id);
+    const runtimeMatches = runtime.filter((entry) => readOwnDataField(entry, "id") === id);
+    const manifestMatches = manifest.filter((entry) => readOwnDataField(entry, "id") === id);
+    const runtimeRecord = runtimeMatches[0];
+    const manifestRecord = manifestMatches[0];
+    if (runtimeMatches.length > 1 || manifestMatches.length > 1) {
+      addIssue(id, "id", "Selected Phase 2 source ID must be unique in both JSON catalogs");
+    }
     if (!runtimeRecord || !manifestRecord) {
       addIssue(id, "id", "Selected Phase 2 source must exist in both JSON catalogs");
       return;
     }
-    const filename = runtimeRecord.originalFilename;
-    const document = typeof filename === "string"
-      ? documents.find((entry) => entry.originalFilename === filename)
-      : undefined;
-    if (!document) {
+    const filenameValue = readOwnDataField(runtimeRecord, "originalFilename");
+    const filename = typeof filenameValue === "string" ? filenameValue : undefined;
+    const documentMatches = filename
+      ? documents.filter((entry) => readOwnDataField(entry, "originalFilename") === filename)
+      : [];
+    const document = documentMatches[0];
+    if (documentMatches.length !== 1) {
       addIssue(id, "originalFilename", "Selected source must resolve to exactly one extracted document filename");
     }
+    const runtimeValue = (field: string): unknown => readOwnDataField(runtimeRecord, field);
+    const manifestValue = (field: string): unknown => readOwnDataField(manifestRecord, field);
     sharedFields.forEach((field) => {
-      if (JSON.stringify(runtimeRecord[field]) !== JSON.stringify(manifestRecord[field])) {
+      if (JSON.stringify(runtimeValue(field)) !== JSON.stringify(manifestValue(field))) {
         addIssue(id, field, `Runtime and manifest source metadata disagree for '${field}'`);
       }
     });
     ["publisher", "year", "location", "license"].forEach((field) => {
-      if (runtimeRecord[field] !== UNKNOWN_PROVENANCE || manifestRecord[field] !== UNKNOWN_PROVENANCE) {
+      if (runtimeValue(field) !== UNKNOWN_PROVENANCE || manifestValue(field) !== UNKNOWN_PROVENANCE) {
         addIssue(id, field, `Unsupported '${field}' metadata must remain explicitly unknown`);
       }
     });
-    if (runtimeRecord.tier !== "Unverified source metadata" || manifestRecord.tier !== "Unverified source metadata") {
+    if (runtimeValue("tier") !== "Unverified source metadata" || manifestValue("tier") !== "Unverified source metadata") {
       addIssue(id, "tier", "Selected source tier must remain unverified");
     }
-    if (runtimeRecord.url !== undefined || manifestRecord.url !== undefined) {
+    if (runtimeValue("url") !== undefined || manifestValue("url") !== undefined) {
       addIssue(id, "url", "Selected source URL is not established by the supplied corpus");
     }
-    if (runtimeRecord.topics !== undefined || manifestRecord.topics !== undefined) {
+    if (runtimeValue("topics") !== undefined || manifestValue("topics") !== undefined) {
       addIssue(id, "topics", "Selected source topics must come only from extracted-document triage");
     }
     if (document) {
-      const grades = Array.isArray(runtimeRecord.grades) ? runtimeRecord.grades : [];
-      if (typeof document.statedGrade !== "string" || !grades.includes(document.statedGrade)) {
+      const gradesValue = runtimeValue("grades");
+      const grades = Array.isArray(gradesValue) ? gradesValue : [];
+      const statedGrade = readOwnDataField(document, "statedGrade");
+      if (typeof statedGrade !== "string" || !grades.includes(statedGrade)) {
         addIssue(id, "grades", "Selected source grade must match the extracted document");
       }
-      const expectedStatus = document.reviewStatus === "Review Required"
+      const reviewStatus = readOwnDataField(document, "reviewStatus");
+      const expectedStatus = reviewStatus === "Review Required"
         ? "Review Required"
         : "Source identity triaged; metadata unverified";
-      if (runtimeRecord.status !== expectedStatus) {
+      if (runtimeValue("status") !== expectedStatus) {
         addIssue(id, "status", "Selected source status must reflect extracted-document triage");
       }
     }
@@ -314,13 +329,17 @@ export function validateMusicalCoreFieldDispositions(
   registryInput: unknown = musicalCoreFieldDispositionsData
 ): PublicationValidationResult {
   const issues: ValidationIssue[] = [];
-  const registry = isRecord(registryInput) ? registryInput : {};
+  const registrySnapshot = cloneBoundedRecord(registryInput);
+  const registry = isRecord(registrySnapshot) ? registrySnapshot : {};
+  const rawTalaSnapshot = cloneBoundedRecord(rawTalas);
+  const safeRawTalas = Array.isArray(rawTalaSnapshot) ? rawTalaSnapshot : [];
+  const evaluationContext = createPublicationEvaluationContext();
   const ledgerIssueIds = new Set(
     Array.isArray(forensicLedgerData.issues)
       ? forensicLedgerData.issues.filter(isRecord).map((issue) => issue.id).filter((id): id is string => typeof id === "string")
       : []
   );
-  const rawIssueCatalog = asUnknownArray(registry.issueCatalog);
+  const rawIssueCatalog = asUnknownArray(readOwnDataField(registry, "issueCatalog"));
   const issueCatalog = rawIssueCatalog.filter(isRecord);
   const issueCatalogIds = new Set<string>();
   rawIssueCatalog.forEach((candidate, index) => {
@@ -340,7 +359,7 @@ export function validateMusicalCoreFieldDispositions(
       issues.push({ entityType: "TalaFieldDisposition", entityId: typeof issue.id === "string" ? issue.id : String(index), field: "issueCatalog", message: "Disposition issue catalog entries must resolve to a forensic-ledger issue", severity: "error" });
     }
   });
-  const rawEntries = asUnknownArray(registry.talas);
+  const rawEntries = asUnknownArray(readOwnDataField(registry, "talas"));
   rawEntries.forEach((candidate, index) => {
     if (!isRecord(candidate)) {
       issues.push({ entityType: "TalaFieldDisposition", entityId: String(index), field: "talas", message: "Disposition tala rows must be objects", severity: "error" });
@@ -353,9 +372,9 @@ export function validateMusicalCoreFieldDispositions(
     bols: Array<{ matra: number; status: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string }>;
   }>;
   if (
-    registry.policy !== "whole-entity-quarantine" ||
-    JSON.stringify(registry.requiredFields) !== JSON.stringify(["context", "structure", "theka", "bols"]) ||
-    JSON.stringify(registry.unclosedRequiredFields) !== JSON.stringify(["structure"])
+    readOwnDataField(registry, "policy") !== "whole-entity-quarantine" ||
+    JSON.stringify(readOwnDataField(registry, "requiredFields")) !== JSON.stringify(["context", "structure", "theka", "bols"]) ||
+    JSON.stringify(readOwnDataField(registry, "unclosedRequiredFields")) !== JSON.stringify(["structure"])
   ) {
     issues.push({ entityType: "TalaFieldDisposition", entityId: "registry", field: "policy", message: "Registry must explicitly record the unclosed structure field under whole-entity quarantine", severity: "error" });
   }
@@ -365,7 +384,7 @@ export function validateMusicalCoreFieldDispositions(
   }
   const hasExactEvidence = (reference: unknown, status: string): boolean => {
     if (!isRecord(reference) || typeof reference.sourceId !== "string" || typeof reference.pageOrSection !== "string") return false;
-    const decision = evaluateSourceReference(reference as unknown as SourceReference);
+    const decision = evaluateSourceReference(reference as unknown as SourceReference, evaluationContext);
     if (status === "verified") return decision.supportable;
     return !!decision.documentId && decision.pageNumbers.length > 0 && [
       "supportable",
@@ -374,7 +393,7 @@ export function validateMusicalCoreFieldDispositions(
     ].includes(decision.reasonCode);
   };
   const seen = new Set<string>();
-  asUnknownArray(rawTalas).forEach((candidate, index) => {
+  safeRawTalas.forEach((candidate, index) => {
     if (!isRecord(candidate) || typeof candidate.id !== "string") {
       issues.push({ entityType: "TalaFieldDisposition", entityId: String(index), field: "talaId", message: "Disposition input must identify a tala", severity: "error" });
       return;
@@ -417,19 +436,28 @@ export function validateMusicalCoreFieldDispositions(
       issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: "bols", message: "Disposition must enumerate every raw tala bol cell", severity: "error" });
     }
     entry.bols.forEach((bol, bolIndex) => {
-      if (bol.matra !== bolIndex + 1 || (bol.status !== "verified" && bol.status !== "needs-review")) {
+      if (!isRecord(bol)) {
+        issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}]`, message: "Bol disposition entries must be safe objects", severity: "error" });
+        return;
+      }
+      const bolMatra = readOwnDataField(bol, "matra");
+      const bolStatus = readOwnDataField(bol, "status");
+      if (bolMatra !== bolIndex + 1 || (bolStatus !== "verified" && bolStatus !== "needs-review")) {
         issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}]`, message: "Bol disposition must preserve sequential matra and status", severity: "error" });
       }
       const rawBol = isRecord(rawBols[bolIndex]) ? rawBols[bolIndex] : undefined;
-      if (bol.quality !== "missing" && bol.value !== rawBol?.bol_si) {
+      const bolQuality = readOwnDataField(bol, "quality");
+      const bolValue = readOwnDataField(bol, "value");
+      if (bolQuality !== "missing" && bolValue !== readOwnDataField(rawBol, "bol_si")) {
         issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}].value`, message: "Bol disposition must preserve the raw auditable cell", severity: "error" });
       }
-      if (!bol.quality || !bol.issueId) {
+      const bolIssueId = readOwnDataField(bol, "issueId");
+      if (!bolQuality || !bolIssueId) {
         issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}]`, message: "Every bol disposition requires quality and forensic issue anchors", severity: "error" });
-      } else if (!issueCatalogIds.has(bol.issueId)) {
+      } else if (typeof bolIssueId !== "string" || !issueCatalogIds.has(bolIssueId)) {
         issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}].issueId`, message: "Bol issue ID must resolve through the structured issue catalog", severity: "error" });
       }
-      if (bol.quality !== "missing" && !hasExactEvidence(bol.sourceReference, bol.status)) {
+      if (bolQuality !== "missing" && !hasExactEvidence(readOwnDataField(bol, "sourceReference"), typeof bolStatus === "string" ? bolStatus : "")) {
         issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}].sourceReference`, message: "Readable bol fields require exact supportable source evidence", severity: "error" });
       }
     });

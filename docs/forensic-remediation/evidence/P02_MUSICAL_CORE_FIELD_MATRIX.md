@@ -131,3 +131,17 @@ Deepchandi retrieval-spelling boundaries above remain `needs-review`.
 | `P02-FINAL-04` | Iterative graph inspection/projection rejects cycles, hostile descriptors, and depth/node overruns while preserving projection-kind identity. | `src/test/content-contracts.test.ts:368`; `src/lib/validation/content-contracts.ts:819`; `src/lib/validation/content-contracts.ts:950` |
 | `P02-FINAL-05` | Nonblank normalized-empty hostile search returns no results. | `src/lib/search/search-engine.ts:99`; `src/test/search-engine.test.ts:79` |
 | `P02-FINAL-06` | Caller-owned Swara handles survive readiness and cancel replacement/unmount work without cross-caller effects. | `src/test/synth.test.ts:199`; `src/test/synth.test.ts:293`; `src/test/components.test.tsx:413`; `src/test/components.test.tsx:570`; `src/test/components.test.tsx:604` |
+
+## Acceptance-hardening runtime boundary
+
+The twenty validated `C3-01`–`C3-20` application findings and the microphone
+ownership correction are traced in
+`docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md`. They change
+runtime containment, projection, validation, query, and local-audio lifecycle
+contracts only. They do not alter any musical value in Sections 1–3.
+
+The source disposition is unchanged: seven evidenced Grade 11 ragas and the
+bounded Grade 10 acoustics subset may remain public; Bhairav and all eight
+Talas remain quarantined; the rejected Deepchandi retrieval-only disposition
+remains historical; original-PDF, diagram, notation, OCR/corrupt-glyph, and
+SME review remain required where already recorded.

@@ -1,6 +1,6 @@
 # AGENTS.md — Agent & Contributor Guide for “ස්වර මඟ” (Swara Maga)
 
-Welcome to **“ස්වර මඟ” (Swara Maga)**, the Sri Lankan School Oriental Music (පෙරදිග සංගීතය - Grades 6–13) digital learning platform.
+Welcome to **“ස්වර මඟ” (Swara Maga)**, the Sri Lankan School Oriental Music (පෙරදිග සංගීතය) digital learning platform. The current verified public curriculum boundary is **Grades 6–11**. Grade 12–13 and A/L records may remain in raw forensic datasets, but they are quarantined and are not public curriculum content.
 
 This document serves as the primary technical and pedagogical operating guide for AI agents, developers, and curriculum contributors interacting with or extending this codebase.
 
@@ -34,7 +34,7 @@ Oriental-Music/
 │   │   ├── admin/                  # CMS publishing and review dashboard
 │   │   ├── attributions/           # Open-source and pedagogical credits
 │   │   ├── curriculum-map/         # Visual competency mapper
-│   │   ├── exams/                  # O/L & A/L mock examination practice center
+│   │   ├── exams/                  # Public Grade 6–11 examination practice; unsupported A/L records stay quarantined
 │   │   ├── glossary/               # Sinhala music glossary
 │   │   ├── instruments/            # Instrument catalog & detail pages
 │   │   ├── learning-paths/         # Goal-oriented learning path pages
@@ -88,7 +88,7 @@ Oriental-Music/
 ├── CONTENT_MODEL.md                # Entity schemas & relationship documentation
 ├── CONTENT_REVIEW_CHECKLIST.md     # 8-stage publishing workflow checklist
 ├── README.md                       # Bilingual project introduction & quickstart
-├── SOURCES.md                      # Detailed catalog of all 13 canonical sources
+├── SOURCES.md                      # Human-readable source inventory; machine counts live in the source catalogs
 └── package.json                    # Project scripts and dependencies
 ```
 
@@ -178,6 +178,8 @@ Content progresses through 8 defined review stages (`ContentReviewStatus`):
 6. `Accessibility & Mobile QA`: 360px viewport check, touch target sizing (44px+), contrast.
 7. `Rights & Source Verification`: Canonical source citation and copyright gate check.
 8. `Published`: Live for public student access.
+
+These labels define the CMS workflow contract only. They do not prove that any current record completed a real review stage. A record may claim `Published` only when the repository contains evidence of the corresponding completed review; otherwise use the explicit unknown/unverified state and let the forensic publication policy decide public eligibility.
 
 ---
 

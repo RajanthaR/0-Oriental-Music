@@ -17,7 +17,10 @@ import {
   validateContentRecord,
   type ContentEntityKind,
 } from "@/lib/validation/content-contracts";
-import { getRecordPublicationDecision } from "@/lib/data/publication-policy";
+import {
+  getRecordPublicationDecision,
+  getRecordPublicationDecisions,
+} from "@/lib/data/publication-policy";
 
 const canonicalCatalogs: Array<[ContentEntityKind, readonly unknown[]]> = [
   ["lesson", lessons],
@@ -253,6 +256,19 @@ describe("closed runtime content contracts", () => {
     expect(validateContentRecord(invalidNestedCheckpoint, "learning-path").isValid).toBe(false);
   });
 
+  it("requires Lesson publication flags to agree with review status", () => {
+    const candidate = structuredClone(lessons[0]) as Record<string, unknown>;
+    candidate.published = true;
+    expect(validateContentRecord(candidate, "lesson")).toMatchObject({
+      isValid: false,
+      issues: expect.arrayContaining([expect.objectContaining({ field: "published" })]),
+    });
+    expect(getRecordPublicationDecision(candidate)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["malformed-record"]),
+    });
+  });
+
   it.each([
     ["grade band", "raga", ragas[0], (record: Record<string, unknown>) => { record.gradeBands = ["11"]; }],
     ["review status", "lesson", lessons[0], (record: Record<string, unknown>) => { (record.reviewMetadata as Record<string, unknown>).status = "INVALID"; }],
@@ -291,6 +307,7 @@ describe("closed runtime content contracts", () => {
     unsupportedQuestion.audioNotes = ["S"];
     delete unsupportedQuestion.options_si;
     delete unsupportedQuestion.correctAnswerIds;
+    expect(projectPublicRecord(unsupportedQuestion, "question")).toBeUndefined();
     expect(validateContentRecord(unsupportedPublicQuiz, "quiz").isValid).toBe(true);
     expect(getRecordPublicationDecision(unsupportedPublicQuiz)).toMatchObject({
       isPublic: false,
@@ -346,6 +363,67 @@ describe("closed runtime content contracts", () => {
     expect(projection.reviewMetadata).toMatchObject({ status: "Needs Revision" });
     (projection.gradeBands as string[]).push("12-13");
     expect(candidate.gradeBands).toEqual(["10-11"]);
+  });
+
+  it("requires the inferred entity kind and sanitizes source provenance", () => {
+    expect(projectPublicRecord(lessons[0], "raga")).toBeUndefined();
+    expect(projectPublicRecord(ragas[0], "lesson")).toBeUndefined();
+
+    const source = projectPublicRecord(sources[0], "source") as Record<string, unknown>;
+    expect(source.publisher).toBe("නොදනී / සනාථ වී නැත");
+    expect(source.year).toBe("නොදනී / සනාථ වී නැත");
+    expect(source.location).toBe("නොදනී / සනාථ වී නැත");
+    expect(source.license).toBe("නොදනී / සනාථ වී නැත");
+    expect(source.status).toBe("Unverified / source review pending");
+  });
+
+  it("rejects duplicate identities even when a proxy lies through property access", () => {
+    const first = structuredClone(ragas[0]) as Record<string, unknown>;
+    const secondTarget = structuredClone(ragas[0]) as Record<string, unknown>;
+    const deceptive = new Proxy(secondTarget, {
+      get(target, property, receiver) {
+        if (property === "id") return "raga-bhupali";
+        return Reflect.get(target, property, receiver);
+      },
+    });
+
+    const decisions = getRecordPublicationDecisions([first, deceptive]);
+    expect(decisions).toHaveLength(2);
+    expect(decisions.every((decision) => !decision.isPublic)).toBe(true);
+    expect(decisions.every((decision) => decision.reasonCodes.includes("duplicate-record-id"))).toBe(true);
+  });
+
+  it("returns no decisions for malformed outer publication containers", () => {
+    expect(getRecordPublicationDecisions(null)).toEqual([]);
+    expect(getRecordPublicationDecisions({})).toEqual([]);
+    expect(getRecordPublicationDecisions(Array.from({ length: 10_001 }, () => lessons[0]))).toEqual([]);
+
+    const throwingOuter = new Proxy([lessons[0]], {
+      ownKeys() {
+        throw new Error("hostile outer container");
+      },
+    });
+    expect(() => getRecordPublicationDecisions(throwingOuter)).not.toThrow();
+    expect(getRecordPublicationDecisions(throwingOuter)).toEqual([]);
+  });
+
+  it("uses one detached snapshot for decision and public projection", () => {
+    const candidate = structuredClone(ragas[0]) as Record<string, unknown>;
+    let reads = 0;
+    const stateful = new Proxy(candidate, {
+      get(target, property, receiver) {
+        if (property === "gradeBands") {
+          reads += 1;
+          return reads === 1 ? ["10-11"] : ["12-13"];
+        }
+        return Reflect.get(target, property, receiver);
+      },
+    });
+
+    const decision = getRecordPublicationDecision(stateful);
+    expect(decision.isPublic).toBe(true);
+    expect((decision.publicProjection as Record<string, unknown>).gradeBands).toEqual(["10-11"]);
+    expect(reads).toBe(0);
   });
 
   it("covers every nested projection allowlist field and strips nested extras", () => {

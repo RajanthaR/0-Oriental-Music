@@ -48,14 +48,24 @@ export function scheduleTablaPlan<TTimer>(
   onStroke: (stroke: PlannedTablaStroke) => void,
   timerApi: TablaTimerApi<TTimer>
 ): () => void {
-  const timers: TTimer[] = [];
+  type TimerEntry = {
+    timer: TTimer;
+    active: boolean;
+  };
+
+  const timers: TimerEntry[] = [];
+  let cancelled = false;
   const cancel = () => {
+    if (cancelled) return;
+    cancelled = true;
     // A timer implementation is outside this module's control. Best effort
     // cleanup is deliberately isolated per timer so one throwing clear does
     // not prevent the remaining registrations from being reclaimed.
-    timers.splice(0).forEach((timer) => {
+    timers.splice(0).forEach((entry) => {
+      if (!entry.active) return;
+      entry.active = false;
       try {
-        timerApi.clear(timer);
+        timerApi.clear(entry.timer);
       } catch {
         // The timer may already have fired or the host may be tearing down.
       }
@@ -64,8 +74,40 @@ export function scheduleTablaPlan<TTimer>(
 
   try {
     plan.forEach((stroke) => {
+      if (cancelled) return;
       if (stroke.delayMs === 0) onStroke(stroke);
-      else timers.push(timerApi.set(() => onStroke(stroke), stroke.delayMs));
+      else {
+        let entry: TimerEntry | null = null;
+        let callbackCompleted = false;
+        const run = () => {
+          if (cancelled || (entry && !entry.active)) return;
+          if (entry) entry.active = false;
+          try {
+            onStroke(stroke);
+          } catch (error) {
+            // Delayed callbacks execute outside the registration try/catch.
+            // Cancel the remaining plan before preserving the original error.
+            cancel();
+            throw error;
+          } finally {
+            if (entry) {
+              const index = timers.indexOf(entry);
+              if (index >= 0) timers.splice(index, 1);
+            }
+            callbackCompleted = true;
+          }
+        };
+        const timer = timerApi.set(run, stroke.delayMs);
+        entry = { timer, active: !cancelled && !callbackCompleted };
+        if (entry.active) timers.push(entry);
+        else {
+          try {
+            timerApi.clear(timer);
+          } catch {
+            // The timer may have fired synchronously during registration.
+          }
+        }
+      }
     });
   } catch (error) {
     // Registration is transactional: if an immediate callback or a later

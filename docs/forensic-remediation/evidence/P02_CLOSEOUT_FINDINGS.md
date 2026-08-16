@@ -7,6 +7,33 @@ it is not acceptance evidence for this closeout. The earlier
 the controlling closeout plan is
 `docs/plans/2026-08-16-002-fix-phase-2-final-contract-closeout-plan.md`.
 
+## Acceptance-hardening findings input
+
+Review run `20260816-191000-p02-final-contract-c3` is preserved as blocked
+historical evidence. It reviewed `beba1479f473b3413b3f2de48a27c558e1937c6f`
+through `4c8ab9755d20d4d23cc8081fe831f448b15f3a2e`, completed all eleven required
+GPT-5.6 Luna/MAX reviewers and all twenty independent validators, and ended
+`Not ready to merge`. It is findings input only; it is not acceptance evidence
+for the controlling plan
+`docs/plans/2026-08-16-003-fix-phase-2-acceptance-hardening-plan.md`.
+
+| IDs | Validated defect group | Acceptance-hardening disposition | Regression/symbol anchors |
+|---|---|---|---|
+| `C3-01`, `C3-04`–`C3-08` | Publication status drift, hostile batches, decision/projection TOCTOU, duplicate IDs, mismatched kinds, and stale identity catalogs. | Per-operation bounded snapshots, checked batches, complete kind contracts, and allowlisted projections fail closed. Summary and repository consumers use fresh decisions. | `src/lib/data/publication-policy.ts:284`, `src/lib/data/publication-policy.ts:1214`, `src/lib/validation/content-contracts.ts:787`, `src/lib/validation/content-contracts.ts:968`. |
+| `C3-02`, `C3-03` | Summary caching ignored evidence changes and source views exposed unsupported provenance. | Summary memoization is removed. Public source fields share the unknown/unverified representation. | `src/lib/data/repository.ts:445`, `src/test/review-closeout.test.ts:100`, `src/test/source-metadata-consistency.test.ts:17`. |
+| `C3-09`, `C3-10`, `C3-12` | Malformed Tala dispositions or selected-source rows could throw, and duplicate extracted-document mappings passed. | Forensic inputs are snapshotted as unknown data; malformed rows produce structured issues and exactly one document mapping is required. | `src/lib/validation/content-validator.ts:224`, `src/lib/validation/content-validator.ts:327`, `src/test/source-metadata-consistency.test.ts:78`. |
+| `C3-11` | Dependency and graph coverage was incomplete. | One declarative field matrix classifies blocking playable/prerequisite/path/quiz references and nonblocking recommendation links; bounded graph rules apply at every decision boundary. | `src/lib/data/publication-policy.ts:182`, `src/lib/data/publication-policy.ts:837`, `src/test/publication-containment.test.ts:36`. |
+| `C3-13` | Correction-log final line anchors were stale. | Final anchors are refreshed after implementation/review stabilization and checked by the closeout test. | `src/test/review-closeout.test.ts:39`. |
+| `C3-14`, `C3-15` | Renderable questions retained forensic fields and an empty quiz crashed. | Explicit renderable variants exclude audio/notation payloads; public projection strips extras; QuizRunner returns a supportive Sinhala unavailable state without recording an attempt. | `src/types/content.ts:382`, `src/components/quiz/QuizRunner.tsx:35`, `src/components/quiz/QuizRunner.tsx:75`, `src/test/review-closeout.test.ts:142`. |
+| `C3-16` | Repository/search boundaries threw on malformed runtime queries. | Omitted/blank strings keep featured behavior; other nonstrings and nonblank normalized-empty controls return no results. | `src/lib/search/search-engine.ts:84`, `src/lib/search/search-engine.ts:113`, `src/test/search-engine.test.ts:109`. |
+| `C3-17`–`C3-20` | Rhythm callback identity reset sessions, completed handles accumulated, stale unavailable callbacks escaped, and delayed Tabla failures left timers. | Generation-owned sessions, settled-handle removal, mounted/current-owner callback guards, and failure-atomic timer cancellation close the lifecycle. | `src/components/audio/RhythmTapGame.tsx:14`, `src/components/audio/TalaVisualizer.tsx:23`, `src/lib/audio/tabla.ts:46`, `src/test/components.test.tsx:726`, `src/test/components.test.tsx:748`, `src/test/synth.test.ts:96`. |
+| `P02-PITCH-OWNERSHIP-001` | Partial or stale microphone starts could retain MediaStreams, AudioContexts, nodes, animation frames, or callbacks. | Latest-generation ownership and idempotent cleanup stop late streams and reclaim every partial resource; audio remains local-only. | `src/lib/audio/pitch.ts:33`, `src/lib/audio/pitch.ts:114`, `src/lib/audio/pitch.ts:220`, `src/test/pitch.test.ts:40`, `src/test/pitch.test.ts:93`. |
+| `P02-PROJECT-SCOPE-001` | Contributor guidance still described the product as public Grades 6–13/A/L and claimed a fixed canonical-source count. | Guidance now states the verified Grades 6–11 public boundary, raw quarantine for 12–13/A/L, no inferred count, and CMS stages as capability rather than completed-review evidence. | `AGENTS.md:3`, `AGENTS.md:37`, `AGENTS.md:182`, `src/test/review-closeout.test.ts:39`. |
+
+All eight Talas remain whole-entity quarantined. No entry above promotes a
+musical fact or changes the rejected Deepchandi disposition. Original-PDF,
+diagram, notation, corrupt-glyph, and SME work remain deferred.
+
 The closeout uses the authorized whole-entity quarantine decision. A tala is
 not public or playable when a required learner-visible context, structure,
 hand action, practice configuration, theka, or bol field is absent, ambiguous,

@@ -74,3 +74,20 @@ All eight Talas remain whole-entity quarantined. Earlier review runs, the
 rejected Deepchandi finding, and the original-PDF, diagram, notation,
 corrupt-glyph, and SME-review boundaries remain preserved in the closeout and
 field matrices.
+
+## Phase 2 acceptance hardening
+
+Run `20260816-191000-p02-final-contract-c3` remains a blocked historical review
+of head `4c8ab9755d20d4d23cc8081fe831f448b15f3a2e`; its twenty validated findings
+are not relabeled as acceptance. The fresh task is governed by
+`docs/plans/2026-08-16-003-fix-phase-2-acceptance-hardening-plan.md`.
+
+| Issue group | Before | Acceptance-hardening state | Final anchors |
+|---|---|---|---|
+| `C3-01`–`C3-08` | Status, identity, evidence, summary, batch, and projection decisions could diverge or reread mutable values. | One bounded operation context, checked batch, complete kind contract, fresh summary, and allowlisted projection fail closed. | `src/lib/data/publication-policy.ts:284`, `src/lib/data/publication-policy.ts:1214`, `src/lib/data/repository.ts:445`, `src/lib/validation/content-contracts.ts:968`. |
+| `C3-09`–`C3-12` | Hostile disposition/source rows and incomplete dependency coverage could throw or fail open. | Unknown-safe source/disposition snapshots, exactly-one document mapping, and one declarative dependency matrix govern all surfaces. | `src/lib/validation/content-validator.ts:224`, `src/lib/validation/content-validator.ts:327`, `src/lib/data/publication-policy.ts:182`. |
+| `C3-13` | Prior numeric documentation anchors drifted. | Closeout documentation is asserted by stable symbols and refreshed final line anchors after review fixes. | `src/test/review-closeout.test.ts:39`. |
+| `C3-14`–`C3-16` | Forensic question fields leaked into the renderable model, empty quizzes crashed, and hostile queries threw/enumerated results. | Explicit public question variants, a safe Sinhala empty state, and uniform query classification close the UI boundaries. | `src/types/content.ts:382`, `src/components/quiz/QuizRunner.tsx:75`, `src/lib/search/search-engine.ts:84`, `src/test/search-engine.test.ts:90`. |
+| `C3-17`–`C3-20` | Rhythm/Tabla work was not consistently session-owned or failure-atomic. | Current-generation callbacks, settled-handle removal, and timer cancellation isolate every caller. | `src/components/audio/RhythmTapGame.tsx:14`, `src/components/audio/TalaVisualizer.tsx:23`, `src/lib/audio/tabla.ts:46`, `src/test/synth.test.ts:96`. |
+| `P02-PITCH-OWNERSHIP-001` | Failed, replaced, pending, or unmounted microphone starts could retain resources or callbacks. | Generation ownership stops late streams and idempotently releases tracks, nodes, frames, and contexts with no network/upload path. | `src/lib/audio/pitch.ts:114`, `src/lib/audio/pitch.ts:220`, `src/test/pitch.test.ts:40`, `src/test/pitch.test.ts:93`. |
+| `P02-PROJECT-SCOPE-001` | Contributor guidance contradicted the forensic Grades 6–11 public boundary and implied a fixed verified source count. | Guidance now distinguishes current public scope, raw quarantined records, and workflow capability from proof of completed review. | `AGENTS.md:3`, `AGENTS.md:37`, `AGENTS.md:182`, `src/test/review-closeout.test.ts:39`. |

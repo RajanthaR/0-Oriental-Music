@@ -37,20 +37,22 @@ import examPapersData from "@/data/exam-papers.json";
 import { searchFilter } from "@/lib/search/search-engine";
 import {
   getRecordPublicationDecision,
-  getRecordPublicationDecisions,
+  evaluatePublicationBatch,
+  createPublicationEvaluationContext,
   getSourceDocumentSummary,
   UNKNOWN_PROVENANCE,
   PUBLIC_GRADE_BANDS,
   sanitizePublicRecord,
   sanitizeReviewRecord,
   createUnverifiedReviewMetadata,
+  type PublicationEvaluationContext,
   type SourceDocumentSummary,
 } from "@/lib/data/publication-policy";
 import {
   isRecord,
   isReviewMetadata,
-  inspectGraph,
-  MAX_ARRAY_ITEMS,
+  readOwnDataField,
+  projectPublicRecord,
   validateContentRecord,
   type ContentEntityKind,
 } from "@/lib/validation/content-contracts";
@@ -64,12 +66,7 @@ function hasUniqueRecordIds(items: readonly unknown[]): boolean {
   const ids = new Set<string>();
   for (const item of items) {
     if (!isRecord(item)) return false;
-    let rawId: unknown;
-    try {
-      rawId = item.id;
-    } catch {
-      return false;
-    }
+    const rawId = readOwnDataField(item, "id");
     const id = typeof rawId === "string" ? rawId.trim() : "";
     if (!id || ids.has(id)) return false;
     ids.add(id);
@@ -109,125 +106,6 @@ function readRawReviewMetadata(lesson: Record<string, unknown>): unknown {
   }
 }
 
-const FINGERPRINT_DANGEROUS_KEYS = new Set(["__proto__", "prototype", "constructor"]);
-
-type FingerprintEntry = { key: string; value: unknown };
-
-/**
- * Build a bounded, descriptor-only fingerprint for mutable test/runtime data.
- *
- * The repository's JSON imports are normally immutable application data, but
- * the CMS simulation and forensic tests intentionally mutate those objects.
- * A summary memo must therefore detect nested changes without invoking a
- * getter, accepting inherited data, or recursively walking an unbounded graph.
- */
-function safeFingerprint(value: unknown): string | undefined {
-  if (value === null || typeof value !== "object") return primitiveFingerprint(value);
-  if (!inspectGraph(value).safe) return undefined;
-
-  const ids = new WeakMap<object, number>();
-  const frames: Array<{ value: object; id: number }> = [];
-  const records: string[] = [];
-  let nextId = 1;
-  ids.set(value, nextId);
-  frames.push({ value, id: nextId });
-  nextId += 1;
-
-  while (frames.length > 0) {
-    const frame = frames.pop()!;
-    const object = frame.value;
-    let entries: FingerprintEntry[];
-    let arrayLength = 0;
-    try {
-      const isArray = Array.isArray(object);
-      const prototype = Object.getPrototypeOf(object);
-      if ((isArray && prototype !== Array.prototype && prototype !== null) ||
-          (!isArray && prototype !== Object.prototype && prototype !== null)) return undefined;
-
-      const descriptors = Object.getOwnPropertyDescriptors(object);
-      const keys = Reflect.ownKeys(descriptors);
-      if (keys.some((key) => typeof key !== "string")) return undefined;
-
-      if (isArray) {
-        const lengthDescriptor = descriptors.length;
-        if (!lengthDescriptor || !("value" in lengthDescriptor) ||
-            typeof lengthDescriptor.value !== "number" ||
-            !Number.isInteger(lengthDescriptor.value) ||
-            lengthDescriptor.value < 0 || lengthDescriptor.value > MAX_ARRAY_ITEMS) return undefined;
-        arrayLength = lengthDescriptor.value;
-        if (keys.length !== arrayLength + 1) return undefined;
-        entries = [];
-        for (let index = 0; index < arrayLength; index += 1) {
-          const key = String(index);
-          const descriptor = descriptors[key];
-          if (!descriptor || !descriptor.enumerable || !("value" in descriptor) ||
-              Object.prototype.hasOwnProperty.call(descriptor, "get") ||
-              Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
-          entries.push({ key, value: descriptor.value });
-        }
-      } else {
-        entries = [];
-        for (const key of keys as string[]) {
-          if (FINGERPRINT_DANGEROUS_KEYS.has(key)) return undefined;
-          const descriptor = descriptors[key];
-          if (!descriptor.enumerable || !("value" in descriptor) ||
-              Object.prototype.hasOwnProperty.call(descriptor, "get") ||
-              Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
-          entries.push({ key, value: descriptor.value });
-        }
-      }
-    } catch {
-      return undefined;
-    }
-
-    const parts = [`${frame.id}:${arrayLength > 0 || Array.isArray(object) ? "a" : "o"}`];
-    for (const entry of entries) {
-      const child = entry.value;
-      let encoded: string | undefined;
-      if (child !== null && typeof child === "object") {
-        let childId = ids.get(child);
-        if (!childId) {
-          childId = nextId;
-          nextId += 1;
-          ids.set(child, childId);
-          frames.push({ value: child, id: childId });
-        }
-        encoded = `@${childId}`;
-      } else {
-        encoded = primitiveFingerprint(child);
-      }
-      if (encoded === undefined) return undefined;
-      parts.push(`${JSON.stringify(entry.key)}=${encoded}`);
-    }
-    records[frame.id - 1] = parts.join(",");
-  }
-  return records.join("|");
-}
-
-function primitiveFingerprint(value: unknown): string | undefined {
-  switch (typeof value) {
-    case "undefined": return "u";
-    case "string": return `s:${JSON.stringify(value)}`;
-    case "number": return `n:${String(value)}`;
-    case "boolean": return `b:${value ? "1" : "0"}`;
-    case "bigint": return `i:${String(value)}`;
-    case "function":
-    case "symbol": return undefined;
-    case "object": return value === null ? "null" : undefined;
-    default: return undefined;
-  }
-}
-
-function safeCollectionFingerprint(items: readonly unknown[]): string | undefined {
-  const parts = [`length:${items.length}`];
-  for (const item of items) {
-    const fingerprint = safeFingerprint(item);
-    if (fingerprint === undefined) return undefined;
-    parts.push(fingerprint);
-  }
-  return parts.join(";");
-}
-
 export interface SourceCatalogView {
   id: string;
   title: string;
@@ -252,7 +130,17 @@ export interface PublicationCollectionSummary {
   needsReview: number;
 }
 
+export interface PublicSearchCatalogs {
+  lessons: Lesson[];
+  ragas: Raga[];
+  talas: Tala[];
+  instruments: Instrument[];
+  glossary: GlossaryTerm[];
+  culturalTraditions: CulturalTradition[];
+}
+
 export type LessonVisibility = "public" | "review";
+type PublicationCatalogKey = keyof PublicationEvaluationContext["catalogs"];
 
 class ContentRepository {
   private sources: unknown[] = sourcesData as unknown[];
@@ -266,37 +154,6 @@ class ContentRepository {
   private learningPaths: unknown[] = learningPathsData as unknown[];
   private quizzes: unknown[] = quizzesData as unknown[];
   private examPapers: unknown[] = examPapersData as unknown[];
-  private publicationCacheGeneration = 0;
-  private publicationSummaryCache?: {
-    generation: number;
-    fingerprint: string;
-    summary: Record<string, PublicationCollectionSummary>;
-  };
-
-  private getPublicationFingerprint(): string | undefined {
-    const collections = [
-      this.sources,
-      this.lessons,
-      this.ragas,
-      this.talas,
-      this.instruments,
-      this.culturalTraditions,
-      this.theatreTraditions,
-      this.glossary,
-      this.learningPaths,
-      this.quizzes,
-      this.examPapers,
-    ];
-    const fingerprints = collections.map(safeCollectionFingerprint);
-    return fingerprints.every((fingerprint): fingerprint is string => fingerprint !== undefined)
-      ? fingerprints.join("||")
-      : undefined;
-  }
-
-  private invalidatePublicationCache(): void {
-    this.publicationCacheGeneration += 1;
-    this.publicationSummaryCache = undefined;
-  }
 
   private freezePublicationSummary(
     summary: Record<string, PublicationCollectionSummary>,
@@ -305,9 +162,16 @@ class ContentRepository {
     return Object.freeze(summary);
   }
 
-  private selectPublic<T>(items: readonly unknown[]): T[] {
+  private selectPublic<T>(
+    catalog: PublicationCatalogKey,
+    context = createPublicationEvaluationContext(),
+  ): T[] {
+    const items = context.catalogs[catalog];
+    if (!context.safe) return [];
     if (!hasUniqueRecordIds(items)) return [];
-    const decisions = getRecordPublicationDecisions(items);
+    const batch = evaluatePublicationBatch(items, context);
+    if (!batch.isValid || batch.decisions.length !== items.length) return [];
+    const decisions = batch.decisions;
     return items.flatMap((item, index) => {
       const decision = decisions[index];
       return decision.isPublic && decision.publicProjection
@@ -316,18 +180,31 @@ class ContentRepository {
     });
   }
 
-  private selectForReview<T>(items: readonly unknown[], kind: ContentEntityKind): T[] {
+  private selectForReview<T>(
+    catalog: PublicationCatalogKey,
+    kind: ContentEntityKind,
+    context = createPublicationEvaluationContext(),
+  ): T[] {
+    if (!context.safe) return [];
+    const items = context.catalogs[catalog];
     return items.flatMap((item) => {
-      const projection = sanitizeReviewRecord(item);
+      const projection = sanitizeReviewRecord(item, context);
       return validateContentRecord(projection, kind).isValid ? [projection as T] : [];
     });
   }
 
-  private summarize(items: readonly unknown[]): PublicationCollectionSummary {
+  private summarize(
+    items: readonly unknown[],
+    context: PublicationEvaluationContext,
+  ): PublicationCollectionSummary {
     if (!hasUniqueRecordIds(items)) {
       return { raw: items.length, public: 0, quarantined: 0, needsReview: items.length };
     }
-    const decisions = getRecordPublicationDecisions(items);
+    const batch = evaluatePublicationBatch(items, context);
+    if (!batch.isValid || batch.decisions.length !== items.length) {
+      return { raw: items.length, public: 0, quarantined: 0, needsReview: items.length };
+    }
+    const decisions = batch.decisions;
     return {
       raw: items.length,
       public: decisions.filter((decision) => decision.state === "public").length,
@@ -339,30 +216,39 @@ class ContentRepository {
   // Sources: public transparency metadata is deliberately sanitized. The raw
   // publisher/year/location/license values are not provenance evidence.
   public getSources(): SourceCatalogView[] {
-    if (!hasUniqueRecordIds(this.sources)) return [];
-    return this.sources.flatMap((candidate) => {
+    const context = createPublicationEvaluationContext();
+    if (!context.safe || !hasUniqueRecordIds(context.catalogs.sources)) return [];
+    return context.catalogs.sources.flatMap((candidate) => {
       if (!validateContentRecord(candidate, "source").isValid || !isRecord(candidate)) return [];
-      const source = candidate as {
+      const projected = projectPublicRecord(candidate, "source");
+      if (!isRecord(projected)) return [];
+      const source = projected as unknown as {
         id: string;
         title: string;
         originalFilename: string;
         grades: string[];
         language: string;
         url?: string;
+        publisher: string;
+        year: string;
+        tier: string;
+        location: string;
+        status: string;
+        license: string;
       };
-      const document = getSourceDocumentSummary(source.id);
+      const document = getSourceDocumentSummary(source.id, context);
       return [{
         id: source.id,
         title: source.title,
         originalFilename: source.originalFilename,
-        publisher: UNKNOWN_PROVENANCE,
+        publisher: source.publisher,
         grades: [...source.grades],
-        year: UNKNOWN_PROVENANCE,
+        year: source.year,
         language: source.language,
-        tier: "මූලාශ්‍ර වාර්තාව (සනාථ නොකළ)",
-        location: UNKNOWN_PROVENANCE,
-        status: "Unverified / source review pending",
-        license: UNKNOWN_PROVENANCE,
+        tier: source.tier,
+        location: source.location,
+        status: source.status,
+        license: source.license,
         url: source.url,
         evidenceState: document.reviewStatus,
         evidenceQuality: document.evidenceQuality,
@@ -399,24 +285,35 @@ class ContentRepository {
     visibility?: LessonVisibility;
     query?: string;
   }): Lesson[] {
-    let list = filters?.visibility === "review"
-      ? this.selectForReview<Lesson>(this.lessons, "lesson")
-      : this.selectPublic<Lesson>(this.lessons);
-    if (filters?.gradeBand) {
-      list = list.filter((lesson) => lesson.gradeBands.includes(filters.gradeBand!));
+    let gradeBand: GradeBandType | undefined;
+    let strandId: string | undefined;
+    let visibility: LessonVisibility | undefined;
+    let query: unknown;
+    try {
+      if (filters !== undefined && (!filters || typeof filters !== "object")) return [];
+      gradeBand = filters?.gradeBand;
+      strandId = filters?.strandId;
+      visibility = filters?.visibility;
+      query = filters?.query;
+    } catch {
+      return [];
     }
-    if (filters?.strandId) {
-      list = list.filter((lesson) => lesson.strandId === filters.strandId);
+    const context = createPublicationEvaluationContext();
+    let list = visibility === "review"
+      ? this.selectForReview<Lesson>("lessons", "lesson", context)
+      : this.selectPublic<Lesson>("lessons", context);
+    if (gradeBand) {
+      list = list.filter((lesson) => lesson.gradeBands.includes(gradeBand));
     }
-    if (filters?.query) {
-      list = searchFilter(list, filters.query, (lesson) => [
-        lesson.title_si,
-        lesson.title_en || "",
-        lesson.summary_si,
-        lesson.learningGoal_si,
-      ]);
+    if (strandId) {
+      list = list.filter((lesson) => lesson.strandId === strandId);
     }
-    return list;
+    return searchFilter(list, query, (lesson) => [
+      lesson.title_si,
+      lesson.title_en || "",
+      lesson.summary_si,
+      lesson.learningGoal_si,
+    ]);
   }
 
   public getLessonById(id: string): Lesson | undefined {
@@ -425,18 +322,14 @@ class ContentRepository {
 
   // Ragas
   public getRagas(query?: string): Raga[] {
-    let list = this.selectPublic<Raga>(this.ragas);
-    if (query) {
-      list = searchFilter(list, query, (raga) => [
-        raga.name_si,
-        raga.name_en,
-        raga.thata_si,
-        raga.vadi_si,
-        raga.samvadi_si,
-        raga.time_si,
-      ]);
-    }
-    return list;
+    return searchFilter(this.selectPublic<Raga>("ragas"), query, (raga) => [
+      raga.name_si,
+      raga.name_en,
+      raga.thata_si,
+      raga.vadi_si,
+      raga.samvadi_si,
+      raga.time_si,
+    ]);
   }
 
   public getRagaById(id: string): Raga | undefined {
@@ -445,16 +338,12 @@ class ContentRepository {
 
   // Talas
   public getTalas(query?: string): Tala[] {
-    let list = this.selectPublic<Tala>(this.talas);
-    if (query) {
-      list = searchFilter(list, query, (tala) => [
-        tala.name_si,
-        tala.name_en,
-        ...tala.aliases_si,
-        tala.theka_si,
-      ]);
-    }
-    return list;
+    return searchFilter(this.selectPublic<Tala>("talas"), query, (tala) => [
+      tala.name_si,
+      tala.name_en,
+      ...tala.aliases_si,
+      tala.theka_si,
+    ]);
   }
 
   public getTalaById(id: string): Tala | undefined {
@@ -463,17 +352,13 @@ class ContentRepository {
 
   // Instruments
   public getInstruments(query?: string): Instrument[] {
-    let list = this.selectPublic<Instrument>(this.instruments);
-    if (query) {
-      list = searchFilter(list, query, (instrument) => [
-        instrument.name_si,
-        instrument.name_en,
-        instrument.category_si,
-        instrument.origin_si,
-        instrument.construction_si,
-      ]);
-    }
-    return list;
+    return searchFilter(this.selectPublic<Instrument>("instruments"), query, (instrument) => [
+      instrument.name_si,
+      instrument.name_en,
+      instrument.category_si,
+      instrument.origin_si,
+      instrument.construction_si,
+    ]);
   }
 
   public getInstrumentById(id: string): Instrument | undefined {
@@ -482,16 +367,12 @@ class ContentRepository {
 
   // Traditions
   public getCulturalTraditions(query?: string): CulturalTradition[] {
-    let list = this.selectPublic<CulturalTradition>(this.culturalTraditions);
-    if (query) {
-      list = searchFilter(list, query, (tradition) => [
-        tradition.title_si,
-        tradition.title_en,
-        tradition.category_si,
-        tradition.description_si,
-      ]);
-    }
-    return list;
+    return searchFilter(this.selectPublic<CulturalTradition>("culturalTraditions"), query, (tradition) => [
+      tradition.title_si,
+      tradition.title_en,
+      tradition.category_si,
+      tradition.description_si,
+    ]);
   }
 
   public getCulturalTraditionById(id: string): CulturalTradition | undefined {
@@ -499,16 +380,12 @@ class ContentRepository {
   }
 
   public getTheatreTraditions(query?: string): TheatreTradition[] {
-    let list = this.selectPublic<TheatreTradition>(this.theatreTraditions);
-    if (query) {
-      list = searchFilter(list, query, (tradition) => [
-        tradition.title_si,
-        tradition.title_en,
-        tradition.type_si,
-        tradition.historicalBackground_si,
-      ]);
-    }
-    return list;
+    return searchFilter(this.selectPublic<TheatreTradition>("theatreTraditions"), query, (tradition) => [
+      tradition.title_si,
+      tradition.title_en,
+      tradition.type_si,
+      tradition.historicalBackground_si,
+    ]);
   }
 
   public getTheatreTraditionById(id: string): TheatreTradition | undefined {
@@ -517,26 +394,23 @@ class ContentRepository {
 
   // Glossary
   public getGlossary(query?: string, category?: string): GlossaryTerm[] {
-    let list = this.selectPublic<GlossaryTerm>(this.glossary);
+    let list = this.selectPublic<GlossaryTerm>("glossary");
     if (category) {
       list = list.filter((term) => term.category_si === category);
     }
-    if (query) {
-      list = searchFilter(list, query, (term) => [
-        term.term_si,
-        term.term_en,
-        term.transliteration,
-        term.definition_si,
-        term.category_si,
-      ]);
-    }
-    return list;
+    return searchFilter(list, query, (term) => [
+      term.term_si,
+      term.term_en,
+      term.transliteration,
+      term.definition_si,
+      term.category_si,
+    ]);
   }
 
   // Learning-path dependency closure is enforced by the central publication
   // decision, so every public surface consumes the same result.
   public getLearningPaths(gradeBand?: GradeBandType): LearningPath[] {
-    let list = this.selectPublic<LearningPath>(this.learningPaths);
+    let list = this.selectPublic<LearningPath>("learningPaths");
     if (gradeBand) {
       list = list.filter((path) => path.gradeBands.includes(gradeBand));
     }
@@ -549,7 +423,7 @@ class ContentRepository {
 
   // Quizzes & Exams
   public getQuizzes(): Quiz[] {
-    return this.selectPublic<Quiz>(this.quizzes);
+    return this.selectPublic<Quiz>("quizzes");
   }
 
   public getQuizById(id: string): Quiz | undefined {
@@ -557,7 +431,7 @@ class ContentRepository {
   }
 
   public getExamPapers(gradeBand?: GradeBandType): ExamPaper[] {
-    let list = this.selectPublic<ExamPaper>(this.examPapers);
+    let list = this.selectPublic<ExamPaper>("examPapers");
     if (gradeBand) {
       list = list.filter((paper) => paper.gradeBand === gradeBand);
     }
@@ -569,39 +443,39 @@ class ContentRepository {
   }
 
   public getPublicationSummary(): Record<string, PublicationCollectionSummary> {
-    const fingerprint = this.getPublicationFingerprint();
-    if (fingerprint !== undefined &&
-        this.publicationSummaryCache?.generation === this.publicationCacheGeneration &&
-        this.publicationSummaryCache.fingerprint === fingerprint) {
-      return this.publicationSummaryCache.summary;
-    }
-
-    const learningPaths = this.summarize(this.learningPaths);
+    const context = createPublicationEvaluationContext();
+    const { catalogs } = context;
+    const learningPaths = this.summarize(catalogs.learningPaths, context);
     const summary = {
-      lessons: this.summarize(this.lessons),
-      ragas: this.summarize(this.ragas),
-      talas: this.summarize(this.talas),
-      instruments: this.summarize(this.instruments),
-      culturalTraditions: this.summarize(this.culturalTraditions),
-      theatreTraditions: this.summarize(this.theatreTraditions),
-      glossary: this.summarize(this.glossary),
+      lessons: this.summarize(catalogs.lessons, context),
+      ragas: this.summarize(catalogs.ragas, context),
+      talas: this.summarize(catalogs.talas, context),
+      instruments: this.summarize(catalogs.instruments, context),
+      culturalTraditions: this.summarize(catalogs.culturalTraditions, context),
+      theatreTraditions: this.summarize(catalogs.theatreTraditions, context),
+      glossary: this.summarize(catalogs.glossary, context),
       learningPaths,
-      quizzes: this.summarize(this.quizzes),
-      exams: this.summarize(this.examPapers),
+      quizzes: this.summarize(catalogs.quizzes, context),
+      exams: this.summarize(catalogs.examPapers, context),
     };
-    const frozenSummary = this.freezePublicationSummary(summary);
-    if (fingerprint !== undefined) {
-      this.publicationSummaryCache = {
-        generation: this.publicationCacheGeneration,
-        fingerprint,
-        summary: frozenSummary,
-      };
-    }
-    return frozenSummary;
+    return this.freezePublicationSummary(summary);
   }
 
   public getSourceDocumentSummary(sourceId: string): SourceDocumentSummary {
     return getSourceDocumentSummary(sourceId);
+  }
+
+  /** One immutable evidence/catalog capture for a complete public search. */
+  public getPublicSearchCatalogs(): PublicSearchCatalogs {
+    const context = createPublicationEvaluationContext();
+    return {
+      lessons: this.selectPublic<Lesson>("lessons", context),
+      ragas: this.selectPublic<Raga>("ragas", context),
+      talas: this.selectPublic<Tala>("talas", context),
+      instruments: this.selectPublic<Instrument>("instruments", context),
+      glossary: this.selectPublic<GlossaryTerm>("glossary", context),
+      culturalTraditions: this.selectPublic<CulturalTradition>("culturalTraditions", context),
+    };
   }
 
   public getPublicGradeBands(): readonly string[] {
@@ -637,7 +511,6 @@ class ContentRepository {
     if (!isReviewMetadata(nextMetadata)) return false;
     lesson.reviewMetadata = nextMetadata;
     lesson.published = isPublished;
-    this.invalidatePublicationCache();
     return true;
   }
 
@@ -672,7 +545,6 @@ class ContentRepository {
     if (!isReviewMetadata(nextMetadata)) return false;
     lesson.reviewMetadata = nextMetadata;
     lesson.published = newStatus === "Published";
-    this.invalidatePublicationCache();
     return true;
   }
 }

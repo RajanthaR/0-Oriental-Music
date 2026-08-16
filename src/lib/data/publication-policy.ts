@@ -61,6 +61,7 @@ export type PublicationReasonCode =
   | "field-disposition-needs-review"
   | "dependent-entity-unavailable"
   | "dependency-cycle"
+  | "duplicate-record-id"
   | "malformed-record"
   | "unknown-record-kind"
   | SourceEvidenceFailureCode;
@@ -133,14 +134,65 @@ type SourceDocumentRecord = {
   reviewStatus: string;
 };
 
-const sourceDocuments = sourceDocumentsData as SourceDocumentRecord[];
-
-const sourcePageQuality = sourcePageQualityData as Array<{
+type SourcePageQualityRecord = {
   documentSlug: string;
   pageNumber: number;
   confidence: EvidenceQuality;
   hasSinhalaText: boolean;
-}>;
+};
+
+type PublicationCatalogSnapshot = {
+  sources: unknown[];
+  lessons: unknown[];
+  ragas: unknown[];
+  talas: unknown[];
+  instruments: unknown[];
+  culturalTraditions: unknown[];
+  theatreTraditions: unknown[];
+  glossary: unknown[];
+  learningPaths: unknown[];
+  quizzes: unknown[];
+  examPapers: unknown[];
+};
+
+/**
+ * All decisions belonging to one public operation share these detached
+ * inputs.  This prevents identity, evidence, dependency, and projection
+ * code from observing different versions of caller-owned or mutable catalog
+ * data.
+ */
+export interface PublicationEvaluationContext {
+  catalogs: PublicationCatalogSnapshot;
+  sourceDocuments: SourceDocumentRecord[];
+  sourcePageQuality: SourcePageQualityRecord[];
+  musicalCoreFieldDispositions: unknown;
+  knownKinds: Map<string, ContentEntityKind | "ambiguous">;
+  snapshots: WeakMap<object, Record<string, unknown>>;
+  stack: Set<string>;
+  memo: WeakMap<object, PublicationDecision>;
+  safe: boolean;
+}
+
+type DependencyRule = {
+  blocking: boolean;
+  catalog: keyof PublicationCatalogSnapshot;
+};
+
+/** One dependency policy for every recognized nested reference. */
+export const DEPENDENCY_FIELD_RULES: Readonly<Record<string, DependencyRule>> = Object.freeze({
+  prerequisites: { blocking: true, catalog: "lessons" },
+  "steps[].lessonId": { blocking: true, catalog: "lessons" },
+  nextRecommendedLessonId: { blocking: false, catalog: "lessons" },
+  quizId: { blocking: false, catalog: "quizzes" },
+  masteryQuizId: { blocking: true, catalog: "quizzes" },
+  nextRecommendedPathId: { blocking: false, catalog: "learningPaths" },
+  talaId: { blocking: true, catalog: "talas" },
+  targetTalaId: { blocking: true, catalog: "talas" },
+  audioTalaId: { blocking: true, catalog: "talas" },
+  ragaId: { blocking: true, catalog: "ragas" },
+  targetRagaId: { blocking: true, catalog: "ragas" },
+  selectedRagaId: { blocking: true, catalog: "ragas" },
+});
 
 type SourceRecord = {
   id: string;
@@ -148,79 +200,131 @@ type SourceRecord = {
   grades: string[];
 };
 
-function getValidatedSourceRecords(): SourceRecord[] {
-  return (sourcesData as unknown[]).flatMap((candidate) =>
+function getValidatedSourceRecords(context: PublicationEvaluationContext): SourceRecord[] {
+  return context.catalogs.sources.flatMap((candidate) =>
     validateContentRecord(candidate, "source").isValid && isRecord(candidate)
       ? [candidate as unknown as SourceRecord]
       : []
   );
 }
 
-function getSourceRecordsById(sourceId: string): SourceRecord[] {
+function getSourceRecordsById(sourceId: string, context: PublicationEvaluationContext): SourceRecord[] {
   const matches: SourceRecord[] = [];
-  for (const candidate of sourcesData as unknown[]) {
+  for (const candidate of context.catalogs.sources) {
     if (!isRecord(candidate) || readOwnDataField(candidate, "id") !== sourceId) continue;
     if (!validateContentRecord(candidate, "source").isValid) continue;
-    const detached = cloneBoundedRecord(candidate);
-    if (detached && isRecord(detached)) matches.push(detached as unknown as SourceRecord);
+    matches.push(candidate as unknown as SourceRecord);
   }
   return matches;
 }
 
-function countSourceRecordsById(sourceId: string): number {
+function countSourceRecordsById(sourceId: string, context: PublicationEvaluationContext): number {
   let count = 0;
-  for (const candidate of sourcesData as unknown[]) {
+  for (const candidate of context.catalogs.sources) {
     if (isRecord(candidate) && readOwnDataField(candidate, "id") === sourceId) count += 1;
   }
   return count;
 }
 
-const KNOWN_KIND_BY_ID = new Map<string, ContentEntityKind | "ambiguous">();
-const registerKnownKinds = (kind: ContentEntityKind, records: unknown[]): void => {
+const RAW_PUBLICATION_CATALOGS: Array<[ContentEntityKind, keyof PublicationCatalogSnapshot, unknown[]]> = [
+  ["lesson", "lessons", lessonsData as unknown[]],
+  ["raga", "ragas", ragasData as unknown[]],
+  ["tala", "talas", talasData as unknown[]],
+  ["instrument", "instruments", instrumentsData as unknown[]],
+  ["cultural-tradition", "culturalTraditions", culturalTraditionsData as unknown[]],
+  ["theatre-tradition", "theatreTraditions", theatreTraditionsData as unknown[]],
+  ["glossary", "glossary", glossaryData as unknown[]],
+  ["learning-path", "learningPaths", learningPathsData as unknown[]],
+  ["quiz", "quizzes", quizzesData as unknown[]],
+  ["exam-paper", "examPapers", examPapersData as unknown[]],
+  ["source", "sources", sourcesData as unknown[]],
+];
+
+function captureEvaluationValue(value: unknown, freezeSnapshot: boolean = true): unknown | undefined {
+  try {
+    const snapshot = cloneBoundedRecord(value);
+    if (snapshot === undefined) return undefined;
+    if (!freezeSnapshot) return snapshot;
+    const pending: object[] = snapshot && typeof snapshot === "object" ? [snapshot] : [];
+    const seen = new WeakSet<object>();
+    while (pending.length > 0) {
+      const current = pending.pop() as object;
+      if (seen.has(current)) continue;
+      seen.add(current);
+      Object.values(current).forEach((child) => {
+        if (child && typeof child === "object") pending.push(child);
+      });
+      Object.freeze(current);
+    }
+    return snapshot;
+  } catch {
+    return undefined;
+  }
+}
+
+function captureEvaluationArray(value: unknown): unknown[] | undefined {
+  const snapshot = captureEvaluationValue(value);
+  return Array.isArray(snapshot) ? snapshot : undefined;
+}
+
+function registerKnownKinds(
+  knownKinds: Map<string, ContentEntityKind | "ambiguous">,
+  kind: ContentEntityKind,
+  records: unknown[],
+): void {
   records.forEach((record) => {
     if (!isRecord(record)) return;
     const id = readOwnDataField(record, "id");
     if (typeof id !== "string" || !id) return;
-    const previous = KNOWN_KIND_BY_ID.get(id);
-    KNOWN_KIND_BY_ID.set(id, previous ? "ambiguous" : kind);
+    const previous = knownKinds.get(id);
+    knownKinds.set(id, previous ? "ambiguous" : kind);
   });
-};
-registerKnownKinds("lesson", lessonsData);
-registerKnownKinds("raga", ragasData);
-registerKnownKinds("tala", talasData);
-registerKnownKinds("instrument", instrumentsData);
-registerKnownKinds("cultural-tradition", culturalTraditionsData);
-registerKnownKinds("theatre-tradition", theatreTraditionsData);
-registerKnownKinds("glossary", glossaryData);
-registerKnownKinds("learning-path", learningPathsData);
-registerKnownKinds("quiz", quizzesData);
-registerKnownKinds("exam-paper", examPapersData);
-registerKnownKinds("source", sourcesData);
-
-const KNOWN_KIND_CATALOGS: Array<[ContentEntityKind, unknown[]]> = [
-  ["lesson", lessonsData], ["raga", ragasData], ["tala", talasData],
-  ["instrument", instrumentsData], ["cultural-tradition", culturalTraditionsData],
-  ["theatre-tradition", theatreTraditionsData], ["glossary", glossaryData],
-  ["learning-path", learningPathsData], ["quiz", quizzesData], ["exam-paper", examPapersData],
-  ["source", sourcesData],
-];
-let knownKindCatalogLengths = KNOWN_KIND_CATALOGS.map(([, records]) => records.length);
-function refreshKnownKindIndexIfCatalogSizesChanged(): void {
-  const lengths = KNOWN_KIND_CATALOGS.map(([, records]) => records.length);
-  if (lengths.every((length, index) => length === knownKindCatalogLengths[index])) return;
-  KNOWN_KIND_BY_ID.clear();
-  KNOWN_KIND_CATALOGS.forEach(([kind, records]) => registerKnownKinds(kind, records));
-  knownKindCatalogLengths = lengths;
 }
 
-function getKnownContentKind(record: unknown): ContentEntityKind | undefined {
+export function createPublicationEvaluationContext(): PublicationEvaluationContext {
+  const capturedCatalogs = {} as PublicationCatalogSnapshot;
+  let safe = true;
+  for (const [, key, rawCatalog] of RAW_PUBLICATION_CATALOGS) {
+    const snapshot = captureEvaluationArray(rawCatalog);
+    if (!snapshot) safe = false;
+    capturedCatalogs[key] = snapshot ?? [];
+  }
+  const capturedDocuments = captureEvaluationArray(sourceDocumentsData);
+  const capturedPageQuality = captureEvaluationArray(sourcePageQualityData);
+  const capturedDispositions = captureEvaluationValue(musicalCoreFieldDispositionsData);
+  if (!capturedDocuments || !capturedPageQuality || capturedDispositions === undefined) safe = false;
+
+  const context: PublicationEvaluationContext = {
+    catalogs: capturedCatalogs,
+    sourceDocuments: (capturedDocuments ?? []) as SourceDocumentRecord[],
+    sourcePageQuality: (capturedPageQuality ?? []) as SourcePageQualityRecord[],
+    musicalCoreFieldDispositions: capturedDispositions,
+    knownKinds: new Map<string, ContentEntityKind | "ambiguous">(),
+    snapshots: new WeakMap<object, Record<string, unknown>>(),
+    stack: new Set<string>(),
+    memo: new WeakMap<object, PublicationDecision>(),
+    safe,
+  };
+
+  for (const [kind, key] of RAW_PUBLICATION_CATALOGS) {
+    const records = context.catalogs[key];
+    registerKnownKinds(context.knownKinds, kind, records);
+    records.forEach((record) => {
+      if (isRecord(record)) context.snapshots.set(record, record);
+    });
+  }
+  return context;
+}
+
+function getKnownContentKind(
+  record: unknown,
+  context: PublicationEvaluationContext,
+): ContentEntityKind | undefined {
   if (!isRecord(record)) return undefined;
   const id = readOwnDataField(record, "id");
   if (typeof id !== "string" || !id) return undefined;
-  refreshKnownKindIndexIfCatalogSizesChanged();
-  const known = KNOWN_KIND_BY_ID.get(id);
-  if (known === "ambiguous") return undefined;
-  return known;
+  const known = context.knownKinds.get(id);
+  return known === "ambiguous" ? undefined : known;
 }
 
 type PublicationRecordShape = {
@@ -293,14 +397,14 @@ type SourceResolution =
   | { status: "ambiguous-document" }
   | { status: "found"; document: SourceDocumentRecord };
 
-function resolveSourceDocument(sourceId: string): SourceResolution {
-  if (countSourceRecordsById(sourceId) > 1) return { status: "ambiguous-source-record" };
-  const sourceMatches = getSourceRecordsById(sourceId);
+function resolveSourceDocument(sourceId: string, context: PublicationEvaluationContext): SourceResolution {
+  if (countSourceRecordsById(sourceId, context) > 1) return { status: "ambiguous-source-record" };
+  const sourceMatches = getSourceRecordsById(sourceId, context);
   if (sourceMatches.length === 0) return { status: "missing-source" };
   if (sourceMatches.length > 1) return { status: "ambiguous-source-record" };
   const source = sourceMatches[0];
 
-  const matches = sourceDocuments.filter(
+  const matches = context.sourceDocuments.filter(
     (document) => document.originalFilename === source.originalFilename
   );
   if (matches.length === 0) return { status: "missing-document" };
@@ -359,8 +463,8 @@ function explicitPageReferences(pageOrSection: string, expectedFilename: string)
 }
 
 
-function qualityForPages(documentSlug: string, pageNumbers: number[]): EvidenceQuality {
-  const qualities = sourcePageQuality
+function qualityForPages(documentSlug: string, pageNumbers: number[], context: PublicationEvaluationContext): EvidenceQuality {
+  const qualities = context.sourcePageQuality
     .filter((page) => page.documentSlug === documentSlug && pageNumbers.includes(page.pageNumber))
     .map((page) => page.confidence);
 
@@ -373,8 +477,8 @@ function qualityForPages(documentSlug: string, pageNumbers: number[]): EvidenceQ
   return "A";
 }
 
-function hasReadablePages(documentSlug: string, pageNumbers: number[]): boolean {
-  const citedPages = sourcePageQuality.filter(
+function hasReadablePages(documentSlug: string, pageNumbers: number[], context: PublicationEvaluationContext): boolean {
+  const citedPages = context.sourcePageQuality.filter(
     (page) => page.documentSlug === documentSlug && pageNumbers.includes(page.pageNumber)
   );
   return (
@@ -427,8 +531,11 @@ function getGradeBands(value: PublicationRecordShape): string[] {
   return Array.from(bands);
 }
 
-export function getSourceDocumentSummary(sourceId: string): SourceDocumentSummary {
-  const resolution = resolveSourceDocument(sourceId);
+export function getSourceDocumentSummary(
+  sourceId: string,
+  context: PublicationEvaluationContext = createPublicationEvaluationContext(),
+): SourceDocumentSummary {
+  const resolution = resolveSourceDocument(sourceId, context);
   if (resolution.status === "missing-source") {
     return {
       reviewStatus: "No matching source record",
@@ -450,7 +557,7 @@ export function getSourceDocumentSummary(sourceId: string): SourceDocumentSummar
   }
 
   const document = resolution.document;
-  const pages = sourcePageQuality.filter((page) => page.documentSlug === document.slug);
+  const pages = context.sourcePageQuality.filter((page) => page.documentSlug === document.slug);
   const quality = pages.length === 0
     ? "missing"
     : pages.some((page) => page.confidence === "D")
@@ -471,20 +578,22 @@ export function getSourceDocumentSummary(sourceId: string): SourceDocumentSummar
 }
 
 export function getSourceCorpusInventory() {
-  const qualityCounts = sourcePageQuality.reduce<Record<string, number>>((counts, page) => {
+  const context = createPublicationEvaluationContext();
+  const qualityCounts = context.sourcePageQuality.reduce<Record<string, number>>((counts, page) => {
     counts[page.confidence] = (counts[page.confidence] || 0) + 1;
     return counts;
   }, {});
   return {
-    sourceRecords: getValidatedSourceRecords().length,
-    sourceDocuments: sourceDocuments.length,
-    sourcePages: sourceDocuments.reduce((sum, document) => sum + document.pageCount, 0),
+    sourceRecords: getValidatedSourceRecords(context).length,
+    sourceDocuments: context.sourceDocuments.length,
+    sourcePages: context.sourceDocuments.reduce((sum, document) => sum + document.pageCount, 0),
     qualityCounts,
   };
 }
 
 export function evaluateSourceReference(
-  reference: SourceReference | undefined
+  reference: SourceReference | undefined,
+  context: PublicationEvaluationContext = createPublicationEvaluationContext(),
 ): SourceEvidenceDecision {
   try {
     const sourceIdValue = isSourceReference(reference) ? readOwnDataField(reference, "sourceId") : undefined;
@@ -501,7 +610,7 @@ export function evaluateSourceReference(
       };
     }
 
-    const resolution = resolveSourceDocument(sourceId);
+    const resolution = resolveSourceDocument(sourceId, context);
     if (resolution.status !== "found") {
       const isAmbiguous = resolution.status === "ambiguous-document" || resolution.status === "ambiguous-source-record";
       return {
@@ -540,7 +649,7 @@ export function evaluateSourceReference(
 
     const pageNumbers = locator.pageNumbers;
     const inRangePages = pageNumbers.filter((page) => page <= document.pageCount);
-    const quality = qualityForPages(document.slug, inRangePages);
+    const quality = qualityForPages(document.slug, inRangePages, context);
 
     if (locator.malformed || pageNumbers.length === 0) {
       return {
@@ -581,7 +690,7 @@ export function evaluateSourceReference(
       };
     }
 
-    if (!hasReadablePages(document.slug, inRangePages)) {
+    if (!hasReadablePages(document.slug, inRangePages, context)) {
       return {
         sourceId,
         documentId: document.id,
@@ -651,29 +760,34 @@ function bandContainsSourceGrade(band: string, sourceGrades: string[]): boolean 
   });
 }
 
-function gradeScopeMatchesSource(gradeBands: string[], sourceId: string | undefined): boolean {
+function gradeScopeMatchesSource(
+  gradeBands: string[],
+  sourceId: string | undefined,
+  context: PublicationEvaluationContext,
+): boolean {
   if (!sourceId) return false;
-  if (countSourceRecordsById(sourceId) !== 1) return false;
-  const matches = getSourceRecordsById(sourceId);
+  if (countSourceRecordsById(sourceId, context) !== 1) return false;
+  const matches = getSourceRecordsById(sourceId, context);
   if (matches.length !== 1 || matches[0].grades.length === 0) return false;
   const source = matches[0];
   return gradeBands.every((band) => bandContainsSourceGrade(band, source.grades));
 }
 
-export function getTalaFieldDisposition(talaOrId: string | unknown): TalaFieldDisposition | undefined {
+export function getTalaFieldDisposition(
+  talaOrId: string | unknown,
+  context: PublicationEvaluationContext = createPublicationEvaluationContext(),
+): TalaFieldDisposition | undefined {
   try {
     const supplied = typeof talaOrId === "string" ? undefined : getRecordShape(talaOrId);
     const suppliedId = readOwnDataField(supplied, "id");
     const talaId = typeof talaOrId === "string" ? talaOrId : typeof suppliedId === "string" ? suppliedId : "";
-    const entry = talaFieldDispositions.talas.find((candidate) => candidate.talaId === talaId);
+    const registry = isRecord(context.musicalCoreFieldDispositions)
+      ? context.musicalCoreFieldDispositions as typeof talaFieldDispositions
+      : undefined;
+    const entries = registry && Array.isArray(registry.talas) ? registry.talas : [];
+    const entry = entries.find((candidate) => candidate.talaId === talaId);
     if (!entry) return undefined;
-  const tala = (supplied ?? (talasData as Array<{
-    id: string;
-    context_si?: string;
-    contextSourceReference?: SourceReference;
-    theka_si: string;
-    bols: Array<{ matra: number; bol_si: string }>;
-  }>).find((candidate) => candidate.id === talaId)) as {
+  const tala = (supplied ?? context.catalogs.talas.find((candidate) => readOwnDataField(candidate, "id") === talaId)) as {
     id?: unknown;
     context_si?: unknown;
     contextSourceReference?: unknown;
@@ -682,7 +796,7 @@ export function getTalaFieldDisposition(talaOrId: string | unknown): TalaFieldDi
   } | undefined;
   const hasExactEvidence = (field: TalaFieldDispositionField): boolean =>
     field.quality === "A" || field.quality === "B"
-      ? evaluateSourceReference(field.sourceReference).supportable
+      ? evaluateSourceReference(field.sourceReference, context).supportable
       : false;
   const contextVerified = entry.context.status === "verified" && (
     entry.context.scope === "not-claimed"
@@ -698,7 +812,8 @@ export function getTalaFieldDisposition(talaOrId: string | unknown): TalaFieldDi
   );
   const allRequiredFieldsVerified =
     Boolean(tala) &&
-    !talaFieldDispositions.unclosedRequiredFields.includes("structure") &&
+    Boolean(registry) &&
+    !registry?.unclosedRequiredFields.includes("structure") &&
     contextVerified &&
     entry.theka.status === "verified" &&
     entry.theka.value === tala?.theka_si &&
@@ -724,7 +839,7 @@ function collectDependencyDispositions(
   path: string,
   seen: WeakSet<object>,
   results: NestedPublicationDisposition[],
-  decisionContext: PublicationDecisionContext,
+  decisionContext: PublicationEvaluationContext,
   graphSafety?: ReturnType<typeof inspectGraph>
 ): void {
   if (!value || typeof value !== "object" || seen.has(value)) return;
@@ -773,41 +888,39 @@ function collectDependencyDispositions(
     const record = current.value as Record<string, unknown>;
     const prefix = current.path ? `${current.path}.` : "";
     const prerequisites = readOwnDataField(record, "prerequisites");
+    const prerequisiteRule = DEPENDENCY_FIELD_RULES.prerequisites;
     if (Array.isArray(prerequisites)) {
-      prerequisites.forEach((dependencyId, index) => addDependency(dependencyId, `${prefix}prerequisites[${index}]`, true, lessonsData));
+      prerequisites.forEach((dependencyId, index) => addDependency(
+        dependencyId,
+        `${prefix}prerequisites[${index}]`,
+        prerequisiteRule.blocking,
+        decisionContext.catalogs[prerequisiteRule.catalog],
+      ));
     }
     const steps = readOwnDataField(record, "steps");
+    const stepRule = DEPENDENCY_FIELD_RULES["steps[].lessonId"];
     if (Array.isArray(steps)) {
       steps.forEach((step, index) => {
         const lessonId = step && typeof step === "object" && !Array.isArray(step)
           ? readOwnDataField(step, "lessonId")
           : undefined;
-        addDependency(lessonId, `${prefix}steps[${index}].lessonId`, true, lessonsData);
+        addDependency(
+          lessonId,
+          `${prefix}steps[${index}].lessonId`,
+          stepRule.blocking,
+          decisionContext.catalogs[stepRule.catalog],
+        );
       });
     }
     const keys = Object.keys(record);
-    const ownKeys = new Set(keys);
-    if (ownKeys.has("nextRecommendedLessonId")) {
-      addDependency(readOwnDataField(record, "nextRecommendedLessonId"), `${prefix}nextRecommendedLessonId`, false, lessonsData);
-    }
-    if (ownKeys.has("quizId")) {
-      addDependency(readOwnDataField(record, "quizId"), `${prefix}quizId`, false, quizzesData);
-    }
-    if (ownKeys.has("masteryQuizId")) {
-      addDependency(readOwnDataField(record, "masteryQuizId"), `${prefix}masteryQuizId`, true, quizzesData);
-    }
-    if (ownKeys.has("nextRecommendedPathId")) {
-      addDependency(readOwnDataField(record, "nextRecommendedPathId"), `${prefix}nextRecommendedPathId`, false, learningPathsData);
-    }
-
     for (const key of keys) {
-      if (["prerequisites", "steps", "nextRecommendedLessonId", "quizId", "masteryQuizId", "nextRecommendedPathId"].includes(key)) continue;
+      if (key === "prerequisites" || key === "steps") continue;
       const child = readOwnDataField(record, key);
       const childPath = `${prefix}${key}`;
-      const recognizedTala = ["talaId", "targetTalaId", "audioTalaId"].includes(key);
-      const recognizedRaga = ["ragaId", "targetRagaId", "selectedRagaId"].includes(key);
-      if (recognizedTala) addDependency(child, childPath, true, talasData);
-      if (recognizedRaga) addDependency(child, childPath, true, ragasData);
+      const dependencyRule = DEPENDENCY_FIELD_RULES[key];
+      if (dependencyRule) {
+        addDependency(child, childPath, dependencyRule.blocking, decisionContext.catalogs[dependencyRule.catalog]);
+      }
       if (child && typeof child === "object") pending.push({ value: child, path: childPath, depth: current.depth + 1 });
     }
   }
@@ -817,9 +930,10 @@ function hasCanonicalRuntimeShape(
   value: unknown,
   knownKind?: ContentEntityKind,
   graphSafety?: ReturnType<typeof inspectGraph>,
-  knownSnapshot?: unknown
+  knownSnapshot?: unknown,
+  context?: PublicationEvaluationContext,
 ): boolean {
-  const kind = knownKind ?? getKnownContentKind(value);
+  const kind = knownKind ?? (context ? getKnownContentKind(value, context) : undefined);
   return !!kind && validateContentRecord(value, kind, graphSafety, knownSnapshot).isValid;
 }
 
@@ -829,7 +943,10 @@ function hasCanonicalRuntimeShape(
  * reduced shape would let callers skip kind, metadata, graph, and dependency
  * checks.
  */
-function getBasePublicationDecision(input: PublicationInput): PublicationDecision {
+function getBasePublicationDecision(
+  input: PublicationInput,
+  context: PublicationEvaluationContext,
+): PublicationDecision {
   try {
     const value = isRecord(input) ? input : {};
     const idValue = readOwnDataField(value, "id");
@@ -837,7 +954,7 @@ function getBasePublicationDecision(input: PublicationInput): PublicationDecisio
     const gradeBands = getGradeBands(value);
     const referenceValue = readOwnDataField(value, "sourceReference");
     const sourceReference = isSourceReference(referenceValue) ? referenceValue : undefined;
-    const sourceEvidence = evaluateSourceReference(sourceReference);
+    const sourceEvidence = evaluateSourceReference(sourceReference, context);
     const reasonCodes: PublicationReasonCode[] = [];
 
     if (hasUnsupportedGrade(gradeBands) || (gradeBands.length > 0 && !hasPublicGrade(gradeBands))) {
@@ -845,7 +962,7 @@ function getBasePublicationDecision(input: PublicationInput): PublicationDecisio
     }
     if (KNOWN_QUARANTINED_ENTITY_IDS.has(id)) reasonCodes.push("known-forensic-issue");
     if (gradeBands.length === 0) reasonCodes.push("missing-grade-scope");
-    if (gradeBands.length > 0 && !gradeScopeMatchesSource(gradeBands, sourceReference ? readOwnDataField(sourceReference, "sourceId") as string : undefined)) {
+    if (gradeBands.length > 0 && !gradeScopeMatchesSource(gradeBands, sourceReference ? readOwnDataField(sourceReference, "sourceId") as string : undefined, context)) {
       reasonCodes.push("source-grade-mismatch");
     }
     if (sourceEvidence.reasonCode !== "supportable") reasonCodes.push(sourceEvidence.reasonCode);
@@ -854,7 +971,7 @@ function getBasePublicationDecision(input: PublicationInput): PublicationDecisio
     const quarantined = hasUnsupportedGrade(gradeBands) || KNOWN_QUARANTINED_ENTITY_IDS.has(id);
     const publicByEvidence =
       hasPublicGrade(gradeBands) &&
-      gradeScopeMatchesSource(gradeBands, typeof sourceId === "string" ? sourceId : undefined) &&
+      gradeScopeMatchesSource(gradeBands, typeof sourceId === "string" ? sourceId : undefined, context) &&
       sourceEvidence.supportable;
     const state: PublicationState = quarantined
       ? "quarantined"
@@ -873,11 +990,14 @@ function getBasePublicationDecision(input: PublicationInput): PublicationDecisio
       withheldFields: [],
     };
   } catch {
-    return failClosedRecordDecision(["malformed-record"]);
+    return failClosedRecordDecision(["malformed-record"], context);
   }
 }
 
-function getQuizContainerPublicationDecision(record: unknown): PublicationDecision {
+function getQuizContainerPublicationDecision(
+  record: unknown,
+  context: PublicationEvaluationContext,
+): PublicationDecision {
   const value = getRecordShape(record);
   const rawId = readOwnDataField(value, "id");
   const id = isNonBlankString(rawId) ? rawId : "";
@@ -892,41 +1012,35 @@ function getQuizContainerPublicationDecision(record: unknown): PublicationDecisi
     isPublic,
     gradeBands,
     reasonCodes: Array.from(new Set(reasonCodes)),
-    sourceEvidence: evaluateSourceReference(undefined),
+    sourceEvidence: evaluateSourceReference(undefined, context),
     reviewState: "needs-review",
     nestedDispositions: [],
     withheldFields: [],
   };
 }
 
-function failClosedRecordDecision(reasonCodes: PublicationReasonCode[]): PublicationDecision {
+function failClosedRecordDecision(
+  reasonCodes: PublicationReasonCode[],
+  context?: PublicationEvaluationContext,
+): PublicationDecision {
   return {
     state: "needs-review",
     isPublic: false,
     gradeBands: [],
     reasonCodes: Array.from(new Set(reasonCodes)),
-    sourceEvidence: evaluateSourceReference(undefined),
+    sourceEvidence: evaluateSourceReference(undefined, context),
     reviewState: "needs-review",
     nestedDispositions: [],
     withheldFields: [],
   };
 }
 
-interface PublicationDecisionContext {
-  stack: Set<string>;
-  memo: WeakMap<object, PublicationDecision>;
-}
-
-function createPublicationDecisionContext(): PublicationDecisionContext {
-  return {
-    stack: new Set<string>(),
-    memo: new WeakMap<object, PublicationDecision>(),
-  };
-}
+type PublicationDecisionContext = PublicationEvaluationContext;
 
 function getRecordPublicationDecisionInternal(
   record: unknown,
   decisionContext: PublicationDecisionContext,
+  knownSnapshot?: unknown,
 ): PublicationDecision {
   const originalObject = record !== null && typeof record === "object" ? record as object : undefined;
   const cached = originalObject ? decisionContext.memo.get(originalObject) : undefined;
@@ -935,21 +1049,24 @@ function getRecordPublicationDecisionInternal(
     if (originalObject && cacheable) decisionContext.memo.set(originalObject, decision);
     return decision;
   };
+  if (!decisionContext.safe) return finish(failClosedRecordDecision(["malformed-record"], decisionContext));
   const graphSafety = inspectGraph(record);
-  if (!graphSafety.safe) return finish(failClosedRecordDecision(["malformed-record"]));
-  const safeRecord = cloneBoundedRecord(record, graphSafety);
-  if (!safeRecord || !isRecord(safeRecord)) return finish(failClosedRecordDecision(["malformed-record"]));
-  const knownKind = getKnownContentKind(safeRecord);
-  if (!knownKind) return finish(failClosedRecordDecision(["unknown-record-kind", "malformed-record"]));
+  if (!graphSafety.safe) return finish(failClosedRecordDecision(["malformed-record"], decisionContext));
+  const safeRecord = (originalObject && decisionContext.snapshots.get(originalObject)) ??
+    knownSnapshot ?? cloneBoundedRecord(record, graphSafety);
+  if (!safeRecord || !isRecord(safeRecord)) return finish(failClosedRecordDecision(["malformed-record"], decisionContext));
+  if (originalObject) decisionContext.snapshots.set(originalObject, safeRecord as Record<string, unknown>);
+  const knownKind = getKnownContentKind(safeRecord, decisionContext);
+  if (!knownKind) return finish(failClosedRecordDecision(["unknown-record-kind", "malformed-record"], decisionContext));
 
-  const hasValidRuntimeShape = hasCanonicalRuntimeShape(safeRecord, knownKind, graphSafety, safeRecord);
+  const hasValidRuntimeShape = hasCanonicalRuntimeShape(safeRecord, knownKind, graphSafety, safeRecord, decisionContext);
   const value = getRecordShape(safeRecord);
   const rawRecordId = readOwnDataField(value, "id");
   const recordId = typeof rawRecordId === "string" ? rawRecordId : "";
-  const isQuiz = (quizzesData as Array<{ id: string }>).some((quiz) => quiz.id === recordId);
+  const isQuiz = decisionContext.catalogs.quizzes.some((quiz) => readOwnDataField(quiz, "id") === recordId);
   const baseDecision = isQuiz
-    ? getQuizContainerPublicationDecision(safeRecord)
-    : getBasePublicationDecision(toPublicationInput(safeRecord));
+    ? getQuizContainerPublicationDecision(safeRecord, decisionContext)
+    : getBasePublicationDecision(toPublicationInput(safeRecord), decisionContext);
   const reasonCodes = new Set(baseDecision.reasonCodes);
   const nestedDispositions = [...baseDecision.nestedDispositions];
   const withheldFields = [...baseDecision.withheldFields];
@@ -976,7 +1093,7 @@ function getRecordPublicationDecisionInternal(
     reasonCodes.add("unsupported-grade");
   }
 
-  const contextDecision = getContextClaimPublicationDecision(safeRecord);
+  const contextDecision = getContextClaimPublicationDecision(safeRecord, decisionContext);
   if (contextDecision.present && !contextDecision.isPublic) {
     if (contextDecision.reasonCode === "no-context-claim" || contextDecision.reasonCode === "unpaired-context-claim") {
       reasonCodes.add("unpaired-context-claim");
@@ -986,8 +1103,8 @@ function getRecordPublicationDecisionInternal(
     withheldFields.push("context_si", "contextSourceReference");
   }
 
-  const isTalaRecord = (talasData as Array<{ id: string }>).some((tala) => tala.id === recordId);
-  const talaDisposition = getTalaFieldDisposition(safeRecord);
+  const isTalaRecord = decisionContext.catalogs.talas.some((tala) => readOwnDataField(tala, "id") === recordId);
+  const talaDisposition = getTalaFieldDisposition(safeRecord, decisionContext);
   if (isTalaRecord && (!talaDisposition || !talaDisposition.allRequiredFieldsVerified)) {
     reasonCodes.add("field-disposition-needs-review");
     withheldFields.push("context", "theka", "bols");
@@ -1006,7 +1123,7 @@ function getRecordPublicationDecisionInternal(
     reasonCodes.add("dependency-cycle");
   }
 
-  const isExam = (examPapersData as Array<{ id: string }>).some((paper) => paper.id === recordId);
+  const isExam = decisionContext.catalogs.examPapers.some((paper) => readOwnDataField(paper, "id") === recordId);
   if (!isQuiz && !isExam) {
     const quarantined = baseDecision.state === "quarantined";
     const contextIsPublic = !contextDecision.present || contextDecision.isPublic;
@@ -1027,11 +1144,11 @@ function getRecordPublicationDecisionInternal(
 
   const lessonId = readOwnDataField(value, "lessonId");
   const parent = isQuiz && typeof lessonId === "string"
-    ? (lessonsData as unknown as Array<{ id: string }>).find((lesson) => lesson.id === lessonId)
+    ? decisionContext.catalogs.lessons.find((lesson) => readOwnDataField(lesson, "id") === lessonId)
     : undefined;
   const parentIsActiveBacklink = isQuiz && typeof lessonId === "string" && decisionContext.stack.has(lessonId);
   const parentIsPublic = !isQuiz || (!!parent && (
-    parentIsActiveBacklink || getRecordPublicationDecisionInternal(parent, decisionContext).isPublic
+    parentIsActiveBacklink || getRecordPublicationDecisionInternal(parent, decisionContext, parent).isPublic
   ));
   if (isQuiz && !parentIsPublic) reasonCodes.add("parent-lesson-unavailable");
   const nestedGroups = isQuiz
@@ -1049,7 +1166,7 @@ function getRecordPublicationDecisionInternal(
     const hasExplicitGrades = isCanonicalGradeBandArray(readOwnDataField(questionShape, "gradeBands"));
     const hasDirectSource = isSourceReference(readOwnDataField(questionShape, "sourceReference"));
     const hasValidQuestionShape = hasCanonicalQuestionShape(question);
-    const decision = getBasePublicationDecision(toPublicationInput(question));
+    const decision = getBasePublicationDecision(toPublicationInput(question), decisionContext);
     nestedDispositions.push({
       path: `${group.path}[${index}]`,
       isPublic: decision.isPublic,
@@ -1079,28 +1196,68 @@ function getRecordPublicationDecisionInternal(
 }
 
 export function getRecordPublicationDecision(record: unknown): PublicationDecision {
-  try {
-    return getRecordPublicationDecisions([record])[0] ?? failClosedRecordDecision(["malformed-record"]);
-  } catch {
-    return failClosedRecordDecision(["malformed-record"]);
-  }
+  return getRecordPublicationDecisions([record])[0] ??
+    failClosedRecordDecision(["malformed-record"], createPublicationEvaluationContext());
 }
 
 /**
- * Evaluates a bounded collection with one request-local memo. The memo never
- * survives the call, so later raw-data mutations are revalidated while shared
- * dependency graphs are evaluated only once per repository read.
+ * Structured result for the checked batch boundary.  The public decision-list
+ * wrapper below intentionally returns an empty list for malformed outer
+ * containers so callers cannot mistake partial evaluation for a complete one.
  */
-export function getRecordPublicationDecisions(records: readonly unknown[]): PublicationDecision[] {
-  const decisionContext = createPublicationDecisionContext();
-  return records.map((record) => {
-    const decision = getRecordPublicationDecisionInternal(record, decisionContext);
-    if (!decision.isPublic) return decision;
-    return {
-      ...decision,
-      publicProjection: sanitizePublicRecordWithDecision(record, decision),
-    };
-  });
+export interface PublicationBatchEvaluation {
+  isValid: boolean;
+  decisions: PublicationDecision[];
+  reasonCode?: "malformed-record";
+}
+
+export function evaluatePublicationBatch(
+  records: unknown,
+  evaluationContext: PublicationEvaluationContext = createPublicationEvaluationContext(),
+): PublicationBatchEvaluation {
+  try {
+    if (!Array.isArray(records)) {
+      return { isValid: false, decisions: [], reasonCode: "malformed-record" };
+    }
+    const trustedSnapshot = Object.values(evaluationContext.catalogs).find((catalog) => catalog === records);
+    const snapshot = trustedSnapshot ?? captureEvaluationArray(records);
+    if (!snapshot) return { isValid: false, decisions: [], reasonCode: "malformed-record" };
+    const seenIds = new Set<string>();
+    const hasDuplicateId = snapshot.some((record) => {
+      if (!isRecord(record)) return false;
+      const id = readOwnDataField(record, "id");
+      if (typeof id !== "string" || !id.trim()) return false;
+      if (seenIds.has(id)) return true;
+      seenIds.add(id);
+      return false;
+    });
+    if (hasDuplicateId) {
+      return {
+        isValid: true,
+        decisions: snapshot.map(() => failClosedRecordDecision(["duplicate-record-id"], evaluationContext)),
+      };
+    }
+    const decisions = snapshot.map((record) => {
+      if (isRecord(record)) evaluationContext.snapshots.set(record, record);
+      const decision = getRecordPublicationDecisionInternal(record, evaluationContext, record);
+      if (!decision.isPublic) return decision;
+      return {
+        ...decision,
+        publicProjection: sanitizePublicRecordWithDecision(record, decision, evaluationContext),
+      };
+    });
+    return { isValid: true, decisions };
+  } catch {
+    return { isValid: false, decisions: [], reasonCode: "malformed-record" };
+  }
+}
+
+export function getRecordPublicationDecisions(
+  records: unknown,
+  evaluationContext?: PublicationEvaluationContext,
+): PublicationDecision[] {
+  const evaluation = evaluatePublicationBatch(records, evaluationContext ?? createPublicationEvaluationContext());
+  return evaluation.isValid ? evaluation.decisions : [];
 }
 
 /**
@@ -1110,16 +1267,15 @@ export function getRecordPublicationDecisions(records: readonly unknown[]): Publ
  * gates.
  */
 export function getPublicationDecision(record: unknown): PublicationDecision {
-  try {
-    return getRecordPublicationDecision(record);
-  } catch {
-    return failClosedRecordDecision(["malformed-record"]);
-  }
+  return getRecordPublicationDecision(record);
 }
 
 export const getQuizPublicationDecision = getRecordPublicationDecision;
 
-export function getContextClaimPublicationDecision(record: unknown): ContextClaimPublicationDecision {
+export function getContextClaimPublicationDecision(
+  record: unknown,
+  context: PublicationEvaluationContext = createPublicationEvaluationContext(),
+): ContextClaimPublicationDecision {
   try {
     const value = getRecordShape(record);
     const contextValue = readOwnDataField(value, "context_si");
@@ -1137,7 +1293,7 @@ export function getContextClaimPublicationDecision(record: unknown): ContextClai
       }
     };
     const present = hasOwnField("context_si") || hasOwnField("contextSourceReference");
-    const sourceEvidence = evaluateSourceReference(contextSourceReference);
+    const sourceEvidence = evaluateSourceReference(contextSourceReference, context);
     if (!present) {
       return { present: false, isPublic: false, reasonCode: "no-context-claim", sourceEvidence };
     }
@@ -1146,7 +1302,7 @@ export function getContextClaimPublicationDecision(record: unknown): ContextClai
     }
     const declaredGrades = getGradeBands(value);
     const sourceId = readOwnDataField(contextSourceReference, "sourceId");
-    if (!gradeScopeMatchesSource(declaredGrades, typeof sourceId === "string" ? sourceId : undefined)) {
+    if (!gradeScopeMatchesSource(declaredGrades, typeof sourceId === "string" ? sourceId : undefined, context)) {
       return {
         present: true,
         isPublic: false,
@@ -1165,7 +1321,7 @@ export function getContextClaimPublicationDecision(record: unknown): ContextClai
       present: true,
       isPublic: false,
       reasonCode: "unpaired-context-claim",
-      sourceEvidence: evaluateSourceReference(undefined),
+      sourceEvidence: evaluateSourceReference(undefined, context),
     };
   }
 }
@@ -1175,26 +1331,25 @@ export function createUnverifiedReviewMetadata(): ReviewMetadata {
 }
 
 export function sanitizePublicRecord<T>(record: T): T {
-  if (!record || typeof record !== "object") return record;
-  try {
-    const decision = getRecordPublicationDecisionInternal(record, createPublicationDecisionContext());
-    return sanitizePublicRecordWithDecision(record, decision);
-  } catch {
-    return {} as T;
-  }
+  const decisions = getRecordPublicationDecisions([record]);
+  return (decisions[0]?.publicProjection ?? {}) as T;
 }
 
-function sanitizePublicRecordWithDecision<T>(record: T, decision: PublicationDecision): T {
+function sanitizePublicRecordWithDecision<T>(
+  record: T,
+  decision: PublicationDecision,
+  context: PublicationEvaluationContext,
+): T {
   if (!record || typeof record !== "object" || !decision.isPublic) return {} as T;
   try {
-    const kind = getKnownContentKind(record);
+    const kind = getKnownContentKind(record, context);
     if (!kind) return {} as T;
     const projected = projectPublicRecord(record, kind);
     const value = (isRecord(projected) ? projected : undefined) as Record<string, unknown> | undefined;
     if (!value) return {} as T;
     if (isMetadataBearingKind(kind)) value.reviewMetadata = createUnverifiedReviewMetadata();
     if ("published" in value) value.published = false;
-    const contextDecision = getContextClaimPublicationDecision(record);
+    const contextDecision = getContextClaimPublicationDecision(record, context);
     if (contextDecision.present && !contextDecision.isPublic) {
       delete value.context_si;
       delete value.contextSourceReference;
@@ -1211,12 +1366,16 @@ function sanitizePublicRecordWithDecision<T>(record: T, decision: PublicationDec
   }
 }
 
-export function sanitizeReviewRecord<T>(record: T): T {
+export function sanitizeReviewRecord<T>(
+  record: T,
+  context: PublicationEvaluationContext = createPublicationEvaluationContext(),
+): T {
   if (!record || typeof record !== "object") return record;
   try {
-    const value = cloneBoundedRecord(record) as Record<string, unknown> | undefined;
+    if (!context.safe) return {} as T;
+    const value = captureEvaluationValue(record, false) as Record<string, unknown> | undefined;
     if (!value || !isRecord(value)) return {} as T;
-    const kind = getKnownContentKind(value);
+    const kind = getKnownContentKind(value, context);
     if (isMetadataBearingKind(kind)) value.reviewMetadata = createUnverifiedReviewMetadata();
     if ("published" in value) value.published = false;
     return value as T;

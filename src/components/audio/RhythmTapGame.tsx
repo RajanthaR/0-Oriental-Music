@@ -33,10 +33,17 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
   const timerRef = useRef<NodeJS.Timeout | number | null>(null);
   const finishTimerRef = useRef<NodeJS.Timeout | number | null>(null);
   const playbackHandlesRef = useRef<Set<TablaPlaybackHandle>>(new Set());
+  const mountedRef = useRef(true);
+  const sessionGenerationRef = useRef(0);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   const trackPlayback = useCallback((handle: TablaPlaybackHandle) => {
     playbackHandlesRef.current.add(handle);
-    void handle.ready;
+    void Promise.resolve(handle.finished).then(
+      () => playbackHandlesRef.current.delete(handle),
+      () => playbackHandlesRef.current.delete(handle),
+    );
   }, []);
 
   const clearPlayback = useCallback(() => {
@@ -45,6 +52,7 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
   }, []);
 
   const clearTimers = useCallback(() => {
+    sessionGenerationRef.current += 1;
     if (timerRef.current !== null) clearInterval(timerRef.current as number);
     if (finishTimerRef.current !== null) clearTimeout(finishTimerRef.current as number);
     timerRef.current = null;
@@ -52,7 +60,14 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
     clearPlayback();
   }, [clearPlayback]);
 
+  const reportAudioUnavailable = useCallback((generation: number) => {
+    if (!mountedRef.current || sessionGenerationRef.current !== generation) return;
+    setFeedbackText("මෙම උපාංගයේ තබ්ලා නාදය ආරම්භ කළ නොහැක. දෘශ්‍ය ස්පන්දනයට අනුව පුහුණු වන්න.");
+    setFeedbackColor("text-primary");
+  }, []);
+
   const handleFinish = useCallback(() => {
+    if (!mountedRef.current) return;
     setIsPlaying(false);
     setIsFinished(true);
     clearTimers();
@@ -83,8 +98,16 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
       setFeedbackColor("text-primary");
     }
 
-    if (onComplete) onComplete(scorePercent);
-  }, [clearTimers, onComplete, safeTotalBeats]);
+    onCompleteRef.current?.(scorePercent);
+  }, [clearTimers, safeTotalBeats]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      clearTimers();
+    };
+  }, [clearTimers]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -96,36 +119,41 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
       setCurrentBeat(0);
       setIsFinished(false);
 
+      const sessionGeneration = sessionGenerationRef.current;
       let beatCount = 0;
       timerRef.current = setInterval(() => {
+        if (!mountedRef.current || sessionGenerationRef.current !== sessionGeneration) return;
         beatCount++;
         setCurrentBeat(beatCount);
         expectedBeatTimesRef.current.push(Date.now());
         const handle = tablaSynth.playBol("ධා", beatIntervalMs, () => {
-          setFeedbackText("මෙම උපාංගයේ තබ්ලා නාදය ආරම්භ කළ නොහැක. දෘශ්‍ය ස්පන්දනයට අනුව පුහුණු වන්න.");
-          setFeedbackColor("text-primary");
+          reportAudioUnavailable(sessionGeneration);
         });
         trackPlayback(handle);
 
         if (beatCount >= safeTotalBeats) {
           if (timerRef.current !== null) clearInterval(timerRef.current as number);
           timerRef.current = null;
-          finishTimerRef.current = setTimeout(handleFinish, 1000);
+          finishTimerRef.current = setTimeout(() => {
+            if (mountedRef.current && sessionGenerationRef.current === sessionGeneration) {
+              handleFinish();
+            }
+          }, 1000);
         }
       }, beatIntervalMs);
     } else {
       clearTimers();
     }
     return clearTimers;
-  }, [isPlaying, safeTotalBeats, beatIntervalMs, clearTimers, handleFinish, trackPlayback]);
+  }, [isPlaying, safeTotalBeats, beatIntervalMs, clearTimers, handleFinish, reportAudioUnavailable, trackPlayback]);
 
   const handleTap = () => {
     if (!isPlaying) return;
     const now = Date.now();
     tapTimesRef.current.push(now);
+    const sessionGeneration = sessionGenerationRef.current;
     const handle = tablaSynth.playBol("තින්", beatIntervalMs, () => {
-      setFeedbackText("මෙම උපාංගයේ තබ්ලා නාදය ආරම්භ කළ නොහැක. දෘශ්‍ය ස්පන්දනයට අනුව පුහුණු වන්න.");
-      setFeedbackColor("text-primary");
+      reportAudioUnavailable(sessionGeneration);
     });
     trackPlayback(handle);
 
@@ -156,6 +184,7 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
   };
 
   const handleStart = () => {
+    sessionGenerationRef.current += 1;
     setIsPlaying(true);
     setFeedbackText("තාලයට අනුව තට්ටු කරන්න...");
     setFeedbackColor("text-text");

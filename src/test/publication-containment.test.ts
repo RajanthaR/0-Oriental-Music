@@ -6,6 +6,7 @@ import sourcesData from "@/data/sources.json";
 import musicalCoreFieldDispositions from "../../data/musical-core-field-dispositions.json";
 import { repository } from "@/lib/data/repository";
 import {
+  DEPENDENCY_FIELD_RULES,
   evaluateSourceReference,
   formatPublicSourceReference,
   getContextClaimPublicationDecision,
@@ -32,6 +33,23 @@ import {
 import forensicLedgerData from "../../data/forensic-ledger.json";
 
 describe("Prompt 1 publication containment", () => {
+  it("declares the complete blocking and nonblocking dependency matrix", () => {
+    expect(DEPENDENCY_FIELD_RULES).toEqual({
+      prerequisites: { blocking: true, catalog: "lessons" },
+      "steps[].lessonId": { blocking: true, catalog: "lessons" },
+      nextRecommendedLessonId: { blocking: false, catalog: "lessons" },
+      quizId: { blocking: false, catalog: "quizzes" },
+      masteryQuizId: { blocking: true, catalog: "quizzes" },
+      nextRecommendedPathId: { blocking: false, catalog: "learningPaths" },
+      talaId: { blocking: true, catalog: "talas" },
+      targetTalaId: { blocking: true, catalog: "talas" },
+      audioTalaId: { blocking: true, catalog: "talas" },
+      ragaId: { blocking: true, catalog: "ragas" },
+      targetRagaId: { blocking: true, catalog: "ragas" },
+      selectedRagaId: { blocking: true, catalog: "ragas" },
+    });
+  });
+
   it("keeps unsupported grades and named quarantined entities out of public data", () => {
     const publicCollections = [
       ...repository.getLessons(),
@@ -168,6 +186,27 @@ describe("Prompt 1 publication containment", () => {
       });
     } finally {
       sourceCatalog.splice(originalLength);
+    }
+  });
+
+  it("rebuilds identity containment when a catalog mutates without changing length", () => {
+    const catalog = lessonsData as unknown as Array<Record<string, unknown>>;
+    const original = catalog[1];
+    const replacement = structuredClone(catalog[0]);
+    catalog[1] = replacement;
+    try {
+      expect(getRecordPublicationDecision(replacement)).toMatchObject({
+        isPublic: false,
+        reasonCodes: expect.arrayContaining(["unknown-record-kind", "malformed-record"]),
+      });
+      expect(repository.getLessons()).toEqual([]);
+      expect(repository.getPublicationSummary().lessons).toMatchObject({
+        raw: catalog.length,
+        public: 0,
+        needsReview: catalog.length,
+      });
+    } finally {
+      catalog[1] = original;
     }
   });
 
@@ -482,6 +521,20 @@ describe("Prompt 1 publication containment", () => {
       "bols[0].sourceReference",
       "bols[1].value",
     ]));
+  });
+
+  it("returns structured Tala disposition errors for malformed bol rows", () => {
+    const malformed = structuredClone(musicalCoreFieldDispositions) as unknown as Record<string, unknown>;
+    const entries = malformed.talas as Array<Record<string, unknown>>;
+    const khemta = entries.find((entry) => entry.talaId === "tala-khemta");
+    expect(khemta).toBeDefined();
+    if (!khemta) return;
+    const bols = khemta.bols as unknown[];
+    bols[0] = null;
+    expect(() => validateMusicalCoreFieldDispositions(talasData, malformed)).not.toThrow();
+    const result = validateMusicalCoreFieldDispositions(talasData, malformed);
+    expect(result.isValid).toBe(false);
+    expect(result.issues.some((issue) => issue.field === "bols[0]")).toBe(true);
   });
 
   it("fails the runtime Tala projection closed when a verified registry value drifts", () => {

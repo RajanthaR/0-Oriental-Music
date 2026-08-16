@@ -325,10 +325,67 @@ export interface RawQuestion {
   sourceReference: SourceReference;
 }
 
+/**
+ * Fields that are safe for a learner-facing question projection.
+ *
+ * `RawQuestion` intentionally retains audio/notation evidence for forensic
+ * review, but those fields must not become part of the public QuizRunner
+ * contract by structural inheritance.
+ */
+export type RenderableQuestionFields = Omit<
+  RawQuestion,
+  | "type"
+  | "options_si"
+  | "correctAnswerIds"
+  | "matchingPairs"
+  | "orderingItems"
+  | "correctShortAnswer_si"
+  | "audioNotes"
+  | "audioTalaId"
+  | "diagramSvg"
+>;
+
+export interface McqQuestion extends RenderableQuestionFields {
+  type: "mcq";
+  options_si: AnswerOption[];
+  correctAnswerIds: string[];
+}
+
+export interface MultiSelectQuestion extends RenderableQuestionFields {
+  type: "multi-select";
+  options_si: AnswerOption[];
+  correctAnswerIds: string[];
+}
+
+export interface MatchingQuestion extends RenderableQuestionFields {
+  type: "matching";
+  matchingPairs: { left_si: string; right_si: string }[];
+}
+
+export interface OrderingQuestion extends RenderableQuestionFields {
+  type: "ordering";
+  orderingItems: { id: string; text_si: string; correctIndex: number }[];
+}
+
+export interface TrueFalseQuestion extends RenderableQuestionFields {
+  type: "true-false";
+  options_si: AnswerOption[];
+  correctAnswerIds: string[];
+}
+
+export interface ShortAnswerQuestion extends RenderableQuestionFields {
+  type: "short-answer";
+  correctShortAnswer_si: string[];
+}
+
 /** Public/UI question union. Unsupported forensic-only variants are excluded. */
-export type Question = {
-  [Type in RenderableQuestionType]: Omit<RawQuestion, "type"> & { type: Type };
-}[RenderableQuestionType];
+export type Question =
+  | McqQuestion
+  | MultiSelectQuestion
+  | MatchingQuestion
+  | OrderingQuestion
+  | TrueFalseQuestion
+  | ShortAnswerQuestion;
 
 export type ForensicQuestion = RawQuestion;
 
