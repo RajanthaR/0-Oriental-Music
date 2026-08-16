@@ -529,6 +529,72 @@ describe("Prompt 1 publication containment", () => {
     expect(getRecordPublicationDecision(nada).reasonCodes).toContain("malformed-record");
   });
 
+  it("rejects every required route-rendered Raga and Lesson shape", () => {
+    const bilawal = ragasData.find((raga) => raga.id === "raga-bilawal");
+    const intro = lessonsData.find((lesson) => lesson.id === "les-intro-01");
+    expect(bilawal).toBeDefined();
+    expect(intro).toBeDefined();
+    if (!bilawal || !intro) return;
+    for (const field of ["time_si", "pakad_si", "characteristics_si"] as const) {
+      const candidate = structuredClone(bilawal) as unknown as Record<string, unknown>;
+      candidate[field] = null;
+      expect(getRecordPublicationDecision(candidate)).toMatchObject({
+        isPublic: false,
+        reasonCodes: expect.arrayContaining(["malformed-record"]),
+      });
+    }
+    for (const mutate of [
+      (candidate: Record<string, unknown>) => { candidate.contentSections = [null]; },
+      (candidate: Record<string, unknown>) => { candidate.diagnosticQuestion = null; },
+      (candidate: Record<string, unknown>) => { candidate.listenActivity = null; },
+      (candidate: Record<string, unknown>) => { candidate.guidedPractice = null; },
+      (candidate: Record<string, unknown>) => { candidate.recap_si = [null]; },
+    ]) {
+      const candidate = structuredClone(intro) as unknown as Record<string, unknown>;
+      mutate(candidate);
+      expect(getRecordPublicationDecision(candidate)).toMatchObject({
+        isPublic: false,
+        reasonCodes: expect.arrayContaining(["malformed-record"]),
+      });
+    }
+  });
+
+  it("rejects missing Quiz, Question, and Exam contract fields", () => {
+    const quiz = quizzesData.find((item) => item.id === "quiz-les-intro-01");
+    const paper = examPapersData.find((item) => item.id === "exam-ol-model-01");
+    expect(quiz).toBeDefined();
+    expect(paper).toBeDefined();
+    if (!quiz || !paper) return;
+    for (const mutate of [
+      (candidate: Record<string, unknown>) => { candidate.title_si = null; },
+      (candidate: Record<string, unknown>) => {
+        ((candidate.questions as Array<Record<string, unknown>>)[0]).difficulty = null;
+      },
+      (candidate: Record<string, unknown>) => {
+        ((candidate.questions as Array<Record<string, unknown>>)[0]).strandId = null;
+      },
+    ]) {
+      const candidate = structuredClone(quiz) as unknown as Record<string, unknown>;
+      mutate(candidate);
+      expect(getRecordPublicationDecision(candidate).reasonCodes).toContain("malformed-record");
+    }
+    for (const field of ["title_si", "timeLimitMinutes", "instructions_si"] as const) {
+      const candidate = structuredClone(paper) as unknown as Record<string, unknown>;
+      candidate[field] = null;
+      expect(getRecordPublicationDecision(candidate).reasonCodes).toContain("malformed-record");
+    }
+  });
+
+  it("fails cyclic runtime records closed without projection recursion", () => {
+    const bilawal = structuredClone(ragasData.find((raga) => raga.id === "raga-bilawal")) as unknown as Record<string, unknown>;
+    bilawal.self = bilawal;
+    expect(() => getRecordPublicationDecision(bilawal)).not.toThrow();
+    expect(getRecordPublicationDecision(bilawal)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["malformed-record"]),
+    });
+  });
+
   it("rejects malformed quiz thresholds and impossible question identities", () => {
     const canonical = quizzesData.find((item) => item.id === "quiz-les-intro-01");
     expect(canonical).toBeDefined();
@@ -583,6 +649,7 @@ describe("Prompt 1 publication containment", () => {
       second.prerequisites = secondPrerequisites;
     }
     expect(getRecordPublicationDecision(quizzesData.find((quiz) => quiz.id === "quiz-les-intro-01")).isPublic).toBe(true);
+    expect(getRecordPublicationDecision(first).reasonCodes).not.toContain("dependency-cycle");
   });
 
   it("returns detached public projections and complete review records", () => {

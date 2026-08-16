@@ -520,6 +520,69 @@ function isStringArray(value: unknown, allowEmpty = false): value is string[] {
   return Array.isArray(value) && (allowEmpty || value.length > 0) && value.every(isNonBlankString);
 }
 
+function isOptionalStringArray(value: unknown): boolean {
+  return value === undefined || (Array.isArray(value) && value.every(isNonBlankString));
+}
+
+function hasDiagnosticQuestionShape(value: unknown): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const question = value as Record<string, unknown>;
+  return isNonBlankString(question.question_si) && isStringArray(question.options_si) &&
+    Number.isInteger(question.correctIndex) && (question.correctIndex as number) >= 0 &&
+    (question.correctIndex as number) < (question.options_si as string[]).length &&
+    isNonBlankString(question.explanation_si);
+}
+
+function hasLessonSectionShape(value: unknown): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const section = value as Record<string, unknown>;
+  if (!isNonBlankString(section.heading_si) || !isNonBlankString(section.content_si)) return false;
+  if (section.keyTerms !== undefined && (!Array.isArray(section.keyTerms) || !section.keyTerms.every((term) => {
+    if (!term || typeof term !== "object" || Array.isArray(term)) return false;
+    const candidate = term as Record<string, unknown>;
+    return isNonBlankString(candidate.term_si) && isNonBlankString(candidate.meaning_si);
+  }))) return false;
+  if (section.notationTable !== undefined && (!Array.isArray(section.notationTable) || !section.notationTable.every((row) => {
+    if (!row || typeof row !== "object" || Array.isArray(row)) return false;
+    const candidate = row as Record<string, unknown>;
+    return isNonBlankString(candidate.rowLabel_si) && isStringArray(candidate.notes, true);
+  }))) return false;
+  return section.diagramSvg === undefined || isNonBlankString(section.diagramSvg);
+}
+
+const AUDIO_ACTIVITY_TYPES = new Set(["swara-demo", "scale-play", "raga-phrase", "rhythm-loop", "instrument-timbre"]);
+const PRACTICE_TOOLS = new Set(["swara-keyboard", "tala-visualizer", "rhythm-tap", "pitch-detector", "notation-arranger", "ear-training"]);
+
+function hasAudioActivityShape(value: unknown): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const activity = value as Record<string, unknown>;
+  return isNonBlankString(activity.type) && AUDIO_ACTIVITY_TYPES.has(activity.type) &&
+    isNonBlankString(activity.title_si) && isNonBlankString(activity.instruction_si) &&
+    isOptionalStringArray(activity.notes) &&
+    (activity.speedBpm === undefined || (Number.isFinite(activity.speedBpm) && (activity.speedBpm as number) > 0));
+}
+
+function hasPracticeTaskShape(value: unknown): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const task = value as Record<string, unknown>;
+  return isNonBlankString(task.title_si) && isNonBlankString(task.instruction_si) &&
+    isNonBlankString(task.interactiveTool) && PRACTICE_TOOLS.has(task.interactiveTool) &&
+    isOptionalStringArray(task.targetSequence) && isOptionalStringArray(task.targetNotes) &&
+    (task.targetBpm === undefined || (Number.isFinite(task.targetBpm) && (task.targetBpm as number) > 0));
+}
+
+function hasObjectCycle(value: unknown, visiting = new WeakSet<object>(), visited = new WeakSet<object>()): boolean {
+  if (!value || typeof value !== "object") return false;
+  if (visiting.has(value)) return true;
+  if (visited.has(value)) return false;
+  visiting.add(value);
+  const children = Array.isArray(value) ? value : Object.values(value as Record<string, unknown>);
+  const cyclic = children.some((child) => hasObjectCycle(child, visiting, visited));
+  visiting.delete(value);
+  visited.add(value);
+  return cyclic;
+}
+
 const PUBLIC_QUESTION_TYPES = new Set([
   "mcq",
   "multi-select",
@@ -538,6 +601,8 @@ function hasCanonicalQuestionShape(question: unknown): boolean {
     !PUBLIC_QUESTION_TYPES.has(value.type) ||
     !isCanonicalGradeBandArray(value.gradeBands) ||
     !isNonBlankString(value.prompt_si) ||
+    !isNonBlankString(value.difficulty) ||
+    !isNonBlankString(value.strandId) ||
     !isNonBlankString(value.explanation_si) ||
     !isSourceReference(value.sourceReference)
   ) return false;
@@ -837,7 +902,7 @@ function hasCanonicalRuntimeShape(value: PublicationRecordShape): boolean {
   }
   if ((ragasData as Array<{ id: string }>).some((record) => record.id === id)) {
     const raga = value as Record<string, unknown>;
-    return ["name_si", "name_en", "thata_si", "arohana_si", "avarohana_si", "vadi_si", "samvadi_si", "jati_si"]
+    return ["name_si", "name_en", "thata_si", "arohana_si", "avarohana_si", "vadi_si", "samvadi_si", "jati_si", "time_si", "rasa_si", "pakad_si"]
       .every((field) => isNonBlankString(raga[field])) &&
       Array.isArray(raga.arohana_swaras) && raga.arohana_swaras.length > 0 && raga.arohana_swaras.every(isValidSwaraToken) &&
       Array.isArray(raga.avarohana_swaras) && raga.avarohana_swaras.length > 0 && raga.avarohana_swaras.every(isValidSwaraToken) &&
@@ -846,26 +911,33 @@ function hasCanonicalRuntimeShape(value: PublicationRecordShape): boolean {
         const candidate = phrase as Record<string, unknown>;
         return isNonBlankString(candidate.name_si) && Array.isArray(candidate.swaras) &&
           candidate.swaras.length > 0 && candidate.swaras.every(isValidSwaraToken);
-      }) && isSourceReference(raga.sourceReference);
+      }) && isStringArray(raga.characteristics_si) && isSourceReference(raga.sourceReference);
   }
   if ((lessonsData as Array<{ id: string }>).some((record) => record.id === id)) {
     const lesson = value as Record<string, unknown>;
     return ["strandId", "title_si", "slug", "summary_si", "learningGoal_si", "quizId"]
       .every((field) => isNonBlankString(lesson[field])) &&
       Number.isFinite(lesson.estimatedMinutes) && (lesson.estimatedMinutes as number) > 0 &&
+      isNonBlankString(lesson.difficulty) && isStringArray(lesson.competencyIds, true) &&
       Array.isArray(lesson.prerequisites) && lesson.prerequisites.every(isNonBlankString) &&
-      Array.isArray(lesson.contentSections) && lesson.contentSections.length > 0 &&
-      isSourceReference(lesson.sourceReference);
+      hasDiagnosticQuestionShape(lesson.diagnosticQuestion) &&
+      Array.isArray(lesson.contentSections) && lesson.contentSections.length > 0 && lesson.contentSections.every(hasLessonSectionShape) &&
+      hasAudioActivityShape(lesson.listenActivity) &&
+      (lesson.performActivity === undefined || hasAudioActivityShape(lesson.performActivity)) &&
+      hasPracticeTaskShape(lesson.guidedPractice) && hasPracticeTaskShape(lesson.independentPractice) &&
+      isStringArray(lesson.recap_si) && isSourceReference(lesson.sourceReference) && typeof lesson.published === "boolean";
   }
   if ((quizzesData as Array<{ id: string }>).some((record) => record.id === id)) {
-    return isNonBlankString(value.lessonId) && isCanonicalGradeBandArray(value.gradeBands) &&
+    return isNonBlankString(value.title_si) && isNonBlankString(value.lessonId) && isCanonicalGradeBandArray(value.gradeBands) &&
       Number.isFinite(value.passingScorePercent) && (value.passingScorePercent as number) >= 1 &&
       (value.passingScorePercent as number) <= 100 &&
       Array.isArray(value.questions) && value.questions.length > 0 && value.questions.every(hasCanonicalQuestionShape) &&
       hasUniqueQuestionIds([value.questions]);
   }
   if ((examPapersData as Array<{ id: string }>).some((record) => record.id === id)) {
-    return isPublicGradeBand(String(value.gradeBand ?? "")) &&
+    return isNonBlankString(value.title_si) && isPublicGradeBand(String(value.gradeBand ?? "")) &&
+      Number.isFinite(value.timeLimitMinutes) && (value.timeLimitMinutes as number) > 0 &&
+      isStringArray(value.instructions_si) &&
       Array.isArray(value.partA_MCQ) && value.partA_MCQ.length > 0 && value.partA_MCQ.every(hasCanonicalQuestionShape) &&
       Array.isArray(value.partB_Structured) && value.partB_Structured.length > 0 && value.partB_Structured.every(hasCanonicalQuestionShape) &&
       hasUniqueQuestionIds([value.partA_MCQ, value.partB_Structured]) && isSourceReference(value.sourceReference);
@@ -981,7 +1053,7 @@ function getRecordPublicationDecisionInternal(record: unknown, decisionStack: Se
   }
   if (recordId) decisionStack.add(recordId);
 
-  const hasValidRuntimeShape = hasCanonicalRuntimeShape(value);
+  const hasValidRuntimeShape = !hasObjectCycle(record) && hasCanonicalRuntimeShape(value);
   if (!hasValidRuntimeShape) reasonCodes.add("malformed-record");
   if (Array.isArray(value.gradeBands) && !isCanonicalGradeBandArray(value.gradeBands)) {
     reasonCodes.add("unsupported-grade");
@@ -1011,7 +1083,9 @@ function getRecordPublicationDecisionInternal(record: unknown, decisionStack: Se
   if (hasBlockingDependency) {
     reasonCodes.add("dependent-entity-unavailable");
   }
-  if (nestedDispositions.some((disposition) => disposition.reasonCodes.includes("dependency-cycle"))) {
+  if (nestedDispositions.some(
+    (disposition) => disposition.blocking && disposition.reasonCodes.includes("dependency-cycle")
+  )) {
     reasonCodes.add("dependency-cycle");
   }
 
@@ -1139,12 +1213,23 @@ export function createUnverifiedReviewMetadata(): ReviewMetadata {
   };
 }
 
-function cloneJsonRecord<T>(value: T): T {
-  if (Array.isArray(value)) return value.map((item) => cloneJsonRecord(item)) as T;
+function cloneJsonRecord<T>(value: T, seen = new WeakMap<object, unknown>()): T {
+  if (!value || typeof value !== "object") return value;
+  const existing = seen.get(value);
+  if (existing !== undefined) return existing as T;
+  if (Array.isArray(value)) {
+    const clone: unknown[] = [];
+    seen.set(value, clone);
+    value.forEach((item) => clone.push(cloneJsonRecord(item, seen)));
+    return clone as T;
+  }
   if (value && typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, cloneJsonRecord(item)])
-    ) as T;
+    const clone: Record<string, unknown> = {};
+    seen.set(value, clone);
+    Object.entries(value as Record<string, unknown>).forEach(([key, item]) => {
+      clone[key] = cloneJsonRecord(item, seen);
+    });
+    return clone as T;
   }
   return value;
 }

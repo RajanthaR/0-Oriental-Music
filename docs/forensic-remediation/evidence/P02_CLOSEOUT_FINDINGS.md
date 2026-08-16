@@ -61,8 +61,11 @@ malformed and value-unbound context, candidate-bound Tala dispositions,
 missing dependency IDs and UI fallback, canonical quiz grades, non-array and
 throwing validator inputs, exam nested claims and display typing, same-record
 term collisions, audio-off phase continuity, same-ID Tala replacement, missing
-transition assertions, disposition issue-ID referential integrity, and the
-runtime canonical-shape gate. The separate RhythmTapGame completion-timer
+transition assertions, disposition issue-ID referential integrity, and an
+initial runtime-shape gate. The final follow-up rereview found that this gate
+still omitted some route-rendered Raga, Lesson, Quiz, and Exam fields and did
+not reject cyclic runtime objects; the second review-fix cycle adds explicit
+nested-shape and cycle regressions. The separate RhythmTapGame completion-timer
 report was initially classified as pre-existing. The follow-up review later
 closed it with exactly-once and reset-cancellation regressions, so it is no
 longer a residual risk. This cycle is not final acceptance; a clean
