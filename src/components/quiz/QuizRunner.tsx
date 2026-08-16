@@ -5,6 +5,7 @@ import { Quiz, Question } from "@/types/content";
 import { CheckCircle2, XCircle, Award, RotateCcw, ArrowRight, ArrowUp, ArrowDown, Sparkles } from "lucide-react";
 import { ProgressStorage } from "@/lib/storage/progress-storage";
 import {
+  MAX_ARRAY_ITEMS,
   isNonBlankString,
   isRecord,
   projectPublicRecord,
@@ -36,20 +37,24 @@ function getUsableQuiz(quiz: unknown): QuizRunnerQuiz | null {
   try {
     if (!isRecord(quiz) || !isNonBlankString(quiz.id) || !isNonBlankString(quiz.title_si) ||
       typeof quiz.passingScorePercent !== "number" || !Number.isFinite(quiz.passingScorePercent) ||
-      quiz.passingScorePercent < 0 || quiz.passingScorePercent > 100) {
+      quiz.passingScorePercent < 1 || quiz.passingScorePercent > 100) {
       return null;
     }
 
     const rawQuestions = quiz.questions;
-    if (!isDenseArray(rawQuestions) || rawQuestions.length === 0) return null;
+    if (!isDenseArray(rawQuestions) || rawQuestions.length === 0 || rawQuestions.length > MAX_ARRAY_ITEMS) return null;
 
     const questions: Question[] = [];
+    const questionIds = new Set<string>();
     for (let index = 0; index < rawQuestions.length; index += 1) {
       const candidate = rawQuestions[index];
       if (!validateContentRecord(candidate, "question").isValid) return null;
       const projected = projectPublicRecord(candidate, "question");
-      if (!projected) return null;
-      questions.push(projected as Question);
+      if (!isRecord(projected)) return null;
+      const questionId = projected.id;
+      if (!isNonBlankString(questionId) || questionIds.has(questionId)) return null;
+      questionIds.add(questionId);
+      questions.push(projected as unknown as Question);
     }
 
     return {
@@ -167,7 +172,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
     } else {
       setIsQuizCompleted(true);
       const finalScore = scoreCount;
-      const passed = (finalScore / totalQuestions) * 100 >= (usableQuiz.passingScorePercent || 70);
+      const passed = (finalScore / totalQuestions) * 100 >= usableQuiz.passingScorePercent;
       ProgressStorage.recordQuizAttempt(usableQuiz.id, finalScore, totalQuestions, passed);
       if (onComplete) onComplete(finalScore, totalQuestions, passed);
     }
@@ -186,7 +191,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
 
   if (isQuizCompleted) {
     const percent = Math.round((scoreCount / totalQuestions) * 100);
-    const passed = percent >= (usableQuiz.passingScorePercent || 70);
+    const passed = percent >= usableQuiz.passingScorePercent;
 
     return (
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-border shadow-warm-lg text-center max-w-lg mx-auto">

@@ -92,8 +92,11 @@ export function validateCatalogIdentityContracts(
     return result;
   };
 
-  const catalogEntries = Array.isArray(catalogs) ? catalogs : [];
-  if (!Array.isArray(catalogs)) {
+  const catalogSnapshot = cloneBoundedRecord(catalogs);
+  const glossarySnapshot = cloneBoundedRecord(glossaryRecords);
+  const terminologySnapshot = cloneBoundedRecord(terminologyRecords);
+  const catalogEntries = Array.isArray(catalogSnapshot) ? catalogSnapshot : [];
+  if (!Array.isArray(catalogSnapshot)) {
     issueFor("Catalog", "catalog", "catalogs", "Catalog collection must be an array");
   }
   catalogEntries.forEach((entry, entryIndex) => {
@@ -167,8 +170,10 @@ export function validateCatalogIdentityContracts(
     });
   };
 
-  validateTerms("Glossary", Array.isArray(glossaryRecords) ? glossaryRecords : []);
-  validateTerms("Terminology", Array.isArray(terminologyRecords) ? terminologyRecords : []);
+  if (!Array.isArray(glossarySnapshot)) issueFor("Glossary", "catalog", "records", "Glossary records must be a safe dense array");
+  if (!Array.isArray(terminologySnapshot)) issueFor("Terminology", "catalog", "records", "Terminology records must be a safe dense array");
+  validateTerms("Glossary", Array.isArray(glossarySnapshot) ? glossarySnapshot : []);
+  validateTerms("Terminology", Array.isArray(terminologySnapshot) ? terminologySnapshot : []);
 
   const identityFields = ["name_si", "name_en", "aliases_si", "title_si", "title_en"] as const;
   catalogEntries.forEach((entry, entryIndex) => {
@@ -613,18 +618,26 @@ export function validatePublicCollection(
 ): PublicationValidationResult {
   const issues: ValidationIssue[] = [];
 
-  if (!Array.isArray(records)) {
+  const snapshot = cloneBoundedRecord(records);
+  if (!Array.isArray(snapshot)) {
     return {
       isValid: false,
-      issues: [baselineIssue(entityType, "catalog", "records", "Public collection must be an array.")],
+      issues: [baselineIssue(entityType, "catalog", "records", "Public collection must be a bounded dense plain-data array.")],
     };
   }
 
-  records.forEach((record, index) => {
-    const value = cloneBoundedRecord(record);
+  const seenIds = new Set<string>();
+  snapshot.forEach((record, index) => {
+    const value = record;
     const idValue = readOwnDataField(value, "id");
     const id = typeof idValue === "string" ? idValue : `${entityType}-${index}`;
-    const decision = getRecordPublicationDecision(record);
+    const normalizedId = typeof idValue === "string" ? idValue.trim() : "";
+    if (!normalizedId || seenIds.has(normalizedId)) {
+      issues.push(baselineIssue(entityType, id, "id", "Public collection IDs must be unique, non-empty normalized strings."));
+    } else {
+      seenIds.add(normalizedId);
+    }
+    const decision = getRecordPublicationDecision(value);
     const gradeBands = decision.gradeBands;
 
     if (!decision.isPublic) {
@@ -985,8 +998,9 @@ export function validateContent(
       : []
   ));
   const structuralRecords = (type: string, value: unknown): Record<string, unknown>[] => {
-    if (!Array.isArray(value)) {
-      issues.push({ entityType: type, entityId: "catalog", field: "catalog", message: `${type} catalog must be an array`, severity: "error" });
+    const catalogSnapshot = cloneBoundedRecord(value);
+    if (!Array.isArray(catalogSnapshot)) {
+      issues.push({ entityType: type, entityId: "catalog", field: "catalog", message: `${type} catalog must be a bounded dense plain-data array`, severity: "error" });
       return [];
     }
     const kindByType: Record<string, ContentEntityKind | undefined> = {
@@ -997,7 +1011,7 @@ export function validateContent(
       CulturalTradition: "cultural-tradition",
       TheatreTradition: "theatre-tradition",
     };
-    return asUnknownArray(value).flatMap((candidate, index) => {
+    return catalogSnapshot.flatMap((candidate, index) => {
       if (!isRecord(candidate)) {
         issues.push({
           entityType: type,

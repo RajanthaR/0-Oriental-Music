@@ -141,7 +141,7 @@ type SourcePageQualityRecord = {
   hasSinhalaText: boolean;
 };
 
-type PublicationCatalogSnapshot = {
+export type PublicationCatalogSnapshot = {
   sources: unknown[];
   lessons: unknown[];
   ragas: unknown[];
@@ -155,6 +155,8 @@ type PublicationCatalogSnapshot = {
   examPapers: unknown[];
 };
 
+export type PublicationCatalogInputs = Partial<Record<keyof PublicationCatalogSnapshot, unknown>>;
+
 /**
  * All decisions belonging to one public operation share these detached
  * inputs.  This prevents identity, evidence, dependency, and projection
@@ -162,7 +164,11 @@ type PublicationCatalogSnapshot = {
  * data.
  */
 export interface PublicationEvaluationContext {
-  catalogs: PublicationCatalogSnapshot;
+  readonly catalogs: PublicationCatalogSnapshot;
+  readonly safe: boolean;
+}
+
+type PublicationEvaluationState = {
   sourceDocuments: SourceDocumentRecord[];
   sourcePageQuality: SourcePageQualityRecord[];
   musicalCoreFieldDispositions: unknown;
@@ -170,7 +176,15 @@ export interface PublicationEvaluationContext {
   snapshots: WeakMap<object, Record<string, unknown>>;
   stack: Set<string>;
   memo: WeakMap<object, PublicationDecision>;
-  safe: boolean;
+  rawCounts: Readonly<Record<keyof PublicationCatalogSnapshot, number>>;
+};
+
+const PUBLICATION_CONTEXT_STATE = new WeakMap<PublicationEvaluationContext, PublicationEvaluationState>();
+
+function getEvaluationState(context: PublicationEvaluationContext): PublicationEvaluationState {
+  const state = PUBLICATION_CONTEXT_STATE.get(context);
+  if (!state) throw new Error("Unknown publication evaluation context.");
+  return state;
 }
 
 type DependencyRule = {
@@ -186,6 +200,7 @@ export const DEPENDENCY_FIELD_RULES: Readonly<Record<string, DependencyRule>> = 
   quizId: { blocking: false, catalog: "quizzes" },
   masteryQuizId: { blocking: true, catalog: "quizzes" },
   nextRecommendedPathId: { blocking: false, catalog: "learningPaths" },
+  lessonId: { blocking: true, catalog: "lessons" },
   talaId: { blocking: true, catalog: "talas" },
   targetTalaId: { blocking: true, catalog: "talas" },
   audioTalaId: { blocking: true, catalog: "talas" },
@@ -267,6 +282,18 @@ function captureEvaluationArray(value: unknown): unknown[] | undefined {
   return Array.isArray(snapshot) ? snapshot : undefined;
 }
 
+function declaredArrayLength(value: unknown): number {
+  try {
+    if (!Array.isArray(value)) return 0;
+    const descriptor = Object.getOwnPropertyDescriptor(value, "length");
+    return descriptor && "value" in descriptor && Number.isSafeInteger(descriptor.value) && descriptor.value >= 0
+      ? descriptor.value
+      : 0;
+  } catch {
+    return 0;
+  }
+}
+
 function registerKnownKinds(
   knownKinds: Map<string, ContentEntityKind | "ambiguous">,
   kind: ContentEntityKind,
@@ -281,10 +308,16 @@ function registerKnownKinds(
   });
 }
 
-export function createPublicationEvaluationContext(): PublicationEvaluationContext {
+export function createPublicationEvaluationContext(
+  catalogInputs: PublicationCatalogInputs = {},
+): PublicationEvaluationContext {
   const capturedCatalogs = {} as PublicationCatalogSnapshot;
+  const rawCounts = {} as Record<keyof PublicationCatalogSnapshot, number>;
   let safe = true;
-  for (const [, key, rawCatalog] of RAW_PUBLICATION_CATALOGS) {
+  for (const [, key, defaultCatalog] of RAW_PUBLICATION_CATALOGS) {
+    const suppliedCatalog = readOwnDataField(catalogInputs, key);
+    const rawCatalog = suppliedCatalog === undefined ? defaultCatalog : suppliedCatalog;
+    rawCounts[key] = declaredArrayLength(rawCatalog);
     const snapshot = captureEvaluationArray(rawCatalog);
     if (!snapshot) safe = false;
     capturedCatalogs[key] = snapshot ?? [];
@@ -294,8 +327,12 @@ export function createPublicationEvaluationContext(): PublicationEvaluationConte
   const capturedDispositions = captureEvaluationValue(musicalCoreFieldDispositionsData);
   if (!capturedDocuments || !capturedPageQuality || capturedDispositions === undefined) safe = false;
 
-  const context: PublicationEvaluationContext = {
+  Object.freeze(capturedCatalogs);
+  const context: PublicationEvaluationContext = Object.freeze({
     catalogs: capturedCatalogs,
+    safe,
+  });
+  const state: PublicationEvaluationState = {
     sourceDocuments: (capturedDocuments ?? []) as SourceDocumentRecord[],
     sourcePageQuality: (capturedPageQuality ?? []) as SourcePageQualityRecord[],
     musicalCoreFieldDispositions: capturedDispositions,
@@ -303,17 +340,29 @@ export function createPublicationEvaluationContext(): PublicationEvaluationConte
     snapshots: new WeakMap<object, Record<string, unknown>>(),
     stack: new Set<string>(),
     memo: new WeakMap<object, PublicationDecision>(),
-    safe,
+    rawCounts: Object.freeze(rawCounts),
   };
+  PUBLICATION_CONTEXT_STATE.set(context, state);
 
   for (const [kind, key] of RAW_PUBLICATION_CATALOGS) {
     const records = context.catalogs[key];
-    registerKnownKinds(context.knownKinds, kind, records);
+    registerKnownKinds(state.knownKinds, kind, records);
     records.forEach((record) => {
-      if (isRecord(record)) context.snapshots.set(record, record);
+      if (isRecord(record)) state.snapshots.set(record, record);
     });
   }
   return context;
+}
+
+export function getPublicationCatalogRawCount(
+  context: PublicationEvaluationContext,
+  catalog: keyof PublicationCatalogSnapshot,
+): number {
+  try {
+    return getEvaluationState(context).rawCounts[catalog] ?? 0;
+  } catch {
+    return 0;
+  }
 }
 
 function getKnownContentKind(
@@ -323,7 +372,7 @@ function getKnownContentKind(
   if (!isRecord(record)) return undefined;
   const id = readOwnDataField(record, "id");
   if (typeof id !== "string" || !id) return undefined;
-  const known = context.knownKinds.get(id);
+  const known = getEvaluationState(context).knownKinds.get(id);
   return known === "ambiguous" ? undefined : known;
 }
 
@@ -404,7 +453,7 @@ function resolveSourceDocument(sourceId: string, context: PublicationEvaluationC
   if (sourceMatches.length > 1) return { status: "ambiguous-source-record" };
   const source = sourceMatches[0];
 
-  const matches = context.sourceDocuments.filter(
+  const matches = getEvaluationState(context).sourceDocuments.filter(
     (document) => document.originalFilename === source.originalFilename
   );
   if (matches.length === 0) return { status: "missing-document" };
@@ -464,7 +513,7 @@ function explicitPageReferences(pageOrSection: string, expectedFilename: string)
 
 
 function qualityForPages(documentSlug: string, pageNumbers: number[], context: PublicationEvaluationContext): EvidenceQuality {
-  const qualities = context.sourcePageQuality
+  const qualities = getEvaluationState(context).sourcePageQuality
     .filter((page) => page.documentSlug === documentSlug && pageNumbers.includes(page.pageNumber))
     .map((page) => page.confidence);
 
@@ -478,7 +527,7 @@ function qualityForPages(documentSlug: string, pageNumbers: number[], context: P
 }
 
 function hasReadablePages(documentSlug: string, pageNumbers: number[], context: PublicationEvaluationContext): boolean {
-  const citedPages = context.sourcePageQuality.filter(
+  const citedPages = getEvaluationState(context).sourcePageQuality.filter(
     (page) => page.documentSlug === documentSlug && pageNumbers.includes(page.pageNumber)
   );
   return (
@@ -557,7 +606,8 @@ export function getSourceDocumentSummary(
   }
 
   const document = resolution.document;
-  const pages = context.sourcePageQuality.filter((page) => page.documentSlug === document.slug);
+  const state = getEvaluationState(context);
+  const pages = state.sourcePageQuality.filter((page) => page.documentSlug === document.slug);
   const quality = pages.length === 0
     ? "missing"
     : pages.some((page) => page.confidence === "D")
@@ -579,14 +629,15 @@ export function getSourceDocumentSummary(
 
 export function getSourceCorpusInventory() {
   const context = createPublicationEvaluationContext();
-  const qualityCounts = context.sourcePageQuality.reduce<Record<string, number>>((counts, page) => {
+  const state = getEvaluationState(context);
+  const qualityCounts = state.sourcePageQuality.reduce<Record<string, number>>((counts, page) => {
     counts[page.confidence] = (counts[page.confidence] || 0) + 1;
     return counts;
   }, {});
   return {
     sourceRecords: getValidatedSourceRecords(context).length,
-    sourceDocuments: context.sourceDocuments.length,
-    sourcePages: context.sourceDocuments.reduce((sum, document) => sum + document.pageCount, 0),
+    sourceDocuments: state.sourceDocuments.length,
+    sourcePages: state.sourceDocuments.reduce((sum, document) => sum + document.pageCount, 0),
     qualityCounts,
   };
 }
@@ -596,8 +647,9 @@ export function evaluateSourceReference(
   context: PublicationEvaluationContext = createPublicationEvaluationContext(),
 ): SourceEvidenceDecision {
   try {
-    const sourceIdValue = isSourceReference(reference) ? readOwnDataField(reference, "sourceId") : undefined;
-    const pageOrSectionValue = isSourceReference(reference) ? readOwnDataField(reference, "pageOrSection") : undefined;
+    const referenceSnapshot = captureEvaluationValue(reference, false);
+    const sourceIdValue = isSourceReference(referenceSnapshot) ? readOwnDataField(referenceSnapshot, "sourceId") : undefined;
+    const pageOrSectionValue = isSourceReference(referenceSnapshot) ? readOwnDataField(referenceSnapshot, "pageOrSection") : undefined;
     const sourceId = typeof sourceIdValue === "string" ? sourceIdValue : undefined;
     const pageOrSection = typeof pageOrSectionValue === "string" ? pageOrSectionValue : undefined;
     if (!sourceId || !pageOrSection?.trim()) {
@@ -778,11 +830,13 @@ export function getTalaFieldDisposition(
   context: PublicationEvaluationContext = createPublicationEvaluationContext(),
 ): TalaFieldDisposition | undefined {
   try {
-    const supplied = typeof talaOrId === "string" ? undefined : getRecordShape(talaOrId);
+    const suppliedSnapshot = typeof talaOrId === "string" ? undefined : captureEvaluationValue(talaOrId, false);
+    const supplied = isRecord(suppliedSnapshot) ? suppliedSnapshot : undefined;
     const suppliedId = readOwnDataField(supplied, "id");
     const talaId = typeof talaOrId === "string" ? talaOrId : typeof suppliedId === "string" ? suppliedId : "";
-    const registry = isRecord(context.musicalCoreFieldDispositions)
-      ? context.musicalCoreFieldDispositions as typeof talaFieldDispositions
+    const dispositionRegistry = getEvaluationState(context).musicalCoreFieldDispositions;
+    const registry = isRecord(dispositionRegistry)
+      ? dispositionRegistry as typeof talaFieldDispositions
       : undefined;
     const entries = registry && Array.isArray(registry.talas) ? registry.talas : [];
     const entry = entries.find((candidate) => candidate.talaId === talaId);
@@ -914,7 +968,7 @@ function collectDependencyDispositions(
     }
     const keys = Object.keys(record);
     for (const key of keys) {
-      if (key === "prerequisites" || key === "steps") continue;
+      if (key === "prerequisites" || key === "steps" || key === "lessonId") continue;
       const child = readOwnDataField(record, key);
       const childPath = `${prefix}${key}`;
       const dependencyRule = DEPENDENCY_FIELD_RULES[key];
@@ -929,12 +983,10 @@ function collectDependencyDispositions(
 function hasCanonicalRuntimeShape(
   value: unknown,
   knownKind?: ContentEntityKind,
-  graphSafety?: ReturnType<typeof inspectGraph>,
-  knownSnapshot?: unknown,
   context?: PublicationEvaluationContext,
 ): boolean {
   const kind = knownKind ?? (context ? getKnownContentKind(value, context) : undefined);
-  return !!kind && validateContentRecord(value, kind, graphSafety, knownSnapshot).isValid;
+  return !!kind && validateContentRecord(value, kind).isValid;
 }
 
 /**
@@ -1042,24 +1094,25 @@ function getRecordPublicationDecisionInternal(
   decisionContext: PublicationDecisionContext,
   knownSnapshot?: unknown,
 ): PublicationDecision {
+  const state = getEvaluationState(decisionContext);
   const originalObject = record !== null && typeof record === "object" ? record as object : undefined;
-  const cached = originalObject ? decisionContext.memo.get(originalObject) : undefined;
+  const cached = originalObject ? state.memo.get(originalObject) : undefined;
   if (cached) return cached;
   const finish = (decision: PublicationDecision, cacheable = true): PublicationDecision => {
-    if (originalObject && cacheable) decisionContext.memo.set(originalObject, decision);
+    if (originalObject && cacheable) state.memo.set(originalObject, decision);
     return decision;
   };
   if (!decisionContext.safe) return finish(failClosedRecordDecision(["malformed-record"], decisionContext));
   const graphSafety = inspectGraph(record);
   if (!graphSafety.safe) return finish(failClosedRecordDecision(["malformed-record"], decisionContext));
-  const safeRecord = (originalObject && decisionContext.snapshots.get(originalObject)) ??
+  const safeRecord = (originalObject && state.snapshots.get(originalObject)) ??
     knownSnapshot ?? cloneBoundedRecord(record, graphSafety);
   if (!safeRecord || !isRecord(safeRecord)) return finish(failClosedRecordDecision(["malformed-record"], decisionContext));
-  if (originalObject) decisionContext.snapshots.set(originalObject, safeRecord as Record<string, unknown>);
+  if (originalObject) state.snapshots.set(originalObject, safeRecord as Record<string, unknown>);
   const knownKind = getKnownContentKind(safeRecord, decisionContext);
   if (!knownKind) return finish(failClosedRecordDecision(["unknown-record-kind", "malformed-record"], decisionContext));
 
-  const hasValidRuntimeShape = hasCanonicalRuntimeShape(safeRecord, knownKind, graphSafety, safeRecord, decisionContext);
+  const hasValidRuntimeShape = hasCanonicalRuntimeShape(safeRecord, knownKind, decisionContext);
   const value = getRecordShape(safeRecord);
   const rawRecordId = readOwnDataField(value, "id");
   const recordId = typeof rawRecordId === "string" ? rawRecordId : "";
@@ -1070,7 +1123,7 @@ function getRecordPublicationDecisionInternal(
   const reasonCodes = new Set(baseDecision.reasonCodes);
   const nestedDispositions = [...baseDecision.nestedDispositions];
   const withheldFields = [...baseDecision.withheldFields];
-  if (recordId && decisionContext.stack.has(recordId)) {
+  if (recordId && state.stack.has(recordId)) {
     return {
       ...baseDecision,
       state: "needs-review",
@@ -1078,7 +1131,7 @@ function getRecordPublicationDecisionInternal(
       reasonCodes: Array.from(new Set<PublicationReasonCode>([...baseDecision.reasonCodes, "dependency-cycle"])),
     };
   }
-  if (decisionContext.stack.size >= 256) {
+  if (state.stack.size >= 256) {
     return finish({
       ...baseDecision,
       state: "needs-review",
@@ -1086,7 +1139,7 @@ function getRecordPublicationDecisionInternal(
       reasonCodes: Array.from(new Set<PublicationReasonCode>([...baseDecision.reasonCodes, "malformed-record"])),
     });
   }
-  if (recordId) decisionContext.stack.add(recordId);
+  if (recordId) state.stack.add(recordId);
 
   if (!hasValidRuntimeShape) reasonCodes.add("malformed-record");
   if (Array.isArray(value.gradeBands) && !isCanonicalGradeBandArray(value.gradeBands)) {
@@ -1138,7 +1191,7 @@ function getRecordPublicationDecisionInternal(
       nestedDispositions,
       withheldFields: Array.from(new Set(withheldFields)),
     };
-    if (recordId) decisionContext.stack.delete(recordId);
+    if (recordId) state.stack.delete(recordId);
     return finish(decision);
   }
 
@@ -1146,11 +1199,20 @@ function getRecordPublicationDecisionInternal(
   const parent = isQuiz && typeof lessonId === "string"
     ? decisionContext.catalogs.lessons.find((lesson) => readOwnDataField(lesson, "id") === lessonId)
     : undefined;
-  const parentIsActiveBacklink = isQuiz && typeof lessonId === "string" && decisionContext.stack.has(lessonId);
+  const parentIsActiveBacklink = isQuiz && typeof lessonId === "string" && state.stack.has(lessonId);
   const parentIsPublic = !isQuiz || (!!parent && (
     parentIsActiveBacklink || getRecordPublicationDecisionInternal(parent, decisionContext, parent).isPublic
   ));
-  if (isQuiz && !parentIsPublic) reasonCodes.add("parent-lesson-unavailable");
+  if (isQuiz) {
+    const parentRule = DEPENDENCY_FIELD_RULES.lessonId;
+    nestedDispositions.push({
+      path: "lessonId",
+      isPublic: parentIsPublic,
+      blocking: parentRule.blocking,
+      reasonCodes: parentIsPublic ? [] : ["parent-lesson-unavailable", "dependent-entity-unavailable"],
+    });
+    if (!parentIsPublic) reasonCodes.add("parent-lesson-unavailable");
+  }
   const nestedGroups = isQuiz
     ? [{ path: "questions", items: readOwnDataField(value, "questions") }]
     : [
@@ -1188,7 +1250,7 @@ function getRecordPublicationDecisionInternal(
     nestedDispositions,
     withheldFields: Array.from(new Set(withheldFields)),
   };
-  if (recordId) decisionContext.stack.delete(recordId);
+  if (recordId) state.stack.delete(recordId);
   const dependsOnActiveBacklink = parentIsActiveBacklink || nestedDispositions.some(
     (disposition) => disposition.reasonCodes.includes("dependency-cycle")
   );
@@ -1208,7 +1270,7 @@ export function getRecordPublicationDecision(record: unknown): PublicationDecisi
 export interface PublicationBatchEvaluation {
   isValid: boolean;
   decisions: PublicationDecision[];
-  reasonCode?: "malformed-record";
+  failureReason?: "non-array" | "unsafe-container" | "evaluation-failed";
 }
 
 export function evaluatePublicationBatch(
@@ -1216,19 +1278,23 @@ export function evaluatePublicationBatch(
   evaluationContext: PublicationEvaluationContext = createPublicationEvaluationContext(),
 ): PublicationBatchEvaluation {
   try {
+    if (!evaluationContext.safe) {
+      return { isValid: false, decisions: [], failureReason: "unsafe-container" };
+    }
     if (!Array.isArray(records)) {
-      return { isValid: false, decisions: [], reasonCode: "malformed-record" };
+      return { isValid: false, decisions: [], failureReason: "non-array" };
     }
     const trustedSnapshot = Object.values(evaluationContext.catalogs).find((catalog) => catalog === records);
     const snapshot = trustedSnapshot ?? captureEvaluationArray(records);
-    if (!snapshot) return { isValid: false, decisions: [], reasonCode: "malformed-record" };
+    if (!snapshot) return { isValid: false, decisions: [], failureReason: "unsafe-container" };
     const seenIds = new Set<string>();
     const hasDuplicateId = snapshot.some((record) => {
       if (!isRecord(record)) return false;
       const id = readOwnDataField(record, "id");
       if (typeof id !== "string" || !id.trim()) return false;
-      if (seenIds.has(id)) return true;
-      seenIds.add(id);
+      const normalizedId = id.trim();
+      if (seenIds.has(normalizedId)) return true;
+      seenIds.add(normalizedId);
       return false;
     });
     if (hasDuplicateId) {
@@ -1238,7 +1304,7 @@ export function evaluatePublicationBatch(
       };
     }
     const decisions = snapshot.map((record) => {
-      if (isRecord(record)) evaluationContext.snapshots.set(record, record);
+      if (isRecord(record)) getEvaluationState(evaluationContext).snapshots.set(record, record);
       const decision = getRecordPublicationDecisionInternal(record, evaluationContext, record);
       if (!decision.isPublic) return decision;
       return {
@@ -1248,7 +1314,7 @@ export function evaluatePublicationBatch(
     });
     return { isValid: true, decisions };
   } catch {
-    return { isValid: false, decisions: [], reasonCode: "malformed-record" };
+    return { isValid: false, decisions: [], failureReason: "evaluation-failed" };
   }
 }
 
@@ -1277,7 +1343,8 @@ export function getContextClaimPublicationDecision(
   context: PublicationEvaluationContext = createPublicationEvaluationContext(),
 ): ContextClaimPublicationDecision {
   try {
-    const value = getRecordShape(record);
+    const recordSnapshot = captureEvaluationValue(record, false);
+    const value = getRecordShape(recordSnapshot);
     const contextValue = readOwnDataField(value, "context_si");
     const referenceValue = readOwnDataField(value, "contextSourceReference");
     const hasContext = typeof contextValue === "string" && contextValue.trim().length > 0;
@@ -1330,23 +1397,23 @@ export function createUnverifiedReviewMetadata(): ReviewMetadata {
   return createContractUnverifiedReviewMetadata() as unknown as ReviewMetadata;
 }
 
-export function sanitizePublicRecord<T>(record: T): T {
+export function sanitizePublicRecord<T>(record: T): T | undefined {
   const decisions = getRecordPublicationDecisions([record]);
-  return (decisions[0]?.publicProjection ?? {}) as T;
+  return decisions[0]?.publicProjection as T | undefined;
 }
 
 function sanitizePublicRecordWithDecision<T>(
   record: T,
   decision: PublicationDecision,
   context: PublicationEvaluationContext,
-): T {
-  if (!record || typeof record !== "object" || !decision.isPublic) return {} as T;
+): T | undefined {
+  if (!record || typeof record !== "object" || !decision.isPublic) return undefined;
   try {
     const kind = getKnownContentKind(record, context);
-    if (!kind) return {} as T;
+    if (!kind) return undefined;
     const projected = projectPublicRecord(record, kind);
     const value = (isRecord(projected) ? projected : undefined) as Record<string, unknown> | undefined;
-    if (!value) return {} as T;
+    if (!value) return undefined;
     if (isMetadataBearingKind(kind)) value.reviewMetadata = createUnverifiedReviewMetadata();
     if ("published" in value) value.published = false;
     const contextDecision = getContextClaimPublicationDecision(record, context);
@@ -1362,7 +1429,7 @@ function sanitizePublicRecordWithDecision<T>(
     });
     return value as T;
   } catch {
-    return {} as T;
+    return undefined;
   }
 }
 

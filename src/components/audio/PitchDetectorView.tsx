@@ -55,7 +55,6 @@ export const PitchDetectorView: React.FC<PitchDetectorViewProps> = ({
     });
 
     if (!mountedRef.current || operationRef.current !== operation) {
-      detectorRef.current?.stopListening();
       return;
     }
 

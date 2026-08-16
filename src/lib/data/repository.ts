@@ -39,6 +39,7 @@ import {
   getRecordPublicationDecision,
   evaluatePublicationBatch,
   createPublicationEvaluationContext,
+  getPublicationCatalogRawCount,
   getSourceDocumentSummary,
   UNKNOWN_PROVENANCE,
   PUBLIC_GRADE_BANDS,
@@ -51,6 +52,7 @@ import {
 import {
   isRecord,
   isReviewMetadata,
+  cloneBoundedRecord,
   readOwnDataField,
   projectPublicRecord,
   validateContentRecord,
@@ -99,8 +101,16 @@ function hasKnownReviewEvidence(value: unknown): value is ReviewMetadata {
 }
 
 function readRawReviewMetadata(lesson: Record<string, unknown>): unknown {
+  return readOwnDataField(lesson, "reviewMetadata");
+}
+
+function findRecordById(items: readonly unknown[], id: string): Record<string, unknown> | undefined {
   try {
-    return lesson.reviewMetadata;
+    for (const candidate of items) {
+      if (!isRecord(candidate)) continue;
+      if (readOwnDataField(candidate, "id") === id) return candidate;
+    }
+    return undefined;
   } catch {
     return undefined;
   }
@@ -128,6 +138,7 @@ export interface PublicationCollectionSummary {
   public: number;
   quarantined: number;
   needsReview: number;
+  failureReasons: readonly string[];
 }
 
 export interface PublicSearchCatalogs {
@@ -155,6 +166,22 @@ class ContentRepository {
   private quizzes: unknown[] = quizzesData as unknown[];
   private examPapers: unknown[] = examPapersData as unknown[];
 
+  private createEvaluationContext(): PublicationEvaluationContext {
+    return createPublicationEvaluationContext({
+      sources: this.sources,
+      lessons: this.lessons,
+      ragas: this.ragas,
+      talas: this.talas,
+      instruments: this.instruments,
+      culturalTraditions: this.culturalTraditions,
+      theatreTraditions: this.theatreTraditions,
+      glossary: this.glossary,
+      learningPaths: this.learningPaths,
+      quizzes: this.quizzes,
+      examPapers: this.examPapers,
+    });
+  }
+
   private freezePublicationSummary(
     summary: Record<string, PublicationCollectionSummary>,
   ): Record<string, PublicationCollectionSummary> {
@@ -164,7 +191,7 @@ class ContentRepository {
 
   private selectPublic<T>(
     catalog: PublicationCatalogKey,
-    context = createPublicationEvaluationContext(),
+    context = this.createEvaluationContext(),
   ): T[] {
     const items = context.catalogs[catalog];
     if (!context.safe) return [];
@@ -183,7 +210,7 @@ class ContentRepository {
   private selectForReview<T>(
     catalog: PublicationCatalogKey,
     kind: ContentEntityKind,
-    context = createPublicationEvaluationContext(),
+    context = this.createEvaluationContext(),
   ): T[] {
     if (!context.safe) return [];
     const items = context.catalogs[catalog];
@@ -194,29 +221,41 @@ class ContentRepository {
   }
 
   private summarize(
-    items: readonly unknown[],
+    catalog: PublicationCatalogKey,
     context: PublicationEvaluationContext,
   ): PublicationCollectionSummary {
+    const items = context.catalogs[catalog];
+    const raw = getPublicationCatalogRawCount(context, catalog);
+    if (!context.safe) {
+      return { raw, public: 0, quarantined: 0, needsReview: raw, failureReasons: ["unsafe-container"] };
+    }
     if (!hasUniqueRecordIds(items)) {
-      return { raw: items.length, public: 0, quarantined: 0, needsReview: items.length };
+      return { raw, public: 0, quarantined: 0, needsReview: raw, failureReasons: ["duplicate-record-id"] };
     }
     const batch = evaluatePublicationBatch(items, context);
     if (!batch.isValid || batch.decisions.length !== items.length) {
-      return { raw: items.length, public: 0, quarantined: 0, needsReview: items.length };
+      return {
+        raw,
+        public: 0,
+        quarantined: 0,
+        needsReview: raw,
+        failureReasons: [batch.failureReason ?? "incomplete-decision-batch"],
+      };
     }
     const decisions = batch.decisions;
     return {
-      raw: items.length,
+      raw,
       public: decisions.filter((decision) => decision.state === "public").length,
       quarantined: decisions.filter((decision) => decision.state === "quarantined").length,
       needsReview: decisions.filter((decision) => decision.state === "needs-review").length,
+      failureReasons: [],
     };
   }
 
   // Sources: public transparency metadata is deliberately sanitized. The raw
   // publisher/year/location/license values are not provenance evidence.
   public getSources(): SourceCatalogView[] {
-    const context = createPublicationEvaluationContext();
+    const context = this.createEvaluationContext();
     if (!context.safe || !hasUniqueRecordIds(context.catalogs.sources)) return [];
     return context.catalogs.sources.flatMap((candidate) => {
       if (!validateContentRecord(candidate, "source").isValid || !isRecord(candidate)) return [];
@@ -298,7 +337,7 @@ class ContentRepository {
     } catch {
       return [];
     }
-    const context = createPublicationEvaluationContext();
+    const context = this.createEvaluationContext();
     let list = visibility === "review"
       ? this.selectForReview<Lesson>("lessons", "lesson", context)
       : this.selectPublic<Lesson>("lessons", context);
@@ -443,20 +482,19 @@ class ContentRepository {
   }
 
   public getPublicationSummary(): Record<string, PublicationCollectionSummary> {
-    const context = createPublicationEvaluationContext();
-    const { catalogs } = context;
-    const learningPaths = this.summarize(catalogs.learningPaths, context);
+    const context = this.createEvaluationContext();
+    const learningPaths = this.summarize("learningPaths", context);
     const summary = {
-      lessons: this.summarize(catalogs.lessons, context),
-      ragas: this.summarize(catalogs.ragas, context),
-      talas: this.summarize(catalogs.talas, context),
-      instruments: this.summarize(catalogs.instruments, context),
-      culturalTraditions: this.summarize(catalogs.culturalTraditions, context),
-      theatreTraditions: this.summarize(catalogs.theatreTraditions, context),
-      glossary: this.summarize(catalogs.glossary, context),
+      lessons: this.summarize("lessons", context),
+      ragas: this.summarize("ragas", context),
+      talas: this.summarize("talas", context),
+      instruments: this.summarize("instruments", context),
+      culturalTraditions: this.summarize("culturalTraditions", context),
+      theatreTraditions: this.summarize("theatreTraditions", context),
+      glossary: this.summarize("glossary", context),
       learningPaths,
-      quizzes: this.summarize(catalogs.quizzes, context),
-      exams: this.summarize(catalogs.examPapers, context),
+      quizzes: this.summarize("quizzes", context),
+      exams: this.summarize("examPapers", context),
     };
     return this.freezePublicationSummary(summary);
   }
@@ -467,7 +505,7 @@ class ContentRepository {
 
   /** One immutable evidence/catalog capture for a complete public search. */
   public getPublicSearchCatalogs(): PublicSearchCatalogs {
-    const context = createPublicationEvaluationContext();
+    const context = this.createEvaluationContext();
     return {
       lessons: this.selectPublic<Lesson>("lessons", context),
       ragas: this.selectPublic<Raga>("ragas", context),
@@ -489,29 +527,34 @@ class ContentRepository {
     newStatus: ReviewStatus,
     isPublished: boolean = false
   ): boolean {
-    const lesson = this.lessons.find((candidate) => isRecord(candidate) && candidate.id === lessonId);
-    if (!isRecord(lesson) || typeof isPublished !== "boolean") return false;
+    try {
+      const lesson = findRecordById(this.lessons, lessonId);
+      if (!lesson || typeof isPublished !== "boolean") return false;
 
-    if ((newStatus === "Published") !== isPublished) return false;
-    const requestsPublication = newStatus === "Published" || isPublished;
-    const rawMetadata = readRawReviewMetadata(lesson);
-    if (requestsPublication && !hasKnownReviewEvidence(rawMetadata)) return false;
-    if (requestsPublication) {
-      const publication = getRecordPublicationDecision(lesson);
-      if (!publication.isPublic || !publication.sourceEvidence.supportable) return false;
+      if ((newStatus === "Published") !== isPublished) return false;
+      const requestsPublication = newStatus === "Published" || isPublished;
+      const rawMetadata = readRawReviewMetadata(lesson);
+      if (requestsPublication && !hasKnownReviewEvidence(rawMetadata)) return false;
+      if (requestsPublication) {
+        const publication = getRecordPublicationDecision(lesson);
+        if (!publication.isPublic || !publication.sourceEvidence.supportable) return false;
+      }
+
+      const safeCandidate = sanitizeReviewRecord(lesson);
+      if (!validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) return false;
+      const metadataSnapshot = cloneBoundedRecord(rawMetadata);
+      const nextMetadata: ReviewMetadata = isReviewMetadata(metadataSnapshot)
+        ? metadataSnapshot as unknown as ReviewMetadata
+        : createUnverifiedReviewMetadata();
+      nextMetadata.status = newStatus;
+      nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
+      if (!isReviewMetadata(nextMetadata)) return false;
+      lesson.reviewMetadata = nextMetadata;
+      lesson.published = isPublished;
+      return true;
+    } catch {
+      return false;
     }
-
-    const safeCandidate = sanitizeReviewRecord(lesson);
-    if (!validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) return false;
-    const nextMetadata: ReviewMetadata = isReviewMetadata(rawMetadata)
-      ? { ...(rawMetadata as unknown as ReviewMetadata) }
-      : createUnverifiedReviewMetadata();
-    nextMetadata.status = newStatus;
-    nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
-    if (!isReviewMetadata(nextMetadata)) return false;
-    lesson.reviewMetadata = nextMetadata;
-    lesson.published = isPublished;
-    return true;
   }
 
   public updateLessonStatus(
@@ -520,32 +563,37 @@ class ContentRepository {
     reviewer: string,
     notes: string
   ): boolean {
-    const lesson = this.lessons.find((candidate) => isRecord(candidate) && candidate.id === lessonId);
-    if (!isRecord(lesson)) return false;
+    try {
+      const lesson = findRecordById(this.lessons, lessonId);
+      if (!lesson) return false;
 
-    const rawMetadata = readRawReviewMetadata(lesson);
-    if (newStatus === "Published") {
-      if (!hasKnownReviewEvidence(rawMetadata)) return false;
-      if (typeof reviewer !== "string" || typeof notes !== "string" ||
-        !reviewer.trim() || !notes.trim() ||
-        [UNKNOWN_PROVENANCE, "Unknown / Unverified", "unknown"].includes(reviewer.trim())) return false;
-      const publication = getRecordPublicationDecision(lesson);
-      if (!publication.isPublic || !publication.sourceEvidence.supportable) return false;
+      const rawMetadata = readRawReviewMetadata(lesson);
+      if (newStatus === "Published") {
+        if (!hasKnownReviewEvidence(rawMetadata)) return false;
+        if (typeof reviewer !== "string" || typeof notes !== "string" ||
+          !reviewer.trim() || !notes.trim() ||
+          [UNKNOWN_PROVENANCE, "Unknown / Unverified", "unknown"].includes(reviewer.trim())) return false;
+        const publication = getRecordPublicationDecision(lesson);
+        if (!publication.isPublic || !publication.sourceEvidence.supportable) return false;
+      }
+
+      const safeCandidate = sanitizeReviewRecord(lesson);
+      if (!validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) return false;
+      const metadataSnapshot = cloneBoundedRecord(rawMetadata);
+      const nextMetadata: ReviewMetadata = isReviewMetadata(metadataSnapshot)
+        ? metadataSnapshot as unknown as ReviewMetadata
+        : createUnverifiedReviewMetadata();
+      nextMetadata.status = newStatus;
+      nextMetadata.reviewer = reviewer;
+      nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
+      nextMetadata.changeNotes = notes;
+      if (!isReviewMetadata(nextMetadata)) return false;
+      lesson.reviewMetadata = nextMetadata;
+      lesson.published = newStatus === "Published";
+      return true;
+    } catch {
+      return false;
     }
-
-    const safeCandidate = sanitizeReviewRecord(lesson);
-    if (!validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) return false;
-    const nextMetadata: ReviewMetadata = isReviewMetadata(rawMetadata)
-      ? { ...(rawMetadata as unknown as ReviewMetadata) }
-      : createUnverifiedReviewMetadata();
-    nextMetadata.status = newStatus;
-    nextMetadata.reviewer = reviewer;
-    nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
-    nextMetadata.changeNotes = notes;
-    if (!isReviewMetadata(nextMetadata)) return false;
-    lesson.reviewMetadata = nextMetadata;
-    lesson.published = newStatus === "Published";
-    return true;
   }
 }
 

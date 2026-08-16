@@ -7,6 +7,8 @@ import musicalCoreFieldDispositions from "../../data/musical-core-field-disposit
 import { repository } from "@/lib/data/repository";
 import {
   DEPENDENCY_FIELD_RULES,
+  createPublicationEvaluationContext,
+  evaluatePublicationBatch,
   evaluateSourceReference,
   formatPublicSourceReference,
   getContextClaimPublicationDecision,
@@ -41,6 +43,7 @@ describe("Prompt 1 publication containment", () => {
       quizId: { blocking: false, catalog: "quizzes" },
       masteryQuizId: { blocking: true, catalog: "quizzes" },
       nextRecommendedPathId: { blocking: false, catalog: "learningPaths" },
+      lessonId: { blocking: true, catalog: "lessons" },
       talaId: { blocking: true, catalog: "talas" },
       targetTalaId: { blocking: true, catalog: "talas" },
       audioTalaId: { blocking: true, catalog: "talas" },
@@ -49,6 +52,41 @@ describe("Prompt 1 publication containment", () => {
       selectedRagaId: { blocking: true, catalog: "ragas" },
     });
   });
+
+  it.each(Object.entries(DEPENDENCY_FIELD_RULES))(
+    "applies the declarative %s dependency rule to the publication decision",
+    (field, rule) => {
+      const canonicalLesson = lessonsData.find((lesson) => lesson.id === "les-intro-01");
+      const canonicalQuiz = quizzesData.find((quiz) => quiz.id === "quiz-les-intro-01");
+      expect(canonicalLesson).toBeDefined();
+      expect(canonicalQuiz).toBeDefined();
+      if (!canonicalLesson || !canonicalQuiz) return;
+
+      const candidate = structuredClone(field === "lessonId" ? canonicalQuiz : canonicalLesson) as unknown as Record<string, unknown>;
+      let expectedPath = field;
+      if (field === "prerequisites") {
+        candidate.prerequisites = ["missing-dependency"];
+        expectedPath = "prerequisites[0]";
+      } else if (field === "steps[].lessonId") {
+        candidate.steps = [{ lessonId: "missing-dependency" }];
+        expectedPath = "steps[0].lessonId";
+      } else {
+        candidate[field] = "missing-dependency";
+      }
+
+      const decision = getRecordPublicationDecision(candidate);
+      const disposition = decision.nestedDispositions.find((item) => item.path === expectedPath);
+      expect(disposition, `${field} disposition`).toMatchObject({
+        isPublic: false,
+        blocking: rule.blocking,
+        reasonCodes: expect.arrayContaining(["dependent-entity-unavailable"]),
+      });
+      expect(decision.isPublic).toBe(!rule.blocking);
+      if (!rule.blocking) {
+        expect((decision.publicProjection as Record<string, unknown> | undefined)?.[field]).toBeUndefined();
+      }
+    },
+  );
 
   it("keeps unsupported grades and named quarantined entities out of public data", () => {
     const publicCollections = [
@@ -145,7 +183,112 @@ describe("Prompt 1 publication containment", () => {
     expect(publicDecision.isPublic).toBe(true);
     const malformed = structuredClone(validLesson) as Record<string, unknown>;
     delete malformed.title_si;
-    expect(sanitizePublicRecord(malformed)).toEqual({});
+    expect(sanitizePublicRecord(malformed)).toBeUndefined();
+  });
+
+  it("fails publication batches closed for whitespace-normalized duplicate IDs", () => {
+    const first = structuredClone(ragasData[0]) as unknown as Record<string, unknown>;
+    const second = structuredClone(ragasData[0]) as unknown as Record<string, unknown>;
+    second.id = ` ${String(first.id)} `;
+    const result = evaluatePublicationBatch([first, second]);
+    expect(result).toMatchObject({ isValid: true });
+    expect(result.decisions).toHaveLength(2);
+    expect(result.decisions.every((decision) =>
+      !decision.isPublic && decision.reasonCodes.includes("duplicate-record-id"))).toBe(true);
+  });
+
+  it("preserves stable failure reasons at the checked batch boundary", () => {
+    const sparse: unknown[] = [];
+    sparse.length = 2;
+    expect(evaluatePublicationBatch(null)).toMatchObject({
+      isValid: false,
+      decisions: [],
+      failureReason: "non-array",
+    });
+    expect(evaluatePublicationBatch(sparse)).toMatchObject({
+      isValid: false,
+      decisions: [],
+      failureReason: "unsafe-container",
+    });
+  });
+
+  it("exposes only frozen publication snapshots, not mutable evaluation caches", () => {
+    const context = createPublicationEvaluationContext();
+    expect(Object.isFrozen(context)).toBe(true);
+    expect(Object.isFrozen(context.catalogs)).toBe(true);
+    expect(Object.isFrozen(context.catalogs.lessons)).toBe(true);
+    for (const privateField of ["memo", "stack", "snapshots", "knownKinds", "sourceDocuments", "sourcePageQuality"]) {
+      expect((context as unknown as Record<string, unknown>)[privateField]).toBeUndefined();
+    }
+  });
+
+  it("reports unsafe catalog captures as current needs-review inventory", () => {
+    const mutableRepository = repository as unknown as { ragas: unknown[] };
+    const original = mutableRepository.ragas;
+    const sparse: unknown[] = [];
+    sparse.length = original.length;
+    try {
+      mutableRepository.ragas = sparse;
+      const summary = repository.getPublicationSummary().ragas;
+      expect(summary).toEqual({
+        raw: original.length,
+        public: 0,
+        quarantined: 0,
+        needsReview: original.length,
+        failureReasons: ["unsafe-container"],
+      });
+    } finally {
+      mutableRepository.ragas = original;
+    }
+  });
+
+  it("snapshots source references before evidence fields are read", () => {
+    const canonical = ragasData[0].sourceReference;
+    let getterReads = 0;
+    const stateful = new Proxy(structuredClone(canonical) as Record<string, unknown>, {
+      get(target, property, receiver) {
+        getterReads += 1;
+        if (property === "sourceId") return "SRC-COUNTERFEIT";
+        return Reflect.get(target, property, receiver);
+      },
+    });
+    expect(evaluateSourceReference(stateful as unknown as typeof canonical))
+      .toMatchObject({ supportable: true, reasonCode: "supportable" });
+    expect(getterReads).toBe(0);
+  });
+
+  it("fails CMS operations safely for hostile IDs and metadata containers", () => {
+    const raw = lessonsData.find((lesson) => lesson.id === "les-intro-01") as unknown as Record<string, unknown>;
+    const originalMetadata = raw.reviewMetadata;
+    const hostileMetadata = new Proxy(structuredClone(originalMetadata) as Record<string, unknown>, {
+      ownKeys() {
+        throw new Error("hostile metadata");
+      },
+    });
+    try {
+      raw.reviewMetadata = hostileMetadata;
+      expect(() => repository.updateLessonStatus("les-intro-01", "Needs Revision", "Reviewer", "Notes"))
+        .not.toThrow();
+      expect(repository.updateLessonStatus("les-intro-01", "Needs Revision", "Reviewer", "Notes")).toBe(false);
+
+      const hostileId = new Proxy({ toString: () => "les-intro-01" }, {
+        getPrototypeOf() {
+          throw new Error("hostile id");
+        },
+      });
+      expect(() => (repository.updateLessonReviewStatus as unknown as (...args: unknown[]) => boolean)(
+        hostileId,
+        "Needs Revision",
+        false,
+      )).not.toThrow();
+      expect((repository.updateLessonReviewStatus as unknown as (...args: unknown[]) => boolean)(
+        hostileId,
+        "Needs Revision",
+        false,
+      )).toBe(false);
+    } finally {
+      raw.reviewMetadata = originalMetadata;
+    }
   });
 
   it("fails closed after a previously trusted raw record becomes accessor-backed", () => {
@@ -663,7 +806,8 @@ describe("Prompt 1 publication containment", () => {
       isPublic: false,
       reasonCodes: expect.arrayContaining(["nested-question-unpublishable", "malformed-record"]),
     });
-    expect(decision.nestedDispositions[0].reasonCodes).toContain("missing-source-reference");
+    expect(decision.nestedDispositions.find((item) => item.path === "questions[0]")?.reasonCodes)
+      .toContain("missing-source-reference");
   });
 
   it("returns detached source grade arrays", () => {

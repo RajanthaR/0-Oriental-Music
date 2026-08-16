@@ -139,6 +139,7 @@
     ]
   },
   "inventory": {
+    "boundary": "Observed extracted-Markdown inventory at the audited snapshot only; these counts do not establish curriculum completeness, official coverage, or publication readiness.",
     "sourceMarkdownFilesInBySource": 30,
     "sourceMarkdownFilesAllArtifacts": 66,
     "originalPdfFilesInCheckout": 0,
@@ -220,7 +221,7 @@
         },
         {
           "path": "data/source-documents.json",
-          "locator": "all 30 extracted documents",
+          "locator": "the extracted-document inventory recorded under inventory.sourceMarkdownFilesInBySource",
           "exactSection": "no supplied Grade 12-13 source document"
         }
       ],
@@ -658,7 +659,7 @@
         },
         {
           "path": "data/source-documents.json",
-          "locator": "30 extracted documents",
+          "locator": "the extracted-document inventory and per-document reviewStatus values",
           "exactSection": "reviewStatus is Source Triaged, Review Required, or Image Only / Gaps; it does not establish all metadata"
         },
         {
@@ -1065,12 +1066,12 @@
         {
           "path": "src/lib/search/search-engine.ts",
           "locator": "SearchIndex.search normalized-query guard",
-          "exactSection": "search-engine.ts:79,99 - raw blank featured results are distinct from normalized-empty hostile input"
+          "exactSection": "search-engine.ts:84,137 - raw blank featured results are distinct from normalized-empty hostile input"
         },
         {
           "path": "src/test/search-engine.test.ts",
           "locator": "raw-empty and normalized-empty control regression",
-          "exactSection": "search-engine.test.ts:79 - bidi and zero-width-only nonblank queries return no results"
+          "exactSection": "search-engine.test.ts:80 - bidi and zero-width-only nonblank queries return no results"
         }
       ],
       "disposition": "preserve featured results only for genuinely empty or whitespace input and return no results when a nonblank query has no normalized or transliterated search text",
@@ -1105,6 +1106,404 @@
       "evidenceBasis": "runtime-inspection"
     }
   ],
+  "acceptanceHardeningCycle1": {
+    "phase": "Phase 2 acceptance hardening cycle 1",
+    "plan": "docs/plans/2026-08-16-003-fix-phase-2-acceptance-hardening-plan.md",
+    "baseSha": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "reviewedHead": "b1b2f5ea949d274fa5e260f39f0554465f704072",
+    "reviewRunId": "20260816-161455-p02-acceptance-c1-4e350894",
+    "artifactDirectory": "C:/tmp/compound-engineering/ce-code-review/20260816-161455-p02-acceptance-c1-4e350894/",
+    "reviewersCompleted": 11,
+    "validatorWave": {
+      "validatorsCompleted": 24,
+      "validated": 23,
+      "rejected": 1,
+      "infrastructureFailures": 0,
+      "degradedP0P1": 0
+    },
+    "rejectedValidator": {
+      "artifact": "validator-05-closeout-plan-reference.json",
+      "status": "rejected",
+      "reason": "Historical dual-plan reference: the earlier final-contract section legitimately points to docs/plans/2026-08-16-002-fix-phase-2-final-contract-closeout-plan.md, while this acceptance-hardening input is governed by docs/plans/2026-08-16-003-fix-phase-2-acceptance-hardening-plan.md. Historical pointers and verdicts remain unchanged."
+    },
+    "status": "Blocked historical acceptance input; 23 validated findings require pending fixes or rerereview; not final acceptance evidence",
+    "dispositionStatuses": [
+      "FIXED-PENDING-REREVIEW"
+    ],
+    "validatedFindings": [
+      {
+        "validatorArtifact": "validator-01-hostile-validator-arrays.json",
+        "severity": "P1",
+        "finding": "Exported validators can iterate hostile or sparse outer collections before a safe snapshot.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Add one bounded dense-array snapshot/guard for validatePublicCollection, validateCatalogIdentityContracts, and validateContent; return structured failure instead of throwing or false-green validation.",
+        "paths": [
+          "src/lib/validation/content-validator.ts"
+        ],
+        "symbols": [
+          "validatePublicCollection",
+          "validateCatalogIdentityContracts",
+          "validateContent"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-02-batch-normalized-duplicate-ids.json",
+        "severity": "P1",
+        "finding": "evaluatePublicationBatch misses duplicate IDs that differ only by surrounding whitespace.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Canonicalize trimmed identity once, reject blank or colliding IDs, and fail closed using the same identity rule as hasUniqueRecordIds.",
+        "paths": [
+          "src/lib/data/publication-policy.ts",
+          "src/lib/data/repository.ts"
+        ],
+        "symbols": [
+          "evaluatePublicationBatch",
+          "hasUniqueRecordIds"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-03-cms-metadata-proxy.json",
+        "severity": "P1",
+        "finding": "CMS review-status mutations can spread or read a hostile reviewMetadata proxy.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Detach metadata with a bounded clone, read only the detached record, and make updateLessonReviewStatus and updateLessonStatus return false on hostile input without throwing.",
+        "paths": [
+          "src/lib/data/repository.ts"
+        ],
+        "symbols": [
+          "hasKnownReviewEvidence",
+          "updateLessonReviewStatus",
+          "updateLessonStatus"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-04-cms-hostile-lookup.json",
+        "severity": "P1",
+        "finding": "CMS lookup can throw when a candidate lesson ID accessor is hostile.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Use safe own-field reads for lookup and a fail-closed mutation boundary; no catalog mutation may occur after a rejected lookup.",
+        "paths": [
+          "src/lib/data/repository.ts"
+        ],
+        "symbols": [
+          "updateLessonReviewStatus",
+          "updateLessonStatus",
+          "findRecordById"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-06-admin-rejected-success.json",
+        "severity": "P1",
+        "finding": "Admin displays success after the repository rejects a Published transition.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Honor the boolean or result from updateLessonReviewStatus, refresh only after success, and show localized rejection feedback.",
+        "paths": [
+          "src/app/admin/page.tsx",
+          "src/lib/data/repository.ts"
+        ],
+        "symbols": [
+          "handleUpdateStatus",
+          "updateLessonReviewStatus"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-07-batch-failure-reasons.json",
+        "severity": "P1",
+        "finding": "Batch wrappers and summaries discard stable malformed or incomplete failure reasons.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Preserve a structured failure union through batch reporting and count incomplete snapshots as needs-review without erasing raw counts.",
+        "paths": [
+          "src/lib/data/publication-policy.ts",
+          "src/lib/data/repository.ts"
+        ],
+        "symbols": [
+          "evaluatePublicationBatch",
+          "getRecordPublicationDecisions",
+          "getPublicationSummary"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-08-quizrunner-duplicate-ids.json",
+        "severity": "P1",
+        "finding": "QuizRunner accepts duplicate question IDs and aliases answer state.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Reject duplicate question IDs during getUsableQuiz projection and render the unavailable state without controls or an attempt.",
+        "paths": [
+          "src/components/quiz/QuizRunner.tsx"
+        ],
+        "symbols": [
+          "getUsableQuiz"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-09-failed-catalog-raw-counts.json",
+        "severity": "P1",
+        "finding": "Failed catalog capture can replace a nonempty catalog with an empty snapshot and erase raw counts.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Retain a bounded raw-count and failure marker and report captured records as needs-review in summaries.",
+        "paths": [
+          "src/lib/data/publication-policy.ts",
+          "src/lib/data/repository.ts"
+        ],
+        "symbols": [
+          "createPublicationEvaluationContext",
+          "getPublicationCatalogRawCount",
+          "getPublicationSummary"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-10-pitch-replacement-race.json",
+        "severity": "P1",
+        "finding": "A stale microphone start can stop the newer replacement session.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Return from the stale or unmounted completion branch without stopping the current detector and add newest-first deferred-start regression coverage.",
+        "paths": [
+          "src/components/audio/PitchDetectorView.tsx",
+          "src/lib/audio/pitch.ts"
+        ],
+        "symbols": [
+          "handleStartMic",
+          "operationRef",
+          "startListening"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-11-known-snapshot-mismatch.json",
+        "severity": "P1",
+        "finding": "Exported validateContentRecord can trust an unrelated caller-supplied known snapshot.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Remove or constrain the public knownSnapshot path and capture the value's own safe snapshot before runtime-shape checks.",
+        "paths": [
+          "src/lib/validation/content-contracts.ts"
+        ],
+        "symbols": [
+          "validateContentRecord",
+          "hasCanonicalRuntimeShape"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-12-curriculum-fixed-count.json",
+        "severity": "P1",
+        "finding": "The legacy curriculum map contradicted its warning by asserting fixed 30-document, complete Grades 6-11 coverage.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "The fixed count and completeness assertion are replaced with bounded extracted-inventory wording; source-backed public scope remains 6-11 and does not imply curriculum completeness.",
+        "paths": [
+          "docs/CURRICULUM_MAP.md"
+        ],
+        "symbols": [
+          "12-13/උසස් පෙළ boundary note"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-13-quiz-format-coverage.json",
+        "severity": "P1",
+        "finding": "Supported quiz formats lack interaction-to-results regression coverage.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Add parameterized controls, submission, scoring, and localized-feedback coverage for every supported renderer format.",
+        "paths": [
+          "src/test/quiz-runner.test.tsx"
+        ],
+        "symbols": [
+          "quiz format scenarios"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-14-dependency-matrix-coverage.json",
+        "severity": "P1",
+        "finding": "The dependency matrix is declared but not behaviorally proved across all recognized keys and public surfaces.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Add matrix-driven available and unavailable cases, optional-link stripping, and direct, list, search, and summary parity checks.",
+        "paths": [
+          "src/lib/data/publication-policy.ts",
+          "src/test/publication-containment.test.ts"
+        ],
+        "symbols": [
+          "DEPENDENCY_FIELD_RULES",
+          "collectDependencyDispositions"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-15-forensic-question-projection.json",
+        "severity": "P2",
+        "finding": "Nested quiz and exam projection can retain forensic audio or notation question types.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Require isPublicQuestionType for every nested child and quarantine the parent when any child is forensic-only or malformed.",
+        "paths": [
+          "src/lib/validation/content-contracts.ts"
+        ],
+        "symbols": [
+          "projectPublicRecord",
+          "isPublicQuestionType",
+          "nested question projection"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-16-evidence-helper-toctou.json",
+        "severity": "P2",
+        "finding": "Evidence helpers reread caller objects after shape checks, allowing stateful proxies to change the evidence decision.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Detach the supplied Tala or context record once at the exported helper boundary and read only that snapshot.",
+        "paths": [
+          "src/lib/data/publication-policy.ts"
+        ],
+        "symbols": [
+          "getTalaFieldDisposition",
+          "getContextClaimPublicationDecision"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-17-quiz-parent-matrix.json",
+        "severity": "P2",
+        "finding": "Quiz-parent lessonId is handled outside the declarative dependency matrix and lacks a nested disposition.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Add the blocking lessonId rule, emit the parent disposition, and extend matrix and public-surface parity tests.",
+        "paths": [
+          "src/lib/data/publication-policy.ts"
+        ],
+        "symbols": [
+          "DEPENDENCY_FIELD_RULES",
+          "collectDependencyDispositions",
+          "quiz-parent decision"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-18-evaluation-context-mutability.json",
+        "severity": "P2",
+        "finding": "PublicationEvaluationContext exposes mutable snapshots, indexes, and memo state.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Hide or freeze evaluation internals and keep mutable memo and stack state private to the context implementation.",
+        "paths": [
+          "src/lib/data/publication-policy.ts"
+        ],
+        "symbols": [
+          "PublicationEvaluationContext",
+          "createPublicationEvaluationContext",
+          "PUBLICATION_CONTEXT_STATE"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-19-stale-search-anchor.json",
+        "severity": "P2",
+        "finding": "Numeric search guard and test anchors in the correction log, field matrix, closeout, and ledger are stale.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Use symbol and heading references now and refresh numeric lines only after code and tests stabilize; no stale line is presented as final acceptance evidence.",
+        "paths": [
+          "src/lib/search/search-engine.ts",
+          "src/test/search-engine.test.ts",
+          "docs/FORENSIC_CORRECTION_LOG.md",
+          "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
+          "docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md",
+          "data/forensic-ledger.json"
+        ],
+        "symbols": [
+          "normalized-empty search guard",
+          "normalized-empty search regression"
+        ],
+        "anchorStatus": "Numeric line anchors intentionally deferred"
+      },
+      {
+        "validatorArtifact": "validator-20-quizrunner-array-limit.json",
+        "severity": "P2",
+        "finding": "QuizRunner accepts a dense question array above the shared MAX_ARRAY_ITEMS bound.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Reject oversized question arrays before iteration or apply the complete bounded graph check and render the unavailable state.",
+        "paths": [
+          "src/components/quiz/QuizRunner.tsx",
+          "src/lib/validation/content-contracts.ts"
+        ],
+        "symbols": [
+          "getUsableQuiz",
+          "MAX_ARRAY_ITEMS"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-21-quizrunner-zero-score.json",
+        "severity": "P2",
+        "finding": "QuizRunner admits passingScorePercent 0 despite the shared contract and then applies a fallback threshold.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Align the renderer with isQuiz for nonpositive thresholds and add the zero-score regression without changing the curriculum contract by inference.",
+        "paths": [
+          "src/components/quiz/QuizRunner.tsx",
+          "src/lib/validation/content-contracts.ts"
+        ],
+        "symbols": [
+          "getUsableQuiz",
+          "isQuiz"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-22-sanitizer-return-type.json",
+        "severity": "P2",
+        "finding": "sanitizePublicRecord<T> promises T but returns an empty object for a rejected record.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Return T | undefined or a discriminated result and require callers to branch on rejection rather than cast an empty object.",
+        "paths": [
+          "src/lib/data/publication-policy.ts"
+        ],
+        "symbols": [
+          "sanitizePublicRecord"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-23-rejected-settled-handles.json",
+        "severity": "P2",
+        "finding": "Rejected finished or ready playback handles lack cleanup regression coverage.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Exercise rejection after a beat, reset or replacement, and unmount; verify settled handles and stale unavailable callbacks are cleaned exactly once.",
+        "paths": [
+          "src/test/components.test.tsx",
+          "src/components/audio/RhythmTapGame.tsx",
+          "src/components/audio/TalaVisualizer.tsx"
+        ],
+        "symbols": [
+          "playback handle rejection and lifecycle scenarios"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-24-public-collection-duplicate-ids.json",
+        "severity": "P1",
+        "finding": "Exported public-collection validators can return valid for exact duplicate records even when batch evaluation detects the collision.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Route validatePublicCollection and validatePublicBoundary through the shared duplicate-aware batch decision and fail the complete collection closed.",
+        "paths": [
+          "src/lib/validation/content-validator.ts",
+          "src/lib/data/publication-policy.ts"
+        ],
+        "symbols": [
+          "validatePublicCollection",
+          "validatePublicBoundary",
+          "evaluatePublicationBatch"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      }
+    ],
+    "historicalPreservation": [
+      "The rejected Deepchandi retrieval finding remains rejected and retrieval-only.",
+      "Earlier p02r4, final-contract, and other blocked review runs remain historical findings input and are not relabeled as acceptance.",
+      "No new musical fact, Tala, raga, grade, metadata, publication, push, ready PR, merge, or deployment is claimed by this record."
+    ]
+  },
   "publicBaseline": {
     "state": "source-backed but not fully reviewed",
     "publicGradeBands": [

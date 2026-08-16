@@ -129,7 +129,7 @@ Deepchandi retrieval-spelling boundaries above remain `needs-review`.
 | `P02-FINAL-02` | Every finite-domain field is checked against the dependency-free closed union. | `src/test/content-contracts.test.ts:241`; `src/test/content-contracts.test.ts:268` |
 | `P02-FINAL-03` | Every imported record and nested question is audited; listed legacy contract debt remains nonpublic. | `src/test/content-contracts.test.ts:101`; `src/lib/validation/content-contracts.ts:602`; `src/lib/validation/content-contracts.ts:702` |
 | `P02-FINAL-04` | Iterative graph inspection/projection rejects cycles, hostile descriptors, and depth/node overruns while preserving projection-kind identity. | `src/test/content-contracts.test.ts:368`; `src/lib/validation/content-contracts.ts:819`; `src/lib/validation/content-contracts.ts:950` |
-| `P02-FINAL-05` | Nonblank normalized-empty hostile search returns no results. | `src/lib/search/search-engine.ts:99`; `src/test/search-engine.test.ts:79` |
+| `P02-FINAL-05` | Nonblank normalized-empty hostile search returns no results. | `src/lib/search/search-engine.ts:84`, `src/lib/search/search-engine.ts:137`; `src/test/search-engine.test.ts:80` |
 | `P02-FINAL-06` | Caller-owned Swara handles survive readiness and cancel replacement/unmount work without cross-caller effects. | `src/test/synth.test.ts:199`; `src/test/synth.test.ts:293`; `src/test/components.test.tsx:413`; `src/test/components.test.tsx:570`; `src/test/components.test.tsx:604` |
 
 ## Acceptance-hardening runtime boundary
@@ -145,3 +145,32 @@ bounded Grade 10 acoustics subset may remain public; Bhairav and all eight
 Talas remain quarantined; the rejected Deepchandi retrieval-only disposition
 remains historical; original-PDF, diagram, notation, OCR/corrupt-glyph, and
 SME review remain required where already recorded.
+
+## Acceptance-hardening cycle 1 traceability boundary
+
+Run `20260816-161455-p02-acceptance-c1-4e350894` reviewed
+`b1b2f5ea949d274fa5e260f39f0554465f704072` (base
+`beba1479f473b3413b3f2de48a27c558e1937c6f`) and is retained as blocked
+acceptance-only evidence. The artifact directory is
+`C:/tmp/compound-engineering/ce-code-review/20260816-161455-p02-acceptance-c1-4e350894/`.
+Eleven reviewers completed; 24 validators completed, 23 validated and 1
+rejected. There were no validator infrastructure failures and no degraded
+P0/P1 evidence. The rejected
+`validator-05-closeout-plan-reference.json` is the historical dual-plan
+reference described in the closeout; it does not rewrite the earlier
+final-contract plan or verdict.
+
+These are application/evidence-contract findings only. They do not change any
+source-grounded raga, Tala, acoustics, grade, or publication disposition in
+Sections 1–3. The complete 23-finding table, including each pending/fixed
+disposition and exact symbol/path anchor, is in
+`docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md` and mirrored in
+`data/forensic-ledger.json`. The fixed-count curriculum wording is
+`FIXED-PENDING-REREVIEW`; code/test findings and the search-anchor item now
+share that same non-acceptance state. Final line-qualified anchors live in the
+closeout matrix and must be refreshed if a later review-fix commit moves them.
+
+The rejected Deepchandi retrieval mapping, all earlier blocked review runs,
+the whole-entity Tala quarantine, and the original-PDF/notation/OCR/SME
+boundaries remain unchanged. This cycle is not final acceptance and does not
+promote a musical claim.

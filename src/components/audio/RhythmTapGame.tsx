@@ -40,6 +40,7 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
 
   const trackPlayback = useCallback((handle: TablaPlaybackHandle) => {
     playbackHandlesRef.current.add(handle);
+    void Promise.resolve(handle.ready).catch(() => undefined);
     void Promise.resolve(handle.finished).then(
       () => playbackHandlesRef.current.delete(handle),
       () => playbackHandlesRef.current.delete(handle),

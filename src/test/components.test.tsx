@@ -11,6 +11,7 @@ import { RhythmTapGame } from "@/components/audio/RhythmTapGame";
 import { repository } from "@/lib/data/repository";
 import { EarTrainingModule } from "@/components/audio/EarTrainingModule";
 import { NotationArranger } from "@/components/audio/NotationArranger";
+import { PitchDetectorView } from "@/components/audio/PitchDetectorView";
 import InstrumentDetailPage from "@/app/instruments/[id]/page";
 import LessonDetailPage from "@/app/lessons/[id]/page";
 import RagaDetailPage from "@/app/ragas/[id]/page";
@@ -30,6 +31,10 @@ const audioMocks = vi.hoisted(() => ({
   playSequenceHandle: vi.fn(() => Object.assign(vi.fn(), { ready: Promise.resolve(true) })),
 }));
 
+const pitchMocks = vi.hoisted(() => ({
+  PitchDetector: vi.fn(),
+}));
+
 vi.mock("@/lib/audio/tabla", () => ({
   tablaSynth: audioMocks,
 }));
@@ -46,6 +51,10 @@ vi.mock("@/lib/audio/synth", async (importOriginal) => {
     },
   };
 });
+
+vi.mock("@/lib/audio/pitch", () => ({
+  PitchDetector: pitchMocks.PitchDetector,
+}));
 
 vi.mock("next/navigation", () => ({
   useParams: () => routeParams,
@@ -76,6 +85,19 @@ const deferredPlayback = () => {
   };
 };
 
+const rejectingPlayback = () => {
+  let rejectReady!: (reason?: unknown) => void;
+  let rejectFinished!: (reason?: unknown) => void;
+  const ready = new Promise<boolean>((_, reject) => { rejectReady = reject; });
+  const finished = new Promise<void>((_, reject) => { rejectFinished = reject; });
+  const cancel = vi.fn();
+  return {
+    handle: Object.assign(cancel, { ready, finished }),
+    rejectReady,
+    rejectFinished,
+  };
+};
+
 afterEach(() => {
   routeParams.id = "inst-tabla";
   audioMocks.playBol.mockReset();
@@ -83,6 +105,7 @@ afterEach(() => {
   audioMocks.playSequence.mockReset().mockResolvedValue(true);
   audioMocks.playSwaraToneHandle.mockReset().mockImplementation(() => readyCancel());
   audioMocks.playSequenceHandle.mockReset().mockImplementation(() => readyCancel());
+  pitchMocks.PitchDetector.mockReset();
   vi.useRealTimers();
 });
 
@@ -98,6 +121,41 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     render(<DroneController />);
     expect(screen.getByText("තාන්පුර ශ්‍රැති මෙවලම (Tanpura Drone)")).toBeInTheDocument();
     expect(screen.getByText("අරඹන්න")).toBeInTheDocument();
+  });
+
+  it("keeps a newer microphone session active when an older start resolves later", async () => {
+    let resolveFirst!: (success: boolean) => void;
+    let resolveSecond!: (success: boolean) => void;
+    const detector = {
+      startListening: vi.fn()
+        .mockImplementationOnce(() => new Promise<boolean>((resolve) => { resolveFirst = resolve; }))
+        .mockImplementationOnce(() => new Promise<boolean>((resolve) => { resolveSecond = resolve; })),
+      stopListening: vi.fn(),
+    };
+    pitchMocks.PitchDetector.mockImplementation(() => detector);
+
+    render(<PitchDetectorView />);
+    const startButton = screen.getByRole("button", { name: "මයික්‍රෆෝනය අරඹන්න" });
+    fireEvent.click(startButton);
+    fireEvent.click(startButton);
+    expect(detector.startListening).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      resolveSecond(true);
+      await Promise.resolve();
+    });
+    expect(screen.getByRole("button", { name: "මයික්‍රෆෝනය නවත්වන්න" })).toBeInTheDocument();
+    expect(detector.stopListening).not.toHaveBeenCalled();
+
+    await act(async () => {
+      resolveFirst(true);
+      await Promise.resolve();
+    });
+    expect(screen.getByRole("button", { name: "මයික්‍රෆෝනය නවත්වන්න" })).toBeInTheDocument();
+    expect(detector.stopListening).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "මයික්‍රෆෝනය නවත්වන්න" }));
+    expect(detector.stopListening).toHaveBeenCalledTimes(1);
   });
 
   it("maps a public raga scale into the keyboard highlight contract", () => {
@@ -646,6 +704,50 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     instrumentLookup.mockRestore();
   });
 
+  it("contains rejected instrument Tabla promises after route replacement and unmount", async () => {
+    vi.useFakeTimers();
+    const tabla = (instrumentsData as Array<{ id: string }>).find((instrument) => instrument.id === "inst-tabla");
+    const instrumentLookup = vi.spyOn(repository, "getInstrumentById").mockImplementation((candidateId) => (
+      candidateId === "inst-tabla" ? tabla as never : undefined
+    ));
+    const first = rejectingPlayback();
+    const second = rejectingPlayback();
+    audioMocks.playBol
+      .mockReturnValueOnce(first.handle)
+      .mockReturnValueOnce(second.handle);
+    routeParams.id = "inst-tabla";
+
+    const view = render(<InstrumentDetailPage />);
+    fireEvent.click(screen.getByRole("button", { name: "ආදර්ශ නාද රටාව අසන්න" }));
+    await act(async () => { vi.advanceTimersByTime(0); });
+    expect(audioMocks.playBol).toHaveBeenCalledTimes(1);
+
+    routeParams.id = "missing-instrument";
+    view.rerender(<InstrumentDetailPage />);
+    expect(first.handle).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      first.rejectReady(new Error("stale instrument ready after replacement"));
+      first.rejectFinished(new Error("stale instrument finished after replacement"));
+      await Promise.resolve();
+    });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+
+    routeParams.id = "inst-tabla";
+    view.rerender(<InstrumentDetailPage />);
+    fireEvent.click(screen.getByRole("button", { name: "ආදර්ශ නාද රටාව අසන්න" }));
+    await act(async () => { vi.advanceTimersByTime(0); });
+    expect(audioMocks.playBol).toHaveBeenCalledTimes(2);
+
+    view.unmount();
+    expect(second.handle).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      second.rejectReady(new Error("stale instrument ready after unmount"));
+      second.rejectFinished(new Error("stale instrument finished after unmount"));
+      await Promise.resolve();
+    });
+    instrumentLookup.mockRestore();
+  });
+
   it("keeps arranger and ear-training Swara ownership isolated", async () => {
     let resolveArranger!: (played: boolean) => void;
     let resolveEar!: (played: boolean) => void;
@@ -764,6 +866,90 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
     act(() => { unavailableCallbacks[1](); });
     expect(screen.getByRole("status")).toHaveTextContent("තබ්ලා නාදය ආරම්භ කළ නොහැක");
+  });
+
+  it("contains rejected Tala ready and finished promises across reset, replacement, and unmount", async () => {
+    const tala = getKhemtaFixture();
+    const first = rejectingPlayback();
+    const second = rejectingPlayback();
+    const third = rejectingPlayback();
+    audioMocks.playBol
+      .mockReturnValueOnce(first.handle)
+      .mockReturnValueOnce(second.handle)
+      .mockReturnValueOnce(third.handle);
+
+    const view = render(<TalaVisualizer tala={tala} />);
+    fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
+    fireEvent.click(screen.getByRole("button", { name: "නැවත මුලට" }));
+    expect(first.handle).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      first.rejectReady(new Error("stale ready after reset"));
+      first.rejectFinished(new Error("stale finished after reset"));
+      await Promise.resolve();
+    });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
+    expect(audioMocks.playBol).toHaveBeenCalledTimes(2);
+    view.rerender(<TalaVisualizer tala={{ ...tala, id: "tala-khemta-replacement" }} />);
+    expect(second.handle).toHaveBeenCalledTimes(1);
+    expect(first.handle).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      second.rejectReady(new Error("stale ready after replacement"));
+      second.rejectFinished(new Error("stale finished after replacement"));
+      await Promise.resolve();
+    });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
+    expect(audioMocks.playBol).toHaveBeenCalledTimes(3);
+    view.unmount();
+    expect(third.handle).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      third.rejectReady(new Error("stale ready after unmount"));
+      third.rejectFinished(new Error("stale finished after unmount"));
+      await Promise.resolve();
+    });
+  });
+
+  it("keeps RhythmTapGame playback ownership isolated when Tabla promises reject", async () => {
+    vi.useFakeTimers();
+    const first = rejectingPlayback();
+    const second = rejectingPlayback();
+    audioMocks.playBol
+      .mockReturnValueOnce(first.handle)
+      .mockReturnValueOnce(second.handle);
+
+    const view = render(<RhythmTapGame bpm={120} totalBeats={2} />);
+    fireEvent.click(screen.getByRole("button", { name: "අරඹන්න" }));
+    act(() => { vi.advanceTimersByTime(500); });
+    expect(audioMocks.playBol).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "නැවත මුලට" }));
+    expect(first.handle).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      first.rejectReady(new Error("stale ready after rhythm reset"));
+      first.rejectFinished(new Error("stale finished after rhythm reset"));
+      await Promise.resolve();
+    });
+    expect(screen.getByText("ආරම්භ කිරීමට 'අරඹන්න' ඔබන්න")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "අරඹන්න" }));
+    act(() => { vi.advanceTimersByTime(500); });
+    expect(audioMocks.playBol).toHaveBeenCalledTimes(2);
+    expect(first.handle).toHaveBeenCalledTimes(1);
+    expect(second.handle).not.toHaveBeenCalled();
+
+    view.unmount();
+    expect(second.handle).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      second.rejectReady(new Error("stale ready after rhythm unmount"));
+      second.rejectFinished(new Error("stale finished after rhythm unmount"));
+      await Promise.resolve();
+    });
   });
 
   it("suppresses stale Rhythm unavailable callbacks after reset", () => {

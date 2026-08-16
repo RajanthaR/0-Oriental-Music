@@ -67,7 +67,7 @@ they must not be described as accepted until that skill verdict is
 | `P02-FINAL-02` | Invalid nonblank finite-domain values bypassed partial guards. | Central finite-union membership covers record and nested fields before publication. | `src/lib/validation/content-contracts.ts:25`, `src/test/content-contracts.test.ts:241`, `src/test/content-contracts.test.ts:268` |
 | `P02-FINAL-03` | Known dormant entity guards omitted required fields and nested shapes. | Closed kind identification plus complete contracts govern validation, publication, repository reads, and projections. | `src/lib/validation/content-contracts.ts:602`, `src/lib/validation/content-contracts.ts:702`, `src/lib/validation/content-contracts.ts:772`, `src/test/content-contracts.test.ts:101` |
 | `P02-FINAL-04` | Recursive graph handling overflowed on deep acyclic input. | Iterative traversal and projection enforce depth 256 and 10,000 unique-node limits; shared DAGs pass and cycles/overruns fail closed. | `src/lib/validation/content-contracts.ts:819`, `src/lib/validation/content-contracts.ts:950`, `src/test/content-contracts.test.ts:368` |
-| `P02-FINAL-05` | Normalized-empty hostile search input enumerated the public catalog. | Preserve raw-empty featured results; return no result for nonblank normalized-empty input. | `src/lib/search/search-engine.ts:99`, `src/test/search-engine.test.ts:79` |
+| `P02-FINAL-05` | Normalized-empty hostile search input enumerated the public catalog. | Preserve raw-empty featured results; return no result for nonblank normalized-empty input. | `src/lib/search/search-engine.ts:84`, `src/lib/search/search-engine.ts:137`, `src/test/search-engine.test.ts:80` |
 | `P02-FINAL-06` | Swara work continued after replacement or unmount. | Caller-owned handles cancel initialization, active oscillators, sequence delays, callbacks, Strict Mode and co-mounted consumer work. | `src/lib/audio/synth.ts:50`, `src/lib/audio/synth.ts:201`, `src/lib/audio/synth.ts:350`, `src/test/synth.test.ts:199`, `src/test/synth.test.ts:293`, `src/test/components.test.tsx:413`, `src/test/components.test.tsx:570` |
 
 All eight Talas remain whole-entity quarantined. Earlier review runs, the
@@ -84,10 +84,39 @@ are not relabeled as acceptance. The fresh task is governed by
 
 | Issue group | Before | Acceptance-hardening state | Final anchors |
 |---|---|---|---|
-| `C3-01`–`C3-08` | Status, identity, evidence, summary, batch, and projection decisions could diverge or reread mutable values. | One bounded operation context, checked batch, complete kind contract, fresh summary, and allowlisted projection fail closed. | `src/lib/data/publication-policy.ts:284`, `src/lib/data/publication-policy.ts:1214`, `src/lib/data/repository.ts:445`, `src/lib/validation/content-contracts.ts:968`. |
-| `C3-09`–`C3-12` | Hostile disposition/source rows and incomplete dependency coverage could throw or fail open. | Unknown-safe source/disposition snapshots, exactly-one document mapping, and one declarative dependency matrix govern all surfaces. | `src/lib/validation/content-validator.ts:224`, `src/lib/validation/content-validator.ts:327`, `src/lib/data/publication-policy.ts:182`. |
+| `C3-01`–`C3-08` | Status, identity, evidence, summary, batch, and projection decisions could diverge or reread mutable values. | One bounded operation context, checked batch, complete kind contract, fresh summary, and allowlisted projection fail closed. | `src/lib/data/publication-policy.ts:311`, `src/lib/data/publication-policy.ts:1276`, `src/lib/data/repository.ts:484`, `src/lib/validation/content-contracts.ts:963`. |
+| `C3-09`–`C3-12` | Hostile disposition/source rows and incomplete dependency coverage could throw or fail open. | Unknown-safe source/disposition snapshots, exactly-one document mapping, and one declarative dependency matrix govern all surfaces. | `src/lib/validation/content-validator.ts:229`, `src/lib/validation/content-validator.ts:332`, `src/lib/data/publication-policy.ts:196`. |
 | `C3-13` | Prior numeric documentation anchors drifted. | Closeout documentation is asserted by stable symbols and refreshed final line anchors after review fixes. | `src/test/review-closeout.test.ts:39`. |
 | `C3-14`–`C3-16` | Forensic question fields leaked into the renderable model, empty quizzes crashed, and hostile queries threw/enumerated results. | Explicit public question variants, a safe Sinhala empty state, and uniform query classification close the UI boundaries. | `src/types/content.ts:382`, `src/components/quiz/QuizRunner.tsx:75`, `src/lib/search/search-engine.ts:84`, `src/test/search-engine.test.ts:90`. |
 | `C3-17`–`C3-20` | Rhythm/Tabla work was not consistently session-owned or failure-atomic. | Current-generation callbacks, settled-handle removal, and timer cancellation isolate every caller. | `src/components/audio/RhythmTapGame.tsx:14`, `src/components/audio/TalaVisualizer.tsx:23`, `src/lib/audio/tabla.ts:46`, `src/test/synth.test.ts:96`. |
 | `P02-PITCH-OWNERSHIP-001` | Failed, replaced, pending, or unmounted microphone starts could retain resources or callbacks. | Generation ownership stops late streams and idempotently releases tracks, nodes, frames, and contexts with no network/upload path. | `src/lib/audio/pitch.ts:114`, `src/lib/audio/pitch.ts:220`, `src/test/pitch.test.ts:40`, `src/test/pitch.test.ts:93`. |
 | `P02-PROJECT-SCOPE-001` | Contributor guidance contradicted the forensic Grades 6–11 public boundary and implied a fixed verified source count. | Guidance now distinguishes current public scope, raw quarantined records, and workflow capability from proof of completed review. | `AGENTS.md:3`, `AGENTS.md:37`, `AGENTS.md:182`, `src/test/review-closeout.test.ts:39`. |
+
+## Acceptance-hardening cycle 1 traceability (append-only)
+
+Run `20260816-161455-p02-acceptance-c1-4e350894` is retained as historical
+acceptance-only evidence for reviewed head
+`b1b2f5ea949d274fa5e260f39f0554465f704072` (base
+`beba1479f473b3413b3f2de48a27c558e1937c6f`). Its artifacts are under
+`C:/tmp/compound-engineering/ce-code-review/20260816-161455-p02-acceptance-c1-4e350894/`.
+Eleven reviewers completed; the validator wave completed 24 validators, with
+23 validated and 1 rejected. There were no validator infrastructure failures
+and no degraded P0/P1 evidence. The rejected validator,
+`validator-05-closeout-plan-reference.json`, is a historical dual-plan
+reference: plan 002 remains the controlling pointer for the earlier
+final-contract section, while plan 003 governs this acceptance-hardening
+input. No historical verdict or plan pointer is rewritten.
+
+The complete 23-row finding/disposition traceability is appended to
+[`P02_CLOSEOUT_FINDINGS.md`](forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md)
+and mirrored in `data/forensic-ledger.json`. The dispositions are uniformly
+`FIXED-PENDING-REREVIEW`; they do not claim final acceptance, push readiness,
+or a ready PR. The code/test/search anchors are line-qualified in the closeout
+matrix and must be refreshed again if a later review-fix commit moves them.
+
+| Cycle-1 evidence boundary | Disposition |
+|---|---|
+| Fixed-count curriculum wording (`validator-12-curriculum-fixed-count.json`) | **FIXED-PENDING-REREVIEW** — `docs/CURRICULUM_MAP.md` now describes an extracted inventory and bounded source-backed 6–11 public scope without a fixed document count or completeness claim. |
+| Runtime, CMS, batch, QuizRunner, dependency, projection, context, microphone, and sanitizer findings (`validator-01`, `02`, `03`, `04`, `06`–`18`, `20`–`24`) | **FIXED-PENDING-REREVIEW** — see the exact per-finding symbols, paths, and line-qualified non-acceptance dispositions in the closeout matrix and ledger. |
+| Search anchor finding (`validator-19-stale-search-anchor.json`) | **FIXED-PENDING-REREVIEW** — the normalized-empty guard and regression anchors are refreshed in the closeout matrix. |
+| Rejected Deepchandi retrieval finding and earlier blocked runs | **PRESERVED HISTORICAL EVIDENCE** — no musical fact, Tala, raga, or prior verdict is promoted or rewritten. |

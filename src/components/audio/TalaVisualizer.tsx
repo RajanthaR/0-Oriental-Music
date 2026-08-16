@@ -90,6 +90,17 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
         },
         reportUnavailable,
       );
+      if (handle.finished) {
+        void Promise.resolve(handle.finished).then(
+          () => {
+            if (playbackCancelRef.current === handle) playbackCancelRef.current = null;
+          },
+          () => {
+            if (playbackCancelRef.current === handle) playbackCancelRef.current = null;
+            reportUnavailable();
+          },
+        );
+      }
     }
   }, [cancelPlayback, matraDurationMs, tala.bols]);
 

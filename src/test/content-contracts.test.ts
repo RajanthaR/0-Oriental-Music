@@ -309,10 +309,25 @@ describe("closed runtime content contracts", () => {
     delete unsupportedQuestion.correctAnswerIds;
     expect(projectPublicRecord(unsupportedQuestion, "question")).toBeUndefined();
     expect(validateContentRecord(unsupportedPublicQuiz, "quiz").isValid).toBe(true);
+    expect(projectPublicRecord(unsupportedPublicQuiz, "quiz")).toBeUndefined();
     expect(getRecordPublicationDecision(unsupportedPublicQuiz)).toMatchObject({
       isPublic: false,
       reasonCodes: expect.arrayContaining(["malformed-record", "nested-question-unpublishable"]),
     });
+  });
+
+  it("never accepts a caller-supplied snapshot as contract evidence", () => {
+    const malformed = structuredClone(ragas[0]) as unknown as Record<string, unknown>;
+    delete malformed.characteristics_si;
+    const unrelatedValidSnapshot = structuredClone(ragas[0]);
+    const callWithLegacyArguments = validateContentRecord as unknown as (
+      value: unknown,
+      kind: ContentEntityKind,
+      graph: unknown,
+      snapshot: unknown,
+    ) => ReturnType<typeof validateContentRecord>;
+    expect(callWithLegacyArguments(malformed, "raga", { safe: true }, unrelatedValidSnapshot))
+      .toMatchObject({ isValid: false });
   });
 
   it("validates source-catalog records without dereferencing malformed input", () => {

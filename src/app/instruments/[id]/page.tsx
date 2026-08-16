@@ -77,13 +77,24 @@ export default function InstrumentDetailPage() {
             }
           });
           tablaHandlesRef.current.add(handle);
-          void handle.ready.then((played) => {
-            if (!mountedRef.current || audioGenerationRef.current !== generation || !tablaHandlesRef.current.has(handle)) return;
-            if (!played) setAudioError(true);
-          });
-          void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
-            tablaHandlesRef.current.delete(handle);
-          });
+          void handle.ready.then(
+            (played) => {
+              if (!mountedRef.current || audioGenerationRef.current !== generation || !tablaHandlesRef.current.has(handle)) return;
+              if (!played) setAudioError(true);
+            },
+            () => {
+              if (mountedRef.current && audioGenerationRef.current === generation && tablaHandlesRef.current.has(handle)) {
+                setAudioError(true);
+              }
+            },
+          );
+          void handle.finished.then(
+            () => tablaHandlesRef.current.delete(handle),
+            () => {
+              const isCurrent = tablaHandlesRef.current.delete(handle);
+              if (isCurrent && mountedRef.current && audioGenerationRef.current === generation) setAudioError(true);
+            },
+          );
         }, i * 400);
         audioTimersRef.current.add(timerId);
       });
@@ -97,29 +108,61 @@ export default function InstrumentDetailPage() {
     } else if (instrument.id === "inst-flute") {
       const handle = swaraSynth.playSequenceHandle(["S", "G", "M", "P", "N", "S'"], 0.5, undefined, 261.63, "flute");
       sequenceHandleRef.current = handle;
-      void handle.ready.then((played) => {
-        if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
-        if (!played) setAudioError(true);
-      });
-      void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
-        const isCurrentHandle = sequenceHandleRef.current === handle;
-        if (isCurrentHandle) sequenceHandleRef.current = null;
-        if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
-        setIsPlayingAudio(false);
-      });
+      void handle.ready.then(
+        (played) => {
+          if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
+          if (!played) setAudioError(true);
+        },
+        () => {
+          if (mountedRef.current && audioGenerationRef.current === generation && sequenceHandleRef.current === handle) {
+            setAudioError(true);
+          }
+        },
+      );
+      void handle.finished.then(
+        () => {
+          const isCurrentHandle = sequenceHandleRef.current === handle;
+          if (isCurrentHandle) sequenceHandleRef.current = null;
+          if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
+          setIsPlayingAudio(false);
+        },
+        () => {
+          const isCurrentHandle = sequenceHandleRef.current === handle;
+          if (isCurrentHandle) sequenceHandleRef.current = null;
+          if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
+          setAudioError(true);
+          setIsPlayingAudio(false);
+        },
+      );
     } else {
       const handle = swaraSynth.playSequenceHandle(["S", "R", "G", "M", "P", "D", "N", "S'"], 0.45, undefined, 261.63, "harmonium");
       sequenceHandleRef.current = handle;
-      void handle.ready.then((played) => {
-        if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
-        if (!played) setAudioError(true);
-      });
-      void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
-        const isCurrentHandle = sequenceHandleRef.current === handle;
-        if (isCurrentHandle) sequenceHandleRef.current = null;
-        if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
-        setIsPlayingAudio(false);
-      });
+      void handle.ready.then(
+        (played) => {
+          if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
+          if (!played) setAudioError(true);
+        },
+        () => {
+          if (mountedRef.current && audioGenerationRef.current === generation && sequenceHandleRef.current === handle) {
+            setAudioError(true);
+          }
+        },
+      );
+      void handle.finished.then(
+        () => {
+          const isCurrentHandle = sequenceHandleRef.current === handle;
+          if (isCurrentHandle) sequenceHandleRef.current = null;
+          if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
+          setIsPlayingAudio(false);
+        },
+        () => {
+          const isCurrentHandle = sequenceHandleRef.current === handle;
+          if (isCurrentHandle) sequenceHandleRef.current = null;
+          if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
+          setAudioError(true);
+          setIsPlayingAudio(false);
+        },
+      );
     }
   };
 

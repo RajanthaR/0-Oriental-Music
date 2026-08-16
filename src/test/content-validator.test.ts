@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { validateCatalogIdentityContracts, validateContent } from "@/lib/validation/content-validator";
+import { validateCatalogIdentityContracts, validateContent, validatePublicCollection } from "@/lib/validation/content-validator";
 import { repository } from "@/lib/data/repository";
 import talasData from "@/data/talas.json";
 import type { Raga, Tala } from "@/types/content";
@@ -219,6 +219,29 @@ describe("Content Validation Suite", () => {
     expect(issues.some((issue) => issue.field === "record")).toBe(true);
     expect(issues.some((issue) => issue.entityType === "Glossary")).toBe(true);
     expect(issues.some((issue) => issue.entityType === "Terminology")).toBe(true);
+  });
+
+  it("fails hostile and sparse outer identity collections closed without throwing", () => {
+    const sparse: unknown[] = [];
+    sparse.length = 3;
+    const throwing = new Proxy([], {
+      ownKeys() {
+        throw new Error("hostile catalog");
+      },
+    });
+    for (const candidate of [sparse, throwing, null, 42]) {
+      expect(() => validateCatalogIdentityContracts(candidate, candidate, candidate)).not.toThrow();
+      expect(validateCatalogIdentityContracts(candidate, candidate, candidate).length).toBeGreaterThan(0);
+    }
+  });
+
+  it("rejects exact and whitespace-normalized duplicate IDs in public collections", () => {
+    const first = structuredClone(ragas[0]) as unknown as Record<string, unknown>;
+    const exact = structuredClone(ragas[0]) as unknown as Record<string, unknown>;
+    const spaced = structuredClone(ragas[0]) as unknown as Record<string, unknown>;
+    spaced.id = ` ${String(first.id)} `;
+    expect(validatePublicCollection("Raga", [first, exact])).toMatchObject({ isValid: false });
+    expect(validatePublicCollection("Raga", [first, spaced])).toMatchObject({ isValid: false });
   });
 
   it("rejects non-array top-level catalogs instead of treating them as empty", () => {

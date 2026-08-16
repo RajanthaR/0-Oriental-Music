@@ -787,14 +787,9 @@ function captureSafeSnapshot<T>(value: T, knownGraphSafety?: GraphSafetyResult):
 export function validateContentRecord(
   value: unknown,
   expectedKind?: ContentEntityKind,
-  knownGraphSafety?: GraphSafetyResult,
-  knownSnapshot?: unknown
 ): ContentContractResult {
   try {
-    if (knownGraphSafety && !knownGraphSafety.safe) {
-      return { kind: expectedKind, isValid: false, issues: [{ field: "record", message: `Unsafe object graph: ${knownGraphSafety.reason ?? "unknown"}.` }] };
-    }
-    const snapshot = knownSnapshot === undefined ? captureSafeSnapshot(value, knownGraphSafety) : knownSnapshot;
+    const snapshot = captureSafeSnapshot(value);
     if (snapshot === undefined) {
       return { kind: expectedKind, isValid: false, issues: [{ field: "record", message: "Record is not a safe plain-data snapshot." }] };
     }
@@ -1018,6 +1013,9 @@ export function projectPublicRecord(value: unknown, kind: ContentEntityKind): un
         for (let index = child.length - 1; index >= 0; index -= 1) {
           const item = child[index];
           if (item !== null && typeof item === "object") {
+            if (childKind === "question" && !isPublicQuestionType(read(item as Record<string, unknown>, "type"))) {
+              return undefined;
+            }
             const existingItem = lookup(item, childKind);
             if (existingItem) {
               targetArray[index] = existingItem;
