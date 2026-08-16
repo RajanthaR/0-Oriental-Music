@@ -93,6 +93,11 @@ export function searchFilter<T>(
   const normalizedQ = normalizeSinhalaText(variant || rawQ);
   const normalizedTrans = normalizeSinhalaText(transliterated);
 
+  // A non-empty query made only of bidi/zero-width controls must not become
+  // `includes("")`, which would expose the entire public catalog. Preserve
+  // the existing featured-result behavior only for genuinely empty input.
+  if (!normalizedQ && !normalizedTrans) return [];
+
   return items.filter((item) => {
     const fields = extractFields(item);
     return fields.some((field) => {

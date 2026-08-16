@@ -14,7 +14,22 @@
     "reviewRunId": "20260815-235819-p02r4",
     "status": "Findings input only; not acceptance evidence"
   },
-  "issueCountBaseline": 29,
+  "followupReviewInput": {
+    "phase": "Phase 2 final-contract findings input",
+    "baseSha": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "reviewedHead": "c1785ae31f153168d362f3b1f294e68726aa819b",
+    "reviewRunId": "20260816-063000-p02-final-acceptance",
+    "artifactDirectory": "C:/tmp/compound-engineering/ce-code-review/20260816-063000-p02-final-acceptance/",
+    "reviewersCompleted": 11,
+    "validatorsCompleted": 6,
+    "validatedFindings": {
+      "P1": 1,
+      "P2": 4,
+      "P3": 1
+    },
+    "status": "Historical validated findings input only; the fresh closeout review is separate acceptance evidence"
+  },
+  "issueCountBaseline": 35,
   "evidencePolicy": {
     "publicGradeBands": [
       "6-7",
@@ -53,7 +68,8 @@
     "severityValues": [
       "P0",
       "P1",
-      "P2"
+      "P2",
+      "P3"
     ],
     "publicVisibilityValues": [
       "contained",
@@ -903,6 +919,150 @@
       "publicVisibility": "contained",
       "confidence": "confirmed",
       "confidenceScope": "application timing and browser capability contract; curriculum evidence N/A",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-FINAL-01",
+      "severity": "P1",
+      "entityOrPath": "Lesson runtime contract, review metadata, and public detail projection",
+      "currentClaim": "A Lesson missing required raw reviewMetadata could pass the public boundary and reach a route that dereferenced the missing value.",
+      "evidence": [
+        {
+          "path": "src/lib/validation/content-contracts.ts",
+          "locator": "isReviewMetadata / isLesson / projectPublicRecord",
+          "exactSection": "complete raw metadata validation and allowlisted safe projection"
+        },
+        {
+          "path": "src/test/content-contracts.test.ts",
+          "locator": "lesson review metadata mutation",
+          "exactSection": "missing metadata returns malformed-record and cannot publish"
+        }
+      ],
+      "disposition": "require valid raw review metadata before publication, report malformed forensic input, and synthesize explicit unverified metadata only in bounded review/public projections",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "runtime content and route-safety contract; curriculum evidence N/A",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-FINAL-02",
+      "severity": "P2",
+      "entityOrPath": "Finite-domain fields in content records and nested activities/questions/checkpoints",
+      "currentClaim": "Arbitrary nonblank difficulty, strand, review, reuse, activity, tool, category, and checkpoint values could pass partial runtime guards.",
+      "evidence": [
+        {
+          "path": "src/lib/validation/content-contracts.ts",
+          "locator": "finite union constants and entity-specific validators",
+          "exactSection": "dependency-free finite-domain membership checks"
+        },
+        {
+          "path": "src/test/content-contracts.test.ts",
+          "locator": "invalid finite-domain mutation matrix",
+          "exactSection": "invalid nonblank values fail their complete runtime contracts"
+        }
+      ],
+      "disposition": "centralize finite domains in dependency-free contracts and fail every unsupported literal closed before source or dependency evaluation",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "runtime domain contract; curriculum evidence N/A",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-FINAL-03",
+      "severity": "P2",
+      "entityOrPath": "Instrument, CulturalTradition, TheatreTradition, LearningPath, Glossary, Quiz, Exam, and nested runtime contracts",
+      "currentClaim": "Dormant or currently nonpublic entity guards omitted required interface fields and nested shapes, allowing later source remediation to expose malformed records.",
+      "evidence": [
+        {
+          "path": "src/lib/validation/content-contracts.ts",
+          "locator": "identifyContentKind / validateContentRecord",
+          "exactSection": "closed known-kind classifier and complete entity/nested contract table"
+        },
+        {
+          "path": "src/test/content-contracts.test.ts",
+          "locator": "canonical entity and malformed-field tables",
+          "exactSection": "every known kind and nested required field is exercised as unknown runtime input"
+        }
+      ],
+      "disposition": "treat all imported catalogs as unknown arrays, reject unknown or ambiguous kinds, and use the same complete contract for validation, publication, repository reads, and allowlisted projections",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "closed-world application contract; no new publication promotion",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-FINAL-04",
+      "severity": "P2",
+      "entityOrPath": "Runtime graph inspection, dependency processing, review sanitization, and public projection",
+      "currentClaim": "Recursive inspection or cloning could overflow on deep acyclic data and did not share one bounded cycle/node/depth policy.",
+      "evidence": [
+        {
+          "path": "src/lib/validation/content-contracts.ts",
+          "locator": "inspectGraph / projectPublicRecord / cloneBoundedJson",
+          "exactSection": "iterative own-property traversal with depth 256 and 10000 unique-node budgets"
+        },
+        {
+          "path": "src/test/content-contracts.test.ts",
+          "locator": "shared DAG, cycle, depth, width, sparse-array, and oversized-collection cases",
+          "exactSection": "at-limit acceptance and over-limit fail-closed regressions"
+        }
+      ],
+      "disposition": "replace recursive JSON walking with bounded iterative traversal; count shared DAG nodes once and reject cycles, sparse arrays, depth overflow, node overflow, and oversized containers as malformed-record",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "runtime denial-of-service and projection safety contract",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-FINAL-05",
+      "severity": "P3",
+      "entityOrPath": "Sinhala public search normalization",
+      "currentClaim": "A nonblank bidi or zero-width query that normalized to an empty string matched every public field through includes-empty behavior.",
+      "evidence": [
+        {
+          "path": "src/lib/search/search-engine.ts",
+          "locator": "SearchIndex.search normalized-query guard",
+          "exactSection": "raw blank featured results are distinct from normalized-empty hostile input"
+        },
+        {
+          "path": "src/test/search-engine.test.ts",
+          "locator": "raw-empty and normalized-empty control regression",
+          "exactSection": "bidi and zero-width-only nonblank queries return no results"
+        }
+      ],
+      "disposition": "preserve featured results only for genuinely empty or whitespace input and return no results when a nonblank query has no normalized or transliterated search text",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "public search correctness and catalog-enumeration boundary",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-FINAL-06",
+      "severity": "P2",
+      "entityOrPath": "Swara synthesis handles and all current sequence/tone consumers",
+      "currentClaim": "Delayed Swara sequence work could continue after replacement or unmount, causing later audio and React callbacks without caller ownership.",
+      "evidence": [
+        {
+          "path": "src/lib/audio/synth.ts",
+          "locator": "SwaraPlaybackHandle / playSwaraToneHandle / playSequenceHandle",
+          "exactSection": "idempotent cancellation, readiness, timer cleanup, and active node stop/disconnect"
+        },
+        {
+          "path": "src/test/synth.test.ts and src/test/components.test.tsx",
+          "locator": "initialization, active-node, delay, StrictMode, replacement, unmount, and co-mounted ownership regressions",
+          "exactSection": "no later note, callback, unavailable state, or cross-caller cancellation"
+        }
+      ],
+      "disposition": "introduce caller-owned Swara handles, keep Promise wrappers for compatibility, and migrate every current page/component consumer to replacement and unmount cleanup without autoplay",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "local Web Audio lifecycle and privacy boundary; curriculum evidence N/A",
       "status": "contained",
       "evidenceBasis": "runtime-inspection"
     }

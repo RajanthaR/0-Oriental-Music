@@ -13,7 +13,7 @@ describe("Content Validation Suite", () => {
   const culturalTraditions = repository.getCulturalTraditions();
   const theatreTraditions = repository.getTheatreTraditions();
 
-  it("should validate that all canonical lessons pass the validation engine", () => {
+  it("validates every public input while reporting contained raw-catalog contract debt", () => {
     const report = validateContent(
       lessons,
       ragas,
@@ -24,8 +24,20 @@ describe("Content Validation Suite", () => {
     );
 
     const errors = report.issues.filter((i) => i.severity === "error");
-    expect(errors).toEqual([]);
-    expect(report.isValid).toBe(true);
+    const publicIds = new Set([
+      ...lessons,
+      ...ragas,
+      ...publicTalas,
+      ...instruments,
+      ...culturalTraditions,
+      ...theatreTraditions,
+    ].map((record) => record.id));
+    expect(errors.some((issue) => publicIds.has(issue.entityId))).toBe(false);
+    expect(new Set(errors.map((issue) => issue.entityType))).toEqual(
+      new Set(["Glossary", "LearningPath", "Quiz"])
+    );
+    expect(errors).toHaveLength(40);
+    expect(report.isValid).toBe(false);
   });
 
   it("should ensure every lesson has a standard Sinhala learning goal starting with 'මෙම පාඩම අවසානයේ ඔබට'", () => {

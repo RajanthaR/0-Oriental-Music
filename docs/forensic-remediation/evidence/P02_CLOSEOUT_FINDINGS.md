@@ -101,3 +101,31 @@ the original Phase 2 base. Each accepting run must preserve its run ID and
 artifacts under `/tmp/compound-engineering/ce-code-review/`, cover the complete
 diff, validate surviving findings independently, and report its final reviewed
 head. No post-review repository mutation is acceptance evidence.
+
+## Fresh final-contract findings
+
+- Review run: `20260816-063000-p02-final-acceptance`
+- Artifacts: `C:/tmp/compound-engineering/ce-code-review/20260816-063000-p02-final-acceptance/`
+- Base: `beba1479f473b3413b3f2de48a27c558e1937c6f`
+- Reviewed head: `c1785ae31f153168d362f3b1f294e68726aa819b`
+- Coverage: 11/11 reviewers; 6/6 validators; 1 P1, 4 P2, 1 P3; 0 rejected, 0 failed, 0 degraded P0/P1.
+- Verdict: `Not ready to merge; three-cycle review budget exhausted with validated actionable findings`.
+
+These six findings are preserved as historical validated input for the fresh
+final-contract closeout plan. Their implementation dispositions below are not
+acceptance evidence until the new mandatory review-fix loop completes on the
+full original-base-to-HEAD diff.
+
+| ID | Severity | Validated defect | Implementation disposition | Regression evidence |
+|---|---:|---|---|---|
+| `P02-FINAL-01` | P1 | Missing Lesson `reviewMetadata` could pass the public guard and crash a detail route. | Complete raw metadata is mandatory; malformed raw content fails closed, while bounded review/public projections use safe unverified metadata. | `src/test/content-contracts.test.ts:61`, `src/test/publication-containment.test.ts:82` |
+| `P02-FINAL-02` | P2 | Nonblank invalid difficulty, strand, and checkpoint values bypassed finite-domain checks. | Shared dependency-free finite unions reject invalid values in records and nested questions/activities. | `src/test/content-contracts.test.ts:119`, `src/test/content-contracts.test.ts:135` |
+| `P02-FINAL-03` | P2 | Instrument, CulturalTradition, TheatreTradition, LearningPath, and other known guards omitted required fields or nested shapes. | All imported catalogs are unknown input; a closed known-kind classifier and complete entity contracts are shared by validation, publication, repository reads, and allowlisted projections. | `src/test/content-contracts.test.ts:48`, `src/test/content-contracts.test.ts:58` |
+| `P02-FINAL-04` | P2 | Deep acyclic records overflowed recursive graph inspection. | Iterative own-property traversal enforces depth 256 and 10,000 unique-node limits, permits shared DAGs, and rejects cycles/sparse or oversized containers. | `src/test/content-contracts.test.ts:217`, `src/test/content-contracts.test.ts:249` |
+| `P02-FINAL-05` | P3 | Nonblank bidi/zero-width input normalized to empty and matched every public field through `includes("")`. | Featured results remain only for genuinely empty/whitespace input; normalized-empty nonblank input returns no results. | `src/test/search-engine.test.ts:79` |
+| `P02-FINAL-06` | P2 | Swara sequence playback continued after component unmount. | Caller-owned tone/sequence handles cancel initialization, active nodes, delays, callbacks, replacement, Strict Mode, and unmount work; Promise APIs remain compatibility wrappers. | `src/test/synth.test.ts:163`, `src/test/synth.test.ts:279`, `src/test/components.test.tsx:449`, `src/test/components.test.tsx:470` |
+
+The rejected Deepchandi finding, all earlier run IDs and blocked verdicts, and
+the original-PDF/notation/OCR/SME limitations above remain unchanged. The
+controlling fresh task is
+`docs/plans/2026-08-16-002-fix-phase-2-final-contract-closeout-plan.md`.

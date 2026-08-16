@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { swaraSynth, SWARA_SEMITONES } from "@/lib/audio/synth";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
 import { Volume2, Play, Sparkles } from "lucide-react";
 
 export interface SwaraKeyboardProps {
@@ -29,9 +29,11 @@ const KEYS_CONFIG = [
   { key: "S'", label_si: "ස̇", sub_si: "තාර", type: "achala", isBlack: false, hotkey: "K" },
 ];
 
+const EMPTY_HIGHLIGHT_NOTES: string[] = [];
+
 export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
   onNotePlay,
-  highlightNotes = [],
+  highlightNotes = EMPTY_HIGHLIGHT_NOTES,
   activeNote,
   allowPlaybackControls = true,
   selectedRagaName,
@@ -42,6 +44,38 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
   const [playingKey, setPlayingKey] = useState<string | null>(null);
   const [isPlayingScale, setIsPlayingScale] = useState(false);
   const [audioUnavailable, setAudioUnavailable] = useState(false);
+  const mountedRef = useRef(false);
+  const generationRef = useRef(0);
+  const playbackRef = useRef<SwaraPlaybackHandle | null>(null);
+  const highlightTimerRef = useRef<number | null>(null);
+  const highlightNotesSignature = highlightNotes.join("\u0000");
+
+  const cancelPlayback = useCallback(() => {
+    generationRef.current += 1;
+    playbackRef.current?.();
+    playbackRef.current = null;
+    if (highlightTimerRef.current !== null) {
+      window.clearTimeout(highlightTimerRef.current);
+      highlightTimerRef.current = null;
+    }
+    if (mountedRef.current) {
+      setPlayingKey(null);
+      setIsPlayingScale(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      cancelPlayback();
+    };
+  }, [cancelPlayback]);
+
+  // A changed target, timbre, or saptaka invalidates any in-flight operation.
+  useEffect(() => {
+    cancelPlayback();
+  }, [cancelPlayback, highlightNotesSignature, saptaka, timbre]);
 
   const getFullNoteSymbol = useCallback((baseKey: string) => {
     if (saptaka === "mandra") {
@@ -56,18 +90,26 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
   }, [saptaka]);
 
   const handlePlayNote = useCallback((baseKey: string) => {
+    cancelPlayback();
     const fullNote = getFullNoteSymbol(baseKey);
+    const generation = generationRef.current;
     setPlayingKey(baseKey);
-    void swaraSynth.playSwaraTone(fullNote, 0.7, 261.63, timbre).then((played) => {
+    const handle = swaraSynth.playSwaraToneHandle(fullNote, 0.7, 261.63, timbre);
+    playbackRef.current = handle;
+    void handle.ready.then((played) => {
+      if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
+      playbackRef.current = null;
       if (!played) setAudioUnavailable(true);
     });
     if (onNotePlay) {
       onNotePlay(fullNote);
     }
-    setTimeout(() => {
+    highlightTimerRef.current = window.setTimeout(() => {
+      highlightTimerRef.current = null;
+      if (!mountedRef.current || generationRef.current !== generation) return;
       setPlayingKey((curr) => (curr === baseKey ? null : curr));
     }, 400);
-  }, [getFullNoteSymbol, onNotePlay, timbre]);
+  }, [cancelPlayback, getFullNoteSymbol, onNotePlay, timbre]);
 
   // Keyboard shortcut listener
   useEffect(() => {
@@ -82,26 +124,26 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handlePlayNote]);
 
-  const handlePlayScaleArohana = async () => {
+  const handlePlayScaleArohana = () => {
     if (isPlayingScale) return;
+    cancelPlayback();
+    const generation = generationRef.current;
     setIsPlayingScale(true);
     const scale = highlightNotes.length > 0
       ? highlightNotes
       : ["S", "R", "G", "M", "P", "D", "N", "S'"];
-
-    for (let i = 0; i < scale.length; i++) {
-      const note = scale[i];
-      const baseKey = note.replace(/[.̣'̇]/g, "");
-      setPlayingKey(baseKey);
-      const played = await swaraSynth.playSwaraTone(note, 0.5, 261.63, timbre);
-      if (!played) {
-        setAudioUnavailable(true);
-        break;
-      }
-      await new Promise((r) => setTimeout(r, 550));
-    }
-    setPlayingKey(null);
-    setIsPlayingScale(false);
+    const handle = swaraSynth.playSequenceHandle(scale, 0.5, (_index, note) => {
+      if (!mountedRef.current || generationRef.current !== generation) return;
+      setPlayingKey(note.replace(/[.̣'̇]/g, ""));
+    }, 261.63, timbre);
+    playbackRef.current = handle;
+    void handle.ready.then((played) => {
+      if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
+      playbackRef.current = null;
+      if (!played) setAudioUnavailable(true);
+      setPlayingKey(null);
+      setIsPlayingScale(false);
+    });
   };
 
   return (

@@ -51,3 +51,26 @@ Complete field-level before/after provenance is documented in [`docs/forensic-re
 ### Evidence & Extraction Limitations
 1. **Extracted Markdown vs Original PDF**: Text extracted with pdftotext/OCR represents our working evidence layer, but complex musical notation diagrams, Sri Lankan folk drumming layout, and diacritic placement remain subject to final original-PDF / SME review before commercial certification.
 2. **Reviewer Provenance**: Internal implementation agent comparisons do not constitute formal government or SME educational approvals. All raw records strictly retain explicit unverified metadata (`Needs Revision` / `නොදනී / සනාථ වී නැත`).
+
+## Phase 2 final-contract closeout
+
+The following six application findings were independently validated in
+`20260816-063000-p02-final-acceptance`. They are implementation-contract
+findings, not new musical or source claims. The implementation dispositions
+remain subject to the fresh mandatory review against the original Phase 2 base;
+they must not be described as accepted until that skill verdict is
+`Ready to merge` with zero actionable findings.
+
+| Issue ID | Validated runtime defect | Implementation disposition | Final line-qualified anchors |
+|---|---|---|---|
+| `P02-FINAL-01` | Missing Lesson `reviewMetadata` could be public and crash a detail route. | Require complete raw metadata; fail malformed input closed; synthesize safe unverified metadata only in bounded projections. | `src/lib/validation/content-contracts.ts:210`, `src/lib/validation/content-contracts.ts:390`, `src/test/content-contracts.test.ts:61` |
+| `P02-FINAL-02` | Invalid nonblank finite-domain values bypassed partial guards. | Central finite-union membership covers record and nested fields before publication. | `src/lib/validation/content-contracts.ts:22`, `src/test/content-contracts.test.ts:119`, `src/test/content-contracts.test.ts:135` |
+| `P02-FINAL-03` | Known dormant entity guards omitted required fields and nested shapes. | Closed kind identification plus complete contracts govern validation, publication, repository reads, and projections. | `src/lib/validation/content-contracts.ts:403`, `src/lib/validation/content-contracts.ts:438`, `src/test/content-contracts.test.ts:58` |
+| `P02-FINAL-04` | Recursive graph handling overflowed on deep acyclic input. | Iterative traversal and projection enforce depth 256 and 10,000 unique-node limits; shared DAGs pass and cycles/overruns fail closed. | `src/lib/validation/content-contracts.ts:538`, `src/test/content-contracts.test.ts:217`, `src/test/content-contracts.test.ts:249` |
+| `P02-FINAL-05` | Normalized-empty hostile search input enumerated the public catalog. | Preserve raw-empty featured results; return no result for nonblank normalized-empty input. | `src/lib/search/search-engine.ts:80`, `src/test/search-engine.test.ts:79` |
+| `P02-FINAL-06` | Swara work continued after replacement or unmount. | Caller-owned handles cancel initialization, active oscillators, sequence delays, callbacks, Strict Mode and co-mounted consumer work. | `src/lib/audio/synth.ts:161`, `src/lib/audio/synth.ts:306`, `src/test/synth.test.ts:163`, `src/test/components.test.tsx:449`, `src/test/components.test.tsx:470` |
+
+All eight Talas remain whole-entity quarantined. Earlier review runs, the
+rejected Deepchandi finding, and the original-PDF, diagram, notation,
+corrupt-glyph, and SME-review boundaries remain preserved in the closeout and
+field matrices.

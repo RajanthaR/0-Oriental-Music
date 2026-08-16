@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
-import { swaraSynth } from "@/lib/audio/synth";
-import { tablaSynth } from "@/lib/audio/tabla";
+import React, { useEffect, useRef, useState } from "react";
+import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
+import { tablaSynth, type TablaPlaybackHandle } from "@/lib/audio/tabla";
 import { Play, CheckCircle2, XCircle, RotateCcw, Sparkles, Volume2 } from "lucide-react";
 
 export interface EarTrainingChallenge {
@@ -49,16 +49,35 @@ export const EarTrainingModule: React.FC = () => {
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [audioUnavailable, setAudioUnavailable] = useState(false);
+  const playbackRef = useRef<SwaraPlaybackHandle | TablaPlaybackHandle | null>(null);
+
+  useEffect(() => {
+    return () => {
+      playbackRef.current?.();
+      playbackRef.current = null;
+    };
+  }, []);
 
   const challenge = DEFAULT_CHALLENGES[currentIndex];
 
-  const handlePlayMystery = async () => {
+  const handlePlayMystery = () => {
+    playbackRef.current?.();
+    playbackRef.current = null;
     if (challenge.type === "swara") {
-      const played = await swaraSynth.playSwaraTone(challenge.targetItem, 0.9, 261.63, "harmonium");
-      if (!played) setAudioUnavailable(true);
+      const handle = swaraSynth.playSwaraToneHandle(challenge.targetItem, 0.9, 261.63, "harmonium");
+      playbackRef.current = handle;
+      void handle.ready.then((played) => {
+        if (playbackRef.current !== handle) return;
+        playbackRef.current = null;
+        if (!played) setAudioUnavailable(true);
+      });
     } else if (challenge.type === "tala") {
       const handle = tablaSynth.playBol(challenge.targetItem, 500, () => setAudioUnavailable(true));
-      if (!(await handle.ready)) setAudioUnavailable(true);
+      playbackRef.current = handle;
+      void handle.ready.then((played) => {
+        if (playbackRef.current !== handle) return;
+        if (!played) setAudioUnavailable(true);
+      });
     }
   };
 
@@ -73,6 +92,8 @@ export const EarTrainingModule: React.FC = () => {
   };
 
   const handleNext = () => {
+    playbackRef.current?.();
+    playbackRef.current = null;
     if (currentIndex < DEFAULT_CHALLENGES.length - 1) {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);

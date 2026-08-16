@@ -11,8 +11,18 @@ import {
   ExamPaper,
   GradeBandType,
   ReviewStatus,
+  ReviewMetadata,
   ContentReviewStatus,
 } from "@/types/content";
+
+export {
+  CURRICULUM_STRANDS,
+  CURRICULUM_STRAND_IDS,
+  type CurriculumStrandId,
+  type StrandInfo,
+} from "@/lib/data/curriculum-strands";
+import { CURRICULUM_STRANDS } from "@/lib/data/curriculum-strands";
+import type { StrandInfo } from "@/lib/data/curriculum-strands";
 
 import sourcesData from "@/data/sources.json";
 import lessonsData from "@/data/lessons.json";
@@ -28,23 +38,20 @@ import examPapersData from "@/data/exam-papers.json";
 import { searchFilter } from "@/lib/search/search-engine";
 import {
   getRecordPublicationDecision,
-  getQuizPublicationDecision,
   getSourceDocumentSummary,
   UNKNOWN_PROVENANCE,
   PUBLIC_GRADE_BANDS,
   sanitizePublicRecord,
   sanitizeReviewRecord,
+  createUnverifiedReviewMetadata,
   type SourceDocumentSummary,
 } from "@/lib/data/publication-policy";
-
-export interface StrandInfo {
-  id: string;
-  name_si: string;
-  name_en: string;
-  description_si: string;
-  iconName: string;
-  gradeBands: GradeBandType[];
-}
+import {
+  isRecord,
+  isReviewMetadata,
+  validateContentRecord,
+  type ContentEntityKind,
+} from "@/lib/validation/content-contracts";
 
 export interface SourceCatalogView {
   id: string;
@@ -72,111 +79,20 @@ export interface PublicationCollectionSummary {
 
 export type LessonVisibility = "public" | "review";
 
-export const CURRICULUM_STRANDS: StrandInfo[] = [
-  {
-    id: "strand-fundamentals",
-    name_si: "මූලික සංගීත දැනුම",
-    name_en: "Music Fundamentals",
-    description_si: "නාදය, ශබ්දයේ ලක්ෂණ සහ සංගීත මූලධර්ම",
-    iconName: "Volume2",
-    gradeBands: ["6-7", "8-9"],
-  },
-  {
-    id: "strand-swara-shruti",
-    name_si: "ස්වර හා ශ්‍රැති",
-    name_en: "Swara and Shruti",
-    description_si: "සප්ත ස්වර, ශුද්ධ/කෝමල/තීව්‍ර ස්වර, සප්තක සහ ශ්‍රැති වාදය",
-    iconName: "Music",
-    gradeBands: ["6-7", "8-9", "10-11"],
-  },
-  {
-    id: "strand-laya-tala",
-    name_si: "ලය හා තාල",
-    name_en: "Laya and Tala",
-    description_si: "මාත්‍රා, විභාග, තාළි, ඛාලි සහ උත්තර භාරතීය තාල",
-    iconName: "Activity",
-    gradeBands: ["6-7", "8-9", "10-11"],
-  },
-  {
-    id: "strand-ragas",
-    name_si: "රාග ලෝකය",
-    name_en: "World of Ragas",
-    description_si: "ථාට 10, රාග ලක්ෂණ, ආරෝහණ/අවරෝහණ සහ පකඩ්",
-    iconName: "Compass",
-    gradeBands: ["8-9", "10-11"],
-  },
-  {
-    id: "strand-vocal-instrumental",
-    name_si: "ගායන හා වාදන පුහුණුව",
-    name_en: "Vocal and Instrumental Practice",
-    description_si: "හඬ පුහුණුව, ආසන, තාන්පුර ශ්‍රැතිය හා අලංකාර",
-    iconName: "Mic",
-    gradeBands: ["6-7", "8-9", "10-11"],
-  },
-  {
-    id: "strand-instruments",
-    name_si: "වාද්‍ය භාණ්ඩ",
-    name_en: "Musical Instruments",
-    description_si: "චතුර්විධ වර්ගීකරණය, සිතාරය, තබ්ලාව සහ දේශීය බෙර",
-    iconName: "Radio",
-    gradeBands: ["6-7", "8-9", "10-11"],
-  },
-  {
-    id: "strand-folk-music",
-    name_si: "ජන හා දේශීය සංගීතය",
-    name_en: "Folk and Indigenous Music",
-    description_si: "ගොයම්, කරත්ත, පාරු කවි, රබන් පද සහ ශාන්තිකර්ම",
-    iconName: "Feather",
-    gradeBands: ["6-7", "8-9", "10-11"],
-  },
-  {
-    id: "strand-theatre-music",
-    name_si: "නාට්‍ය හා රංග සංගීතය",
-    name_en: "Theatre and Dramatic Music",
-    description_si: "නාඩගම්, නූර්ති, සොකරි සහ කෝලම් සංගීත සම්ප්‍රදාය",
-    iconName: "Drama",
-    gradeBands: ["8-9", "10-11"],
-  },
-  {
-    id: "strand-appreciation",
-    name_si: "ගී රසවිඳීම හා ඉතිහාසය",
-    name_en: "Music Appreciation and History",
-    description_si: "ගීත විචාරය, සංගීතමය අංග සහ පුරෝගාමීන්",
-    iconName: "Sparkles",
-    gradeBands: ["10-11"],
-  },
-  {
-    id: "strand-creativity-tech",
-    name_si: "නිර්මාණ හා සංගීත තාක්ෂණය",
-    name_en: "Creativity and Music Tech",
-    description_si: "තනු හා රිද්ම නිර්මාණ, ප්‍රස්තාරගත කිරීම සහ ඩිජිටල් මෙවලම්",
-    iconName: "Wand2",
-    gradeBands: ["8-9", "10-11"],
-  },
-  {
-    id: "strand-exam-practice",
-    name_si: "ප්‍රශ්න හා විභාග පුහුණුව",
-    name_en: "Exam Practice",
-    description_si: "10–11 ශ්‍රේණි විභාග අභ්‍යාස සහ මූලාශ්‍ර සමාලෝචන සටහන්",
-    iconName: "Award",
-    gradeBands: ["10-11"],
-  },
-];
-
 class ContentRepository {
-  private sources = sourcesData;
-  private lessons: Lesson[] = lessonsData as Lesson[];
-  private ragas: Raga[] = ragasData as Raga[];
-  private talas: Tala[] = talasData as Tala[];
-  private instruments: Instrument[] = instrumentsData as Instrument[];
-  private culturalTraditions: CulturalTradition[] = culturalTraditionsData as unknown as CulturalTradition[];
-  private theatreTraditions: TheatreTradition[] = theatreTraditionsData as TheatreTradition[];
-  private glossary: GlossaryTerm[] = glossaryData as GlossaryTerm[];
-  private learningPaths: LearningPath[] = learningPathsData as LearningPath[];
-  private quizzes: Quiz[] = quizzesData as Quiz[];
-  private examPapers: ExamPaper[] = examPapersData as ExamPaper[];
+  private sources: unknown[] = sourcesData as unknown[];
+  private lessons: unknown[] = lessonsData as unknown[];
+  private ragas: unknown[] = ragasData as unknown[];
+  private talas: unknown[] = talasData as unknown[];
+  private instruments: unknown[] = instrumentsData as unknown[];
+  private culturalTraditions: unknown[] = culturalTraditionsData as unknown[];
+  private theatreTraditions: unknown[] = theatreTraditionsData as unknown[];
+  private glossary: unknown[] = glossaryData as unknown[];
+  private learningPaths: unknown[] = learningPathsData as unknown[];
+  private quizzes: unknown[] = quizzesData as unknown[];
+  private examPapers: unknown[] = examPapersData as unknown[];
 
-  private selectPublic<T extends { id: string }>(items: T[]): T[] {
+  private selectPublic<T>(items: readonly unknown[]): T[] {
     return items.flatMap((item) => {
       const decision = getRecordPublicationDecision(item);
       return decision.isPublic && decision.publicProjection
@@ -185,11 +101,14 @@ class ContentRepository {
     });
   }
 
-  private selectForReview<T extends { id: string }>(items: T[]): T[] {
-    return items.map((item) => sanitizeReviewRecord(item));
+  private selectForReview<T>(items: readonly unknown[], kind: ContentEntityKind): T[] {
+    return items.flatMap((item) => {
+      const projection = sanitizeReviewRecord(item);
+      return validateContentRecord(projection, kind).isValid ? [projection as T] : [];
+    });
   }
 
-  private summarize<T extends { id: string }>(items: T[]): PublicationCollectionSummary {
+  private summarize(items: readonly unknown[]): PublicationCollectionSummary {
     const decisions = items.map((item) => getRecordPublicationDecision(item));
     return {
       raw: items.length,
@@ -200,26 +119,29 @@ class ContentRepository {
   }
 
   private summarizeQuizzes(): PublicationCollectionSummary {
-    const decisions = this.quizzes.map((quiz) => getQuizPublicationDecision(quiz));
-    return {
-      raw: this.quizzes.length,
-      public: decisions.filter((decision) => decision.state === "public").length,
-      quarantined: decisions.filter((decision) => decision.state === "quarantined").length,
-      needsReview: decisions.filter((decision) => decision.state === "needs-review").length,
-    };
+    return this.summarize(this.quizzes);
   }
 
   // Sources: public transparency metadata is deliberately sanitized. The raw
   // publisher/year/location/license values are not provenance evidence.
   public getSources(): SourceCatalogView[] {
-    return this.sources.map((source) => {
+    return this.sources.flatMap((candidate) => {
+      if (!validateContentRecord(candidate, "source").isValid || !isRecord(candidate)) return [];
+      const source = candidate as {
+        id: string;
+        title: string;
+        originalFilename: string;
+        grades: string[];
+        language: string;
+        url?: string;
+      };
       const document = getSourceDocumentSummary(source.id);
-      return {
+      return [{
         id: source.id,
         title: source.title,
         originalFilename: source.originalFilename,
         publisher: UNKNOWN_PROVENANCE,
-        grades: source.grades,
+        grades: [...source.grades],
         year: UNKNOWN_PROVENANCE,
         language: source.language,
         tier: "මූලාශ්‍ර වාර්තාව (සනාථ නොකළ)",
@@ -229,7 +151,7 @@ class ContentRepository {
         url: source.url,
         evidenceState: document.reviewStatus,
         evidenceQuality: document.evidenceQuality,
-      };
+      }];
     });
   }
 
@@ -263,8 +185,8 @@ class ContentRepository {
     query?: string;
   }): Lesson[] {
     let list = filters?.visibility === "review"
-      ? this.selectForReview(this.lessons)
-      : this.selectPublic(this.lessons);
+      ? this.selectForReview<Lesson>(this.lessons, "lesson")
+      : this.selectPublic<Lesson>(this.lessons);
     if (filters?.gradeBand) {
       list = list.filter((lesson) => lesson.gradeBands.includes(filters.gradeBand!));
     }
@@ -288,7 +210,7 @@ class ContentRepository {
 
   // Ragas
   public getRagas(query?: string): Raga[] {
-    let list = this.selectPublic(this.ragas);
+    let list = this.selectPublic<Raga>(this.ragas);
     if (query) {
       list = searchFilter(list, query, (raga) => [
         raga.name_si,
@@ -308,7 +230,7 @@ class ContentRepository {
 
   // Talas
   public getTalas(query?: string): Tala[] {
-    let list = this.selectPublic(this.talas);
+    let list = this.selectPublic<Tala>(this.talas);
     if (query) {
       list = searchFilter(list, query, (tala) => [
         tala.name_si,
@@ -326,7 +248,7 @@ class ContentRepository {
 
   // Instruments
   public getInstruments(query?: string): Instrument[] {
-    let list = this.selectPublic(this.instruments);
+    let list = this.selectPublic<Instrument>(this.instruments);
     if (query) {
       list = searchFilter(list, query, (instrument) => [
         instrument.name_si,
@@ -345,7 +267,7 @@ class ContentRepository {
 
   // Traditions
   public getCulturalTraditions(query?: string): CulturalTradition[] {
-    let list = this.selectPublic(this.culturalTraditions);
+    let list = this.selectPublic<CulturalTradition>(this.culturalTraditions);
     if (query) {
       list = searchFilter(list, query, (tradition) => [
         tradition.title_si,
@@ -362,7 +284,7 @@ class ContentRepository {
   }
 
   public getTheatreTraditions(query?: string): TheatreTradition[] {
-    let list = this.selectPublic(this.theatreTraditions);
+    let list = this.selectPublic<TheatreTradition>(this.theatreTraditions);
     if (query) {
       list = searchFilter(list, query, (tradition) => [
         tradition.title_si,
@@ -380,7 +302,7 @@ class ContentRepository {
 
   // Glossary
   public getGlossary(query?: string, category?: string): GlossaryTerm[] {
-    let list = this.selectPublic(this.glossary);
+    let list = this.selectPublic<GlossaryTerm>(this.glossary);
     if (category) {
       list = list.filter((term) => term.category_si === category);
     }
@@ -399,7 +321,7 @@ class ContentRepository {
   // Learning-path dependency closure is enforced by the central publication
   // decision, so every public surface consumes the same result.
   public getLearningPaths(gradeBand?: GradeBandType): LearningPath[] {
-    let list = this.selectPublic(this.learningPaths);
+    let list = this.selectPublic<LearningPath>(this.learningPaths);
     if (gradeBand) {
       list = list.filter((path) => path.gradeBands.includes(gradeBand));
     }
@@ -412,12 +334,7 @@ class ContentRepository {
 
   // Quizzes & Exams
   public getQuizzes(): Quiz[] {
-    return this.quizzes.flatMap((quiz) => {
-      const decision = getQuizPublicationDecision(quiz);
-      return decision.isPublic && decision.publicProjection
-        ? [decision.publicProjection as Quiz]
-        : [];
-    });
+    return this.selectPublic<Quiz>(this.quizzes);
   }
 
   public getQuizById(id: string): Quiz | undefined {
@@ -425,7 +342,7 @@ class ContentRepository {
   }
 
   public getExamPapers(gradeBand?: GradeBandType): ExamPaper[] {
-    let list = this.selectPublic(this.examPapers);
+    let list = this.selectPublic<ExamPaper>(this.examPapers);
     if (gradeBand) {
       list = list.filter((paper) => paper.gradeBand === gradeBand);
     }
@@ -469,12 +386,19 @@ class ContentRepository {
     newStatus: ReviewStatus,
     isPublished: boolean = false
   ): boolean {
-    const lesson = this.lessons.find((candidate) => candidate.id === lessonId);
-    if (!lesson) return false;
+    const lesson = this.lessons.find((candidate) => isRecord(candidate) && candidate.id === lessonId);
+    if (!isRecord(lesson) || typeof isPublished !== "boolean") return false;
 
-    lesson.reviewMetadata.status = newStatus;
+    const safeCandidate = sanitizeReviewRecord(lesson);
+    if (!validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) return false;
+    const nextMetadata: ReviewMetadata = isReviewMetadata(safeCandidate.reviewMetadata)
+      ? { ...(safeCandidate.reviewMetadata as unknown as ReviewMetadata) }
+      : createUnverifiedReviewMetadata();
+    nextMetadata.status = newStatus;
+    nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
+    if (!isReviewMetadata(nextMetadata)) return false;
+    lesson.reviewMetadata = nextMetadata;
     lesson.published = isPublished;
-    lesson.reviewMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
     return true;
   }
 
@@ -484,13 +408,20 @@ class ContentRepository {
     reviewer: string,
     notes: string
   ): boolean {
-    const lesson = this.lessons.find((candidate) => candidate.id === lessonId);
-    if (!lesson) return false;
+    const lesson = this.lessons.find((candidate) => isRecord(candidate) && candidate.id === lessonId);
+    if (!isRecord(lesson)) return false;
 
-    lesson.reviewMetadata.status = newStatus;
-    lesson.reviewMetadata.reviewer = reviewer;
-    lesson.reviewMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
-    lesson.reviewMetadata.changeNotes = notes;
+    const safeCandidate = sanitizeReviewRecord(lesson);
+    if (!validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) return false;
+    const nextMetadata: ReviewMetadata = isReviewMetadata(safeCandidate.reviewMetadata)
+      ? { ...(safeCandidate.reviewMetadata as unknown as ReviewMetadata) }
+      : createUnverifiedReviewMetadata();
+    nextMetadata.status = newStatus;
+    nextMetadata.reviewer = reviewer;
+    nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
+    nextMetadata.changeNotes = notes;
+    if (!isReviewMetadata(nextMetadata)) return false;
+    lesson.reviewMetadata = nextMetadata;
     lesson.published = newStatus === "Published";
     return true;
   }

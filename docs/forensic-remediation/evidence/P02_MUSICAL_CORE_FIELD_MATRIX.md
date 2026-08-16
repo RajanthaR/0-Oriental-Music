@@ -112,3 +112,13 @@ Canonical source: `oriental_music_markdown/by-source/grade_10_nadaya.md`, extrac
 - Lawani's Grade 11 school-context statement, all unresolved normalized bol cells, and the Grade 11 `දීප්චන්දි` spelling remain source-attributed `needs-review` items until document triage/original-PDF review is complete; none is a verified public data field.
 - English transliterations and `practiceTempoBpm` are editorial/application values with `N/A` evidence quality.
 - Earlier grades are not inferred from “previously studied” wording; they require exact source locators in a later phase.
+
+## Runtime-contract cross-reference
+
+The six final application-contract findings are recorded separately in
+`docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md` under “Fresh
+final-contract findings” and in `data/forensic-ledger.json` as
+`P02-FINAL-01` through `P02-FINAL-06`. They do not add or promote a musical or
+curriculum claim. This matrix remains limited to source-grounded fields, and
+the unresolved original-PDF, notation/layout, OCR-glyph, Lawani-context, and
+Deepchandi retrieval-spelling boundaries above remain `needs-review`.

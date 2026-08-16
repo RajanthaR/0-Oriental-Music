@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Sparkles, Clock, Play, ArrowRight, Music, FileText, CheckCircle2 } from "lucide-react";
 import { repository } from "@/lib/data/repository";
 import { formatPublicSourceReference } from "@/lib/data/publication-policy";
-import { swaraSynth } from "@/lib/audio/synth";
+import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
 import { SwaraKeyboard } from "@/components/audio/SwaraKeyboard";
 
 export default function RagaDetailPage() {
@@ -17,6 +17,21 @@ export default function RagaDetailPage() {
   const source = raga ? repository.getSourceById(raga.sourceReference.sourceId) : undefined;
   const [playingPhraseIdx, setPlayingPhraseIdx] = useState<number | null>(null);
   const [audioError, setAudioError] = useState(false);
+  const mountedRef = useRef(false);
+  const audioGenerationRef = useRef(0);
+  const sequenceHandleRef = useRef<SwaraPlaybackHandle | null>(null);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    setPlayingPhraseIdx(null);
+    setAudioError(false);
+    return () => {
+      mountedRef.current = false;
+      audioGenerationRef.current += 1;
+      sequenceHandleRef.current?.();
+      sequenceHandleRef.current = null;
+    };
+  }, [ragaId]);
 
   if (!raga) {
     return (
@@ -31,14 +46,18 @@ export default function RagaDetailPage() {
 
   const playSequence = async (phraseSwaras: string[], idx: number) => {
     if (playingPhraseIdx !== null) return;
+    audioGenerationRef.current += 1;
+    const generation = audioGenerationRef.current;
     setPlayingPhraseIdx(idx);
     setAudioError(false);
-    try {
-      const played = await swaraSynth.playSequence(phraseSwaras, 0.6, undefined, 261.63, "harmonium");
-      if (!played) setAudioError(true);
-    } finally {
-      setPlayingPhraseIdx(null);
-    }
+    sequenceHandleRef.current?.();
+    const handle = swaraSynth.playSequenceHandle(phraseSwaras, 0.6, undefined, 261.63, "harmonium");
+    sequenceHandleRef.current = handle;
+    const played = await handle.ready;
+    if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
+    sequenceHandleRef.current = null;
+    if (!played) setAudioError(true);
+    setPlayingPhraseIdx(null);
   };
 
   const handlePlayPhrase = (phraseSwaras: string[], idx: number) => playSequence(phraseSwaras, idx);

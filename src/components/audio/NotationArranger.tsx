@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { swaraSynth } from "@/lib/audio/synth";
+import React, { useEffect, useRef, useState } from "react";
+import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
 import { CheckCircle2, RotateCcw, Sparkles, Volume2 } from "lucide-react";
 
 export interface NotationArrangerProps {
@@ -22,6 +22,14 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
   const [isEvaluated, setIsEvaluated] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [audioUnavailable, setAudioUnavailable] = useState(false);
+  const playbackRef = useRef<SwaraPlaybackHandle | null>(null);
+
+  useEffect(() => {
+    return () => {
+      playbackRef.current?.();
+      playbackRef.current = null;
+    };
+  }, []);
 
   const handleSelectItem = (item: string, idx: number) => {
     // Play tone if it's a swara
@@ -29,7 +37,12 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
     if (["ස", "රි", "ග", "ම", "ප", "ධ", "නි"].includes(clean)) {
       const swaraMap: Record<string, string> = { "ස": "S", "රි": "R", "ග": "G", "ම": "M", "ප": "P", "ධ": "D", "නි": "N" };
       if (swaraMap[clean]) {
-        void swaraSynth.playSwaraTone(swaraMap[clean]).then((played) => {
+        playbackRef.current?.();
+        const handle = swaraSynth.playSwaraToneHandle(swaraMap[clean]);
+        playbackRef.current = handle;
+        void handle.ready.then((played) => {
+          if (playbackRef.current !== handle) return;
+          playbackRef.current = null;
           if (!played) setAudioUnavailable(true);
         });
       }
@@ -59,6 +72,8 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
   };
 
   const handleReset = () => {
+    playbackRef.current?.();
+    playbackRef.current = null;
     setAvailableItems(shuffledItems);
     setArrangedItems([]);
     setIsEvaluated(false);

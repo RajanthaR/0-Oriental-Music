@@ -95,6 +95,7 @@ export interface DiagnosticQuestion {
 
 export interface Lesson {
   id: string;
+  /** Runtime validation narrows this to the canonical curriculum-strand set. */
   strandId: string;
   title_si: string;
   title_en?: string;
@@ -182,7 +183,7 @@ export interface Instrument {
   id: string;
   name_si: string;
   name_en: string;
-  category_si: "තත් භාණ්ඩ (Chordophone)" | "අවනද්ධ භාණ්ඩ (Membranophone)" | "සුශිර භාණ්ඩ (Aerophone)" | "ඝන භාණ්ඩ (Idiophone)";
+  category_si: "තත් භාණ්ඩ (Chordophone)" | "අවනද්ධ භාණ්ඩ (Membranophone)" | "සුෂිර භාණ්ඩ (Aerophone)" | "ඝන භාණ්ඩ (Idiophone)";
   origin_si: "දේශීය / ශ්‍රී ලාංකීය" | "උත්තර භාරතීය" | "බටහිර / පෙරදිග ආභාසය";
   construction_si: string;
   soundProduction_si: string;
@@ -301,6 +302,7 @@ export interface Question {
   type: QuestionType;
   gradeBands: GradeBandType[];
   difficulty: DifficultyLevel;
+  /** Runtime validation narrows this to the canonical curriculum-strand set. */
   strandId: string;
   prompt_si: string;
   options_si?: AnswerOption[];

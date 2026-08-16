@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -20,7 +20,7 @@ import {
 import { repository } from "@/lib/data/repository";
 import { formatPublicSourceReference } from "@/lib/data/publication-policy";
 import { ProgressStorage } from "@/lib/storage/progress-storage";
-import { swaraSynth } from "@/lib/audio/synth";
+import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
 import { SwaraKeyboard } from "@/components/audio/SwaraKeyboard";
 import { TalaVisualizer } from "@/components/audio/TalaVisualizer";
 import { RhythmTapGame } from "@/components/audio/RhythmTapGame";
@@ -43,6 +43,10 @@ export default function LessonDetailPage() {
   const [showDiagnosticResult, setShowDiagnosticResult] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [audioError, setAudioError] = useState(false);
+  const mountedRef = useRef(false);
+  const audioGenerationRef = useRef(0);
+  const sequenceHandleRef = useRef<SwaraPlaybackHandle | null>(null);
+  const audioTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!lesson) return;
@@ -50,6 +54,22 @@ export default function LessonDetailPage() {
     setIsSaved(p.savedLessonIds.includes(lesson.id));
     setIsCompleted(p.completedLessonIds.includes(lesson.id));
   }, [lesson]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    setAudioPlaying(false);
+    setAudioError(false);
+    return () => {
+      mountedRef.current = false;
+      audioGenerationRef.current += 1;
+      sequenceHandleRef.current?.();
+      sequenceHandleRef.current = null;
+      if (audioTimerRef.current !== null) {
+        window.clearTimeout(audioTimerRef.current);
+        audioTimerRef.current = null;
+      }
+    };
+  }, [lessonId]);
 
   if (!lesson) {
     return (
@@ -69,14 +89,30 @@ export default function LessonDetailPage() {
 
   const handlePlayLessonAudio = async () => {
     if (audioPlaying) return;
+    audioGenerationRef.current += 1;
+    const generation = audioGenerationRef.current;
+    sequenceHandleRef.current?.();
+    sequenceHandleRef.current = null;
+    if (audioTimerRef.current !== null) {
+      window.clearTimeout(audioTimerRef.current);
+      audioTimerRef.current = null;
+    }
     setAudioPlaying(true);
     setAudioError(false);
     if (lesson.listenActivity.notes) {
-      const played = await swaraSynth.playSequence(lesson.listenActivity.notes, 0.6, undefined, 261.63, "harmonium");
+      const handle = swaraSynth.playSequenceHandle(lesson.listenActivity.notes, 0.6, undefined, 261.63, "harmonium");
+      sequenceHandleRef.current = handle;
+      const played = await handle.ready;
+      if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
+      sequenceHandleRef.current = null;
       if (!played) setAudioError(true);
       setAudioPlaying(false);
     } else {
-      setTimeout(() => setAudioPlaying(false), 2000);
+      audioTimerRef.current = window.setTimeout(() => {
+        audioTimerRef.current = null;
+        if (!mountedRef.current || audioGenerationRef.current !== generation) return;
+        setAudioPlaying(false);
+      }, 2000);
     }
   };
 

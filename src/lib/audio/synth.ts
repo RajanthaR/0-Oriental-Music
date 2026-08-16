@@ -37,6 +37,24 @@ export const SWARA_SEMITONES: Record<string, SwaraPitchInfo> = {
 // Root Sa standard frequency: Middle C (C4 = 261.63Hz) or C#4 (277.18Hz)
 export const DEFAULT_ROOT_FREQ = 261.63; // C4
 
+export type SwaraTimbre = "harmonium" | "flute" | "sitar" | "pure";
+
+/**
+ * A caller-owned Swara playback operation.
+ *
+ * The function is intentionally callable so it mirrors the Tabla playback
+ * contract already used by the interactive components. Calling it more than
+ * once is safe; `ready` resolves to false when the operation is cancelled or
+ * Web Audio cannot be started.
+ */
+export type SwaraPlaybackHandle = (() => void) & {
+  ready: Promise<boolean>;
+};
+
+function createPlaybackHandle(cancel: () => void, ready: Promise<boolean>): SwaraPlaybackHandle {
+  return Object.assign(cancel, { ready });
+}
+
 export function getSwaraFrequency(swaraNotation: string, rootFreq: number = DEFAULT_ROOT_FREQ): number {
   const safeRootFreq = typeof rootFreq === "number" && isFinite(rootFreq) && rootFreq > 0 ? rootFreq : DEFAULT_ROOT_FREQ;
   if (!swaraNotation || typeof swaraNotation !== "string") return safeRootFreq;
@@ -62,6 +80,40 @@ export function getSwaraFrequency(swaraNotation: string, rootFreq: number = DEFA
 export class SwaraSynthEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
+
+  private createVoiceCleanup(
+    oscillators: AudioScheduledSourceNode[],
+    gains: GainNode[],
+    timerId?: number
+  ): () => void {
+    let cleaned = false;
+    return () => {
+      if (cleaned) return;
+      cleaned = true;
+      if (timerId !== undefined && typeof window !== "undefined") {
+        window.clearTimeout(timerId);
+      }
+      oscillators.forEach((oscillator) => {
+        try {
+          oscillator.stop();
+        } catch {
+          // The oscillator may already have reached its scheduled stop time.
+        }
+        try {
+          oscillator.disconnect();
+        } catch {
+          // Disconnection is best-effort during browser teardown.
+        }
+      });
+      gains.forEach((gain) => {
+        try {
+          gain.disconnect();
+        } catch {
+          // Disconnection is best-effort during browser teardown.
+        }
+      });
+    };
+  }
 
   private async initContext(): Promise<boolean> {
     try {
@@ -97,88 +149,140 @@ export class SwaraSynthEngine {
     swara: string,
     durationSec: number = 0.8,
     rootFreq: number = DEFAULT_ROOT_FREQ,
-    timbre: "harmonium" | "flute" | "sitar" | "pure" = "harmonium"
+    timbre: SwaraTimbre = "harmonium"
   ): Promise<boolean> {
-    if (typeof window === "undefined" || !swara || typeof swara !== "string") return false;
-    if (!(await this.initContext()) || !this.ctx || !this.masterGain) return false;
+    return this.playSwaraToneHandle(swara, durationSec, rootFreq, timbre).ready;
+  }
 
-    const freq = getSwaraFrequency(swara, rootFreq);
-    if (!isFinite(freq) || freq <= 0) return false;
+  /**
+   * Schedule a single tone and return an operation that owns every node it
+   * creates. This keeps delayed Web Audio work cancellable by React callers.
+   */
+  public playSwaraToneHandle(
+    swara: string,
+    durationSec: number = 0.8,
+    rootFreq: number = DEFAULT_ROOT_FREQ,
+    timbre: SwaraTimbre = "harmonium"
+  ): SwaraPlaybackHandle {
+    let cancelled = false;
+    let cleanupVoice: (() => void) | undefined;
+    let resolveReady!: (played: boolean) => void;
+    const ready = new Promise<boolean>((resolve) => {
+      resolveReady = resolve;
+    });
 
-    try {
-      const now = this.ctx.currentTime;
-
-      const noteGain = this.ctx.createGain();
-      noteGain.connect(this.masterGain);
-
-      if (timbre === "harmonium") {
-      // Additive harmonics for reedy harmonium texture
-      const harmonics = [1, 2, 3, 4, 5, 6];
-      const gains = [0.4, 0.35, 0.2, 0.15, 0.08, 0.04];
-
-      harmonics.forEach((h, idx) => {
-        if (!this.ctx) return;
-        const osc = this.ctx.createOscillator();
-        osc.type = idx % 2 === 0 ? "sawtooth" : "triangle";
-        osc.frequency.setValueAtTime(freq * h, now);
-
-        const hGain = this.ctx.createGain();
-        hGain.gain.setValueAtTime(gains[idx], now);
-        osc.connect(hGain);
-        hGain.connect(noteGain);
-
-        osc.start(now);
-        osc.stop(now + durationSec + 0.1);
-      });
-
-      // Envelope
-      noteGain.gain.setValueAtTime(0.0001, now);
-      noteGain.gain.linearRampToValueAtTime(0.5, now + 0.05);
-      noteGain.gain.setValueAtTime(0.45, now + durationSec * 0.8);
-      noteGain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
-      } else if (timbre === "flute") {
-      // Gentle sine + slight octave harmonic with breath-like attack
-      const osc = this.ctx.createOscillator();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, now);
-
-      const osc2 = this.ctx.createOscillator();
-      osc2.type = "sine";
-      osc2.frequency.setValueAtTime(freq * 2, now);
-
-      const g2 = this.ctx.createGain();
-      g2.gain.setValueAtTime(0.1, now);
-
-      osc.connect(noteGain);
-      osc2.connect(g2);
-      g2.connect(noteGain);
-
-      noteGain.gain.setValueAtTime(0.0001, now);
-      noteGain.gain.linearRampToValueAtTime(0.4, now + 0.1);
-      noteGain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
-
-      osc.start(now);
-      osc2.start(now);
-      osc.stop(now + durationSec + 0.05);
-      osc2.stop(now + durationSec + 0.05);
-      } else {
-      // Default pure tone
-      const osc = this.ctx.createOscillator();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, now);
-      osc.connect(noteGain);
-
-      noteGain.gain.setValueAtTime(0.0001, now);
-      noteGain.gain.linearRampToValueAtTime(0.4, now + 0.02);
-      noteGain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
-
-      osc.start(now);
-      osc.stop(now + durationSec + 0.05);
-      }
-      return true;
-    } catch {
+    const fail = () => {
+      resolveReady(false);
       return false;
+    };
+
+    if (typeof window === "undefined" || !swara || typeof swara !== "string") {
+      return createPlaybackHandle(() => {
+        cancelled = true;
+      }, Promise.resolve(false));
     }
+
+    void (async () => {
+      try {
+        if (!(await this.initContext()) || cancelled || !this.ctx || !this.masterGain) {
+          fail();
+          return;
+        }
+
+        const freq = getSwaraFrequency(swara, rootFreq);
+        const safeDuration = typeof durationSec === "number" && isFinite(durationSec) && durationSec > 0
+          ? durationSec
+          : 0.8;
+        if (!isFinite(freq) || freq <= 0) {
+          fail();
+          return;
+        }
+
+        const now = this.ctx.currentTime;
+        const noteGain = this.ctx.createGain();
+        const oscillators: AudioScheduledSourceNode[] = [];
+        const gains: GainNode[] = [noteGain];
+        noteGain.connect(this.masterGain);
+
+        const addOscillator = (
+          frequency: number,
+          type: OscillatorType,
+          targetGain: GainNode = noteGain
+        ) => {
+          if (!this.ctx) return;
+          const oscillator = this.ctx.createOscillator();
+          oscillator.type = type;
+          oscillator.frequency.setValueAtTime(frequency, now);
+          oscillator.connect(targetGain);
+          oscillator.start(now);
+          oscillator.stop(now + safeDuration + 0.1);
+          oscillators.push(oscillator);
+        };
+
+        if (timbre === "harmonium") {
+          const harmonics = [1, 2, 3, 4, 5, 6];
+          const harmonicGains = [0.4, 0.35, 0.2, 0.15, 0.08, 0.04];
+          harmonics.forEach((harmonic, index) => {
+            const harmonicGain = this.ctx?.createGain();
+            if (!harmonicGain) return;
+            harmonicGain.gain.setValueAtTime(harmonicGains[index], now);
+            harmonicGain.connect(noteGain);
+            gains.push(harmonicGain);
+            addOscillator(freq * harmonic, index % 2 === 0 ? "sawtooth" : "triangle", harmonicGain);
+          });
+          noteGain.gain.setValueAtTime(0.0001, now);
+          noteGain.gain.linearRampToValueAtTime(0.5, now + 0.05);
+          noteGain.gain.setValueAtTime(0.45, now + safeDuration * 0.8);
+          noteGain.gain.exponentialRampToValueAtTime(0.0001, now + safeDuration);
+        } else if (timbre === "flute") {
+          const octaveGain = this.ctx.createGain();
+          gains.push(octaveGain);
+          octaveGain.gain.setValueAtTime(0.1, now);
+          octaveGain.connect(noteGain);
+          addOscillator(freq, "sine");
+          addOscillator(freq * 2, "sine", octaveGain);
+          noteGain.gain.setValueAtTime(0.0001, now);
+          noteGain.gain.linearRampToValueAtTime(0.4, now + 0.1);
+          noteGain.gain.exponentialRampToValueAtTime(0.0001, now + safeDuration);
+        } else {
+          addOscillator(freq, "sine");
+          noteGain.gain.setValueAtTime(0.0001, now);
+          noteGain.gain.linearRampToValueAtTime(0.4, now + 0.02);
+          noteGain.gain.exponentialRampToValueAtTime(0.0001, now + safeDuration);
+        }
+
+        if (cancelled || oscillators.length === 0) {
+          cleanupVoice = this.createVoiceCleanup(oscillators, gains);
+          cleanupVoice();
+          fail();
+          return;
+        }
+
+        const naturalCleanupTimer = window.setTimeout(() => {
+          cleanupVoice?.();
+          cleanupVoice = undefined;
+        }, (safeDuration + 0.2) * 1000);
+        cleanupVoice = this.createVoiceCleanup(oscillators, gains, naturalCleanupTimer);
+        if (cancelled) {
+          cleanupVoice();
+          fail();
+          return;
+        }
+        resolveReady(true);
+      } catch {
+        cleanupVoice?.();
+        cleanupVoice = undefined;
+        fail();
+      }
+    })();
+
+    return createPlaybackHandle(() => {
+      if (cancelled) return;
+      cancelled = true;
+      cleanupVoice?.();
+      cleanupVoice = undefined;
+      resolveReady(false);
+    }, ready);
   }
 
   /**
@@ -189,16 +293,92 @@ export class SwaraSynthEngine {
     noteDurationSec: number = 0.6,
     onStep?: (index: number, swara: string) => void,
     rootFreq: number = DEFAULT_ROOT_FREQ,
-    timbre: "harmonium" | "flute" | "sitar" | "pure" = "harmonium"
+    timbre: SwaraTimbre = "harmonium"
   ): Promise<boolean> {
-    for (let i = 0; i < swaras.length; i++) {
-      const swara = swaras[i];
-      if (onStep) onStep(i, swara);
-      const played = await this.playSwaraTone(swara, noteDurationSec, rootFreq, timbre);
-      if (!played) return false;
-      await new Promise((resolve) => setTimeout(resolve, noteDurationSec * 1000));
-    }
-    return true;
+    return this.playSequenceHandle(swaras, noteDurationSec, onStep, rootFreq, timbre).ready;
+  }
+
+  /**
+   * Play a sequence with caller-owned cancellation. The sequence owns the
+   * current tone handle and its inter-note timer, so cancellation cannot leave
+   * a later note or callback running after the caller has gone away.
+   */
+  public playSequenceHandle(
+    swaras: string[],
+    noteDurationSec: number = 0.6,
+    onStep?: (index: number, swara: string) => void,
+    rootFreq: number = DEFAULT_ROOT_FREQ,
+    timbre: SwaraTimbre = "harmonium"
+  ): SwaraPlaybackHandle {
+    let cancelled = false;
+    let currentTone: SwaraPlaybackHandle | undefined;
+    let timerId: number | undefined;
+    let resolveDelay: (() => void) | undefined;
+    let resolveReady!: (played: boolean) => void;
+    const ready = new Promise<boolean>((resolve) => {
+      resolveReady = resolve;
+    });
+    const safeDuration = typeof noteDurationSec === "number" && isFinite(noteDurationSec) && noteDurationSec > 0
+      ? noteDurationSec
+      : 0.6;
+
+    void (async () => {
+      try {
+        for (let index = 0; index < swaras.length; index += 1) {
+          if (cancelled) {
+            resolveReady(false);
+            return;
+          }
+          const swara = swaras[index];
+          onStep?.(index, swara);
+          if (cancelled) {
+            resolveReady(false);
+            return;
+          }
+          currentTone = this.playSwaraToneHandle(swara, safeDuration, rootFreq, timbre);
+          const played = await currentTone.ready;
+          if (!played || cancelled) {
+            currentTone = undefined;
+            resolveReady(false);
+            return;
+          }
+          await new Promise<void>((resolve) => {
+            resolveDelay = resolve;
+            timerId = window.setTimeout(() => {
+              timerId = undefined;
+              resolveDelay = undefined;
+              resolve();
+            }, safeDuration * 1000);
+          });
+          currentTone = undefined;
+        }
+        resolveReady(!cancelled);
+      } catch {
+        if (timerId !== undefined) {
+          window.clearTimeout(timerId);
+          timerId = undefined;
+        }
+        resolveDelay?.();
+        resolveDelay = undefined;
+        currentTone?.();
+        currentTone = undefined;
+        resolveReady(false);
+      }
+    })();
+
+    return createPlaybackHandle(() => {
+      if (cancelled) return;
+      cancelled = true;
+      if (timerId !== undefined) {
+        window.clearTimeout(timerId);
+        timerId = undefined;
+      }
+      resolveDelay?.();
+      resolveDelay = undefined;
+      currentTone?.();
+      currentTone = undefined;
+      resolveReady(false);
+    }, ready);
   }
 
   public setVolume(vol: number) {

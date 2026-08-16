@@ -78,6 +78,31 @@ describe("Prompt 1 publication containment", () => {
     repository.updateLessonReviewStatus("les-raga-bhairav", "Needs Revision", false);
   });
 
+  it("keeps malformed raw lessons nonpublic while review and CMS paths fail safely", () => {
+    const raw = lessonsData.find((lesson) => lesson.id === "les-intro-01") as Record<string, unknown> | undefined;
+    expect(raw).toBeDefined();
+    if (!raw) return;
+    const originalMetadata = structuredClone(raw.reviewMetadata);
+    const originalTitle = raw.title_si;
+    try {
+      delete raw.reviewMetadata;
+      expect(getRecordPublicationDecision(raw)).toMatchObject({
+        isPublic: false,
+        reasonCodes: expect.arrayContaining(["malformed-record"]),
+      });
+      expect(repository.getLessons({ visibility: "review" }).find((lesson) => lesson.id === raw.id)?.reviewMetadata)
+        .toMatchObject({ status: "Needs Revision" });
+      expect(repository.updateLessonStatus(String(raw.id), "Needs Revision", "Review Agent", "Safe repair")).toBe(true);
+      expect(raw.reviewMetadata).toMatchObject({ status: "Needs Revision", reviewer: "Review Agent" });
+
+      raw.title_si = null;
+      expect(repository.updateLessonStatus(String(raw.id), "Needs Revision", "Review Agent", "Invalid record")).toBe(false);
+    } finally {
+      raw.title_si = originalTitle;
+      raw.reviewMetadata = originalMetadata;
+    }
+  });
+
   it("does not expose the old A/L selector scope through repository data", () => {
     expect(repository.getPublicGradeBands()).toEqual(["6-7", "8-9", "10-11"]);
     expect(repository.getExamPapers().every((paper) => paper.gradeBand !== "12-13")).toBe(true);
@@ -420,15 +445,8 @@ describe("Prompt 1 publication containment", () => {
   });
 
   it("quarantines records that reverse-depend on an unavailable raga", () => {
-    const dependent = {
-      id: "synthetic-raga-dependent",
-      gradeBands: ["10-11"],
-      sourceReference: {
-        sourceId: "SRC-G11-RAGA-ID",
-        pageOrSection: "sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 1",
-      },
-      selectedRagaId: "raga-bhairav",
-    };
+    const dependent = structuredClone(lessonsData.find((lesson) => lesson.id === "les-intro-01")) as unknown as Record<string, unknown>;
+    dependent.selectedRagaId = "raga-bhairav";
     expect(getRecordPublicationDecision(dependent)).toMatchObject({
       isPublic: false,
       reasonCodes: expect.arrayContaining(["dependent-entity-unavailable"]),
@@ -436,16 +454,8 @@ describe("Prompt 1 publication containment", () => {
   });
 
   it("quarantines recognized dependencies that do not resolve", () => {
-    const dependent = {
-      id: "synthetic-missing-dependent",
-      gradeBands: ["10-11"],
-      sourceReference: {
-        sourceId: "SRC-G11-RAGA-ID",
-        pageOrSection: "sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 1",
-      },
-      selectedRagaId: "raga-does-not-exist",
-      audioTalaId: "tala-does-not-exist",
-    };
+    const dependent = structuredClone(lessonsData.find((lesson) => lesson.id === "les-intro-01")) as unknown as Record<string, unknown>;
+    (dependent.listenActivity as Record<string, unknown>).talaId = "tala-does-not-exist";
     expect(getRecordPublicationDecision(dependent)).toMatchObject({
       isPublic: false,
       reasonCodes: expect.arrayContaining(["dependent-entity-unavailable"]),
@@ -506,15 +516,22 @@ describe("Prompt 1 publication containment", () => {
   });
 
   it("requires direct provenance instead of borrowing a parent lesson source", () => {
-    const synthetic = {
-      id: "synthetic-parent-linked-record",
-      lessonId: "les-intro-01",
-      gradeBands: ["10-11"],
-    };
-    expect(getRecordPublicationDecision(synthetic)).toMatchObject({
+    const knownQuiz = structuredClone(quizzesData.find((quiz) => quiz.id === "quiz-les-intro-01")) as unknown as Record<string, unknown>;
+    delete (knownQuiz.questions as Array<Record<string, unknown>>)[0].sourceReference;
+    const decision = getRecordPublicationDecision(knownQuiz);
+    expect(decision).toMatchObject({
       isPublic: false,
-      reasonCodes: expect.arrayContaining(["missing-source-reference", "malformed-record"]),
+      reasonCodes: expect.arrayContaining(["nested-question-unpublishable", "malformed-record"]),
     });
+    expect(decision.nestedDispositions[0].reasonCodes).toContain("missing-source-reference");
+  });
+
+  it("returns detached source grade arrays", () => {
+    const firstRead = repository.getSources();
+    expect(firstRead.length).toBeGreaterThan(0);
+    const originalGrades = [...firstRead[0].grades];
+    firstRead[0].grades.push("12-13");
+    expect(repository.getSourceById(firstRead[0].id)?.grades).toEqual(originalGrades);
   });
 
   it("fails closed for unknown kinds and malformed known records", () => {

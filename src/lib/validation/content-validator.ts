@@ -26,6 +26,10 @@ import { repository } from "@/lib/data/repository";
 import { normalizeSinhalaText } from "@/lib/search/normalize-sinhala";
 import { planTablaBol } from "@/lib/audio/tabla";
 import { isSafePracticeBpm } from "@/lib/audio/tempo";
+import {
+  validateContentRecord,
+  type ContentEntityKind,
+} from "@/lib/validation/content-contracts";
 
 export interface ValidationIssue {
   entityType: string;
@@ -890,12 +894,24 @@ export function validateContent(
   theatreTraditions: unknown
 ): { isValid: boolean; issues: ValidationIssue[] } {
   const issues: ValidationIssue[] = [];
-  const validSourceIds = new Set(sourcesData.map((s) => s.id));
+  const validSourceIds = new Set((sourcesData as unknown[]).flatMap((candidate) =>
+    validateContentRecord(candidate, "source").isValid && isRecord(candidate) && typeof candidate.id === "string"
+      ? [candidate.id]
+      : []
+  ));
   const structuralRecords = (type: string, value: unknown): Record<string, unknown>[] => {
     if (!Array.isArray(value)) {
       issues.push({ entityType: type, entityId: "catalog", field: "catalog", message: `${type} catalog must be an array`, severity: "error" });
       return [];
     }
+    const kindByType: Record<string, ContentEntityKind | undefined> = {
+      Lesson: "lesson",
+      Raga: "raga",
+      Tala: "tala",
+      Instrument: "instrument",
+      CulturalTradition: "cultural-tradition",
+      TheatreTradition: "theatre-tradition",
+    };
     return asUnknownArray(value).flatMap((candidate, index) => {
       if (!isRecord(candidate)) {
         issues.push({
@@ -906,6 +922,16 @@ export function validateContent(
           severity: "error",
         });
         return [];
+      }
+      const contract = validateContentRecord(candidate, kindByType[type]);
+      if (!contract.isValid) {
+        contract.issues.forEach((issue) => issues.push({
+          entityType: type,
+          entityId: entityId(candidate, index),
+          field: issue.field,
+          message: issue.message,
+          severity: "error",
+        }));
       }
       return [candidate];
     });
@@ -1266,6 +1292,24 @@ export function validateContent(
     { type: "ExamPaper", records: examPapersData },
     { type: "Terminology", records: terminologyData },
   ];
+  const contractCatalogs: Array<{ type: string; kind: ContentEntityKind; records: unknown[] }> = [
+    { type: "Glossary", kind: "glossary", records: glossaryData as unknown[] },
+    { type: "LearningPath", kind: "learning-path", records: learningPathsData as unknown[] },
+    { type: "Quiz", kind: "quiz", records: quizzesData as unknown[] },
+    { type: "ExamPaper", kind: "exam-paper", records: examPapersData as unknown[] },
+  ];
+  contractCatalogs.forEach(({ type, kind, records }) => {
+    records.forEach((candidate, index) => {
+      const contract = validateContentRecord(candidate, kind);
+      contract.issues.forEach((issue) => issues.push({
+        entityType: type,
+        entityId: entityId(candidate, index),
+        field: issue.field,
+        message: issue.message,
+        severity: "error",
+      }));
+    });
+  });
   issues.push(...validateCatalogIdentityContracts(
     rawCatalogs,
     glossaryData.filter((term) => getRecordPublicationDecision(term).isPublic),

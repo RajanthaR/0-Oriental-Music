@@ -20,6 +20,8 @@ const audioMocks = vi.hoisted(() => ({
   playBol: vi.fn(),
   playSwaraTone: vi.fn(),
   playSequence: vi.fn(),
+  playSwaraToneHandle: vi.fn(() => Object.assign(vi.fn(), { ready: Promise.resolve(true) })),
+  playSequenceHandle: vi.fn(() => Object.assign(vi.fn(), { ready: Promise.resolve(true) })),
 }));
 
 vi.mock("@/lib/audio/tabla", () => ({
@@ -33,6 +35,8 @@ vi.mock("@/lib/audio/synth", async (importOriginal) => {
     swaraSynth: {
       playSwaraTone: audioMocks.playSwaraTone,
       playSequence: audioMocks.playSequence,
+      playSwaraToneHandle: audioMocks.playSwaraToneHandle,
+      playSequenceHandle: audioMocks.playSequenceHandle,
     },
   };
 });
@@ -50,6 +54,8 @@ afterEach(() => {
   audioMocks.playBol.mockReset();
   audioMocks.playSwaraTone.mockReset().mockResolvedValue(true);
   audioMocks.playSequence.mockReset().mockResolvedValue(true);
+  audioMocks.playSwaraToneHandle.mockReset().mockImplementation(() => readyCancel());
+  audioMocks.playSequenceHandle.mockReset().mockImplementation(() => readyCancel());
   vi.useRealTimers();
 });
 
@@ -361,6 +367,7 @@ describe("Interactive Audio & Quiz Components Suite", () => {
 
   it("shows localized fallback feedback for unavailable public audio controls", async () => {
     audioMocks.playSwaraTone.mockResolvedValue(false);
+    audioMocks.playSwaraToneHandle.mockReturnValue(Object.assign(vi.fn(), { ready: Promise.resolve(false) }));
     const keyboard = render(<SwaraKeyboard />);
     fireEvent.click(screen.getByRole("button", { name: "ස (ෂඩ්ජ) ස්වරය" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("නාදය ආරම්භ කළ නොහැක");
@@ -374,6 +381,123 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     render(<EarTrainingModule />);
     fireEvent.click(screen.getByRole("button", { name: /නාදය අසන්න/ }));
     expect(await screen.findByRole("alert")).toHaveTextContent("නාදය ආරම්භ කළ නොහැක");
+  });
+
+  it("cancels owned Swara tone and scale work on replacement and unmount", () => {
+    vi.useFakeTimers();
+    const toneCancels: Array<ReturnType<typeof vi.fn>> = [];
+    const scaleCancels: Array<ReturnType<typeof vi.fn>> = [];
+    const neverReady = new Promise<boolean>(() => undefined);
+    audioMocks.playSwaraToneHandle.mockImplementation(() => {
+      const cancel = vi.fn();
+      toneCancels.push(cancel);
+      return Object.assign(cancel, { ready: neverReady });
+    });
+    audioMocks.playSequenceHandle.mockImplementation(() => {
+      const cancel = vi.fn();
+      scaleCancels.push(cancel);
+      return Object.assign(cancel, { ready: neverReady });
+    });
+
+    const { unmount } = render(<SwaraKeyboard />);
+    fireEvent.click(screen.getByRole("button", { name: "ස (ෂඩ්ජ) ස්වරය" }));
+    fireEvent.click(screen.getByRole("button", { name: "ආරෝහණය අසන්න" }));
+    expect(toneCancels[0]).toHaveBeenCalledTimes(1);
+    expect(scaleCancels[0]).not.toHaveBeenCalled();
+    unmount();
+    expect(scaleCancels[0]).toHaveBeenCalledTimes(1);
+    act(() => { vi.advanceTimersByTime(5000); });
+  });
+
+  it("keeps co-mounted Swara keyboard cancellation isolated", () => {
+    const cancels: Array<ReturnType<typeof vi.fn>> = [];
+    const neverReady = new Promise<boolean>(() => undefined);
+    audioMocks.playSwaraToneHandle.mockImplementation(() => {
+      const cancel = vi.fn();
+      cancels.push(cancel);
+      return Object.assign(cancel, { ready: neverReady });
+    });
+    const { unmount } = render(
+      <>
+        <SwaraKeyboard />
+        <SwaraKeyboard />
+      </>
+    );
+    fireEvent.click(screen.getAllByRole("button", { name: "ස (ෂඩ්ජ) ස්වරය" })[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: "ස (ෂඩ්ජ) ස්වරය" })[1]);
+    expect(cancels).toHaveLength(2);
+    expect(cancels[0]).not.toHaveBeenCalled();
+    expect(cancels[1]).not.toHaveBeenCalled();
+    unmount();
+    expect(cancels[0]).toHaveBeenCalledTimes(1);
+    expect(cancels[1]).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps active Swara playback when an equivalent highlight array is recreated", () => {
+    const cancel = vi.fn();
+    const neverReady = new Promise<boolean>(() => undefined);
+    audioMocks.playSequenceHandle.mockReturnValue(Object.assign(cancel, { ready: neverReady }));
+    const { rerender, unmount } = render(<SwaraKeyboard highlightNotes={["S", "R", "G"]} />);
+    fireEvent.click(screen.getByRole("button", { name: "ආරෝහණය අසන්න" }));
+    rerender(<SwaraKeyboard highlightNotes={["S", "R", "G"]} />);
+    expect(cancel).not.toHaveBeenCalled();
+    rerender(<SwaraKeyboard highlightNotes={["S", "R", "M"]} />);
+    expect(cancel).toHaveBeenCalledTimes(1);
+    unmount();
+  });
+
+  it("owns Swara playback across StrictMode replacement and unmount", async () => {
+    let resolveFirst!: (played: boolean) => void;
+    const firstReady = new Promise<boolean>((resolve) => { resolveFirst = resolve; });
+    const firstCancel = vi.fn();
+    const secondCancel = vi.fn();
+    audioMocks.playSwaraToneHandle
+      .mockReturnValueOnce(Object.assign(firstCancel, { ready: firstReady }))
+      .mockReturnValueOnce(Object.assign(secondCancel, { ready: new Promise<boolean>(() => undefined) }));
+
+    const view = render(<StrictMode><SwaraKeyboard /></StrictMode>);
+    fireEvent.click(screen.getByRole("button", { name: "ස (ෂඩ්ජ) ස්වරය" }));
+    fireEvent.click(screen.getByRole("button", { name: "රි (ශුද්ධ) ස්වරය" }));
+    expect(firstCancel).toHaveBeenCalledTimes(1);
+    expect(secondCancel).not.toHaveBeenCalled();
+    resolveFirst(false);
+    await act(async () => Promise.resolve());
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    view.unmount();
+    expect(secondCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps arranger and ear-training Swara ownership isolated", async () => {
+    let resolveArranger!: (played: boolean) => void;
+    let resolveEar!: (played: boolean) => void;
+    const arrangerCancel = vi.fn();
+    const earCancel = vi.fn();
+    audioMocks.playSwaraToneHandle
+      .mockReturnValueOnce(Object.assign(arrangerCancel, {
+        ready: new Promise<boolean>((resolve) => { resolveArranger = resolve; }),
+      }))
+      .mockReturnValueOnce(Object.assign(earCancel, {
+        ready: new Promise<boolean>((resolve) => { resolveEar = resolve; }),
+      }));
+
+    const view = render(
+      <>
+        <NotationArranger />
+        <EarTrainingModule />
+      </>
+    );
+    fireEvent.click(screen.getByRole("button", { name: "ස" }));
+    fireEvent.click(screen.getByRole("button", { name: /නාදය අසන්න/ }));
+    fireEvent.click(screen.getByRole("button", { name: "නැවත" }));
+    expect(arrangerCancel).toHaveBeenCalledTimes(1);
+    expect(earCancel).not.toHaveBeenCalled();
+    resolveArranger(false);
+    await act(async () => Promise.resolve());
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    view.unmount();
+    expect(earCancel).toHaveBeenCalledTimes(1);
+    resolveEar(false);
+    await act(async () => Promise.resolve());
   });
 
   it("finishes the rhythm game once and cancels owned playback on reset", () => {

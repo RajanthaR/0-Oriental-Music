@@ -28,6 +28,11 @@ export type TablaPlaybackHandle = (() => void) & {
   ready: Promise<boolean>;
 };
 
+type ActiveTablaStroke = {
+  cancel: () => void;
+  finished: Promise<void>;
+};
+
 function createPlaybackHandle(cancel: () => void, ready: Promise<boolean>): TablaPlaybackHandle {
   return Object.assign(cancel, { ready });
 }
@@ -132,8 +137,33 @@ export class TablaSynthEngine {
   /**
    * Synthesize Dayan (Treble Drum) open ringing stroke (Na / Ta)
    */
-  private playDayanOpen(baseFreq: number = 293.66, duration: number = 0.5) {
-    if (!this.ctx || !this.masterGain) return;
+  private createActiveStroke(
+    oscillators: AudioScheduledSourceNode[],
+    gains: GainNode[],
+    durationMs: number
+  ): ActiveTablaStroke {
+    let finished = false;
+    let resolveFinished!: () => void;
+    const finishedPromise = new Promise<void>((resolve) => { resolveFinished = resolve; });
+    const cleanup = () => {
+      if (finished) return;
+      finished = true;
+      window.clearTimeout(timerId);
+      oscillators.forEach((oscillator) => {
+        try { oscillator.stop(); } catch { /* already stopped */ }
+        try { oscillator.disconnect(); } catch { /* browser teardown */ }
+      });
+      gains.forEach((gain) => {
+        try { gain.disconnect(); } catch { /* browser teardown */ }
+      });
+      resolveFinished();
+    };
+    const timerId = window.setTimeout(cleanup, durationMs);
+    return { cancel: cleanup, finished: finishedPromise };
+  }
+
+  private playDayanOpen(baseFreq: number = 293.66, duration: number = 0.5): ActiveTablaStroke | undefined {
+    if (!this.ctx || !this.masterGain) return undefined;
     const now = this.ctx.currentTime;
 
     const gain = this.ctx.createGain();
@@ -162,13 +192,14 @@ export class TablaSynthEngine {
     osc2.start(now);
     osc1.stop(now + duration + 0.05);
     osc2.stop(now + duration + 0.05);
+    return this.createActiveStroke([osc1, osc2], [gain, g2], (duration + 0.1) * 1000);
   }
 
   /**
    * Synthesize Dayan closed/damped stroke (Tin / Te / Ke)
    */
-  private playDayanClosed(baseFreq: number = 293.66, duration: number = 0.15) {
-    if (!this.ctx || !this.masterGain) return;
+  private playDayanClosed(baseFreq: number = 293.66, duration: number = 0.15): ActiveTablaStroke | undefined {
+    if (!this.ctx || !this.masterGain) return undefined;
     const now = this.ctx.currentTime;
 
     const gain = this.ctx.createGain();
@@ -185,13 +216,14 @@ export class TablaSynthEngine {
 
     osc.start(now);
     osc.stop(now + duration + 0.02);
+    return this.createActiveStroke([osc], [gain], (duration + 0.07) * 1000);
   }
 
   /**
    * Synthesize Bayan (Bass Drum) resonant resonant stroke with gentle modulation (Ge / Ghe)
    */
-  private playBayanBass(pitchBend: boolean = true, duration: number = 0.6) {
-    if (!this.ctx || !this.masterGain) return;
+  private playBayanBass(pitchBend: boolean = true, duration: number = 0.6): ActiveTablaStroke | undefined {
+    if (!this.ctx || !this.masterGain) return undefined;
     const now = this.ctx.currentTime;
 
     const gain = this.ctx.createGain();
@@ -220,27 +252,37 @@ export class TablaSynthEngine {
 
     osc.start(now);
     osc.stop(now + duration + 0.05);
+    return this.createActiveStroke([osc], [gain], (duration + 0.1) * 1000);
   }
 
   /**
    * Play any standard Tabla Bol
    */
-  private playStroke(strokeKind: TablaStrokeKind) {
+  private playStroke(strokeKind: TablaStrokeKind): ActiveTablaStroke | undefined {
+    const strokes: ActiveTablaStroke[] = [];
+    const add = (stroke: ActiveTablaStroke | undefined) => {
+      if (stroke) strokes.push(stroke);
+    };
     if (strokeKind === "combined-open") {
-      this.playBayanBass(true, 0.65);
-      this.playDayanOpen(293.66, 0.5);
+      add(this.playBayanBass(true, 0.65));
+      add(this.playDayanOpen(293.66, 0.5));
     } else if (strokeKind === "combined-closed") {
-      this.playBayanBass(false, 0.55);
-      this.playDayanClosed(293.66, 0.3);
+      add(this.playBayanBass(false, 0.55));
+      add(this.playDayanClosed(293.66, 0.3));
     } else if (strokeKind === "bass") {
-      this.playBayanBass(true, 0.6);
+      add(this.playBayanBass(true, 0.6));
     } else if (strokeKind === "open") {
-      this.playDayanOpen(293.66, 0.45);
+      add(this.playDayanOpen(293.66, 0.45));
     } else if (strokeKind === "closed") {
-      this.playDayanClosed(293.66, 0.25);
+      add(this.playDayanClosed(293.66, 0.25));
     } else if (strokeKind === "fallback") {
-      this.playDayanClosed(260, 0.2);
+      add(this.playDayanClosed(260, 0.2));
     }
+    if (strokes.length === 0) return undefined;
+    return {
+      cancel: () => strokes.forEach((stroke) => stroke.cancel()),
+      finished: Promise.all(strokes.map((stroke) => stroke.finished)).then(() => undefined),
+    };
   }
 
   public playBol(
@@ -261,13 +303,18 @@ export class TablaSynthEngine {
     if (plan.length === 0) return createPlaybackHandle(() => undefined, Promise.resolve(true));
 
     let cancelScheduled: () => void = () => undefined;
+    const activeStrokes = new Set<ActiveTablaStroke>();
     const ready = this.initContext().then((available) => {
       if (cancelled) return false;
       if (!available) return unavailable();
       cancelScheduled = scheduleTablaPlan(plan, (stroke) => {
         if (cancelled) return;
         try {
-          this.playStroke(stroke.kind);
+          const activeStroke = this.playStroke(stroke.kind);
+          if (activeStroke) {
+            activeStrokes.add(activeStroke);
+            void activeStroke.finished.then(() => activeStrokes.delete(activeStroke));
+          }
         } catch {
           onUnavailable?.();
         }
@@ -281,6 +328,8 @@ export class TablaSynthEngine {
     return createPlaybackHandle(() => {
       cancelled = true;
       cancelScheduled();
+      activeStrokes.forEach((stroke) => stroke.cancel());
+      activeStrokes.clear();
     }, ready);
   }
 }

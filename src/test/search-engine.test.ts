@@ -76,6 +76,16 @@ describe("Search Engine & Sinhala Normalizer Suite", () => {
     expect(searchIndex.search("constructor")).toEqual([]);
   });
 
+  it("keeps featured results for raw empty input but rejects normalized-empty controls", () => {
+    const fixture = [
+      { id: "featured", title_si: "ස්වර පාඩම" },
+    ];
+    expect(searchFilter(fixture, "   ", (item) => [item.title_si])).toEqual(fixture);
+    expect(searchFilter(fixture, "\u200B\u200E\u202E\u2066\uFEFF", (item) => [item.title_si])).toEqual([]);
+    expect(searchFilter(fixture, "\u200B\u200Eස්වර", (item) => [item.title_si])).toEqual(fixture);
+    expect(searchIndex.search("\u200B\u200E\u202E\u2066\uFEFF")).toEqual([]);
+  });
+
   it("should keep search results inside the publication boundary", () => {
     const results = searchIndex.search("ස්වර");
     expect(results.every((result) => !["les-exam-skills", "raga-bhairav", "tala-roopak"].includes(result.id))).toBe(true);

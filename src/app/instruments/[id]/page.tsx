@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Radio, Play, ShieldAlert, FileText, ArrowRight, Wrench, Volume2 } from "lucide-react";
 import { repository } from "@/lib/data/repository";
 import { formatPublicSourceReference } from "@/lib/data/publication-policy";
-import { swaraSynth } from "@/lib/audio/synth";
-import { tablaSynth } from "@/lib/audio/tabla";
+import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
+import { tablaSynth, type TablaPlaybackHandle } from "@/lib/audio/tabla";
 
 export default function InstrumentDetailPage() {
   const params = useParams();
@@ -17,6 +17,37 @@ export default function InstrumentDetailPage() {
   const source = instrument ? repository.getSourceById(instrument.sourceReference.sourceId) : undefined;
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioError, setAudioError] = useState(false);
+  const mountedRef = useRef(false);
+  const audioGenerationRef = useRef(0);
+  const sequenceHandleRef = useRef<SwaraPlaybackHandle | null>(null);
+  const tablaHandlesRef = useRef<Set<TablaPlaybackHandle>>(new Set());
+  const audioTimersRef = useRef<Set<number>>(new Set());
+  const completionTimerRef = useRef<number | null>(null);
+
+  const cancelOwnedAudio = useCallback(() => {
+    audioGenerationRef.current += 1;
+    sequenceHandleRef.current?.();
+    sequenceHandleRef.current = null;
+    tablaHandlesRef.current.forEach((handle) => handle());
+    tablaHandlesRef.current.clear();
+    audioTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
+    audioTimersRef.current.clear();
+    if (completionTimerRef.current !== null) {
+      window.clearTimeout(completionTimerRef.current);
+      completionTimerRef.current = null;
+    }
+    if (mountedRef.current) setIsPlayingAudio(false);
+  }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    setIsPlayingAudio(false);
+    setAudioError(false);
+    return () => {
+      mountedRef.current = false;
+      cancelOwnedAudio();
+    };
+  }, [cancelOwnedAudio, instId]);
 
   if (!instrument) {
     return (
@@ -31,29 +62,52 @@ export default function InstrumentDetailPage() {
 
   const handlePlaySample = () => {
     if (isPlayingAudio) return;
+    cancelOwnedAudio();
+    const generation = audioGenerationRef.current;
     setIsPlayingAudio(true);
     setAudioError(false);
 
     if (instrument.id === "inst-tabla" || instrument.category_si.includes("අවනද්ධ")) {
       ["ධා", "ධින්", "ධින්", "ධා"].forEach((bol, i) => {
-        setTimeout(() => {
-          const handle = tablaSynth.playBol(bol, 400, () => setAudioError(true));
-          void handle.ready;
+        const timerId = window.setTimeout(() => {
+          audioTimersRef.current.delete(timerId);
+          if (!mountedRef.current || audioGenerationRef.current !== generation) return;
+          const handle = tablaSynth.playBol(bol, 400, () => {
+            if (mountedRef.current && audioGenerationRef.current === generation) setAudioError(true);
+          });
+          tablaHandlesRef.current.add(handle);
+          void handle.ready.then((played) => {
+            if (!mountedRef.current || audioGenerationRef.current !== generation) return;
+            if (!played) setAudioError(true);
+          });
         }, i * 400);
+        audioTimersRef.current.add(timerId);
       });
-      setTimeout(() => setIsPlayingAudio(false), 2000);
+      completionTimerRef.current = window.setTimeout(() => {
+        completionTimerRef.current = null;
+        if (!mountedRef.current || audioGenerationRef.current !== generation) return;
+        tablaHandlesRef.current.forEach((handle) => handle());
+        tablaHandlesRef.current.clear();
+        setIsPlayingAudio(false);
+      }, 2000);
     } else if (instrument.id === "inst-flute") {
-      swaraSynth.playSequence(["S", "G", "M", "P", "N", "S'"], 0.5, undefined, 261.63, "flute")
-        .then((played) => {
-          if (!played) setAudioError(true);
-        })
-        .finally(() => setIsPlayingAudio(false));
+      const handle = swaraSynth.playSequenceHandle(["S", "G", "M", "P", "N", "S'"], 0.5, undefined, 261.63, "flute");
+      sequenceHandleRef.current = handle;
+      void handle.ready.then((played) => {
+        if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
+        sequenceHandleRef.current = null;
+        if (!played) setAudioError(true);
+        setIsPlayingAudio(false);
+      });
     } else {
-      swaraSynth.playSequence(["S", "R", "G", "M", "P", "D", "N", "S'"], 0.45, undefined, 261.63, "harmonium")
-        .then((played) => {
-          if (!played) setAudioError(true);
-        })
-        .finally(() => setIsPlayingAudio(false));
+      const handle = swaraSynth.playSequenceHandle(["S", "R", "G", "M", "P", "D", "N", "S'"], 0.45, undefined, 261.63, "harmonium");
+      sequenceHandleRef.current = handle;
+      void handle.ready.then((played) => {
+        if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
+        sequenceHandleRef.current = null;
+        if (!played) setAudioError(true);
+        setIsPlayingAudio(false);
+      });
     }
   };
 
