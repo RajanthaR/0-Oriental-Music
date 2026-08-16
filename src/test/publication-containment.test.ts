@@ -15,10 +15,12 @@ import {
   getRecordPublicationDecision,
   getPublicationDecision,
   getSourceCorpusInventory,
+  getSourceDocumentSummary,
   getTalaFieldDisposition,
   KNOWN_QUARANTINED_ENTITY_IDS,
   UNKNOWN_PROVENANCE,
   sanitizePublicRecord,
+  sanitizeReviewRecord,
 } from "@/lib/data/publication-policy";
 import quizzesData from "@/data/quizzes.json";
 import examPapersData from "@/data/exam-papers.json";
@@ -138,11 +140,12 @@ describe("Prompt 1 publication containment", () => {
   });
 
   it("keeps malformed raw lessons nonpublic while review and CMS paths fail safely", () => {
-    const raw = lessonsData.find((lesson) => lesson.id === "les-intro-01") as Record<string, unknown> | undefined;
+    const lessonCatalog = lessonsData as unknown as Array<Record<string, unknown>>;
+    const rawIndex = lessonCatalog.findIndex((lesson) => lesson.id === "les-intro-01");
+    const raw = lessonCatalog[rawIndex];
     expect(raw).toBeDefined();
     if (!raw) return;
-    const originalMetadata = structuredClone(raw.reviewMetadata);
-    const originalTitle = raw.title_si;
+    const original = structuredClone(raw);
     try {
       delete raw.reviewMetadata;
       expect(getRecordPublicationDecision(raw)).toMatchObject({
@@ -152,13 +155,13 @@ describe("Prompt 1 publication containment", () => {
       expect(repository.getLessons({ visibility: "review" }).find((lesson) => lesson.id === raw.id)?.reviewMetadata)
         .toMatchObject({ status: "Needs Revision" });
       expect(repository.updateLessonStatus(String(raw.id), "Needs Revision", "Review Agent", "Safe repair")).toBe(true);
-      expect(raw.reviewMetadata).toMatchObject({ status: "Needs Revision", reviewer: "Review Agent" });
+      const repaired = lessonCatalog[rawIndex];
+      expect(repaired.reviewMetadata).toMatchObject({ status: "Needs Revision", reviewer: "Review Agent" });
 
-      raw.title_si = null;
-      expect(repository.updateLessonStatus(String(raw.id), "Needs Revision", "Review Agent", "Invalid record")).toBe(false);
+      repaired.title_si = null;
+      expect(repository.updateLessonStatus(String(repaired.id), "Needs Revision", "Review Agent", "Invalid record")).toBe(false);
     } finally {
-      raw.title_si = originalTitle;
-      raw.reviewMetadata = originalMetadata;
+      lessonCatalog[rawIndex] = original;
     }
   });
 
@@ -210,6 +213,111 @@ describe("Prompt 1 publication containment", () => {
       decisions: [],
       failureReason: "unsafe-container",
     });
+  });
+
+  it("never substitutes trusted defaults for explicitly malformed catalog inputs", () => {
+    const accessorBacked: Record<string, unknown> = {};
+    Object.defineProperty(accessorBacked, "ragas", {
+      enumerable: true,
+      get() {
+        throw new Error("catalog getter must not run");
+      },
+    });
+    const inputs: unknown[] = [
+      { ragas: undefined },
+      { ragas: null },
+      { ragas: Symbol("unsafe") },
+      accessorBacked,
+    ];
+    for (const input of inputs) {
+      const context = createPublicationEvaluationContext(input as never);
+      expect(context.safe).toBe(false);
+      expect(context.catalogs.ragas).toEqual([]);
+      expect(evaluatePublicationBatch([ragasData[0]], context)).toMatchObject({
+        isValid: false,
+        decisions: [],
+        failureReason: "unsafe-container",
+      });
+    }
+  });
+
+  it("uses one normalized identity index for context, batch, review, and repository reads", () => {
+    const first = structuredClone(ragasData[0]) as unknown as Record<string, unknown>;
+    const second = structuredClone(ragasData[0]) as unknown as Record<string, unknown>;
+    second.id = ` ${String(first.id)} `;
+    const context = createPublicationEvaluationContext({ ragas: [first, second] });
+    expect(context.safe).toBe(true);
+    expect(getRecordPublicationDecision(first, context)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["unknown-record-kind"]),
+    });
+    expect(evaluatePublicationBatch(context.catalogs.ragas, context).decisions.every(
+      (decision) => decision.reasonCodes.includes("duplicate-record-id"),
+    )).toBe(true);
+    expect(sanitizeReviewRecord(first, context)).toMatchObject({ id: "raga-bilawal" });
+
+    const mutableRepository = repository as unknown as { ragas: unknown[] };
+    const original = mutableRepository.ragas;
+    try {
+      mutableRepository.ragas = [first, second];
+      expect(repository.getRagas()).toEqual([]);
+      expect(repository.getRagaById(String(first.id))).toBeUndefined();
+      expect(repository.getPublicationSummary().ragas).toMatchObject({
+        raw: 2,
+        public: 0,
+        needsReview: 2,
+        failureReasons: ["duplicate-record-id"],
+      });
+    } finally {
+      mutableRepository.ragas = original;
+    }
+
+    const mutableLessons = repository as unknown as { lessons: unknown[] };
+    const originalLessons = mutableLessons.lessons;
+    const lessonA = structuredClone(lessonsData[0]) as unknown as Record<string, unknown>;
+    const lessonB = structuredClone(lessonsData[0]) as unknown as Record<string, unknown>;
+    lessonB.id = ` ${String(lessonA.id)} `;
+    try {
+      mutableLessons.lessons = [lessonA, lessonB];
+      expect(repository.getLessons({ visibility: "review" })).toEqual([]);
+      expect(repository.updateLessonReviewStatus(String(lessonA.id), "Needs Revision", false)).toBe(false);
+    } finally {
+      mutableLessons.lessons = originalLessons;
+    }
+  });
+
+  it("fails every evidence helper closed for unsafe or forged evaluation contexts", () => {
+    const reference = ragasData[0].sourceReference;
+    const unsafe = createPublicationEvaluationContext({ lessons: undefined });
+    expect(evaluateSourceReference(reference, unsafe)).toMatchObject({
+      supportable: false,
+      reasonCode: "unsafe-evaluation-context",
+    });
+    expect(getContextClaimPublicationDecision(talasData[0], unsafe)).toMatchObject({
+      isPublic: false,
+      reasonCode: "unsafe-evaluation-context",
+    });
+    expect(getSourceDocumentSummary(reference.sourceId, unsafe)).toMatchObject({
+      pageCount: 0,
+      evidenceQuality: "missing",
+    });
+
+    const valid = createPublicationEvaluationContext();
+    const forged = Object.freeze({ safe: true, catalogs: valid.catalogs }) as never;
+    expect(() => getSourceDocumentSummary(reference.sourceId, forged)).not.toThrow();
+    expect(getSourceDocumentSummary(reference.sourceId, forged)).toMatchObject({
+      pageCount: 0,
+      evidenceQuality: "missing",
+    });
+  });
+
+  it("deep-freezes the dependency matrix so policy cannot be changed at runtime", () => {
+    expect(Object.isFrozen(DEPENDENCY_FIELD_RULES)).toBe(true);
+    for (const rule of Object.values(DEPENDENCY_FIELD_RULES)) expect(Object.isFrozen(rule)).toBe(true);
+    expect(() => {
+      (DEPENDENCY_FIELD_RULES.prerequisites as { blocking: boolean }).blocking = false;
+    }).toThrow();
+    expect(DEPENDENCY_FIELD_RULES.prerequisites.blocking).toBe(true);
   });
 
   it("exposes only frozen publication snapshots, not mutable evaluation caches", () => {
@@ -291,6 +399,98 @@ describe("Prompt 1 publication containment", () => {
     }
   });
 
+  it("keeps CMS publication evidence immutable and applies status changes atomically", () => {
+    const mutableRepository = repository as unknown as { lessons: unknown[] };
+    const index = mutableRepository.lessons.findIndex(
+      (candidate) => candidate && typeof candidate === "object" && (candidate as Record<string, unknown>).id === "les-intro-01",
+    );
+    const original = mutableRepository.lessons[index];
+    const lesson = structuredClone(original) as Record<string, unknown>;
+    const verifiedMetadata = {
+      status: "Rights & Source Verification",
+      reviewer: "Verified reviewer fixture",
+      reviewDate: "2026-08-15",
+      lastVerifiedDate: "2026-08-15",
+      changeNotes: "Verified claim-level evidence fixture",
+      license: "Verified educational licence fixture",
+      reuseStatus: "Curriculum Canonical",
+    };
+    lesson.reviewMetadata = verifiedMetadata;
+    Object.defineProperty(lesson, "published", {
+      value: false,
+      writable: false,
+      configurable: true,
+      enumerable: true,
+    });
+    mutableRepository.lessons[index] = lesson;
+    try {
+      expect(repository.updateLessonStatus(
+        "les-intro-01",
+        "Published",
+        "FORGED REVIEWER",
+        "forged notes",
+      )).toBe(false);
+      expect(mutableRepository.lessons[index]).toBe(lesson);
+      expect(lesson.reviewMetadata).toEqual(verifiedMetadata);
+      expect(lesson.published).toBe(false);
+
+      expect(repository.updateLessonStatus(
+        "les-intro-01",
+        "Published",
+        verifiedMetadata.reviewer,
+        verifiedMetadata.changeNotes,
+      )).toBe(true);
+      const replacement = mutableRepository.lessons[index] as Record<string, unknown>;
+      expect(replacement).not.toBe(lesson);
+      expect(replacement.published).toBe(true);
+      expect(replacement.reviewMetadata).toMatchObject({
+        status: "Published",
+        reviewer: verifiedMetadata.reviewer,
+        changeNotes: verifiedMetadata.changeNotes,
+      });
+      expect(lesson.published).toBe(false);
+      expect(lesson.reviewMetadata).toEqual(verifiedMetadata);
+    } finally {
+      mutableRepository.lessons[index] = original;
+    }
+  });
+
+  it("evaluates CMS publication against the same repository source snapshot", () => {
+    const mutableRepository = repository as unknown as { lessons: unknown[]; sources: unknown[] };
+    const index = mutableRepository.lessons.findIndex(
+      (candidate) => candidate && typeof candidate === "object" && (candidate as Record<string, unknown>).id === "les-intro-01",
+    );
+    const originalLesson = mutableRepository.lessons[index];
+    const originalSources = mutableRepository.sources;
+    const lesson = structuredClone(originalLesson) as Record<string, unknown>;
+    lesson.reviewMetadata = {
+      status: "Rights & Source Verification",
+      reviewer: "Verified reviewer fixture",
+      reviewDate: "2026-08-15",
+      lastVerifiedDate: "2026-08-15",
+      changeNotes: "Verified claim-level evidence fixture",
+      license: "Verified educational licence fixture",
+      reuseStatus: "Curriculum Canonical",
+    };
+    lesson.published = false;
+    mutableRepository.lessons[index] = lesson;
+    mutableRepository.sources = [];
+    try {
+      expect(repository.updateLessonReviewStatus("les-intro-01", "Published", true)).toBe(false);
+      expect(repository.updateLessonStatus(
+        "les-intro-01",
+        "Published",
+        "Verified reviewer fixture",
+        "Verified claim-level evidence fixture",
+      )).toBe(false);
+      expect(mutableRepository.lessons[index]).toBe(lesson);
+      expect(lesson.published).toBe(false);
+    } finally {
+      mutableRepository.lessons[index] = originalLesson;
+      mutableRepository.sources = originalSources;
+    }
+  });
+
   it("fails closed after a previously trusted raw record becomes accessor-backed", () => {
     const candidate = structuredClone(ragasData[0]) as Record<string, unknown>;
     expect(getRecordPublicationDecision(candidate).isPublic).toBe(true);
@@ -329,6 +529,28 @@ describe("Prompt 1 publication containment", () => {
       });
     } finally {
       sourceCatalog.splice(originalLength);
+    }
+  });
+
+  it("uses the repository source snapshot for both source rows and source summaries", () => {
+    const mutableRepository = repository as unknown as { sources: unknown[] };
+    const original = mutableRepository.sources;
+    const changed = structuredClone(sourcesData) as unknown as Array<Record<string, unknown>>;
+    const target = changed[0];
+    target.originalFilename = `missing-${String(target.originalFilename)}`;
+    try {
+      mutableRepository.sources = changed;
+      const source = repository.getSourceById(String(target.id));
+      const summary = repository.getSourceDocumentSummary(String(target.id));
+      expect(source?.evidenceState).toBe(summary.reviewStatus);
+      expect(source?.evidenceQuality).toBe(summary.evidenceQuality);
+      expect(summary).toMatchObject({
+        pageCount: 0,
+        evidenceQuality: "missing",
+        reviewStatus: "No matching extracted document",
+      });
+    } finally {
+      mutableRepository.sources = original;
     }
   });
 

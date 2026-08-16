@@ -64,6 +64,162 @@
       "P02-PITCH-OWNERSHIP-001",
       "P02-PROJECT-SCOPE-001"
     ],
+    "traceability": {
+      "C3-01": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-01.json",
+        "test": { "path": "src/test/review-closeout.test.ts", "symbol": "rejects every CMS status/published mismatch" },
+        "fix": { "path": "src/lib/data/repository.ts", "symbol": "updateLessonReviewStatus" },
+        "anchor": { "path": "src/lib/data/repository.ts", "line": 548, "symbol": "updateLessonReviewStatus" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-02": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-02.json",
+        "test": { "path": "src/test/review-closeout.test.ts", "symbol": "recomputes publication summaries" },
+        "fix": { "path": "src/lib/data/repository.ts", "symbol": "getPublicationSummary" },
+        "anchor": { "path": "src/lib/data/repository.ts", "line": 507, "symbol": "getPublicationSummary" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-03": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-03.json",
+        "test": { "path": "src/test/source-metadata-consistency.test.ts", "line": 17, "symbol": "unknown provenance representation" },
+        "fix": { "path": "src/lib/validation/content-contracts.ts", "symbol": "projectPublicRecord" },
+        "anchor": { "path": "src/lib/validation/content-contracts.ts", "line": 984, "symbol": "projectPublicRecord" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-04": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-04.json",
+        "test": { "path": "src/test/publication-containment.test.ts", "line": 196, "symbol": "duplicate IDs" },
+        "fix": { "path": "src/lib/data/publication-policy.ts", "symbol": "evaluatePublicationBatch" },
+        "anchor": { "path": "src/lib/data/publication-policy.ts", "line": 1348, "symbol": "evaluatePublicationBatch" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-05": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-05.json",
+        "test": { "path": "src/test/content-contracts.test.ts", "line": 475, "symbol": "detached snapshot" },
+        "fix": { "path": "src/lib/data/publication-policy.ts", "symbol": "captureEvaluationValue" },
+        "anchor": { "path": "src/lib/data/publication-policy.ts", "line": 285, "symbol": "captureEvaluationValue" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-06": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-06.json",
+        "test": { "path": "src/test/review-closeout.test.ts", "symbol": "fails closed for duplicate top-level IDs" },
+        "fix": { "path": "src/lib/validation/content-validator.ts", "symbol": "validatePublicCollection" },
+        "anchor": { "path": "src/lib/validation/content-validator.ts", "line": 615, "symbol": "validatePublicCollection" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-07": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-07.json",
+        "test": { "path": "src/test/content-contracts.test.ts", "line": 342, "symbol": "unknown or ambiguous kinds" },
+        "fix": { "path": "src/lib/validation/content-contracts.ts", "symbol": "projectPublicRecord" },
+        "anchor": { "path": "src/lib/validation/content-contracts.ts", "line": 984, "symbol": "projectPublicRecord" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-08": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-08.json",
+        "test": { "path": "src/test/publication-containment.test.ts", "line": 452, "symbol": "identity containment" },
+        "fix": { "path": "src/lib/data/publication-policy.ts", "symbol": "createPublicationEvaluationContext" },
+        "anchor": { "path": "src/lib/data/publication-policy.ts", "line": 362, "symbol": "createPublicationEvaluationContext" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-09": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-09.json",
+        "test": { "path": "src/test/content-validator.test.ts", "line": 144, "symbol": "malformed tala fields" },
+        "fix": { "path": "src/lib/validation/content-validator.ts", "symbol": "validateMusicalCoreFieldDispositions" },
+        "anchor": { "path": "src/lib/validation/content-validator.ts", "line": 332, "symbol": "validateMusicalCoreFieldDispositions" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-10": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-10.json",
+        "test": { "path": "src/test/source-metadata-consistency.test.ts", "line": 79, "symbol": "ambiguous extracted-document mappings" },
+        "fix": { "path": "src/lib/validation/content-validator.ts", "symbol": "validateSelectedSourceMetadata" },
+        "anchor": { "path": "src/lib/validation/content-validator.ts", "line": 229, "symbol": "validateSelectedSourceMetadata" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-11": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-11.json",
+        "test": { "path": "src/test/publication-containment.test.ts", "line": 58, "symbol": "declarative %s dependency rule" },
+        "fix": { "path": "src/lib/data/publication-policy.ts", "symbol": "DEPENDENCY_FIELD_RULES" },
+        "anchor": { "path": "src/lib/data/publication-policy.ts", "line": 221, "symbol": "DEPENDENCY_FIELD_RULES" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-12": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-12.json",
+        "test": { "path": "src/test/source-metadata-consistency.test.ts", "line": 79, "symbol": "ambiguous extracted-document mappings" },
+        "fix": { "path": "src/lib/validation/content-validator.ts", "symbol": "validateSelectedSourceMetadata" },
+        "anchor": { "path": "src/lib/validation/content-validator.ts", "line": 229, "symbol": "validateSelectedSourceMetadata" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-13": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-13.json",
+        "test": { "path": "src/test/review-closeout.test.ts", "symbol": "resolves current musical-core anchors" },
+        "fix": { "path": "docs/FORENSIC_CORRECTION_LOG.md", "symbol": "P02-FINAL-06" },
+        "anchor": { "path": "docs/FORENSIC_CORRECTION_LOG.md", "line": 71, "symbol": "P02-FINAL-06" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-14": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-14.json",
+        "test": { "path": "src/test/content-contracts.test.ts", "line": 384, "symbol": "discriminator-compatible fields" },
+        "fix": { "path": "src/lib/validation/content-contracts.ts", "symbol": "projectPublicRecord" },
+        "anchor": { "path": "src/lib/validation/content-contracts.ts", "line": 984, "symbol": "projectPublicRecord" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-15": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-15.json",
+        "test": { "path": "src/test/quiz-runner.test.tsx", "line": 175, "symbol": "duplicate question IDs" },
+        "fix": { "path": "src/components/quiz/QuizRunner.tsx", "symbol": "getUsableQuiz" },
+        "anchor": { "path": "src/components/quiz/QuizRunner.tsx", "line": 36, "symbol": "getUsableQuiz" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-16": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-16.json",
+        "test": { "path": "src/test/search-engine.test.ts", "line": 80, "symbol": "normalized-empty controls" },
+        "fix": { "path": "src/lib/search/search-engine.ts", "symbol": "classifySearchQuery" },
+        "anchor": { "path": "src/lib/search/search-engine.ts", "line": 84, "symbol": "classifySearchQuery" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-17": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-17.json",
+        "test": { "path": "src/test/components.test.tsx", "line": 811, "symbol": "rhythm session" },
+        "fix": { "path": "src/components/audio/RhythmTapGame.tsx", "symbol": "RhythmTapGame" },
+        "anchor": { "path": "src/components/audio/RhythmTapGame.tsx", "line": 14, "symbol": "RhythmTapGame" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-18": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-18.json",
+        "test": { "path": "src/test/components.test.tsx", "line": 828, "symbol": "completed rhythm playback handles" },
+        "fix": { "path": "src/components/audio/TalaVisualizer.tsx", "symbol": "TalaVisualizer" },
+        "anchor": { "path": "src/components/audio/TalaVisualizer.tsx", "line": 23, "symbol": "TalaVisualizer" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-19": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-19.json",
+        "test": { "path": "src/test/components.test.tsx", "line": 850, "symbol": "stale Tala unavailable callbacks" },
+        "fix": { "path": "src/components/audio/TalaVisualizer.tsx", "symbol": "TalaVisualizer" },
+        "anchor": { "path": "src/components/audio/TalaVisualizer.tsx", "line": 23, "symbol": "TalaVisualizer" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-20": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-20.json",
+        "test": { "path": "src/test/components.test.tsx", "line": 918, "symbol": "Tabla promises reject" },
+        "fix": { "path": "src/lib/audio/tabla.ts", "symbol": "scheduleTablaPlan" },
+        "anchor": { "path": "src/lib/audio/tabla.ts", "line": 46, "symbol": "scheduleTablaPlan" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "P02-PITCH-OWNERSHIP-001": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/metadata.json authorizedAdditionalFindings",
+        "test": { "path": "src/test/pitch.test.ts", "line": 76, "symbol": "late stream" },
+        "fix": { "path": "src/lib/audio/pitch.ts", "symbol": "startListening" },
+        "anchor": { "path": "src/lib/audio/pitch.ts", "line": 114, "symbol": "startListening" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "P02-PROJECT-SCOPE-001": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/metadata.json authorizedAdditionalFindings",
+        "test": { "path": "src/test/review-closeout.test.ts", "symbol": "records the acceptance-hardening scope" },
+        "fix": { "path": "AGENTS.md", "symbol": "current verified public curriculum boundary" },
+        "anchor": { "path": "AGENTS.md", "line": 3, "symbol": "current verified public curriculum boundary" },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      }
+    },
     "implementationDisposition": "Bounded runtime containment and lifecycle hardening only; no musical claim is promoted. All eight Talas remain whole-entity quarantined.",
     "status": "Historical findings input with implementation pending fresh review acceptance; not acceptance evidence"
   },
@@ -530,7 +686,7 @@
         {
           "path": "src/test/components.test.tsx",
           "locator": "static quarantine regression",
-          "exactSection": "public EarTraining and Search UI contain no Roopak, Bhairav, Dadra, or Lawani claims"
+          "exactSection": "public EarTraining and Search UI contain no Roopak, Bhairav, Dadra, or Lawani claims; components.test.tsx:971 static quarantine regression; search-engine.test.ts:20 quarantined query regression"
         }
       ],
       "disposition": "remove quarantined static claims and regression-lock public UI copy independently of repository filtering",
@@ -588,7 +744,7 @@
         {
           "path": "src/test/components.test.tsx",
           "locator": "TalaVisualizer lifecycle and hydration regressions",
-          "exactSection": "Start/tick/Stop/Reset/audio-off/tala-change/unmount and co-mounted isolation are interaction-tested"
+          "exactSection": "Start/tick/Stop/Reset/audio-off/tala-change/unmount and co-mounted isolation are interaction-tested at components.test.tsx:182,261,286"
         }
       ],
       "disposition": "replace global cancellation with caller-owned scheduling handles and regression-lock independent playback sessions",
@@ -1095,7 +1251,7 @@
         {
           "path": "src/test/synth.test.ts and src/test/components.test.tsx",
           "locator": "initialization, active-node, delay, StrictMode, replacement, unmount, and co-mounted ownership regressions",
-          "exactSection": "synth.test.ts:199,293 and components.test.tsx:413,570,604 - no later note, callback, unavailable state, or cross-caller cancellation"
+          "exactSection": "synth.test.ts:199,293 and components.test.tsx:471,555 - no later note, callback, unavailable state, or cross-caller cancellation"
         }
       ],
       "disposition": "introduce caller-owned Swara handles, keep Promise wrappers for compatibility, and migrate every current page/component consumer to replacement and unmount cleanup without autoplay",
@@ -1501,6 +1657,103 @@
     "historicalPreservation": [
       "The rejected Deepchandi retrieval finding remains rejected and retrieval-only.",
       "Earlier p02r4, final-contract, and other blocked review runs remain historical findings input and are not relabeled as acceptance.",
+      "No new musical fact, Tala, raga, grade, metadata, publication, push, ready PR, merge, or deployment is claimed by this record."
+    ]
+  },
+  "acceptanceHardeningCycle2": {
+    "phase": "Phase 2 acceptance hardening cycle 2 traceability repair",
+    "plan": "docs/plans/2026-08-16-003-fix-phase-2-acceptance-hardening-plan.md",
+    "baseSha": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "reviewedHead": "5b3d2fac41b6b53c3747cb60ec7cc7a316eacd86",
+    "reviewRunId": "20260816-200203-p02-acceptance-c2-8f89f6b1",
+    "artifactDirectory": "C:/tmp/compound-engineering/ce-code-review/20260816-200203-p02-acceptance-c2-8f89f6b1/",
+    "reviewersCompleted": 11,
+    "validatorWave": {
+      "validatorAttempts": 24,
+      "validated": 20,
+      "rejected": 4,
+      "infrastructureFailures": 0,
+      "degradedP0P1": 0
+    },
+    "selectedFindingIds": [
+      "V15",
+      "V23"
+    ],
+    "validatedFindings": [
+      {
+        "id": "V15",
+        "validatorArtifact": "validator-15-stale-anchors.json",
+        "finding": "Correction-log, closeout, field-matrix, and ledger rows retained blank or unrelated numeric anchors, while the closeout test asserted only nonblank lines.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Refresh affected Phase 2 rows to current symbols/headings and require semantic anchor resolution in the closeout test.",
+        "paths": [
+          "docs/FORENSIC_CORRECTION_LOG.md",
+          "docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md",
+          "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
+          "data/forensic-ledger.json",
+          "src/test/review-closeout.test.ts"
+        ],
+        "symbols": [
+          "gradeScopeMatchesSource",
+          "requires each public grade band to contain a grade established by its source",
+          "retains ready Swara ownership until finished",
+          "should not discover quarantined Bhairav or Roopak claims"
+        ],
+        "anchorStatus": "Current line-qualified anchors carry semantic symbols/headings; fresh rereview remains required"
+      },
+      {
+        "id": "V23",
+        "validatorArtifact": "validator-23-finding-traceability-tests.json",
+        "finding": "Acceptance-hardening coverage checked only ID sentinels and anchor counts instead of the exact scoped IDs and each finding's test/fix/anchor/disposition mapping.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Require the exact C3-01 through C3-20 plus authorized P02 finding set and validate every structured semantic mapping against current files and historical evidence tables.",
+        "paths": [
+          "src/test/review-closeout.test.ts",
+          "docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md",
+          "docs/FORENSIC_CORRECTION_LOG.md",
+          "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
+          "data/forensic-ledger.json"
+        ],
+        "symbols": [
+          "Exact scoped finding traceability",
+          "acceptanceHardeningInput.traceability",
+          "FIXED-PENDING-REREVIEW"
+        ],
+        "anchorStatus": "Exact ID set and test/fix/anchor/disposition mapping are machine-checked; fresh rereview remains required"
+      }
+    ],
+    "currentSemanticAnchors": [
+      {
+        "path": "src/test/musical-core.test.ts",
+        "line": 386,
+        "symbol": "verifies bounded quarantine status for out-of-scope entities"
+      },
+      {
+        "path": "src/lib/data/publication-policy.ts",
+        "line": 884,
+        "symbol": "gradeScopeMatchesSource"
+      },
+      {
+        "path": "src/test/publication-containment.test.ts",
+        "line": 683,
+        "symbol": "requires each public grade band to contain a grade established by its source"
+      },
+      {
+        "path": "src/test/components.test.tsx",
+        "line": 555,
+        "symbol": "retains ready Swara ownership until finished"
+      },
+      {
+        "path": "src/test/search-engine.test.ts",
+        "line": 20,
+        "symbol": "should not discover quarantined Bhairav or Roopak claims"
+      }
+    ],
+    "status": "Blocked historical acceptance input; V15 and V23 fixes remain pending fresh review; not acceptance evidence",
+    "otherCycle2FindingsUntouched": true,
+    "historicalPreservation": [
+      "The rejected Deepchandi retrieval finding remains rejected and retrieval-only.",
+      "Earlier p02r4, final-contract, cycle-1, and cycle-2 review runs remain historical findings input and are not relabeled as acceptance.",
       "No new musical fact, Tala, raga, grade, metadata, publication, push, ready PR, merge, or deployment is claimed by this record."
     ]
   },

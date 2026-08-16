@@ -104,16 +104,38 @@ function readRawReviewMetadata(lesson: Record<string, unknown>): unknown {
   return readOwnDataField(lesson, "reviewMetadata");
 }
 
-function findRecordById(items: readonly unknown[], id: string): Record<string, unknown> | undefined {
+function normalizeRecordId(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function findUniqueRecordById(items: readonly unknown[], id: string): Record<string, unknown> | undefined {
   try {
+    const normalizedId = normalizeRecordId(id);
+    if (!normalizedId) return undefined;
+    let match: Record<string, unknown> | undefined;
     for (const candidate of items) {
       if (!isRecord(candidate)) continue;
-      if (readOwnDataField(candidate, "id") === id) return candidate;
+      if (normalizeRecordId(readOwnDataField(candidate, "id")) !== normalizedId) continue;
+      if (match) return undefined;
+      match = candidate;
     }
-    return undefined;
+    return match;
   } catch {
     return undefined;
   }
+}
+
+function findUniqueRecordIndex(items: readonly unknown[], id: string): number {
+  const normalizedId = normalizeRecordId(id);
+  if (!normalizedId) return -1;
+  let match = -1;
+  for (let index = 0; index < items.length; index += 1) {
+    const candidate = items[index];
+    if (!isRecord(candidate) || normalizeRecordId(readOwnDataField(candidate, "id")) !== normalizedId) continue;
+    if (match !== -1) return -1;
+    match = index;
+  }
+  return match;
 }
 
 export interface SourceCatalogView {
@@ -214,6 +236,7 @@ class ContentRepository {
   ): T[] {
     if (!context.safe) return [];
     const items = context.catalogs[catalog];
+    if (!hasUniqueRecordIds(items)) return [];
     return items.flatMap((item) => {
       const projection = sanitizeReviewRecord(item, context);
       return validateContentRecord(projection, kind).isValid ? [projection as T] : [];
@@ -500,7 +523,7 @@ class ContentRepository {
   }
 
   public getSourceDocumentSummary(sourceId: string): SourceDocumentSummary {
-    return getSourceDocumentSummary(sourceId);
+    return getSourceDocumentSummary(sourceId, this.createEvaluationContext());
   }
 
   /** One immutable evidence/catalog capture for a complete public search. */
@@ -528,29 +551,36 @@ class ContentRepository {
     isPublished: boolean = false
   ): boolean {
     try {
-      const lesson = findRecordById(this.lessons, lessonId);
-      if (!lesson || typeof isPublished !== "boolean") return false;
+      const context = this.createEvaluationContext();
+      if (!context.safe || !hasUniqueRecordIds(context.catalogs.lessons)) return false;
+      const lesson = findUniqueRecordById(context.catalogs.lessons, lessonId);
+      const rawIndex = findUniqueRecordIndex(this.lessons, lessonId);
+      if (!lesson || rawIndex < 0 || typeof isPublished !== "boolean") return false;
 
       if ((newStatus === "Published") !== isPublished) return false;
       const requestsPublication = newStatus === "Published" || isPublished;
       const rawMetadata = readRawReviewMetadata(lesson);
       if (requestsPublication && !hasKnownReviewEvidence(rawMetadata)) return false;
       if (requestsPublication) {
-        const publication = getRecordPublicationDecision(lesson);
+        const publication = getRecordPublicationDecision(lesson, context);
         if (!publication.isPublic || !publication.sourceEvidence.supportable) return false;
       }
 
-      const safeCandidate = sanitizeReviewRecord(lesson);
+      const safeCandidate = sanitizeReviewRecord(lesson, context);
       if (!validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) return false;
       const metadataSnapshot = cloneBoundedRecord(rawMetadata);
       const nextMetadata: ReviewMetadata = isReviewMetadata(metadataSnapshot)
         ? metadataSnapshot as unknown as ReviewMetadata
         : createUnverifiedReviewMetadata();
       nextMetadata.status = newStatus;
-      nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
+      if (!requestsPublication) nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
       if (!isReviewMetadata(nextMetadata)) return false;
-      lesson.reviewMetadata = nextMetadata;
-      lesson.published = isPublished;
+      const replacement = cloneBoundedRecord(lesson);
+      if (!isRecord(replacement)) return false;
+      replacement.reviewMetadata = nextMetadata;
+      replacement.published = isPublished;
+      if (!validateContentRecord(replacement, "lesson").isValid) return false;
+      this.lessons[rawIndex] = replacement;
       return true;
     } catch {
       return false;
@@ -564,32 +594,43 @@ class ContentRepository {
     notes: string
   ): boolean {
     try {
-      const lesson = findRecordById(this.lessons, lessonId);
-      if (!lesson) return false;
+      const context = this.createEvaluationContext();
+      if (!context.safe || !hasUniqueRecordIds(context.catalogs.lessons)) return false;
+      const lesson = findUniqueRecordById(context.catalogs.lessons, lessonId);
+      const rawIndex = findUniqueRecordIndex(this.lessons, lessonId);
+      if (!lesson || rawIndex < 0) return false;
 
       const rawMetadata = readRawReviewMetadata(lesson);
       if (newStatus === "Published") {
-        if (!hasKnownReviewEvidence(rawMetadata)) return false;
+        if (!hasKnownReviewEvidence(rawMetadata) || !isRecord(rawMetadata)) return false;
         if (typeof reviewer !== "string" || typeof notes !== "string" ||
           !reviewer.trim() || !notes.trim() ||
           [UNKNOWN_PROVENANCE, "Unknown / Unverified", "unknown"].includes(reviewer.trim())) return false;
-        const publication = getRecordPublicationDecision(lesson);
+        if (reviewer.trim() !== String(readOwnDataField(rawMetadata, "reviewer")).trim() ||
+          notes.trim() !== String(readOwnDataField(rawMetadata, "changeNotes")).trim()) return false;
+        const publication = getRecordPublicationDecision(lesson, context);
         if (!publication.isPublic || !publication.sourceEvidence.supportable) return false;
       }
 
-      const safeCandidate = sanitizeReviewRecord(lesson);
+      const safeCandidate = sanitizeReviewRecord(lesson, context);
       if (!validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) return false;
       const metadataSnapshot = cloneBoundedRecord(rawMetadata);
       const nextMetadata: ReviewMetadata = isReviewMetadata(metadataSnapshot)
         ? metadataSnapshot as unknown as ReviewMetadata
         : createUnverifiedReviewMetadata();
       nextMetadata.status = newStatus;
-      nextMetadata.reviewer = reviewer;
-      nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
-      nextMetadata.changeNotes = notes;
+      if (newStatus !== "Published") {
+        nextMetadata.reviewer = reviewer;
+        nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
+        nextMetadata.changeNotes = notes;
+      }
       if (!isReviewMetadata(nextMetadata)) return false;
-      lesson.reviewMetadata = nextMetadata;
-      lesson.published = newStatus === "Published";
+      const replacement = cloneBoundedRecord(lesson);
+      if (!isRecord(replacement)) return false;
+      replacement.reviewMetadata = nextMetadata;
+      replacement.published = newStatus === "Published";
+      if (!validateContentRecord(replacement, "lesson").isValid) return false;
+      this.lessons[rawIndex] = replacement;
       return true;
     } catch {
       return false;

@@ -75,14 +75,30 @@ export const EarTrainingModule: React.FC = () => {
     if (challenge.type === "swara") {
       const handle = swaraSynth.playSwaraToneHandle(challenge.targetItem, 0.9, 261.63, "harmonium");
       playbackRef.current = handle;
-      void handle.ready.then((played) => {
-        if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
-        if (!played) setAudioUnavailable(true);
-      });
-      void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
-        const isCurrentHandle = playbackRef.current === handle;
-        if (isCurrentHandle) playbackRef.current = null;
-      });
+      void handle.ready.then(
+        (played) => {
+          if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
+          if (!played) setAudioUnavailable(true);
+        },
+        () => {
+          if (mountedRef.current && generationRef.current === generation && playbackRef.current === handle) {
+            setAudioUnavailable(true);
+          }
+        },
+      );
+      void (handle.finished ?? handle.ready.then(() => undefined, () => undefined)).then(
+        () => {
+          const isCurrentHandle = playbackRef.current === handle;
+          if (isCurrentHandle) playbackRef.current = null;
+        },
+        () => {
+          const isCurrentHandle = playbackRef.current === handle;
+          if (isCurrentHandle) playbackRef.current = null;
+          if (mountedRef.current && generationRef.current === generation && isCurrentHandle) {
+            setAudioUnavailable(true);
+          }
+        },
+      );
     } else if (challenge.type === "tala") {
       let handle: TablaPlaybackHandle;
       handle = tablaSynth.playBol(challenge.targetItem, 500, () => {
@@ -91,14 +107,30 @@ export const EarTrainingModule: React.FC = () => {
         }
       });
       playbackRef.current = handle;
-      void handle.ready.then((played) => {
-        if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
-        if (!played) setAudioUnavailable(true);
-      });
-      void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
-        const isCurrentHandle = playbackRef.current === handle;
-        if (isCurrentHandle) playbackRef.current = null;
-      });
+      void handle.ready.then(
+        (played) => {
+          if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
+          if (!played) setAudioUnavailable(true);
+        },
+        () => {
+          if (mountedRef.current && generationRef.current === generation && playbackRef.current === handle) {
+            setAudioUnavailable(true);
+          }
+        },
+      );
+      void (handle.finished ?? handle.ready.then(() => undefined, () => undefined)).then(
+        () => {
+          const isCurrentHandle = playbackRef.current === handle;
+          if (isCurrentHandle) playbackRef.current = null;
+        },
+        () => {
+          const isCurrentHandle = playbackRef.current === handle;
+          if (isCurrentHandle) playbackRef.current = null;
+          if (mountedRef.current && generationRef.current === generation && isCurrentHandle) {
+            setAudioUnavailable(true);
+          }
+        },
+      );
     }
   };
 

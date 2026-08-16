@@ -892,6 +892,27 @@ const PUBLIC_FIELDS: Record<ContentEntityKind, readonly string[]> = {
   source: ["id", "title", "originalFilename", "publisher", "grades", "year", "language", "tier", "location", "status", "license", "url"],
 };
 
+const QUESTION_COMMON_PUBLIC_FIELDS = [
+  "id", "type", "gradeBands", "difficulty", "strandId", "prompt_si",
+  "explanation_si", "markingPoints_si", "sourceReference",
+] as const;
+
+const QUESTION_VARIANT_PUBLIC_FIELDS: Readonly<Record<string, readonly string[]>> = Object.freeze({
+  mcq: Object.freeze(["options_si", "correctAnswerIds"]),
+  "multi-select": Object.freeze(["options_si", "correctAnswerIds"]),
+  matching: Object.freeze(["matchingPairs"]),
+  ordering: Object.freeze(["orderingItems"]),
+  "true-false": Object.freeze(["options_si", "correctAnswerIds"]),
+  "short-answer": Object.freeze(["correctShortAnswer_si"]),
+});
+
+function questionProjectionFields(source: Record<string, unknown>): readonly string[] | undefined {
+  const type = read(source, "type");
+  if (typeof type !== "string" || !isPublicQuestionType(type)) return undefined;
+  const variantFields = QUESTION_VARIANT_PUBLIC_FIELDS[type];
+  return variantFields ? [...QUESTION_COMMON_PUBLIC_FIELDS, ...variantFields] : undefined;
+}
+
 type ProjectionKind = ContentEntityKind | "metadata" | "source-reference" | "diagnostic" | "lesson-section" | "key-term" | "notation-row" | "audio-activity" | "practice-task" | "puzzle-data" | "sample-phrase" | "tala-bol" | "tempo" | "verse-example" | "featured-song" | "glossary-audio" | "path-step" | "answer-option" | "matching-pair" | "ordering-item";
 
 const NESTED_FIELDS: Record<ProjectionKind, readonly string[]> = {
@@ -980,7 +1001,9 @@ export function projectPublicRecord(value: unknown, kind: ContentEntityKind): un
   remember(snapshot, kind, root);
   while (work.length > 0) {
     const current = work.pop() as Work;
-    const fields = NESTED_FIELDS[current.kind];
+    const fields = current.kind === "question"
+      ? questionProjectionFields(current.source)
+      : NESTED_FIELDS[current.kind];
     if (!fields) return undefined;
     for (const field of fields) {
       if (!hasOwn(current.source, field)) continue;

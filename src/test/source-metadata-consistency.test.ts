@@ -8,6 +8,7 @@ import { repository } from "@/lib/data/repository";
 import { projectPublicRecord } from "@/lib/validation/content-contracts";
 import {
   SELECTED_PHASE_2_SOURCE_IDS,
+  validateMusicalCoreFieldDispositions,
   validateSelectedSourceMetadata,
 } from "@/lib/validation/content-validator";
 
@@ -96,6 +97,71 @@ describe("selected Phase 2 source metadata", () => {
     );
     expect(result.isValid).toBe(false);
     expect(result.issues.some((issue) => issue.field === "originalFilename")).toBe(true);
+  });
+
+  it.each([
+    ["zero extracted documents", []],
+    [
+      "a missing selected-source mapping",
+      sourceDocuments.filter((document) => document.originalFilename !== "sg10_emus_chap1_mulikanga.pdf"),
+    ],
+  ])("rejects %s", (_label, documents) => {
+    const result = validateSelectedSourceMetadata(
+      runtimeSources,
+      manifest.sources,
+      documents,
+      humanCatalog
+    );
+    expect(result.isValid).toBe(false);
+    expect(result.issues.some((issue) =>
+      issue.entityId === SELECTED_PHASE_2_SOURCE_IDS[0] && issue.field === "originalFilename"
+    )).toBe(true);
+  });
+
+  it.each([
+    ["null registry", null],
+    ["sparse registry", (() => {
+      const sparse: unknown[] = [];
+      sparse.length = 1;
+      return sparse;
+    })()],
+    ["malformed disposition row", {
+      policy: "whole-entity-quarantine",
+      requiredFields: ["context", "structure", "theka", "bols"],
+      unclosedRequiredFields: ["structure"],
+      issueCatalog: [],
+      talas: [null],
+    }],
+    ["accessor-backed disposition row", (() => {
+      const row: Record<string, unknown> = {};
+      Object.defineProperty(row, "talaId", {
+        configurable: true,
+        enumerable: true,
+        get() {
+          throw new Error("hostile disposition accessor");
+        },
+      });
+      return {
+        policy: "whole-entity-quarantine",
+        requiredFields: ["context", "structure", "theka", "bols"],
+        unclosedRequiredFields: ["structure"],
+        issueCatalog: [],
+        talas: [row],
+      };
+    })()],
+    ["throwing disposition proxy", new Proxy({}, {
+      ownKeys() {
+        throw new Error("hostile disposition proxy");
+      },
+    })],
+  ])("returns deterministic issues for %s without throwing", (_label, registry) => {
+    const run = () => validateMusicalCoreFieldDispositions([], registry);
+    expect(run).not.toThrow();
+    const first = run();
+    const second = run();
+    expect(first.isValid).toBe(false);
+    expect(first.issues.length).toBeGreaterThan(0);
+    expect(second).toEqual(first);
   });
 
   it("returns issues instead of invoking hostile selected-source accessors", () => {

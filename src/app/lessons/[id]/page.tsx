@@ -100,15 +100,30 @@ export default function LessonDetailPage() {
     if (lesson.listenActivity.notes) {
       const handle = swaraSynth.playSequenceHandle(lesson.listenActivity.notes, 0.6, undefined, 261.63, "harmonium");
       sequenceHandleRef.current = handle;
-      void handle.ready.then((played) => {
-        if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
-        if (!played) setAudioError(true);
-      });
-      await (handle.finished ?? handle.ready.then(() => undefined));
-      const isCurrentHandle = sequenceHandleRef.current === handle;
-      if (isCurrentHandle) sequenceHandleRef.current = null;
-      if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
-      setAudioPlaying(false);
+      void handle.ready.then(
+        (played) => {
+          if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
+          if (!played) setAudioError(true);
+        },
+        () => {
+          if (mountedRef.current && audioGenerationRef.current === generation && sequenceHandleRef.current === handle) {
+            setAudioError(true);
+            setAudioPlaying(false);
+          }
+        },
+      );
+      let finishedWithError = false;
+      try {
+        await (handle.finished ?? handle.ready.then(() => undefined, () => undefined));
+      } catch {
+        finishedWithError = true;
+      } finally {
+        const isCurrentHandle = sequenceHandleRef.current === handle;
+        if (isCurrentHandle) sequenceHandleRef.current = null;
+        if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
+        if (finishedWithError) setAudioError(true);
+        setAudioPlaying(false);
+      }
     } else {
       audioTimerRef.current = window.setTimeout(() => {
         audioTimerRef.current = null;

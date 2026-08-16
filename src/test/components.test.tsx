@@ -20,6 +20,7 @@ import { TalaDirectoryResults } from "@/components/tala/TalaDirectoryResults";
 import talasData from "@/data/talas.json";
 import instrumentsData from "@/data/instruments.json";
 import type { Quiz, Tala } from "@/types/content";
+import type { PitchMatchResult } from "@/lib/audio/pitch";
 
 const routeParams = vi.hoisted(() => ({ id: "inst-tabla" }));
 
@@ -98,6 +99,17 @@ const rejectingPlayback = () => {
   };
 };
 
+const pitchResultFixture = (): PitchMatchResult => ({
+  frequency: 261.63,
+  swara_si: "ස (Sa)",
+  swara_en: "S",
+  centsOff: 0,
+  isInTune: true,
+  clarity: 0.95,
+});
+
+type PitchCallback = (result: PitchMatchResult | null) => void;
+
 afterEach(() => {
   routeParams.id = "inst-tabla";
   audioMocks.playBol.mockReset();
@@ -126,19 +138,26 @@ describe("Interactive Audio & Quiz Components Suite", () => {
   it("keeps a newer microphone session active when an older start resolves later", async () => {
     let resolveFirst!: (success: boolean) => void;
     let resolveSecond!: (success: boolean) => void;
+    const callbacks: PitchCallback[] = [];
     const detector = {
-      startListening: vi.fn()
-        .mockImplementationOnce(() => new Promise<boolean>((resolve) => { resolveFirst = resolve; }))
-        .mockImplementationOnce(() => new Promise<boolean>((resolve) => { resolveSecond = resolve; })),
+      startListening: vi.fn((callback: PitchCallback) => {
+        callbacks.push(callback);
+        return new Promise<boolean>((resolve) => {
+          if (callbacks.length === 1) resolveFirst = resolve;
+          else resolveSecond = resolve;
+        });
+      }),
       stopListening: vi.fn(),
     };
+    const onTargetMatched = vi.fn();
     pitchMocks.PitchDetector.mockImplementation(() => detector);
 
-    render(<PitchDetectorView />);
+    render(<PitchDetectorView onTargetMatched={onTargetMatched} />);
     const startButton = screen.getByRole("button", { name: "මයික්‍රෆෝනය අරඹන්න" });
     fireEvent.click(startButton);
     fireEvent.click(startButton);
     expect(detector.startListening).toHaveBeenCalledTimes(2);
+    expect(callbacks).toHaveLength(2);
 
     await act(async () => {
       resolveSecond(true);
@@ -146,6 +165,8 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     });
     expect(screen.getByRole("button", { name: "මයික්‍රෆෝනය නවත්වන්න" })).toBeInTheDocument();
     expect(detector.stopListening).not.toHaveBeenCalled();
+    act(() => callbacks[1](pitchResultFixture()));
+    expect(onTargetMatched).toHaveBeenCalledTimes(1);
 
     await act(async () => {
       resolveFirst(true);
@@ -153,9 +174,68 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     });
     expect(screen.getByRole("button", { name: "මයික්‍රෆෝනය නවත්වන්න" })).toBeInTheDocument();
     expect(detector.stopListening).not.toHaveBeenCalled();
+    act(() => callbacks[0](pitchResultFixture()));
+    expect(onTargetMatched).toHaveBeenCalledTimes(1);
 
     fireEvent.click(screen.getByRole("button", { name: "මයික්‍රෆෝනය නවත්වන්න" }));
     expect(detector.stopListening).toHaveBeenCalledTimes(1);
+  });
+
+  it("suppresses a retained microphone callback after the user stops", async () => {
+    let resolveStart!: (success: boolean) => void;
+    let callback!: PitchCallback;
+    const detector = {
+      startListening: vi.fn((nextCallback: PitchCallback) => {
+        callback = nextCallback;
+        return new Promise<boolean>((resolve) => { resolveStart = resolve; });
+      }),
+      stopListening: vi.fn(),
+    };
+    const onTargetMatched = vi.fn();
+    pitchMocks.PitchDetector.mockImplementation(() => detector);
+
+    render(<PitchDetectorView onTargetMatched={onTargetMatched} />);
+    fireEvent.click(screen.getByRole("button", { name: "මයික්‍රෆෝනය අරඹන්න" }));
+    await act(async () => {
+      resolveStart(true);
+      await Promise.resolve();
+    });
+    act(() => callback(pitchResultFixture()));
+    expect(onTargetMatched).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("ස (Sa)")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "මයික්‍රෆෝනය නවත්වන්න" }));
+    act(() => callback(pitchResultFixture()));
+    expect(onTargetMatched).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText("ස (Sa)")).not.toBeInTheDocument();
+    expect(detector.stopListening).toHaveBeenCalledTimes(1);
+  });
+
+  it("suppresses a callback and a pending start completion after unmount", async () => {
+    let resolveStart!: (success: boolean) => void;
+    let callback!: PitchCallback;
+    const detector = {
+      startListening: vi.fn((nextCallback: PitchCallback) => {
+        callback = nextCallback;
+        return new Promise<boolean>((resolve) => { resolveStart = resolve; });
+      }),
+      stopListening: vi.fn(),
+    };
+    const onTargetMatched = vi.fn();
+    pitchMocks.PitchDetector.mockImplementation(() => detector);
+
+    const { unmount } = render(<PitchDetectorView onTargetMatched={onTargetMatched} />);
+    fireEvent.click(screen.getByRole("button", { name: "මයික්‍රෆෝනය අරඹන්න" }));
+    expect(callback).toEqual(expect.any(Function));
+    unmount();
+    expect(detector.stopListening).toHaveBeenCalledTimes(1);
+
+    act(() => callback(pitchResultFixture()));
+    await act(async () => {
+      resolveStart(true);
+      await Promise.resolve();
+    });
+    expect(onTargetMatched).not.toHaveBeenCalled();
   });
 
   it("maps a public raga scale into the keyboard highlight contract", () => {

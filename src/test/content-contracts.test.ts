@@ -18,6 +18,7 @@ import {
   type ContentEntityKind,
 } from "@/lib/validation/content-contracts";
 import {
+  createPublicationEvaluationContext,
   getRecordPublicationDecision,
   getRecordPublicationDecisions,
 } from "@/lib/data/publication-policy";
@@ -380,6 +381,44 @@ describe("closed runtime content contracts", () => {
     expect(candidate.gradeBands).toEqual(["10-11"]);
   });
 
+  it("projects only discriminator-compatible fields for every renderable question variant", () => {
+    const questions = (quizzes as Array<{ questions: Array<Record<string, unknown>> }>)
+      .flatMap((quiz) => quiz.questions);
+    const variantFields: Record<string, readonly string[]> = {
+      mcq: ["options_si", "correctAnswerIds"],
+      "multi-select": ["options_si", "correctAnswerIds"],
+      matching: ["matchingPairs"],
+      ordering: ["orderingItems"],
+      "true-false": ["options_si", "correctAnswerIds"],
+      "short-answer": ["correctShortAnswer_si"],
+    };
+    const forgedValues: Record<string, unknown> = {
+      options_si: [{ id: "forged-option", text_si: "ව්‍යාජ" }],
+      correctAnswerIds: ["forged-option"],
+      matchingPairs: [{ left_si: "ව්‍යාජ", right_si: "ක්ෂේත්‍රය" }],
+      orderingItems: [{ id: "forged-order", text_si: "ව්‍යාජ", correctIndex: 0 }],
+      correctShortAnswer_si: ["ව්‍යාජ"],
+      audioNotes: ["S"],
+      audioTalaId: "tala-roopak",
+      diagramSvg: "<svg />",
+    };
+
+    for (const [type, allowed] of Object.entries(variantFields)) {
+      const canonical = questions.find((question) => question.type === type);
+      expect(canonical, type).toBeDefined();
+      if (!canonical) continue;
+      const candidate = structuredClone(canonical);
+      for (const [field, value] of Object.entries(forgedValues)) {
+        if (!allowed.includes(field)) candidate[field] = structuredClone(value);
+      }
+      const projection = projectPublicRecord(candidate, "question") as Record<string, unknown>;
+      expect(projection, type).toBeDefined();
+      for (const field of Object.keys(forgedValues)) {
+        if (!allowed.includes(field)) expect(projection, `${type}:${field}`).not.toHaveProperty(field);
+      }
+    }
+  });
+
   it("requires the inferred entity kind and sanitizes source provenance", () => {
     expect(projectPublicRecord(lessons[0], "raga")).toBeUndefined();
     expect(projectPublicRecord(ragas[0], "lesson")).toBeUndefined();
@@ -420,6 +459,17 @@ describe("closed runtime content contracts", () => {
     });
     expect(() => getRecordPublicationDecisions(throwingOuter)).not.toThrow();
     expect(getRecordPublicationDecisions(throwingOuter)).toEqual([]);
+  });
+
+  it("exposes catalog snapshots as readonly at compile time and frozen at runtime", () => {
+    const context = createPublicationEvaluationContext();
+    if (false) {
+      // @ts-expect-error publication snapshots are immutable operation inputs.
+      context.catalogs.lessons.push(lessons[0]);
+      // @ts-expect-error a captured catalog cannot be replaced by consumers.
+      context.catalogs.lessons = [];
+    }
+    expect(Object.isFrozen(context.catalogs.lessons)).toBe(true);
   });
 
   it("uses one detached snapshot for decision and public projection", () => {

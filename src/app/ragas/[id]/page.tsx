@@ -52,15 +52,30 @@ export default function RagaDetailPage() {
     sequenceHandleRef.current?.();
     const handle = swaraSynth.playSequenceHandle(phraseSwaras, 0.6, undefined, 261.63, "harmonium");
     sequenceHandleRef.current = handle;
-    void handle.ready.then((played) => {
-      if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
-      if (!played) setAudioError(true);
-    });
-    await (handle.finished ?? handle.ready.then(() => undefined));
-    const isCurrentHandle = sequenceHandleRef.current === handle;
-    if (isCurrentHandle) sequenceHandleRef.current = null;
-    if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
-    setPlayingPhraseIdx(null);
+    void handle.ready.then(
+      (played) => {
+        if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
+        if (!played) setAudioError(true);
+      },
+      () => {
+        if (mountedRef.current && audioGenerationRef.current === generation && sequenceHandleRef.current === handle) {
+          setAudioError(true);
+          setPlayingPhraseIdx(null);
+        }
+      },
+    );
+    let finishedWithError = false;
+    try {
+      await (handle.finished ?? handle.ready.then(() => undefined, () => undefined));
+    } catch {
+      finishedWithError = true;
+    } finally {
+      const isCurrentHandle = sequenceHandleRef.current === handle;
+      if (isCurrentHandle) sequenceHandleRef.current = null;
+      if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
+      if (finishedWithError) setAudioError(true);
+      setPlayingPhraseIdx(null);
+    }
   };
 
   const handlePlayPhrase = (phraseSwaras: string[], idx: number) => playSequence(phraseSwaras, idx);

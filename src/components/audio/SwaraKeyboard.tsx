@@ -93,15 +93,41 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
     const fullNote = getFullNoteSymbol(baseKey);
     const generation = generationRef.current;
     setPlayingKey(baseKey);
+    setAudioUnavailable(false);
     const handle = swaraSynth.playSwaraToneHandle(fullNote, 0.7, 261.63, timbre);
     playbackRef.current = handle;
-    void handle.ready.then((played) => {
-      if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
-      if (!played) setAudioUnavailable(true);
-    });
-    void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
-      if (playbackRef.current === handle) playbackRef.current = null;
-    });
+    void handle.ready.then(
+      (played) => {
+        if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
+        if (!played) setAudioUnavailable(true);
+      },
+      () => {
+        if (mountedRef.current && generationRef.current === generation && playbackRef.current === handle) {
+          setAudioUnavailable(true);
+          if (highlightTimerRef.current !== null) {
+            window.clearTimeout(highlightTimerRef.current);
+            highlightTimerRef.current = null;
+          }
+          setPlayingKey(null);
+        }
+      },
+    );
+    void (handle.finished ?? handle.ready.then(() => undefined, () => undefined)).then(
+      () => {
+        if (playbackRef.current === handle) playbackRef.current = null;
+      },
+      () => {
+        const isCurrentHandle = playbackRef.current === handle;
+        if (isCurrentHandle) playbackRef.current = null;
+        if (!mountedRef.current || generationRef.current !== generation || !isCurrentHandle) return;
+        if (highlightTimerRef.current !== null) {
+          window.clearTimeout(highlightTimerRef.current);
+          highlightTimerRef.current = null;
+        }
+        setAudioUnavailable(true);
+        setPlayingKey(null);
+      },
+    );
     if (onNotePlay) {
       onNotePlay(fullNote);
     }
@@ -130,6 +156,7 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
     cancelPlayback();
     const generation = generationRef.current;
     setIsPlayingScale(true);
+    setAudioUnavailable(false);
     const scale = highlightNotes.length > 0
       ? highlightNotes
       : ["S", "R", "G", "M", "P", "D", "N", "S'"];
@@ -138,17 +165,36 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
       setPlayingKey(note.replace(/[.̣'̇]/g, ""));
     }, 261.63, timbre);
     playbackRef.current = handle;
-    void handle.ready.then((played) => {
-      if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
-      if (!played) setAudioUnavailable(true);
-    });
-    void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
-      const isCurrentHandle = playbackRef.current === handle;
-      if (isCurrentHandle) playbackRef.current = null;
-      if (!mountedRef.current || generationRef.current !== generation || !isCurrentHandle) return;
-      setPlayingKey(null);
-      setIsPlayingScale(false);
-    });
+    void handle.ready.then(
+      (played) => {
+        if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
+        if (!played) setAudioUnavailable(true);
+      },
+      () => {
+        if (mountedRef.current && generationRef.current === generation && playbackRef.current === handle) {
+          setAudioUnavailable(true);
+          setPlayingKey(null);
+          setIsPlayingScale(false);
+        }
+      },
+    );
+    void (handle.finished ?? handle.ready.then(() => undefined, () => undefined)).then(
+      () => {
+        const isCurrentHandle = playbackRef.current === handle;
+        if (isCurrentHandle) playbackRef.current = null;
+        if (!mountedRef.current || generationRef.current !== generation || !isCurrentHandle) return;
+        setPlayingKey(null);
+        setIsPlayingScale(false);
+      },
+      () => {
+        const isCurrentHandle = playbackRef.current === handle;
+        if (isCurrentHandle) playbackRef.current = null;
+        if (!mountedRef.current || generationRef.current !== generation || !isCurrentHandle) return;
+        setAudioUnavailable(true);
+        setPlayingKey(null);
+        setIsPlayingScale(false);
+      },
+    );
   };
 
   return (

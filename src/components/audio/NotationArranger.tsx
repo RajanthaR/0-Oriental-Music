@@ -47,15 +47,32 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
       const swaraMap: Record<string, string> = { "ස": "S", "රි": "R", "ග": "G", "ම": "M", "ප": "P", "ධ": "D", "නි": "N" };
       if (swaraMap[clean]) {
         const generation = generationRef.current;
+        setAudioUnavailable(false);
         const handle = swaraSynth.playSwaraToneHandle(swaraMap[clean]);
         playbackRef.current = handle;
-        void handle.ready.then((played) => {
-          if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
-          if (!played) setAudioUnavailable(true);
-    });
-    void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
-      if (playbackRef.current === handle) playbackRef.current = null;
-    });
+        void handle.ready.then(
+          (played) => {
+            if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
+            if (!played) setAudioUnavailable(true);
+          },
+          () => {
+            if (mountedRef.current && generationRef.current === generation && playbackRef.current === handle) {
+              setAudioUnavailable(true);
+            }
+          },
+        );
+        void (handle.finished ?? handle.ready.then(() => undefined, () => undefined)).then(
+          () => {
+            if (playbackRef.current === handle) playbackRef.current = null;
+          },
+          () => {
+            const isCurrentHandle = playbackRef.current === handle;
+            if (isCurrentHandle) playbackRef.current = null;
+            if (mountedRef.current && generationRef.current === generation && isCurrentHandle) {
+              setAudioUnavailable(true);
+            }
+          },
+        );
       }
     }
 

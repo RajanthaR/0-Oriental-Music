@@ -38,6 +38,17 @@ afterEach(() => {
 });
 
 describe("PitchDetector resource ownership", () => {
+  it.each([
+    ["missing mediaDevices", undefined],
+    ["missing getUserMedia", {}],
+  ])("returns false when the browser microphone API is %s", async (_label, mediaDevices) => {
+    Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: mediaDevices });
+    const callback = vi.fn();
+
+    await expect(new PitchDetector().startListening(callback)).resolves.toBe(false);
+    expect(callback).not.toHaveBeenCalled();
+  });
+
   it("returns false for denied permission without retaining browser resources", async () => {
     const getUserMedia = vi.fn().mockRejectedValue(new Error("permission denied"));
     Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: { getUserMedia } });
@@ -48,6 +59,42 @@ describe("PitchDetector resource ownership", () => {
     expect(getUserMedia).toHaveBeenCalledTimes(1);
     expect(() => detector.stopListening()).not.toThrow();
     expect(error).toHaveBeenCalledWith("Microphone access error:", expect.any(Error));
+  });
+
+  it("stops the permission stream when AudioContext is unavailable", async () => {
+    const { stream, track } = createStream();
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: vi.fn().mockResolvedValue(stream) },
+    });
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: undefined });
+    Object.defineProperty(window, "webkitAudioContext", { configurable: true, value: undefined });
+    const callback = vi.fn();
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    await expect(new PitchDetector().startListening(callback)).resolves.toBe(false);
+    expect(track.stop).toHaveBeenCalledTimes(1);
+    expect(callback).not.toHaveBeenCalled();
+  });
+
+  it("stops the permission stream when AudioContext construction throws", async () => {
+    const { stream, track } = createStream();
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: vi.fn().mockResolvedValue(stream) },
+    });
+    class ThrowingContext {
+      constructor() {
+        throw new Error("context construction failed");
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: ThrowingContext });
+    const callback = vi.fn();
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    await expect(new PitchDetector().startListening(callback)).resolves.toBe(false);
+    expect(track.stop).toHaveBeenCalledTimes(1);
+    expect(callback).not.toHaveBeenCalled();
   });
 
   it("stops a stream and closes the context when graph initialization fails", async () => {
@@ -71,6 +118,113 @@ describe("PitchDetector resource ownership", () => {
     expect(getUserMedia).toHaveBeenCalledTimes(1);
     expect(track.stop).toHaveBeenCalledTimes(1);
     expect(close).toHaveBeenCalledTimes(1);
+  });
+
+  it("disconnects a source and closes the context when analyser creation fails", async () => {
+    const { stream, track } = createStream();
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: vi.fn().mockResolvedValue(stream) },
+    });
+    const source = { connect: vi.fn(), disconnect: vi.fn() };
+    const close = vi.fn().mockResolvedValue(undefined);
+    class FailingAnalyserContext {
+      state = "running";
+      sampleRate = 44100;
+      close = close;
+      createMediaStreamSource() {
+        return source;
+      }
+      createAnalyser() {
+        throw new Error("analyser setup failed");
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: FailingAnalyserContext });
+    const callback = vi.fn();
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    await expect(new PitchDetector().startListening(callback)).resolves.toBe(false);
+    expect(source.connect).not.toHaveBeenCalled();
+    expect(source.disconnect).toHaveBeenCalledTimes(1);
+    expect(track.stop).toHaveBeenCalledTimes(1);
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(callback).not.toHaveBeenCalled();
+  });
+
+  it("disconnects a source and closes the context when source connection fails", async () => {
+    const { stream, track } = createStream();
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: vi.fn().mockResolvedValue(stream) },
+    });
+    const source = {
+      connect: vi.fn(() => { throw new Error("source connection failed"); }),
+      disconnect: vi.fn(),
+    };
+    const close = vi.fn().mockResolvedValue(undefined);
+    class FailingConnectionContext {
+      state = "running";
+      sampleRate = 44100;
+      close = close;
+      createMediaStreamSource() {
+        return source;
+      }
+      createAnalyser() {
+        return {
+          fftSize: 2048,
+          getFloatTimeDomainData: (buffer: Float32Array) => buffer.fill(0),
+        };
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: FailingConnectionContext });
+    const callback = vi.fn();
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    await expect(new PitchDetector().startListening(callback)).resolves.toBe(false);
+    expect(source.connect).toHaveBeenCalledTimes(1);
+    expect(source.disconnect).toHaveBeenCalledTimes(1);
+    expect(track.stop).toHaveBeenCalledTimes(1);
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(callback).not.toHaveBeenCalled();
+  });
+
+  it("disconnects a source and closes the context when analyser configuration fails", async () => {
+    const { stream, track } = createStream();
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: vi.fn().mockResolvedValue(stream) },
+    });
+    const source = { connect: vi.fn(), disconnect: vi.fn() };
+    const analyser: { fftSize: number; getFloatTimeDomainData: (buffer: Float32Array) => void } = {
+      fftSize: 0,
+      getFloatTimeDomainData: (buffer: Float32Array) => buffer.fill(0),
+    };
+    Object.defineProperty(analyser, "fftSize", {
+      configurable: true,
+      set: vi.fn(() => { throw new Error("analyser configuration failed"); }),
+    });
+    const close = vi.fn().mockResolvedValue(undefined);
+    class FailingConfigurationContext {
+      state = "running";
+      sampleRate = 44100;
+      close = close;
+      createMediaStreamSource() {
+        return source;
+      }
+      createAnalyser() {
+        return analyser;
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: FailingConfigurationContext });
+    const callback = vi.fn();
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    await expect(new PitchDetector().startListening(callback)).resolves.toBe(false);
+    expect(source.connect).not.toHaveBeenCalled();
+    expect(source.disconnect).toHaveBeenCalledTimes(1);
+    expect(track.stop).toHaveBeenCalledTimes(1);
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(callback).not.toHaveBeenCalled();
   });
 
   it("stops a late stream when stopped while permission is pending", async () => {
@@ -188,6 +342,84 @@ describe("PitchDetector resource ownership", () => {
     expect(onPitchDetected).toHaveBeenCalledTimes(1);
     expect(track.stop).toHaveBeenCalledTimes(1);
     expect(close).toHaveBeenCalledTimes(1);
+  });
+
+  it("cleans the active graph when requestAnimationFrame setup fails", async () => {
+    const { stream, track } = createStream();
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: vi.fn().mockResolvedValue(stream) },
+    });
+    const source = { connect: vi.fn(), disconnect: vi.fn() };
+    const close = vi.fn().mockResolvedValue(undefined);
+    class WorkingContext {
+      state = "running";
+      sampleRate = 44100;
+      close = close;
+      createMediaStreamSource() {
+        return source;
+      }
+      createAnalyser() {
+        return {
+          fftSize: 2048,
+          getFloatTimeDomainData: (buffer: Float32Array) => buffer.fill(0),
+        };
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: WorkingContext });
+    const request = vi.fn(() => { throw new Error("animation scheduling failed"); });
+    Object.defineProperty(globalThis, "requestAnimationFrame", {
+      configurable: true,
+      writable: true,
+      value: request,
+    });
+    const callback = vi.fn();
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    await expect(new PitchDetector().startListening(callback)).resolves.toBe(false);
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith(null);
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(source.disconnect).toHaveBeenCalledTimes(1);
+    expect(track.stop).toHaveBeenCalledTimes(1);
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(error).toHaveBeenCalledWith("Pitch detection error:", expect.any(Error));
+  });
+
+  it("does not upload microphone data through a network API", async () => {
+    const { stream, track } = createStream();
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: vi.fn().mockResolvedValue(stream) },
+    });
+    const close = vi.fn().mockResolvedValue(undefined);
+    class WorkingContext {
+      state = "running";
+      sampleRate = 44100;
+      close = close;
+      createMediaStreamSource() {
+        return { connect: vi.fn(), disconnect: vi.fn() };
+      }
+      createAnalyser() {
+        return {
+          fftSize: 2048,
+          getFloatTimeDomainData: (buffer: Float32Array) => buffer.fill(0),
+        };
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: WorkingContext });
+    Object.defineProperty(globalThis, "requestAnimationFrame", {
+      configurable: true,
+      writable: true,
+      value: vi.fn(() => 1),
+    });
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("network upload is forbidden"));
+
+    const detector = new PitchDetector();
+    await expect(detector.startListening(() => undefined)).resolves.toBe(true);
+    expect(fetchSpy).not.toHaveBeenCalled();
+    detector.stopListening();
+    expect(track.stop).toHaveBeenCalledTimes(1);
   });
 
   it("cleans all resources when a detection callback throws", async () => {

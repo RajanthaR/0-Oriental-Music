@@ -130,7 +130,7 @@ Deepchandi retrieval-spelling boundaries above remain `needs-review`.
 | `P02-FINAL-03` | Every imported record and nested question is audited; listed legacy contract debt remains nonpublic. | `src/test/content-contracts.test.ts:101`; `src/lib/validation/content-contracts.ts:602`; `src/lib/validation/content-contracts.ts:702` |
 | `P02-FINAL-04` | Iterative graph inspection/projection rejects cycles, hostile descriptors, and depth/node overruns while preserving projection-kind identity. | `src/test/content-contracts.test.ts:368`; `src/lib/validation/content-contracts.ts:819`; `src/lib/validation/content-contracts.ts:950` |
 | `P02-FINAL-05` | Nonblank normalized-empty hostile search returns no results. | `src/lib/search/search-engine.ts:84`, `src/lib/search/search-engine.ts:137`; `src/test/search-engine.test.ts:80` |
-| `P02-FINAL-06` | Caller-owned Swara handles survive readiness and cancel replacement/unmount work without cross-caller effects. | `src/test/synth.test.ts:199`; `src/test/synth.test.ts:293`; `src/test/components.test.tsx:413`; `src/test/components.test.tsx:570`; `src/test/components.test.tsx:604` |
+| `P02-FINAL-06` | Caller-owned Swara handles survive readiness and cancel replacement/unmount work without cross-caller effects. | `src/test/synth.test.ts:199`; `src/test/synth.test.ts:293`; `src/test/components.test.tsx:471 (cancels owned Swara tone and scale work)`; `src/test/components.test.tsx:555 (retains ready Swara ownership until finished)` |
 
 ## Acceptance-hardening runtime boundary
 
@@ -174,3 +174,22 @@ The rejected Deepchandi retrieval mapping, all earlier blocked review runs,
 the whole-entity Tala quarantine, and the original-PDF/notation/OCR/SME
 boundaries remain unchanged. This cycle is not final acceptance and does not
 promote a musical claim.
+
+## Acceptance-hardening cycle 2 traceability boundary (V15/V23 only)
+
+Run `20260816-200203-p02-acceptance-c2-8f89f6b1` is retained as blocked
+acceptance-only evidence for reviewed head `5b3d2fac41b6b53c3747cb60ec7cc7a316eacd86`
+against base `beba1479f473b3413b3f2de48a27c558e1937c6f`. The 24-validator wave
+had 20 validated and four rejected attempts, with no infrastructure failure or
+degraded P0/P1 evidence. This scoped repair updates only the stale anchors and
+finding-level mapping required by `V15` and `V23`; both remain
+`FIXED-PENDING-REREVIEW`, not accepted.
+
+| Cycle-2 finding | Semantic repair evidence | Disposition |
+|---|---|---|
+| `V15` | `src/test/musical-core.test.ts:386 (verifies bounded quarantine status for out-of-scope entities)`; `src/lib/data/publication-policy.ts:884 (gradeScopeMatchesSource)`; `src/test/publication-containment.test.ts:683 (requires each public grade band to contain a grade established by its source)`; `src/test/components.test.tsx:555 (retains ready Swara ownership until finished)`; `src/test/search-engine.test.ts:20 (should not discover quarantined Bhairav or Roopak claims)`; closeout and correction-log rows now carry these symbols/headings. | **FIXED-PENDING-REREVIEW** |
+| `V23` | `src/test/review-closeout.test.ts` exact scoped ID and semantic mapping assertions; `data/forensic-ledger.json` `acceptanceHardeningInput.traceability` mirrors test/fix/anchor/disposition fields. | **FIXED-PENDING-REREVIEW** |
+
+The rejected Deepchandi retrieval-only disposition, all prior blocked run IDs,
+and the whole-entity quarantine/original-PDF/notation/OCR/SME boundaries are
+preserved. No cycle-2 fix is acceptance evidence or a release/PR authorization.
