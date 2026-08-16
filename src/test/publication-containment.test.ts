@@ -70,7 +70,7 @@ describe("Prompt 1 publication containment", () => {
 
   it("prevents CMS review status updates from leaking quarantined records into public getters", () => {
     const success = repository.updateLessonReviewStatus("les-raga-bhairav", "Published", true);
-    expect(success).toBe(true);
+    expect(success).toBe(false);
     expect(repository.getLessons().some((l) => l.id === "les-raga-bhairav")).toBe(false);
     expect(repository.getLessonById("les-raga-bhairav")).toBeUndefined();
 

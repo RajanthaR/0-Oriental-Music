@@ -122,3 +122,12 @@ final-contract findings” and in `data/forensic-ledger.json` as
 curriculum claim. This matrix remains limited to source-grounded fields, and
 the unresolved original-PDF, notation/layout, OCR-glyph, Lawani-context, and
 Deepchandi retrieval-spelling boundaries above remain `needs-review`.
+
+| Runtime issue | Final application disposition | Line-qualified regression anchor |
+|---|---|---|
+| `P02-FINAL-01` | Missing raw review metadata fails publication closed; bounded projections use explicit unverified metadata. | `src/test/content-contracts.test.ts:172`; `src/test/publication-containment.test.ts:81` |
+| `P02-FINAL-02` | Every finite-domain field is checked against the dependency-free closed union. | `src/test/content-contracts.test.ts:203`; `src/test/content-contracts.test.ts:230` |
+| `P02-FINAL-03` | Every imported record and nested question is audited; listed legacy contract debt remains nonpublic. | `src/test/content-contracts.test.ts:63`; `src/lib/validation/content-contracts.ts:624` |
+| `P02-FINAL-04` | Iterative graph inspection/projection rejects cycles, hostile descriptors, and depth/node overruns while preserving projection-kind identity. | `src/test/content-contracts.test.ts:313`; `src/test/content-contracts.test.ts:361`; `src/test/content-contracts.test.ts:391`; `src/lib/validation/content-contracts.ts:829` |
+| `P02-FINAL-05` | Nonblank normalized-empty hostile search returns no results. | `src/lib/search/search-engine.ts:99`; `src/test/search-engine.test.ts:79` |
+| `P02-FINAL-06` | Caller-owned Swara handles survive readiness and cancel replacement/unmount work without cross-caller effects. | `src/test/synth.test.ts:163`; `src/test/components.test.tsx:392`; `src/test/components.test.tsx:455` |

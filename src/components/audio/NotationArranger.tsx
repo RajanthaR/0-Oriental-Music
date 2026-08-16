@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
 import { CheckCircle2, RotateCcw, Sparkles, Volume2 } from "lucide-react";
 
@@ -22,29 +22,40 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
   const [isEvaluated, setIsEvaluated] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [audioUnavailable, setAudioUnavailable] = useState(false);
+  const mountedRef = useRef(false);
+  const generationRef = useRef(0);
   const playbackRef = useRef<SwaraPlaybackHandle | null>(null);
 
-  useEffect(() => {
-    return () => {
-      playbackRef.current?.();
-      playbackRef.current = null;
-    };
+  const cancelPlayback = useCallback(() => {
+    generationRef.current += 1;
+    playbackRef.current?.();
   }, []);
 
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      cancelPlayback();
+    };
+  }, [cancelPlayback]);
+
   const handleSelectItem = (item: string, idx: number) => {
+    cancelPlayback();
     // Play tone if it's a swara
     const clean = item.trim();
     if (["ස", "රි", "ග", "ම", "ප", "ධ", "නි"].includes(clean)) {
       const swaraMap: Record<string, string> = { "ස": "S", "රි": "R", "ග": "G", "ම": "M", "ප": "P", "ධ": "D", "නි": "N" };
       if (swaraMap[clean]) {
-        playbackRef.current?.();
+        const generation = generationRef.current;
         const handle = swaraSynth.playSwaraToneHandle(swaraMap[clean]);
         playbackRef.current = handle;
         void handle.ready.then((played) => {
-          if (playbackRef.current !== handle) return;
-          playbackRef.current = null;
+          if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
           if (!played) setAudioUnavailable(true);
-        });
+    });
+    void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
+      if (playbackRef.current === handle) playbackRef.current = null;
+    });
       }
     }
 
@@ -72,8 +83,7 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
   };
 
   const handleReset = () => {
-    playbackRef.current?.();
-    playbackRef.current = null;
+    cancelPlayback();
     setAvailableItems(shuffledItems);
     setArrangedItems([]);
     setIsEvaluated(false);

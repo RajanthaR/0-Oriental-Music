@@ -308,4 +308,276 @@ describe("Audio Synthesis Engine & Tuning Suite", () => {
       Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
     }
   });
+
+  it("rolls back partially constructed Swara and Tabla graphs", async () => {
+    const originalAudioContext = window.AudioContext;
+    const swaraOscillators: Array<{ stop: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn> }> = [];
+    let swaraOscillatorCount = 0;
+    class PartialSwaraAudioContext {
+      state = "running";
+      currentTime = 0;
+      destination = {};
+      createGain() {
+        return {
+          gain: {
+            setValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+          },
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+        };
+      }
+      createOscillator() {
+        swaraOscillatorCount += 1;
+        if (swaraOscillatorCount === 2) throw new Error("partial Swara construction");
+        const oscillator = {
+          type: "sine",
+          frequency: { setValueAtTime: vi.fn() },
+          connect: vi.fn(),
+          start: vi.fn(),
+          stop: vi.fn(),
+          disconnect: vi.fn(),
+        };
+        swaraOscillators.push(oscillator);
+        return oscillator;
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: PartialSwaraAudioContext });
+    try {
+      const swaraHandle = new SwaraSynthEngine().playSwaraToneHandle("S");
+      await expect(swaraHandle.ready).resolves.toBe(false);
+      await swaraHandle.finished;
+      expect(swaraOscillators).toHaveLength(1);
+      expect(swaraOscillators[0].stop).toHaveBeenCalled();
+      expect(swaraOscillators[0].disconnect).toHaveBeenCalledTimes(1);
+    } finally {
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
+    }
+
+    const tablaOscillators: Array<{ stop: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn> }> = [];
+    let tablaOscillatorCount = 0;
+    class PartialTablaAudioContext {
+      state = "running";
+      currentTime = 0;
+      destination = {};
+      createGain() {
+        return {
+          gain: {
+            setValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+          },
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+        };
+      }
+      createOscillator() {
+        tablaOscillatorCount += 1;
+        if (tablaOscillatorCount === 2) throw new Error("partial Tabla construction");
+        const oscillator = {
+          type: "sine",
+          frequency: {
+            setValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+          },
+          connect: vi.fn(),
+          start: vi.fn(),
+          stop: vi.fn(),
+          disconnect: vi.fn(),
+        };
+        tablaOscillators.push(oscillator);
+        return oscillator;
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: PartialTablaAudioContext });
+    try {
+      const unavailable = vi.fn();
+      const tablaHandle = new TablaSynthEngine().playBol("ධා", 500, unavailable);
+      await expect(tablaHandle.ready).resolves.toBe(false);
+      await tablaHandle.finished;
+      expect(unavailable).toHaveBeenCalledTimes(1);
+      expect(tablaOscillators).toHaveLength(1);
+      expect(tablaOscillators[0].stop).toHaveBeenCalled();
+      expect(tablaOscillators[0].disconnect).toHaveBeenCalledTimes(1);
+    } finally {
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
+    }
+  });
+
+  it("keeps a Swara owner until the voice cleanup actually finishes", async () => {
+    const originalAudioContext = window.AudioContext;
+    const oscillators: Array<{ stop: ReturnType<typeof vi.fn> }> = [];
+    class FakeAudioContext {
+      state = "running";
+      currentTime = 0;
+      destination = {};
+      createGain() {
+        return {
+          gain: {
+            setValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+          },
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+        };
+      }
+      createOscillator() {
+        const oscillator = {
+          type: "sine",
+          frequency: { setValueAtTime: vi.fn() },
+          connect: vi.fn(),
+          start: vi.fn(),
+          stop: vi.fn(),
+          disconnect: vi.fn(),
+        };
+        oscillators.push(oscillator);
+        return oscillator;
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: FakeAudioContext });
+    vi.useFakeTimers();
+    try {
+      const handle = new SwaraSynthEngine().playSwaraToneHandle("S", 1);
+      await expect(handle.ready).resolves.toBe(true);
+      let finished = false;
+      void handle.finished.then(() => { finished = true; });
+      await Promise.resolve();
+      expect(finished).toBe(false);
+      vi.advanceTimersByTime(1199);
+      await Promise.resolve();
+      expect(finished).toBe(false);
+      vi.advanceTimersByTime(1);
+      await Promise.resolve();
+      expect(finished).toBe(true);
+      expect(oscillators[0].stop).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
+    }
+  });
+
+  it("deduplicates failed context initialization before allowing a replacement", async () => {
+    const originalAudioContext = window.AudioContext;
+    let instances = 0;
+    const closed: number[] = [];
+    class RacingAudioContext {
+      readonly id = ++instances;
+      state = this.id === 1 ? "suspended" : "running";
+      currentTime = 0;
+      destination = {};
+      createGain() {
+        return {
+          gain: {
+            setValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+          },
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+        };
+      }
+      createOscillator() {
+        return {
+          type: "sine",
+          frequency: { setValueAtTime: vi.fn() },
+          connect: vi.fn(),
+          start: vi.fn(),
+          stop: vi.fn(),
+          disconnect: vi.fn(),
+        };
+      }
+      resume() {
+        return this.id === 1
+          ? Promise.reject(new Error("first context blocked"))
+          : Promise.resolve();
+      }
+      close() {
+        closed.push(this.id);
+        this.state = "closed";
+        return Promise.resolve();
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: RacingAudioContext });
+    try {
+      const engine = new SwaraSynthEngine();
+      const first = engine.playSwaraToneHandle("S");
+      const second = engine.playSwaraToneHandle("R");
+      await expect(Promise.all([first.ready, second.ready])).resolves.toEqual([false, false]);
+      expect(instances).toBe(1);
+      expect(closed).toEqual([1]);
+
+      const replacement = engine.playSwaraToneHandle("G");
+      await expect(replacement.ready).resolves.toBe(true);
+      expect(instances).toBe(2);
+      expect(closed).toEqual([1]);
+      replacement();
+    } finally {
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
+    }
+  });
+
+  it("guards Tabla replacement contexts from an older failed initializer", async () => {
+    const originalAudioContext = window.AudioContext;
+    let instances = 0;
+    const closed: number[] = [];
+    class RacingTablaAudioContext {
+      readonly id = ++instances;
+      state = this.id === 1 ? "suspended" : "running";
+      currentTime = 0;
+      destination = {};
+      createGain() {
+        return {
+          gain: {
+            setValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+          },
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+        };
+      }
+      createOscillator() {
+        return {
+          type: "sine",
+          frequency: {
+            setValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+          },
+          connect: vi.fn(),
+          start: vi.fn(),
+          stop: vi.fn(),
+          disconnect: vi.fn(),
+        };
+      }
+      resume() {
+        return this.id === 1
+          ? Promise.reject(new Error("first Tabla context blocked"))
+          : Promise.resolve();
+      }
+      close() {
+        closed.push(this.id);
+        this.state = "closed";
+        return Promise.resolve();
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: RacingTablaAudioContext });
+    try {
+      const engine = new TablaSynthEngine();
+      const first = engine.playBol("ධා");
+      const second = engine.playBol("ධා");
+      await expect(Promise.all([first.ready, second.ready])).resolves.toEqual([false, false]);
+      expect(instances).toBe(1);
+      expect(closed).toEqual([1]);
+
+      const replacement = engine.playBol("ධා");
+      await expect(replacement.ready).resolves.toBe(true);
+      expect(instances).toBe(2);
+      expect(closed).toEqual([1]);
+      replacement();
+    } finally {
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
+    }
+  });
 });

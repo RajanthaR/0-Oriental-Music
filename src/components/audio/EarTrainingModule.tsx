@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
 import { tablaSynth, type TablaPlaybackHandle } from "@/lib/audio/tabla";
 import { Play, CheckCircle2, XCircle, RotateCcw, Sparkles, Volume2 } from "lucide-react";
@@ -49,34 +49,55 @@ export const EarTrainingModule: React.FC = () => {
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [audioUnavailable, setAudioUnavailable] = useState(false);
+  const mountedRef = useRef(false);
+  const generationRef = useRef(0);
   const playbackRef = useRef<SwaraPlaybackHandle | TablaPlaybackHandle | null>(null);
 
-  useEffect(() => {
-    return () => {
-      playbackRef.current?.();
-      playbackRef.current = null;
-    };
+  const cancelPlayback = useCallback(() => {
+    generationRef.current += 1;
+    playbackRef.current?.();
   }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      cancelPlayback();
+    };
+  }, [cancelPlayback]);
 
   const challenge = DEFAULT_CHALLENGES[currentIndex];
 
   const handlePlayMystery = () => {
-    playbackRef.current?.();
-    playbackRef.current = null;
+    cancelPlayback();
+    const generation = generationRef.current;
+    setAudioUnavailable(false);
     if (challenge.type === "swara") {
       const handle = swaraSynth.playSwaraToneHandle(challenge.targetItem, 0.9, 261.63, "harmonium");
       playbackRef.current = handle;
       void handle.ready.then((played) => {
-        if (playbackRef.current !== handle) return;
-        playbackRef.current = null;
+        if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
         if (!played) setAudioUnavailable(true);
       });
+      void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
+        const isCurrentHandle = playbackRef.current === handle;
+        if (isCurrentHandle) playbackRef.current = null;
+      });
     } else if (challenge.type === "tala") {
-      const handle = tablaSynth.playBol(challenge.targetItem, 500, () => setAudioUnavailable(true));
+      let handle: TablaPlaybackHandle;
+      handle = tablaSynth.playBol(challenge.targetItem, 500, () => {
+        if (mountedRef.current && generationRef.current === generation && playbackRef.current === handle) {
+          setAudioUnavailable(true);
+        }
+      });
       playbackRef.current = handle;
       void handle.ready.then((played) => {
-        if (playbackRef.current !== handle) return;
+        if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
         if (!played) setAudioUnavailable(true);
+      });
+      void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
+        const isCurrentHandle = playbackRef.current === handle;
+        if (isCurrentHandle) playbackRef.current = null;
       });
     }
   };
@@ -92,8 +113,7 @@ export const EarTrainingModule: React.FC = () => {
   };
 
   const handleNext = () => {
-    playbackRef.current?.();
-    playbackRef.current = null;
+    cancelPlayback();
     if (currentIndex < DEFAULT_CHALLENGES.length - 1) {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);

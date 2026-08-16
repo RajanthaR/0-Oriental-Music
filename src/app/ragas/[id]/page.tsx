@@ -29,7 +29,6 @@ export default function RagaDetailPage() {
       mountedRef.current = false;
       audioGenerationRef.current += 1;
       sequenceHandleRef.current?.();
-      sequenceHandleRef.current = null;
     };
   }, [ragaId]);
 
@@ -53,10 +52,14 @@ export default function RagaDetailPage() {
     sequenceHandleRef.current?.();
     const handle = swaraSynth.playSequenceHandle(phraseSwaras, 0.6, undefined, 261.63, "harmonium");
     sequenceHandleRef.current = handle;
-    const played = await handle.ready;
-    if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
-    sequenceHandleRef.current = null;
-    if (!played) setAudioError(true);
+    void handle.ready.then((played) => {
+      if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
+      if (!played) setAudioError(true);
+    });
+    await (handle.finished ?? handle.ready.then(() => undefined));
+    const isCurrentHandle = sequenceHandleRef.current === handle;
+    if (isCurrentHandle) sequenceHandleRef.current = null;
+    if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
     setPlayingPhraseIdx(null);
   };
 

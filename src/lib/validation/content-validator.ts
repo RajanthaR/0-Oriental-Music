@@ -27,6 +27,11 @@ import { normalizeSinhalaText } from "@/lib/search/normalize-sinhala";
 import { planTablaBol } from "@/lib/audio/tabla";
 import { isSafePracticeBpm } from "@/lib/audio/tempo";
 import {
+  cloneBoundedRecord,
+  isMappedTalaBolToken,
+  isRecord,
+  isValidSwaraToken,
+  readOwnDataField,
   validateContentRecord,
   type ContentEntityKind,
 } from "@/lib/validation/content-contracts";
@@ -76,7 +81,12 @@ export function validateCatalogIdentityContracts(
         issueFor(type, String(index), "record", `${type} record must be a non-null object`);
         return;
       }
-      result.push({ record: candidate as Record<string, unknown>, index });
+      const safe = cloneBoundedRecord(candidate);
+      if (!safe || !isRecord(safe)) {
+        issueFor(type, String(index), "record", `${type} record must be a safe plain-data object`);
+        return;
+      }
+      result.push({ record: safe, index });
     });
     return result;
   };
@@ -84,7 +94,8 @@ export function validateCatalogIdentityContracts(
   catalogs.forEach(({ type, records }) => {
     const ids = new Set<string>();
     objectRecords(type, Array.isArray(records) ? records : []).forEach(({ record, index }) => {
-      const id = typeof record.id === "string" ? record.id.trim() : "";
+      const rawId = readOwnDataField(record, "id");
+      const id = typeof rawId === "string" ? rawId.trim() : "";
       if (!id || ids.has(id)) {
         issueFor(type, id || String(index), "id", `Duplicate or missing ${type} ID`);
       } else ids.add(id);
@@ -877,12 +888,9 @@ function asUnknownArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return !!value && typeof value === "object" && !Array.isArray(value);
-}
-
 function entityId(value: unknown, index: number): string {
-  return isRecord(value) && typeof value.id === "string" ? value.id : String(index);
+  const id = readOwnDataField(value, "id");
+  return typeof id === "string" ? id : String(index);
 }
 
 export function validateContent(
@@ -923,17 +931,28 @@ export function validateContent(
         });
         return [];
       }
-      const contract = validateContentRecord(candidate, kindByType[type]);
+      const safe = cloneBoundedRecord(candidate);
+      if (!safe || !isRecord(safe)) {
+        issues.push({
+          entityType: type,
+          entityId: String(index),
+          field: "record",
+          message: `${type} record must be a safe plain-data object`,
+          severity: "error",
+        });
+        return [];
+      }
+      const contract = validateContentRecord(safe, kindByType[type]);
       if (!contract.isValid) {
         contract.issues.forEach((issue) => issues.push({
           entityType: type,
-          entityId: entityId(candidate, index),
+          entityId: entityId(safe, index),
           field: issue.field,
           message: issue.message,
           severity: "error",
         }));
       }
-      return [candidate];
+      return [safe];
     });
   };
   const lessonRecords = structuralRecords("Lesson", lessons) as unknown as Lesson[];
@@ -1041,7 +1060,6 @@ export function validateContent(
         severity: "error",
       });
     }
-    const validSwaras = new Set(["S", "r", "R", "g", "G", "M", "m", "P", "d", "D", "n", "N", "S'", ".r", ".R", ".g", ".G", ".M", ".m", ".P", ".d", ".D", ".n", ".N"]);
     const arohana = Array.isArray(r.arohana_swaras) ? r.arohana_swaras : [];
     const avarohana = Array.isArray(r.avarohana_swaras) ? r.avarohana_swaras : [];
     if (!Array.isArray(r.avarohana_swaras) || r.avarohana_swaras.length === 0) {
@@ -1054,7 +1072,7 @@ export function validateContent(
       });
     }
     [...arohana, ...avarohana].forEach((swara) => {
-      if (typeof swara !== "string" || !validSwaras.has(swara)) {
+      if (!isValidSwaraToken(swara)) {
         issues.push({
           entityType: "Raga",
           entityId: r.id,
@@ -1115,7 +1133,7 @@ export function validateContent(
           return;
         }
         phrase.swaras.forEach((swara) => {
-          if (typeof swara !== "string" || !validSwaras.has(swara)) {
+          if (!isValidSwaraToken(swara)) {
             issues.push({
               entityType: "Raga",
               entityId: r.id,
@@ -1141,7 +1159,7 @@ export function validateContent(
       typeof bol === "object" &&
       Number.isInteger(bol.matra) &&
       Number.isInteger(bol.vibhagIndex) &&
-      typeof bol.bol_si === "string" &&
+      isMappedTalaBolToken(bol.bol_si) &&
       typeof bol.action_si === "string" &&
       !!bol.action_si.trim() &&
       typeof bol.isSam === "boolean" &&
@@ -1204,10 +1222,12 @@ export function validateContent(
       });
     }
 
-    if (validBolObjects && bols.some((bol) => {
-      if (typeof bol.bol_si !== "string" || !bol.bol_si.trim()) return true;
-      const plan = planTablaBol(bol.bol_si);
-      if (bol.bol_si === "-") return plan.length !== 0;
+    if (bols.some((candidate) => {
+      if (!isRecord(candidate)) return true;
+      const bol = readOwnDataField(candidate, "bol_si");
+      if (!isMappedTalaBolToken(bol)) return true;
+      const plan = planTablaBol(bol);
+      if (bol.trim().toLocaleLowerCase() === "-" || bol.trim().toLocaleLowerCase() === "s") return plan.length !== 0;
       return plan.length === 0 || plan.some((stroke) => stroke.kind === "fallback" || stroke.kind === "rest");
     })) {
       issues.push({

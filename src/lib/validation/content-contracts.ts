@@ -75,6 +75,19 @@ export const QUESTION_TYPES = [
   "notation-id",
 ] as const;
 
+export const PUBLIC_QUESTION_TYPES = [
+  "mcq",
+  "multi-select",
+  "matching",
+  "ordering",
+  "true-false",
+  "short-answer",
+] as const;
+
+export function isPublicQuestionType(value: unknown): boolean {
+  return isOneOf(PUBLIC_QUESTION_TYPES, value);
+}
+
 export const INSTRUMENT_CATEGORIES = [
   "තත් භාණ්ඩ (Chordophone)",
   "අවනද්ධ භාණ්ඩ (Membranophone)",
@@ -149,16 +162,126 @@ export interface GraphSafetyResult {
   depth?: number;
 }
 
+const DANGEROUS_JSON_KEYS = new Set(["__proto__", "prototype", "constructor"]);
+const SAFE_SNAPSHOT_OBJECTS = new WeakSet<object>();
+const VERIFIED_PLAIN_OBJECTS = new WeakSet<object>();
+
+type SafeOwnEntry = { key: string; value: unknown };
+type SafeOwnEntries = {
+  isArray: boolean;
+  length: number;
+  entries: SafeOwnEntry[];
+};
+
+/**
+ * Read only descriptor values from a plain JSON-shaped object.  This is the
+ * trust boundary for runtime content: no accessor is invoked and no
+ * inherited value is accepted.  All reflective operations are guarded since
+ * a Proxy can throw from any of them.
+ */
+function safeOwnEntries(value: object): SafeOwnEntries | undefined {
+  try {
+    const isArray = Array.isArray(value);
+    const prototype = Object.getPrototypeOf(value);
+    if (isArray) {
+      if (prototype !== Array.prototype && prototype !== null) return undefined;
+    } else if (prototype !== Object.prototype && prototype !== null) {
+      return undefined;
+    }
+
+    const descriptors = Object.getOwnPropertyDescriptors(value);
+    const descriptorKeys = Reflect.ownKeys(descriptors);
+    if (descriptorKeys.some((key) => typeof key !== "string")) return undefined;
+
+    const entries: SafeOwnEntry[] = [];
+    if (isArray) {
+      const lengthDescriptor = descriptors.length;
+      if (!lengthDescriptor || !("value" in lengthDescriptor) ||
+          typeof lengthDescriptor.value !== "number" ||
+          !Number.isInteger(lengthDescriptor.value) ||
+          lengthDescriptor.value < 0 || lengthDescriptor.value > MAX_ARRAY_ITEMS) {
+        return undefined;
+      }
+      const length = lengthDescriptor.value;
+      for (const key of descriptorKeys as string[]) {
+        if (key === "length") continue;
+        if (DANGEROUS_JSON_KEYS.has(key)) return undefined;
+        if (!/^\d+$/.test(key)) return undefined;
+        const index = Number(key);
+        if (!Number.isSafeInteger(index) || index < 0 || index >= length || String(index) !== key) return undefined;
+        const descriptor = descriptors[key];
+        if (!descriptor.enumerable || !("value" in descriptor) ||
+            Object.prototype.hasOwnProperty.call(descriptor, "get") ||
+            Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
+      }
+      if (descriptorKeys.length !== length + 1) return undefined;
+      for (let index = 0; index < length; index += 1) {
+        const descriptor = descriptors[String(index)];
+        if (!descriptor || !descriptor.enumerable || !("value" in descriptor) ||
+            Object.prototype.hasOwnProperty.call(descriptor, "get") ||
+            Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
+        entries.push({ key: String(index), value: descriptor.value });
+      }
+      VERIFIED_PLAIN_OBJECTS.add(value);
+      return { isArray: true, length, entries };
+    }
+
+    for (const key of descriptorKeys as string[]) {
+      if (DANGEROUS_JSON_KEYS.has(key)) return undefined;
+      const descriptor = descriptors[key];
+      if (!descriptor.enumerable || !("value" in descriptor) ||
+          Object.prototype.hasOwnProperty.call(descriptor, "get") ||
+          Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
+      entries.push({ key, value: descriptor.value });
+    }
+    VERIFIED_PLAIN_OBJECTS.add(value);
+    return { isArray: false, length: entries.length, entries };
+  } catch {
+    return undefined;
+  }
+}
+
+function hasPlainDataShape(value: unknown): value is Record<string, unknown> {
+  if (value === null || typeof value !== "object") return false;
+  try {
+    if (SAFE_SNAPSHOT_OBJECTS.has(value) || VERIFIED_PLAIN_OBJECTS.has(value)) return !Array.isArray(value);
+    return !Array.isArray(value) && safeOwnEntries(value)?.isArray === false;
+  } catch {
+    return false;
+  }
+}
+
 export function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+  return hasPlainDataShape(value);
+}
+
+/** Safe descriptor-value access for policy and validation helpers. */
+export function readOwnDataField(value: unknown, field: string): unknown {
+  if (typeof field !== "string" || DANGEROUS_JSON_KEYS.has(field) || value === null || typeof value !== "object") return undefined;
+  try {
+    if (SAFE_SNAPSHOT_OBJECTS.has(value) || VERIFIED_PLAIN_OBJECTS.has(value)) return Object.prototype.hasOwnProperty.call(value, field) ? (value as Record<string, unknown>)[field] : undefined;
+    const entries = safeOwnEntries(value);
+    return entries?.entries.find((entry) => entry.key === field)?.value;
+  } catch {
+    return undefined;
+  }
 }
 
 function hasOwn(value: Record<string, unknown>, field: string): boolean {
-  return Object.prototype.hasOwnProperty.call(value, field);
+  if (SAFE_SNAPSHOT_OBJECTS.has(value) || VERIFIED_PLAIN_OBJECTS.has(value)) {
+    try { return Object.prototype.hasOwnProperty.call(value, field); } catch { return false; }
+  }
+  return readOwnDataField(value, field) !== undefined || (() => {
+    try {
+      return safeOwnEntries(value)?.entries.some((entry) => entry.key === field) ?? false;
+    } catch {
+      return false;
+    }
+  })();
 }
 
-function read(value: Record<string, unknown>, field: string): unknown {
-  return value[field];
+function read(value: unknown, field: string): unknown {
+  return readOwnDataField(value, field);
 }
 
 export function isNonBlankString(value: unknown): value is string {
@@ -203,15 +326,18 @@ export function isCurriculumStrandId(value: unknown): value is CurriculumStrandI
 
 export function isSourceReference(value: unknown): value is { sourceId: string; pageOrSection: string; notes?: string } {
   if (!isRecord(value) || !hasOwn(value, "sourceId") || !hasOwn(value, "pageOrSection")) return false;
-  return isNonBlankString(value.sourceId) && isNonBlankString(value.pageOrSection) &&
-    (value.notes === undefined || isNonBlankString(value.notes));
+  const sourceId = read(value, "sourceId");
+  const pageOrSection = read(value, "pageOrSection");
+  const notes = read(value, "notes");
+  return isNonBlankString(sourceId) && isNonBlankString(pageOrSection) &&
+    (notes === undefined || isNonBlankString(notes));
 }
 
 export function isReviewMetadata(value: unknown): boolean {
   if (!isRecord(value)) return false;
   const required = ["status", "reviewer", "reviewDate", "lastVerifiedDate", "changeNotes", "license", "reuseStatus"];
-  return required.every((field) => hasOwn(value, field) && isNonBlankString(value[field])) &&
-    isOneOf(REVIEW_STATUSES, value.status) && isOneOf(REUSE_STATUSES, value.reuseStatus);
+  return required.every((field) => hasOwn(value, field) && isNonBlankString(read(value, field))) &&
+    isOneOf(REVIEW_STATUSES, read(value, "status")) && isOneOf(REUSE_STATUSES, read(value, "reuseStatus"));
 }
 
 function hasRequiredStrings(value: Record<string, unknown>, fields: readonly string[]): boolean {
@@ -226,9 +352,13 @@ function isOptionalFinitePositive(value: unknown): boolean {
   return value === undefined || isPositiveNumber(value);
 }
 
+function isSafeTempo(value: unknown): value is number {
+  return isFiniteNumber(value) && value >= 40 && value <= 240;
+}
+
 const VALID_SWARA_TOKENS = new Set(["S", "r", "R", "g", "G", "M", "m", "P", "d", "D", "n", "N"]);
 
-function isValidSwaraToken(value: unknown): value is string {
+export function isValidSwaraToken(value: unknown): value is string {
   if (!isNonBlankString(value)) return false;
   const hasMandra = value.startsWith(".");
   const hasTara = value.endsWith("'");
@@ -258,33 +388,75 @@ function isLessonSection(value: unknown): boolean {
 
 function isDiagnosticQuestion(value: unknown): boolean {
   if (!isRecord(value) || !hasRequiredStrings(value, ["question_si", "explanation_si"])) return false;
-  return isStringArray(value.options_si) && isInteger(value.correctIndex) &&
-    value.correctIndex >= 0 && value.correctIndex < value.options_si.length;
+  const options = read(value, "options_si");
+  const correctIndex = read(value, "correctIndex");
+  return isStringArray(options) && isInteger(correctIndex) &&
+    correctIndex >= 0 && correctIndex < options.length;
 }
 
 function isAudioActivity(value: unknown): boolean {
   if (!isRecord(value) || !hasRequiredStrings(value, ["type", "title_si", "instruction_si"])) return false;
-  return isOneOf(AUDIO_ACTIVITY_TYPES, value.type) && isOptionalStringArray(value.notes) &&
-    (value.rootNote === undefined || isNonBlankString(value.rootNote)) &&
-    isOptionalFinitePositive(value.speedBpm) &&
-    (value.talaId === undefined || isNonBlankString(value.talaId)) &&
-    (value.instrumentType === undefined || isNonBlankString(value.instrumentType)) &&
-    (value.description_si === undefined || isNonBlankString(value.description_si));
+  const type = read(value, "type");
+  const notes = read(value, "notes");
+  const rootNote = read(value, "rootNote");
+  const speedBpm = read(value, "speedBpm");
+  const talaId = read(value, "talaId");
+  const instrumentType = read(value, "instrumentType");
+  const description = read(value, "description_si");
+  if (!isOneOf(AUDIO_ACTIVITY_TYPES, type) ||
+      !isOptionalStringArray(notes) ||
+      (notes !== undefined && (!isStringArray(notes) || !notes.every(isValidSwaraToken))) ||
+      (rootNote !== undefined && !isNonBlankString(rootNote)) ||
+      !isOptionalFinitePositive(speedBpm) ||
+      (talaId !== undefined && !isNonBlankString(talaId)) ||
+      (instrumentType !== undefined && !isNonBlankString(instrumentType)) ||
+      (description !== undefined && !isNonBlankString(description))) return false;
+
+  if (type === "rhythm-loop") {
+    return (notes === undefined || isStringArray(notes, true)) && isSafeTempo(speedBpm) && isNonBlankString(talaId);
+  }
+  return isStringArray(notes) && notes.every(isValidSwaraToken);
 }
 
 function isPuzzleData(value: unknown): boolean {
   return isRecord(value) && hasRequiredStrings(value, ["prompt_si"]) &&
-    isStringArray(value.shuffledItems) && isStringArray(value.correctOrder);
+    isStringArray(read(value, "shuffledItems")) && isStringArray(read(value, "correctOrder"));
 }
 
 function isPracticeTask(value: unknown): boolean {
   if (!isRecord(value) || !hasRequiredStrings(value, ["title_si", "instruction_si", "interactiveTool"])) return false;
-  return isOneOf(PRACTICE_TOOLS, value.interactiveTool) &&
-    isOptionalStringArray(value.targetSequence) &&
-    isOptionalStringArray(value.targetNotes) &&
-    isOptionalFinitePositive(value.targetBpm) &&
-    (value.targetTalaId === undefined || isNonBlankString(value.targetTalaId)) &&
-    (value.puzzleData === undefined || isPuzzleData(value.puzzleData));
+  const tool = read(value, "interactiveTool");
+  const targetSequence = read(value, "targetSequence");
+  const targetNotes = read(value, "targetNotes");
+  const targetBpm = read(value, "targetBpm");
+  const targetTalaId = read(value, "targetTalaId");
+  const puzzleData = read(value, "puzzleData");
+  if (!isOneOf(PRACTICE_TOOLS, tool) ||
+      !isOptionalStringArray(targetSequence) ||
+      (targetSequence !== undefined && (!isStringArray(targetSequence) || !targetSequence.every(isValidSwaraToken))) ||
+      !isOptionalStringArray(targetNotes) ||
+      (targetNotes !== undefined && (!isStringArray(targetNotes) || !targetNotes.every(isValidSwaraToken))) ||
+      !isOptionalFinitePositive(targetBpm) ||
+      (targetBpm !== undefined && !isSafeTempo(targetBpm)) ||
+      (targetTalaId !== undefined && !isNonBlankString(targetTalaId)) ||
+      (puzzleData !== undefined && !isPuzzleData(puzzleData))) return false;
+
+  switch (tool) {
+    case "swara-keyboard":
+      return isStringArray(targetSequence) && targetSequence.every(isValidSwaraToken);
+    case "tala-visualizer":
+      return isNonBlankString(targetTalaId);
+    case "rhythm-tap":
+      return isSafeTempo(targetBpm);
+    case "pitch-detector":
+      return isStringArray(targetNotes) && targetNotes.every(isValidSwaraToken);
+    case "notation-arranger":
+      return isPuzzleData(puzzleData);
+    case "ear-training":
+      return true;
+    default:
+      return false;
+  }
 }
 
 function isAnswerOption(value: unknown): boolean {
@@ -301,90 +473,139 @@ function isOrderingItem(value: unknown): boolean {
 
 function isQuestionShape(value: unknown): boolean {
   if (!isRecord(value) || !hasRequiredStrings(value, ["id", "type", "prompt_si", "explanation_si", "strandId"])) return false;
-  if (!isOneOf(QUESTION_TYPES, value.type) || !isGradeBandArray(value.gradeBands) ||
-      !isOneOf(DIFFICULTY_LEVELS, value.difficulty) || !isCurriculumStrandId(value.strandId) ||
-      !isSourceReference(value.sourceReference)) return false;
+  const type = read(value, "type");
+  const gradeBands = read(value, "gradeBands");
+  const difficulty = read(value, "difficulty");
+  const strandId = read(value, "strandId");
+  const sourceReference = read(value, "sourceReference");
+  const options = read(value, "options_si");
+  const correctAnswerIds = read(value, "correctAnswerIds");
+  const matchingPairs = read(value, "matchingPairs");
+  const orderingItems = read(value, "orderingItems");
+  const correctShortAnswer = read(value, "correctShortAnswer_si");
+  const audioNotes = read(value, "audioNotes");
+  const audioTalaId = read(value, "audioTalaId");
+  const diagramSvg = read(value, "diagramSvg");
+  const markingPoints = read(value, "markingPoints_si");
+  if (!isOneOf(QUESTION_TYPES, type) || !isGradeBandArray(gradeBands) ||
+      !isOneOf(DIFFICULTY_LEVELS, difficulty) || !isCurriculumStrandId(strandId) ||
+      !isSourceReference(sourceReference)) return false;
 
-  if (value.options_si !== undefined && (!Array.isArray(value.options_si) || !value.options_si.every(isAnswerOption))) return false;
-  if (value.correctAnswerIds !== undefined && !isStringArray(value.correctAnswerIds)) return false;
-  if (value.matchingPairs !== undefined && (!Array.isArray(value.matchingPairs) || !value.matchingPairs.every(isMatchingPair))) return false;
-  if (value.orderingItems !== undefined && (!Array.isArray(value.orderingItems) || !value.orderingItems.every(isOrderingItem))) return false;
-  if (value.correctShortAnswer_si !== undefined && !isStringArray(value.correctShortAnswer_si)) return false;
-  if (value.audioNotes !== undefined && !isStringArray(value.audioNotes)) return false;
-  if (value.audioTalaId !== undefined && !isNonBlankString(value.audioTalaId)) return false;
-  if (value.diagramSvg !== undefined && !isNonBlankString(value.diagramSvg)) return false;
-  if (value.markingPoints_si !== undefined && !isStringArray(value.markingPoints_si)) return false;
+  if (options !== undefined && (!Array.isArray(options) || !options.every(isAnswerOption))) return false;
+  if (correctAnswerIds !== undefined && !isStringArray(correctAnswerIds)) return false;
+  if (matchingPairs !== undefined && (!Array.isArray(matchingPairs) || !matchingPairs.every(isMatchingPair))) return false;
+  if (orderingItems !== undefined && (!Array.isArray(orderingItems) || !orderingItems.every(isOrderingItem))) return false;
+  if (correctShortAnswer !== undefined && !isStringArray(correctShortAnswer)) return false;
+  if (audioNotes !== undefined && (!isStringArray(audioNotes) || !audioNotes.every(isValidSwaraToken))) return false;
+  if (audioTalaId !== undefined && !isNonBlankString(audioTalaId)) return false;
+  if (diagramSvg !== undefined && !isNonBlankString(diagramSvg)) return false;
+  if (markingPoints !== undefined && !isStringArray(markingPoints)) return false;
 
-  const type = value.type;
   if (type === "mcq" || type === "multi-select" || type === "true-false") {
-    if (!Array.isArray(value.options_si) || value.options_si.length < 2 || !value.options_si.every(isAnswerOption)) return false;
-    const ids = value.options_si.map((option) => (option as Record<string, unknown>).id as string);
-    if (new Set(ids).size !== ids.length || !isStringArray(value.correctAnswerIds)) return false;
-    if (new Set(value.correctAnswerIds).size !== value.correctAnswerIds.length || !value.correctAnswerIds.every((id) => ids.includes(id))) return false;
-    return type === "true-false" ? ids.length === 2 && value.correctAnswerIds.length === 1 :
-      type === "mcq" ? value.correctAnswerIds.length === 1 : true;
+    if (!Array.isArray(options) || options.length < 2 || !options.every(isAnswerOption)) return false;
+    const ids = options.map((option) => read(option, "id") as string);
+    if (new Set(ids).size !== ids.length || !isStringArray(correctAnswerIds)) return false;
+    if (new Set(correctAnswerIds).size !== correctAnswerIds.length || !correctAnswerIds.every((id) => ids.includes(id))) return false;
+    return type === "true-false" ? ids.length === 2 && correctAnswerIds.length === 1 :
+      type === "mcq" ? correctAnswerIds.length === 1 : true;
   }
   if (type === "matching") {
-    if (!Array.isArray(value.matchingPairs) || value.matchingPairs.length === 0 || !value.matchingPairs.every(isMatchingPair)) return false;
-    const left = value.matchingPairs.map((pair) => normalizeSinhalaText((pair as Record<string, unknown>).left_si as string));
-    const right = value.matchingPairs.map((pair) => normalizeSinhalaText((pair as Record<string, unknown>).right_si as string));
+    if (!Array.isArray(matchingPairs) || matchingPairs.length === 0 || !matchingPairs.every(isMatchingPair)) return false;
+    const left = matchingPairs.map((pair) => normalizeSinhalaText(read(pair, "left_si") as string));
+    const right = matchingPairs.map((pair) => normalizeSinhalaText(read(pair, "right_si") as string));
     return new Set(left).size === left.length && new Set(right).size === right.length;
   }
   if (type === "ordering") {
-    if (!Array.isArray(value.orderingItems) || value.orderingItems.length < 2 || value.orderingItems.length > 50 || !value.orderingItems.every(isOrderingItem)) return false;
-    const ids = value.orderingItems.map((item) => (item as Record<string, unknown>).id as string);
-    const indices = value.orderingItems.map((item) => (item as Record<string, unknown>).correctIndex as number).sort((a, b) => a - b);
+    if (!Array.isArray(orderingItems) || orderingItems.length < 2 || orderingItems.length > 50 || !orderingItems.every(isOrderingItem)) return false;
+    const ids = orderingItems.map((item) => read(item, "id") as string);
+    const indices = orderingItems.map((item) => read(item, "correctIndex") as number).sort((a, b) => a - b);
     return new Set(ids).size === ids.length && indices.every((index, position) => index === position);
   }
   if (type === "short-answer") {
-    if (!isStringArray(value.correctShortAnswer_si)) return false;
-    const answers = value.correctShortAnswer_si.map(normalizeSinhalaText);
+    if (!isStringArray(correctShortAnswer)) return false;
+    const answers = correctShortAnswer.map(normalizeSinhalaText);
     return new Set(answers).size === answers.length;
   }
-  if (type === "audio-id") return isStringArray(value.audioNotes) || isNonBlankString(value.audioTalaId);
-  return type === "notation-id" && (isStringArray(value.audioNotes) || isNonBlankString(value.diagramSvg));
+  if (type === "audio-id") return isStringArray(audioNotes) || isNonBlankString(audioTalaId);
+  return type === "notation-id" && (isStringArray(audioNotes) || isNonBlankString(diagramSvg));
 }
 
 export function isQuestion(value: unknown): boolean {
-  return inspectGraph(value).safe && isQuestionShape(value);
+  try {
+    return inspectGraph(value).safe && isQuestionShape(value);
+  } catch {
+    return false;
+  }
+}
+
+/** Closed, dependency-free mirror of the tabla planner's intentional strokes. */
+const VALID_TABLA_BOL_TOKENS = new Set([
+  "-", "s",
+  "dha", "ධා", "ධ", "dhin", "ධින්", "ධී", "ධි",
+  "ge", "ගේ", "ගෙ", "ග", "ghe",
+  "na", "නා", "න", "ta", "තා", "ත", "tin", "තින්", "තී", "ති",
+  "තන්න", "te", "තෙ", "ti", "කේ", "කෙ", "ක", "ke", "කත්", "තූ", "තු", "නක",
+  "ධන්න", "ධනක",
+]);
+
+export function isMappedTalaBolToken(value: unknown): value is string {
+  return isNonBlankString(value) && VALID_TABLA_BOL_TOKENS.has(value.trim().toLocaleLowerCase());
 }
 
 function isTalaBol(value: unknown): boolean {
-  return isRecord(value) && isInteger(value.matra) && value.matra > 0 && isNonBlankString(value.bol_si) &&
-    isInteger(value.vibhagIndex) && value.vibhagIndex >= 0 && typeof value.isSam === "boolean" &&
-    typeof value.isTali === "boolean" && typeof value.isKhali === "boolean" && isNonBlankString(value.action_si);
+  if (!isRecord(value)) return false;
+  const matra = read(value, "matra");
+  const bol = read(value, "bol_si");
+  const vibhagIndex = read(value, "vibhagIndex");
+  const isSam = read(value, "isSam");
+  const isTali = read(value, "isTali");
+  const isKhali = read(value, "isKhali");
+  const action = read(value, "action_si");
+  return isInteger(matra) && matra > 0 && isMappedTalaBolToken(bol) &&
+    isInteger(vibhagIndex) && vibhagIndex >= 0 && typeof isSam === "boolean" &&
+    typeof isTali === "boolean" && typeof isKhali === "boolean" && isNonBlankString(action);
 }
 
 function isTala(value: Record<string, unknown>): boolean {
-  if (!hasRequiredStrings(value, ["id", "name_si", "name_en", "theka_si"]) || !isGradeBandArray(value.gradeBands) ||
-      !isStringArray(value.aliases_si, true) || !isStringArray(value.taliKhali_si) || !isSourceReference(value.sourceReference)) return false;
-  if (!isInteger(value.matras) || value.matras < 1 || !isInteger(value.vibhagCount) || value.vibhagCount < 1 ||
-      !Array.isArray(value.vibhagStructure) || value.vibhagStructure.length !== value.vibhagCount ||
-      !value.vibhagStructure.every((size) => isInteger(size) && size > 0) ||
-      value.vibhagStructure.reduce((sum, size) => sum + (size as number), 0) !== value.matras) return false;
-  if (!Array.isArray(value.bols) || value.bols.length !== value.matras || !value.bols.every(isTalaBol)) return false;
+  const matras = read(value, "matras");
+  const vibhagCount = read(value, "vibhagCount");
+  const vibhagStructure = read(value, "vibhagStructure");
+  const bols = read(value, "bols");
+  if (!hasRequiredStrings(value, ["id", "name_si", "name_en", "theka_si"]) || !isGradeBandArray(read(value, "gradeBands")) ||
+      !isStringArray(read(value, "aliases_si"), true) || !isStringArray(read(value, "taliKhali_si")) || !isSourceReference(read(value, "sourceReference"))) return false;
+  if (!isInteger(matras) || matras < 1 || !isInteger(vibhagCount) || vibhagCount < 1 ||
+      !Array.isArray(vibhagStructure) || vibhagStructure.length !== vibhagCount ||
+      !vibhagStructure.every((size) => isInteger(size) && size > 0) ||
+      vibhagStructure.reduce((sum, size) => sum + (size as number), 0) !== matras) return false;
+  if (!Array.isArray(bols) || bols.length !== matras || !bols.every(isTalaBol)) return false;
   const expectedVibhags: number[] = [];
-  value.vibhagStructure.forEach((size, group) => { for (let index = 0; index < (size as number); index += 1) expectedVibhags.push(group); });
-  if (value.bols.some((bol, index) => {
+  vibhagStructure.forEach((size, group) => { for (let index = 0; index < (size as number); index += 1) expectedVibhags.push(group); });
+  if (bols.some((bol, index) => {
     const candidate = bol as Record<string, unknown>;
-    return candidate.matra !== index + 1 || candidate.vibhagIndex !== expectedVibhags[index];
+    return read(candidate, "matra") !== index + 1 || read(candidate, "vibhagIndex") !== expectedVibhags[index];
   })) return false;
-  const tempo = value.practiceTempoBpm;
-  if (!isRecord(tempo) || !["thah_bpm", "dugun_bpm", "chaugun_bpm"].every((field) => isFiniteNumber(tempo[field]) && (tempo[field] as number) >= 40 && (tempo[field] as number) <= 240)) return false;
-  const hasContext = value.context_si !== undefined;
-  const hasContextReference = value.contextSourceReference !== undefined;
+  const samCount = bols.filter((bol) => read(bol, "isSam") === true).length;
+  if (samCount !== 1 || bols.some((bol) => read(bol, "isTali") === true && read(bol, "isKhali") === true)) return false;
+  const tempo = read(value, "practiceTempoBpm");
+  if (!isRecord(tempo) || !["thah_bpm", "dugun_bpm", "chaugun_bpm"].every((field) => isSafeTempo(read(tempo, field)))) return false;
+  const hasContext = read(value, "context_si") !== undefined;
+  const hasContextReference = read(value, "contextSourceReference") !== undefined;
   return hasContext === hasContextReference && (!hasContext || (
-    isNonBlankString(value.context_si) && isSourceReference(value.contextSourceReference)
+    isNonBlankString(read(value, "context_si")) && isSourceReference(read(value, "contextSourceReference"))
   ));
 }
 
 function isRaga(value: Record<string, unknown>): boolean {
   if (!hasRequiredStrings(value, ["id", "name_si", "name_en", "thata_si", "arohana_si", "avarohana_si", "vadi_si", "samvadi_si", "jati_si", "time_si", "rasa_si", "pakad_si"]) ||
-      !isGradeBandArray(value.gradeBands) || !isStringArray(value.characteristics_si) || !isSourceReference(value.sourceReference)) return false;
-  if (!Array.isArray(value.arohana_swaras) || value.arohana_swaras.length === 0 || !value.arohana_swaras.every(isValidSwaraToken) ||
-      !Array.isArray(value.avarohana_swaras) || value.avarohana_swaras.length === 0 || !value.avarohana_swaras.every(isValidSwaraToken)) return false;
-  return Array.isArray(value.samplePhrases) && value.samplePhrases.length > 0 && value.samplePhrases.every((phrase) =>
-    isRecord(phrase) && hasRequiredStrings(phrase, ["name_si"]) && isStringArray(phrase.swaras));
+      !isGradeBandArray(read(value, "gradeBands")) || !isStringArray(read(value, "characteristics_si")) || !isSourceReference(read(value, "sourceReference"))) return false;
+  const arohana = read(value, "arohana_swaras");
+  const avarohana = read(value, "avarohana_swaras");
+  const samplePhrases = read(value, "samplePhrases");
+  if (!Array.isArray(arohana) || arohana.length === 0 || !arohana.every(isValidSwaraToken) ||
+      !Array.isArray(avarohana) || avarohana.length === 0 || !avarohana.every(isValidSwaraToken)) return false;
+  return Array.isArray(samplePhrases) && samplePhrases.length > 0 && samplePhrases.every((phrase) =>
+    isRecord(phrase) && hasRequiredStrings(phrase, ["name_si"]) &&
+    isStringArray(read(phrase, "swaras")) && (read(phrase, "swaras") as unknown[]).every(isValidSwaraToken));
 }
 
 function isLesson(value: Record<string, unknown>): boolean {
@@ -491,7 +712,7 @@ export function identifyContentKind(value: unknown): ContentEntityKind | undefin
   if (!isRecord(value)) return undefined;
   let matches: ContentEntityKind[] = [];
   try {
-    const keys = new Set(Object.keys(value));
+    const keys = new Set(safeOwnEntries(value)?.entries.map((entry) => entry.key) ?? []);
     matches = KIND_SIGNATURES.filter((signature) => signature.keys.every((key) => keys.has(key))).map((signature) => signature.kind);
   } catch {
     return undefined;
@@ -499,45 +720,115 @@ export function identifyContentKind(value: unknown): ContentEntityKind | undefin
   return matches.length === 1 ? matches[0] : undefined;
 }
 
+/** Capture a bounded, detached plain-data snapshot without invoking getters. */
+function captureSafeSnapshot<T>(value: T, knownGraphSafety?: GraphSafetyResult): T | undefined {
+  if (value === null || typeof value !== "object") return value;
+  try {
+    if (knownGraphSafety && !knownGraphSafety.safe) return undefined;
+    const rootEntries = safeOwnEntries(value as object);
+    if (!rootEntries) return undefined;
+    const root: unknown = rootEntries.isArray ? [] : {};
+    const seen = new WeakMap<object, object>();
+    const colors = new WeakMap<object, 1 | 2>();
+    const stack: Array<{ source: object; target: object; depth: number; entries: SafeOwnEntry[]; index: number }> = [{
+      source: value as object,
+      target: root as object,
+      depth: 0,
+      entries: rootEntries.entries,
+      index: 0,
+    }];
+    seen.set(value as object, root as object);
+    colors.set(value as object, 1);
+    SAFE_SNAPSHOT_OBJECTS.add(root as object);
+    let nodes = 1;
+    while (stack.length > 0) {
+      const current = stack[stack.length - 1];
+      if (current.index >= current.entries.length) {
+        colors.set(current.source, 2);
+        stack.pop();
+        continue;
+      }
+      const entry = current.entries[current.index++];
+      const child = entry.value;
+      if (child === null || typeof child !== "object") {
+        (current.target as Record<string, unknown>)[entry.key] = child;
+        continue;
+      }
+      const childDepth = current.depth + 1;
+      if (childDepth > MAX_GRAPH_DEPTH) return undefined;
+      const color = colors.get(child);
+      if (color === 1) return undefined;
+      const existing = seen.get(child);
+      if (existing && color === 2) {
+        (current.target as Record<string, unknown>)[entry.key] = existing;
+        continue;
+      }
+      if (nodes >= MAX_GRAPH_NODES) return undefined;
+      const childEntries = safeOwnEntries(child);
+      if (!childEntries) return undefined;
+      const target = childEntries.isArray ? [] : {};
+      seen.set(child, target);
+      colors.set(child, 1);
+      SAFE_SNAPSHOT_OBJECTS.add(target);
+      nodes += 1;
+      (current.target as Record<string, unknown>)[entry.key] = target;
+      stack.push({ source: child, target, depth: childDepth, entries: childEntries.entries, index: 0 });
+    }
+    return root as T;
+  } catch {
+    return undefined;
+  }
+}
+
 export function validateContentRecord(
   value: unknown,
   expectedKind?: ContentEntityKind,
   knownGraphSafety?: GraphSafetyResult
 ): ContentContractResult {
-  const graph = knownGraphSafety ?? inspectGraph(value);
-  if (!graph.safe) return { kind: expectedKind, isValid: false, issues: [{ field: "record", message: `Unsafe object graph: ${graph.reason ?? "unknown"}.` }] };
-  const inferredKind = identifyContentKind(value);
-  const kind = expectedKind ?? inferredKind;
-  if (!kind || inferredKind !== kind || !isRecord(value)) {
-    return { kind, isValid: false, issues: [{ field: "kind", message: "Record kind is unknown, ambiguous, or does not match the expected contract." }] };
+  try {
+    if (knownGraphSafety && !knownGraphSafety.safe) {
+      return { kind: expectedKind, isValid: false, issues: [{ field: "record", message: `Unsafe object graph: ${knownGraphSafety.reason ?? "unknown"}.` }] };
+    }
+    const snapshot = captureSafeSnapshot(value);
+    if (snapshot === undefined) {
+      return { kind: expectedKind, isValid: false, issues: [{ field: "record", message: "Record is not a safe plain-data snapshot." }] };
+    }
+    const inferredKind = identifyContentKind(snapshot);
+    const kind = expectedKind ?? inferredKind;
+    if (!kind || inferredKind !== kind || !isRecord(snapshot)) {
+      return { kind, isValid: false, issues: [{ field: "kind", message: "Record kind is unknown, ambiguous, or does not match the expected contract." }] };
+    }
+    let valid = false;
+    switch (kind) {
+      case "lesson": valid = isLesson(snapshot); break;
+      case "raga": valid = isRaga(snapshot); break;
+      case "tala": valid = isTala(snapshot); break;
+      case "instrument": valid = isInstrument(snapshot); break;
+      case "cultural-tradition": valid = isCulturalTradition(snapshot); break;
+      case "theatre-tradition": valid = isTheatreTradition(snapshot); break;
+      case "glossary": valid = isGlossary(snapshot); break;
+      case "learning-path": valid = isLearningPath(snapshot); break;
+      case "quiz": valid = isQuiz(snapshot); break;
+      case "exam-paper": valid = isExamPaper(snapshot); break;
+      case "question": valid = isQuestionShape(snapshot); break;
+      case "source": valid = isSource(snapshot); break;
+      default: valid = false;
+    }
+    const issues: ContractIssue[] = [];
+    if (REQUIRED_METADATA_KINDS.has(kind) && !isReviewMetadata(read(snapshot, "reviewMetadata"))) {
+      issues.push({ field: "reviewMetadata", message: "Metadata-bearing records require a complete, finite reviewMetadata object." });
+    }
+    if (!valid) issues.push({ field: "record", message: `Record does not satisfy the complete ${kind} runtime contract.` });
+    return { kind, isValid: valid && issues.length === 0, issues };
+  } catch {
+    return { kind: expectedKind, isValid: false, issues: [{ field: "record", message: "Record could not be safely validated." }] };
   }
-  let valid = false;
-  switch (kind) {
-    case "lesson": valid = isLesson(value); break;
-    case "raga": valid = isRaga(value); break;
-    case "tala": valid = isTala(value); break;
-    case "instrument": valid = isInstrument(value); break;
-    case "cultural-tradition": valid = isCulturalTradition(value); break;
-    case "theatre-tradition": valid = isTheatreTradition(value); break;
-    case "glossary": valid = isGlossary(value); break;
-    case "learning-path": valid = isLearningPath(value); break;
-    case "quiz": valid = isQuiz(value); break;
-    case "exam-paper": valid = isExamPaper(value); break;
-    case "question": valid = isQuestionShape(value); break;
-    case "source": valid = isSource(value); break;
-  }
-  const issues: ContractIssue[] = [];
-  if (REQUIRED_METADATA_KINDS.has(kind) && !isReviewMetadata(value.reviewMetadata)) {
-    issues.push({ field: "reviewMetadata", message: "Metadata-bearing records require a complete, finite reviewMetadata object." });
-  }
-  if (!valid) issues.push({ field: "record", message: `Record does not satisfy the complete ${kind} runtime contract.` });
-  return { kind, isValid: valid && issues.length === 0, issues };
 }
 
 /** Iterative cycle/depth/node guard shared by all public-boundary operations. */
 export function inspectGraph(value: unknown): GraphSafetyResult {
   if (value === null || typeof value !== "object") return { safe: true, nodes: 0 };
-  type Frame = { value: object; depth: number; keys: string[]; index: number };
+  type Frame = { value: object; depth: number; entries: SafeOwnEntry[]; index: number };
   const colors = new WeakMap<object, 1 | 2>();
   const stack: Frame[] = [];
   let nodes = 0;
@@ -547,34 +838,34 @@ export function inspectGraph(value: unknown): GraphSafetyResult {
     if (color === 1) return { safe: false, nodes, reason: "cycle", depth };
     if (color === 2) return undefined;
     if (nodes >= MAX_GRAPH_NODES) return { safe: false, nodes, reason: "node-limit", depth };
-    if (Array.isArray(candidate)) {
-      if (candidate.length > MAX_ARRAY_ITEMS) return { safe: false, nodes, reason: "node-limit", depth };
-      let arrayKeys: string[];
-      try { arrayKeys = Object.keys(candidate); } catch { return { safe: false, nodes, reason: "unreadable", depth }; }
-      if (arrayKeys.length !== candidate.length || arrayKeys.some((key, index) => key !== String(index))) {
-        return { safe: false, nodes, reason: "unreadable", depth };
+    try {
+      if (Array.isArray(candidate)) {
+        const lengthDescriptor = Object.getOwnPropertyDescriptor(candidate, "length");
+        if (lengthDescriptor && "value" in lengthDescriptor && typeof lengthDescriptor.value === "number" && lengthDescriptor.value > MAX_ARRAY_ITEMS) {
+          return { safe: false, nodes, reason: "node-limit", depth };
+        }
       }
+    } catch {
+      return { safe: false, nodes, reason: "unreadable", depth };
     }
-    let keys: string[];
-    try { keys = Object.keys(candidate); } catch { return { safe: false, nodes, reason: "unreadable", depth }; }
-    if (keys.length > MAX_GRAPH_NODES) return { safe: false, nodes, reason: "node-limit", depth };
+    const own = safeOwnEntries(candidate);
+    if (!own) return { safe: false, nodes, reason: "unreadable", depth };
+    if (own.length > MAX_GRAPH_NODES) return { safe: false, nodes, reason: "node-limit", depth };
     nodes += 1;
     colors.set(candidate, 1);
-    stack.push({ value: candidate, depth, keys, index: 0 });
+    stack.push({ value: candidate, depth, entries: own.entries, index: 0 });
     return undefined;
   };
   const initialFailure = push(value, 0);
   if (initialFailure) return initialFailure;
   while (stack.length > 0) {
     const frame = stack[stack.length - 1];
-    if (frame.index >= frame.keys.length) {
+    if (frame.index >= frame.entries.length) {
       colors.set(frame.value, 2);
       stack.pop();
       continue;
     }
-    const key = frame.keys[frame.index++];
-    let child: unknown;
-    try { child = (frame.value as Record<string, unknown>)[key]; } catch { return { safe: false, nodes, reason: "unreadable", depth: frame.depth }; }
+    const child = frame.entries[frame.index++].value;
     if (child !== null && typeof child === "object") {
       const failure = push(child, frame.depth + 1);
       if (failure) return failure;
@@ -667,20 +958,27 @@ function nestedProjectionKind(parent: ProjectionKind, field: string): Projection
  * overflow the call stack during sanitization.
  */
 export function projectPublicRecord(value: unknown, kind: ContentEntityKind): unknown | undefined {
-  const safety = inspectGraph(value);
-  if (!safety.safe || !isRecord(value)) return undefined;
+  const snapshot = captureSafeSnapshot(value);
+  if (!snapshot || !isRecord(snapshot)) return undefined;
   const root: Record<string, unknown> = {};
-  const seen = new WeakMap<object, unknown>();
+  const seen = new WeakMap<object, Map<ProjectionKind, unknown>>();
+  let projectedNodes = 1;
   type Work = { source: Record<string, unknown>; target: Record<string, unknown>; kind: ProjectionKind };
-  const work: Work[] = [{ source: value, target: root, kind }];
-  seen.set(value, root);
+  const remember = (source: object, projectionKind: ProjectionKind, target: unknown): void => {
+    const byKind = seen.get(source) ?? new Map<ProjectionKind, unknown>();
+    byKind.set(projectionKind, target);
+    seen.set(source, byKind);
+  };
+  const lookup = (source: object, projectionKind: ProjectionKind): unknown => seen.get(source)?.get(projectionKind);
+  const work: Work[] = [{ source: snapshot, target: root, kind }];
+  remember(snapshot, kind, root);
   while (work.length > 0) {
     const current = work.pop() as Work;
     const fields = NESTED_FIELDS[current.kind];
+    if (!fields) return undefined;
     for (const field of fields) {
       if (!hasOwn(current.source, field)) continue;
-      let child: unknown;
-      try { child = current.source[field]; } catch { return undefined; }
+      const child = read(current.source, field);
       if (field === "reviewMetadata") {
         current.target[field] = createUnverifiedReviewMetadata();
         continue;
@@ -695,27 +993,38 @@ export function projectPublicRecord(value: unknown, kind: ContentEntityKind): un
         continue;
       }
       if (!childKind) continue;
-      const existing = seen.get(child);
+      const existing = lookup(child, childKind);
       if (existing) {
         current.target[field] = existing;
         continue;
       }
       if (Array.isArray(child)) {
+        if (projectedNodes >= MAX_GRAPH_NODES) return undefined;
         const targetArray: unknown[] = [];
-        seen.set(child, targetArray);
+        projectedNodes += 1;
+        remember(child, childKind, targetArray);
         current.target[field] = targetArray;
         for (let index = child.length - 1; index >= 0; index -= 1) {
           const item = child[index];
           if (item !== null && typeof item === "object") {
+            const existingItem = lookup(item, childKind);
+            if (existingItem) {
+              targetArray[index] = existingItem;
+              continue;
+            }
+            if (projectedNodes >= MAX_GRAPH_NODES) return undefined;
             const itemTarget: Record<string, unknown> = {};
-            seen.set(item, itemTarget);
+            projectedNodes += 1;
+            remember(item, childKind, itemTarget);
             targetArray[index] = itemTarget;
             work.push({ source: item as Record<string, unknown>, target: itemTarget, kind: childKind });
           } else targetArray[index] = item;
         }
       } else {
+        if (projectedNodes >= MAX_GRAPH_NODES) return undefined;
         const targetObject: Record<string, unknown> = {};
-        seen.set(child, targetObject);
+        projectedNodes += 1;
+        remember(child, childKind, targetObject);
         current.target[field] = targetObject;
         work.push({ source: child as Record<string, unknown>, target: targetObject, kind: childKind });
       }
@@ -740,34 +1049,8 @@ export function createUnverifiedReviewMetadata(): Record<string, string> {
 }
 
 /** Detached all-field copy for review/admin views; unlike the old clone this is iterative and bounded. */
-export function cloneBoundedRecord<T>(value: T): T | undefined {
-  if (value === null || typeof value !== "object") return value;
-  if (!inspectGraph(value).safe) return undefined;
-  const root = Array.isArray(value) ? [] : {};
-  const seen = new WeakMap<object, unknown>();
-  seen.set(value as object, root);
-  const queue: Array<{ source: object; target: object }> = [{ source: value as object, target: root as object }];
-  let cursor = 0;
-  while (cursor < queue.length) {
-    const current = queue[cursor++];
-    let keys: string[];
-    try { keys = Object.keys(current.source); } catch { return undefined; }
-    for (const key of keys) {
-      let child: unknown;
-      try { child = (current.source as Record<string, unknown>)[key]; } catch { return undefined; }
-      if (child !== null && typeof child === "object") {
-        const existing = seen.get(child);
-        if (existing) (current.target as Record<string, unknown>)[key] = existing;
-        else {
-          const next = Array.isArray(child) ? [] : {};
-          seen.set(child, next);
-          (current.target as Record<string, unknown>)[key] = next;
-          queue.push({ source: child as object, target: next as object });
-        }
-      } else (current.target as Record<string, unknown>)[key] = child;
-    }
-  }
-  return root as T;
+export function cloneBoundedRecord<T>(value: T, knownGraphSafety?: GraphSafetyResult): T | undefined {
+  return captureSafeSnapshot(value, knownGraphSafety);
 }
 
 export function isMetadataBearingKind(kind: ContentEntityKind | undefined): boolean {

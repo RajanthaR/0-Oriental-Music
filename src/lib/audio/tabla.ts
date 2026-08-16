@@ -26,6 +26,8 @@ export interface TablaTimerApi<TTimer = number> {
 
 export type TablaPlaybackHandle = (() => void) & {
   ready: Promise<boolean>;
+  /** Resolves only after scheduled strokes and their nodes are cleaned up. */
+  finished: Promise<void>;
 };
 
 type ActiveTablaStroke = {
@@ -33,8 +35,12 @@ type ActiveTablaStroke = {
   finished: Promise<void>;
 };
 
-function createPlaybackHandle(cancel: () => void, ready: Promise<boolean>): TablaPlaybackHandle {
-  return Object.assign(cancel, { ready });
+function createPlaybackHandle(
+  cancel: () => void,
+  ready: Promise<boolean>,
+  finished: Promise<void>
+): TablaPlaybackHandle {
+  return Object.assign(cancel, { ready, finished });
 }
 
 export function scheduleTablaPlan<TTimer>(
@@ -106,32 +112,60 @@ export function planTablaBol(bolName: string, matraDurationMs: number = 500): Pl
 export class TablaSynthEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
+  private initPromise: Promise<boolean> | null = null;
 
-  private async initContext(): Promise<boolean> {
+  private async runContextInit(): Promise<boolean> {
+    let attemptedContext: AudioContext | null = null;
+    let attemptedMasterGain: GainNode | null = null;
     try {
-      if (!this.ctx) {
+      if (this.ctx && this.ctx.state !== "closed") {
+        attemptedContext = this.ctx;
+        attemptedMasterGain = this.masterGain;
+      } else {
         const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
         if (!AudioCtx) return false;
-        this.ctx = new AudioCtx();
-        this.masterGain = this.ctx.createGain();
-        this.masterGain.gain.setValueAtTime(0.7, this.ctx.currentTime);
-        this.masterGain.connect(this.ctx.destination);
+        attemptedContext = new AudioCtx();
+        const masterGain = attemptedContext.createGain();
+        attemptedMasterGain = masterGain;
+        masterGain.gain.setValueAtTime(0.7, attemptedContext.currentTime);
+        masterGain.connect(attemptedContext.destination);
+        this.ctx = attemptedContext;
+        this.masterGain = masterGain;
       }
-      if (this.ctx.state === "suspended") await this.ctx.resume();
-      return this.ctx.state !== "closed";
+      if (attemptedContext.state === "suspended") await attemptedContext.resume();
+      return attemptedContext.state !== "closed" && this.ctx === attemptedContext;
     } catch {
-      const failedContext = this.ctx;
-      this.ctx = null;
-      this.masterGain = null;
-      if (failedContext && failedContext.state !== "closed") {
+      // Never clear or close a replacement installed after this attempt began.
+      if (attemptedContext && this.ctx === attemptedContext) {
+        this.ctx = null;
+        this.masterGain = null;
+      }
+      if (attemptedMasterGain) {
         try {
-          await failedContext.close();
+          attemptedMasterGain.disconnect();
         } catch {
-          // The context is already unusable; clearing the references is the fail-closed path.
+          // The graph may have failed before the gain was connected.
+        }
+      }
+      if (attemptedContext && attemptedContext.state !== "closed") {
+        try {
+          await attemptedContext.close();
+        } catch {
+          // The context is already unusable; fail closed for this attempt.
         }
       }
       return false;
     }
+  }
+
+  private initContext(): Promise<boolean> {
+    if (this.initPromise) return this.initPromise;
+    const attempt = this.runContextInit();
+    this.initPromise = attempt;
+    void attempt.finally(() => {
+      if (this.initPromise === attempt) this.initPromise = null;
+    });
+    return attempt;
   }
 
   /**
@@ -149,50 +183,69 @@ export class TablaSynthEngine {
       if (finished) return;
       finished = true;
       window.clearTimeout(timerId);
-      oscillators.forEach((oscillator) => {
-        try { oscillator.stop(); } catch { /* already stopped */ }
-        try { oscillator.disconnect(); } catch { /* browser teardown */ }
-      });
-      gains.forEach((gain) => {
-        try { gain.disconnect(); } catch { /* browser teardown */ }
-      });
+      this.cleanupNodes(oscillators, gains);
       resolveFinished();
     };
     const timerId = window.setTimeout(cleanup, durationMs);
     return { cancel: cleanup, finished: finishedPromise };
   }
 
+  private cleanupNodes(
+    oscillators: AudioScheduledSourceNode[],
+    gains: GainNode[]
+  ): void {
+    oscillators.forEach((oscillator) => {
+      try { oscillator.stop(); } catch { /* already stopped or partially started */ }
+      try { oscillator.disconnect(); } catch { /* browser teardown */ }
+    });
+    gains.forEach((gain) => {
+      try { gain.disconnect(); } catch { /* browser teardown */ }
+    });
+  }
+
   private playDayanOpen(baseFreq: number = 293.66, duration: number = 0.5): ActiveTablaStroke | undefined {
     if (!this.ctx || !this.masterGain) return undefined;
-    const now = this.ctx.currentTime;
+    const context = this.ctx;
+    const masterGain = this.masterGain;
+    const oscillators: AudioScheduledSourceNode[] = [];
+    const gains: GainNode[] = [];
+    try {
+      const now = context.currentTime;
+      const gain = context.createGain();
+      gains.push(gain);
+      gain.connect(masterGain);
 
-    const gain = this.ctx.createGain();
-    gain.connect(this.masterGain);
+      // Fundamental and rim overtone
+      const osc1 = context.createOscillator();
+      oscillators.push(osc1);
+      osc1.type = "sine";
+      osc1.frequency.setValueAtTime(baseFreq, now);
 
-    // Fundamental and rim overtone
-    const osc1 = this.ctx.createOscillator();
-    osc1.type = "sine";
-    osc1.frequency.setValueAtTime(baseFreq, now);
+      const osc2 = context.createOscillator();
+      oscillators.push(osc2);
+      osc2.type = "triangle";
+      osc2.frequency.setValueAtTime(baseFreq * 2.89, now); // Anharmonic rim overtone
 
-    const osc2 = this.ctx.createOscillator();
-    osc2.type = "triangle";
-    osc2.frequency.setValueAtTime(baseFreq * 2.89, now); // Anharmonic rim overtone
+      const g2 = context.createGain();
+      gains.push(g2);
+      g2.gain.setValueAtTime(0.3, now);
+      osc2.connect(g2);
+      g2.connect(gain);
+      osc1.connect(gain);
 
-    const g2 = this.ctx.createGain();
-    g2.gain.setValueAtTime(0.3, now);
-    osc2.connect(g2);
-    g2.connect(gain);
-    osc1.connect(gain);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.8, now + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
-    gain.gain.setValueAtTime(0.001, now);
-    gain.gain.linearRampToValueAtTime(0.8, now + 0.005);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-    osc1.start(now);
-    osc2.start(now);
-    osc1.stop(now + duration + 0.05);
-    osc2.stop(now + duration + 0.05);
-    return this.createActiveStroke([osc1, osc2], [gain, g2], (duration + 0.1) * 1000);
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + duration + 0.05);
+      osc2.stop(now + duration + 0.05);
+      return this.createActiveStroke(oscillators, gains, (duration + 0.1) * 1000);
+    } catch (error) {
+      this.cleanupNodes(oscillators, gains);
+      throw error;
+    }
   }
 
   /**
@@ -200,23 +253,33 @@ export class TablaSynthEngine {
    */
   private playDayanClosed(baseFreq: number = 293.66, duration: number = 0.15): ActiveTablaStroke | undefined {
     if (!this.ctx || !this.masterGain) return undefined;
-    const now = this.ctx.currentTime;
+    const context = this.ctx;
+    const masterGain = this.masterGain;
+    const oscillators: AudioScheduledSourceNode[] = [];
+    const gains: GainNode[] = [];
+    try {
+      const now = context.currentTime;
+      const gain = context.createGain();
+      gains.push(gain);
+      gain.connect(masterGain);
 
-    const gain = this.ctx.createGain();
-    gain.connect(this.masterGain);
+      const osc = context.createOscillator();
+      oscillators.push(osc);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(baseFreq, now);
+      osc.connect(gain);
 
-    const osc = this.ctx.createOscillator();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(baseFreq, now);
-    osc.connect(gain);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.6, now + 0.003);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
-    gain.gain.setValueAtTime(0.001, now);
-    gain.gain.linearRampToValueAtTime(0.6, now + 0.003);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-    osc.start(now);
-    osc.stop(now + duration + 0.02);
-    return this.createActiveStroke([osc], [gain], (duration + 0.07) * 1000);
+      osc.start(now);
+      osc.stop(now + duration + 0.02);
+      return this.createActiveStroke(oscillators, gains, (duration + 0.07) * 1000);
+    } catch (error) {
+      this.cleanupNodes(oscillators, gains);
+      throw error;
+    }
   }
 
   /**
@@ -224,35 +287,45 @@ export class TablaSynthEngine {
    */
   private playBayanBass(pitchBend: boolean = true, duration: number = 0.6): ActiveTablaStroke | undefined {
     if (!this.ctx || !this.masterGain) return undefined;
-    const now = this.ctx.currentTime;
+    const context = this.ctx;
+    const masterGain = this.masterGain;
+    const oscillators: AudioScheduledSourceNode[] = [];
+    const gains: GainNode[] = [];
+    try {
+      const now = context.currentTime;
+      const gain = context.createGain();
+      gains.push(gain);
+      gain.connect(masterGain);
 
-    const gain = this.ctx.createGain();
-    gain.connect(this.masterGain);
+      const osc = context.createOscillator();
+      oscillators.push(osc);
+      osc.type = "sine";
 
-    const osc = this.ctx.createOscillator();
-    osc.type = "sine";
+      const startFreq = 80;
+      const peakFreq = pitchBend ? 120 : 85;
+      const endFreq = 65;
 
-    const startFreq = 80;
-    const peakFreq = pitchBend ? 120 : 85;
-    const endFreq = 65;
+      osc.frequency.setValueAtTime(startFreq, now);
+      if (pitchBend) {
+        osc.frequency.exponentialRampToValueAtTime(peakFreq, now + 0.06);
+        osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+      } else {
+        osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+      }
 
-    osc.frequency.setValueAtTime(startFreq, now);
-    if (pitchBend) {
-      osc.frequency.exponentialRampToValueAtTime(peakFreq, now + 0.06);
-      osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
-    } else {
-      osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration);
+      osc.connect(gain);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.9, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+      osc.start(now);
+      osc.stop(now + duration + 0.05);
+      return this.createActiveStroke(oscillators, gains, (duration + 0.1) * 1000);
+    } catch (error) {
+      this.cleanupNodes(oscillators, gains);
+      throw error;
     }
-
-    osc.connect(gain);
-
-    gain.gain.setValueAtTime(0.001, now);
-    gain.gain.linearRampToValueAtTime(0.9, now + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-    osc.start(now);
-    osc.stop(now + duration + 0.05);
-    return this.createActiveStroke([osc], [gain], (duration + 0.1) * 1000);
   }
 
   /**
@@ -263,20 +336,27 @@ export class TablaSynthEngine {
     const add = (stroke: ActiveTablaStroke | undefined) => {
       if (stroke) strokes.push(stroke);
     };
-    if (strokeKind === "combined-open") {
-      add(this.playBayanBass(true, 0.65));
-      add(this.playDayanOpen(293.66, 0.5));
-    } else if (strokeKind === "combined-closed") {
-      add(this.playBayanBass(false, 0.55));
-      add(this.playDayanClosed(293.66, 0.3));
-    } else if (strokeKind === "bass") {
-      add(this.playBayanBass(true, 0.6));
-    } else if (strokeKind === "open") {
-      add(this.playDayanOpen(293.66, 0.45));
-    } else if (strokeKind === "closed") {
-      add(this.playDayanClosed(293.66, 0.25));
-    } else if (strokeKind === "fallback") {
-      add(this.playDayanClosed(260, 0.2));
+    try {
+      if (strokeKind === "combined-open") {
+        add(this.playBayanBass(true, 0.65));
+        add(this.playDayanOpen(293.66, 0.5));
+      } else if (strokeKind === "combined-closed") {
+        add(this.playBayanBass(false, 0.55));
+        add(this.playDayanClosed(293.66, 0.3));
+      } else if (strokeKind === "bass") {
+        add(this.playBayanBass(true, 0.6));
+      } else if (strokeKind === "open") {
+        add(this.playDayanOpen(293.66, 0.45));
+      } else if (strokeKind === "closed") {
+        add(this.playDayanClosed(293.66, 0.25));
+      } else if (strokeKind === "fallback") {
+        add(this.playDayanClosed(260, 0.2));
+      }
+    } catch (error) {
+      // A combined bol may have started one side before the other side
+      // failed. Roll the completed side back before propagating the failure.
+      strokes.forEach((stroke) => stroke.cancel());
+      throw error;
     }
     if (strokes.length === 0) return undefined;
     return {
@@ -291,46 +371,95 @@ export class TablaSynthEngine {
     onUnavailable?: () => void
   ): TablaPlaybackHandle {
     let cancelled = false;
+    let failed = false;
+    let unavailableReported = false;
+    let resolveFinished!: () => void;
+    let finishedResolved = false;
+    const finished = new Promise<void>((resolve) => {
+      resolveFinished = resolve;
+    });
+    const finishIfIdle = (pendingDelayed: { current: number }, activeStrokes: Set<ActiveTablaStroke>) => {
+      if (!finishedResolved && pendingDelayed.current === 0 && activeStrokes.size === 0) {
+        finishedResolved = true;
+        resolveFinished();
+      }
+    };
+    let cancelScheduled: () => void = () => undefined;
+    const pendingDelayed = { current: 0 };
+    const activeStrokes = new Set<ActiveTablaStroke>();
     const unavailable = () => {
-      if (cancelled) return false;
+      if (cancelled || unavailableReported) return false;
+      failed = true;
+      unavailableReported = true;
       onUnavailable?.();
+      cancelScheduled();
+      pendingDelayed.current = 0;
+      finishIfIdle(pendingDelayed, activeStrokes);
       return false;
     };
     if (typeof window === "undefined" || !bolName || typeof bolName !== "string") {
-      return createPlaybackHandle(() => undefined, Promise.resolve(unavailable()));
+      const ready = typeof window === "undefined" ? Promise.resolve(false) : Promise.resolve(unavailable());
+      if (!finishedResolved) {
+        finishedResolved = true;
+        resolveFinished();
+      }
+      return createPlaybackHandle(() => {
+        cancelled = true;
+      }, ready, finished);
     }
     const plan = planTablaBol(bolName, matraDurationMs);
-    if (plan.length === 0) return createPlaybackHandle(() => undefined, Promise.resolve(true));
-
-    let cancelScheduled: () => void = () => undefined;
-    const activeStrokes = new Set<ActiveTablaStroke>();
+    if (plan.length === 0) {
+      finishedResolved = true;
+      resolveFinished();
+      return createPlaybackHandle(() => undefined, Promise.resolve(true), finished);
+    }
+    pendingDelayed.current = plan.filter((stroke) => stroke.delayMs > 0).length;
     const ready = this.initContext().then((available) => {
       if (cancelled) return false;
       if (!available) return unavailable();
       cancelScheduled = scheduleTablaPlan(plan, (stroke) => {
-        if (cancelled) return;
+        if (stroke.delayMs > 0) pendingDelayed.current = Math.max(0, pendingDelayed.current - 1);
+        if (cancelled || failed) {
+          finishIfIdle(pendingDelayed, activeStrokes);
+          return;
+        }
         try {
           const activeStroke = this.playStroke(stroke.kind);
           if (activeStroke) {
             activeStrokes.add(activeStroke);
-            void activeStroke.finished.then(() => activeStrokes.delete(activeStroke));
+            void activeStroke.finished.then(() => {
+              activeStrokes.delete(activeStroke);
+              finishIfIdle(pendingDelayed, activeStrokes);
+            });
           }
         } catch {
-          onUnavailable?.();
+          unavailable();
         }
+        finishIfIdle(pendingDelayed, activeStrokes);
       }, {
         set: (callback, delayMs) => window.setTimeout(callback, delayMs),
         clear: (timer) => window.clearTimeout(timer),
       });
-      return true;
+      if (failed) {
+        cancelScheduled();
+        pendingDelayed.current = 0;
+        finishIfIdle(pendingDelayed, activeStrokes);
+      }
+      return !failed;
     }).catch(() => unavailable());
 
     return createPlaybackHandle(() => {
+      if (cancelled) return;
       cancelled = true;
       cancelScheduled();
+      pendingDelayed.current = 0;
       activeStrokes.forEach((stroke) => stroke.cancel());
       activeStrokes.clear();
-    }, ready);
+      if (!finishedResolved) {
+        finishedResolved = true;
+        resolveFinished();
+      }
+    }, ready, finished);
   }
 }
 

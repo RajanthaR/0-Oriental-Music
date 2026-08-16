@@ -11,9 +11,11 @@ import { RhythmTapGame } from "@/components/audio/RhythmTapGame";
 import { repository } from "@/lib/data/repository";
 import { EarTrainingModule } from "@/components/audio/EarTrainingModule";
 import { NotationArranger } from "@/components/audio/NotationArranger";
+import InstrumentDetailPage from "@/app/instruments/[id]/page";
 import SearchPage from "@/app/search/page";
 import { TalaDirectoryResults } from "@/components/tala/TalaDirectoryResults";
 import talasData from "@/data/talas.json";
+import instrumentsData from "@/data/instruments.json";
 import type { Quiz, Tala } from "@/types/content";
 
 const audioMocks = vi.hoisted(() => ({
@@ -40,6 +42,10 @@ vi.mock("@/lib/audio/synth", async (importOriginal) => {
     },
   };
 });
+
+vi.mock("next/navigation", () => ({
+  useParams: () => ({ id: "inst-tabla" }),
+}));
 
 const getKhemtaFixture = (): Tala => {
   const tala = (talasData as Tala[]).find((candidate) => candidate.id === "tala-khemta");
@@ -465,6 +471,62 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     view.unmount();
     expect(secondCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("retains ready Swara ownership until finished on every direct-tone consumer", async () => {
+    const toneCancels: Array<ReturnType<typeof vi.fn>> = [];
+    audioMocks.playSwaraToneHandle.mockImplementation(() => {
+      const cancel = vi.fn();
+      toneCancels.push(cancel);
+      return Object.assign(cancel, {
+        ready: Promise.resolve(true),
+        finished: new Promise<void>(() => undefined),
+      });
+    });
+
+    const keyboard = render(<SwaraKeyboard />);
+    fireEvent.click(screen.getByRole("button", { name: "ස (ෂඩ්ජ) ස්වරය" }));
+    await act(async () => Promise.resolve());
+    keyboard.unmount();
+
+    const arranger = render(<NotationArranger />);
+    fireEvent.click(screen.getByRole("button", { name: "ස" }));
+    await act(async () => Promise.resolve());
+    arranger.unmount();
+
+    const earTraining = render(<EarTrainingModule />);
+    fireEvent.click(screen.getByRole("button", { name: /නාදය අසන්න/ }));
+    await act(async () => Promise.resolve());
+    earTraining.unmount();
+
+    expect(toneCancels).toHaveLength(3);
+    toneCancels.forEach((cancel) => expect(cancel).toHaveBeenCalledTimes(1));
+  });
+
+  it("does not report a Tabla unavailable error when the demo intentionally cancels", async () => {
+    vi.useFakeTimers();
+    const tabla = (instrumentsData as Array<{ id: string }>).find((instrument) => instrument.id === "inst-tabla");
+    const instrumentLookup = vi.spyOn(repository, "getInstrumentById").mockReturnValue(tabla as never);
+    const sourceLookup = vi.spyOn(repository, "getSourceById").mockReturnValue({ title: "test source" } as never);
+    audioMocks.playBol.mockImplementation(() => {
+      let resolveReady!: (played: boolean) => void;
+      let resolveFinished!: () => void;
+      const ready = new Promise<boolean>((resolve) => { resolveReady = resolve; });
+      const finished = new Promise<void>((resolve) => { resolveFinished = resolve; });
+      const cancel = vi.fn(() => {
+        resolveReady(false);
+        resolveFinished();
+      });
+      return Object.assign(cancel, { ready, finished });
+    });
+    const view = render(<InstrumentDetailPage />);
+    fireEvent.click(screen.getByRole("button", { name: "ආදර්ශ නාද රටාව අසන්න" }));
+    await act(async () => { vi.advanceTimersByTime(2000); });
+    await act(async () => Promise.resolve());
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    view.unmount();
+    instrumentLookup.mockRestore();
+    sourceLookup.mockRestore();
   });
 
   it("keeps arranger and ear-training Swara ownership isolated", async () => {

@@ -53,7 +53,6 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
   const cancelPlayback = useCallback(() => {
     generationRef.current += 1;
     playbackRef.current?.();
-    playbackRef.current = null;
     if (highlightTimerRef.current !== null) {
       window.clearTimeout(highlightTimerRef.current);
       highlightTimerRef.current = null;
@@ -98,8 +97,10 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
     playbackRef.current = handle;
     void handle.ready.then((played) => {
       if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
-      playbackRef.current = null;
       if (!played) setAudioUnavailable(true);
+    });
+    void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
+      if (playbackRef.current === handle) playbackRef.current = null;
     });
     if (onNotePlay) {
       onNotePlay(fullNote);
@@ -139,8 +140,12 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
     playbackRef.current = handle;
     void handle.ready.then((played) => {
       if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
-      playbackRef.current = null;
       if (!played) setAudioUnavailable(true);
+    });
+    void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
+      const isCurrentHandle = playbackRef.current === handle;
+      if (isCurrentHandle) playbackRef.current = null;
+      if (!mountedRef.current || generationRef.current !== generation || !isCurrentHandle) return;
       setPlayingKey(null);
       setIsPlayingScale(false);
     });

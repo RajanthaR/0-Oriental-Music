@@ -4,8 +4,11 @@ import {
   createUnverifiedReviewMetadata as createContractUnverifiedReviewMetadata,
   inspectGraph,
   isMetadataBearingKind,
+  isPublicQuestionType,
   isRecord,
   isQuestion,
+  isSourceReference as isContractSourceReference,
+  readOwnDataField,
   projectPublicRecord,
   validateContentRecord,
   type ContentEntityKind,
@@ -151,11 +154,11 @@ const sourceRecords: SourceRecord[] = (sourcesData as unknown[]).flatMap((candid
 const KNOWN_KIND_BY_ID = new Map<string, ContentEntityKind | "ambiguous">();
 const registerKnownKinds = (kind: ContentEntityKind, records: unknown[]): void => {
   records.forEach((record) => {
-    if (!record || typeof record !== "object" || Array.isArray(record)) return;
-    const id = (record as Record<string, unknown>).id;
+    if (!isRecord(record)) return;
+    const id = readOwnDataField(record, "id");
     if (typeof id !== "string" || !id) return;
     const previous = KNOWN_KIND_BY_ID.get(id);
-    KNOWN_KIND_BY_ID.set(id, previous && previous !== kind ? "ambiguous" : kind);
+    KNOWN_KIND_BY_ID.set(id, previous ? "ambiguous" : kind);
   });
 };
 registerKnownKinds("lesson", lessonsData);
@@ -170,10 +173,28 @@ registerKnownKinds("quiz", quizzesData);
 registerKnownKinds("exam-paper", examPapersData);
 registerKnownKinds("source", sourcesData);
 
+const KNOWN_KIND_CATALOGS: Array<[ContentEntityKind, unknown[]]> = [
+  ["lesson", lessonsData], ["raga", ragasData], ["tala", talasData],
+  ["instrument", instrumentsData], ["cultural-tradition", culturalTraditionsData],
+  ["theatre-tradition", theatreTraditionsData], ["glossary", glossaryData],
+  ["learning-path", learningPathsData], ["quiz", quizzesData], ["exam-paper", examPapersData],
+  ["source", sourcesData],
+];
+let knownKindCatalogLengths = KNOWN_KIND_CATALOGS.map(([, records]) => records.length);
+function refreshKnownKindIndexIfCatalogSizesChanged(): void {
+  const lengths = KNOWN_KIND_CATALOGS.map(([, records]) => records.length);
+  if (lengths.every((length, index) => length === knownKindCatalogLengths[index])) return;
+  KNOWN_KIND_BY_ID.clear();
+  KNOWN_KIND_CATALOGS.forEach(([kind, records]) => registerKnownKinds(kind, records));
+  knownKindCatalogLengths = lengths;
+}
+
 function getKnownContentKind(record: unknown): ContentEntityKind | undefined {
-  if (!record || typeof record !== "object" || Array.isArray(record)) return undefined;
-  const id = (record as Record<string, unknown>).id;
-  const known = typeof id === "string" ? KNOWN_KIND_BY_ID.get(id) : undefined;
+  if (!isRecord(record)) return undefined;
+  const id = readOwnDataField(record, "id");
+  if (typeof id !== "string" || !id) return undefined;
+  refreshKnownKindIndexIfCatalogSizesChanged();
+  const known = KNOWN_KIND_BY_ID.get(id);
   if (known === "ambiguous") return undefined;
   return known;
 }
@@ -337,34 +358,40 @@ function hasReadablePages(documentSlug: string, pageNumbers: number[]): boolean 
 }
 
 function getRecordShape(record: unknown): PublicationRecordShape {
-  return record && typeof record === "object" ? (record as PublicationRecordShape) : {};
+  return isRecord(record) ? (record as PublicationRecordShape) : {};
 }
 
 function isSourceReference(value: unknown): value is SourceReference {
-  if (!value || typeof value !== "object") return false;
-  const reference = value as Record<string, unknown>;
-  return typeof reference.sourceId === "string" && typeof reference.pageOrSection === "string";
+  return isContractSourceReference(value);
 }
 
 function resolveRecordSourceReference(value: PublicationRecordShape): SourceReference | undefined {
-  return isSourceReference(value.sourceReference) ? value.sourceReference : undefined;
+  const reference = readOwnDataField(value, "sourceReference");
+  return isSourceReference(reference) ? reference : undefined;
 }
 
 export function toPublicationInput(record: unknown): PublicationInput {
-  const value = getRecordShape(record);
-  return {
-    id: typeof value.id === "string" ? value.id : "",
-    gradeBands: getGradeBands(value),
-    sourceReference: resolveRecordSourceReference(value),
-  };
+  try {
+    const value = getRecordShape(record);
+    const id = readOwnDataField(value, "id");
+    return {
+      id: typeof id === "string" ? id : "",
+      gradeBands: getGradeBands(value),
+      sourceReference: resolveRecordSourceReference(value),
+    };
+  } catch {
+    return { id: "", gradeBands: [], sourceReference: undefined };
+  }
 }
 
 function getGradeBands(value: PublicationRecordShape): string[] {
   const bands = new Set<string>();
 
-  if (typeof value.gradeBand === "string") bands.add(value.gradeBand);
-  if (Array.isArray(value.gradeBands)) {
-    value.gradeBands.forEach((band) => {
+  const gradeBand = readOwnDataField(value, "gradeBand");
+  const gradeBands = readOwnDataField(value, "gradeBands");
+  if (typeof gradeBand === "string") bands.add(gradeBand);
+  if (Array.isArray(gradeBands)) {
+    gradeBands.forEach((band) => {
       if (typeof band === "string") bands.add(band);
     });
   }
@@ -429,7 +456,121 @@ export function getSourceCorpusInventory() {
 export function evaluateSourceReference(
   reference: SourceReference | undefined
 ): SourceEvidenceDecision {
-  if (!reference || !reference.sourceId || !reference.pageOrSection?.trim()) {
+  try {
+    const sourceIdValue = isSourceReference(reference) ? readOwnDataField(reference, "sourceId") : undefined;
+    const pageOrSectionValue = isSourceReference(reference) ? readOwnDataField(reference, "pageOrSection") : undefined;
+    const sourceId = typeof sourceIdValue === "string" ? sourceIdValue : undefined;
+    const pageOrSection = typeof pageOrSectionValue === "string" ? pageOrSectionValue : undefined;
+    if (!sourceId || !pageOrSection?.trim()) {
+      return {
+        pageNumbers: [],
+        quality: "missing",
+        supportable: false,
+        reasonCode: "missing-source-reference",
+        reason: "Claim-level source ID and exact page/section evidence are required.",
+      };
+    }
+
+    const resolution = resolveSourceDocument(sourceId);
+    if (resolution.status !== "found") {
+      const isAmbiguous = resolution.status === "ambiguous-document";
+      return {
+        sourceId,
+        pageNumbers: [],
+        quality: "missing",
+        supportable: false,
+        reasonCode: isAmbiguous ? "ambiguous-source-document" : "unknown-source",
+        reason:
+          resolution.status === "missing-source"
+            ? "The source ID is not present in the canonical source catalog."
+            : resolution.status === "missing-document"
+            ? "The supplied source catalog has no matching extracted document."
+            : "The source filename maps to more than one extracted document.",
+      };
+    }
+
+    const document = resolution.document;
+    const locator = explicitPageReferences(pageOrSection, document.originalFilename);
+    if (locator.mismatchedDocument) {
+      return {
+        sourceId,
+        documentId: document.id,
+        documentSlug: document.slug,
+        pageNumbers: [],
+        quality: "missing",
+        supportable: false,
+        reasonCode: "mismatched-source-document",
+        reason: "The page locator names a PDF other than the document selected by its source ID.",
+      };
+    }
+
+    const pageNumbers = locator.pageNumbers;
+    const inRangePages = pageNumbers.filter((page) => page <= document.pageCount);
+    const quality = qualityForPages(document.slug, inRangePages);
+
+    if (locator.malformed || pageNumbers.length === 0) {
+      return {
+        sourceId,
+        documentId: document.id,
+        documentSlug: document.slug,
+        pageNumbers: [],
+        quality: "missing",
+        supportable: false,
+        reasonCode: "missing-page-evidence",
+        reason: "No exact numeric page evidence was supplied.",
+      };
+    }
+
+    if (inRangePages.length !== pageNumbers.length) {
+      return {
+        sourceId,
+        documentId: document.id,
+        documentSlug: document.slug,
+        pageNumbers: [],
+        quality: "missing",
+        supportable: false,
+        reasonCode: "page-out-of-range",
+        reason: "At least one cited page number falls outside the extracted document page range.",
+      };
+    }
+
+    if (document.reviewStatus !== "Source Triaged") {
+      return {
+        sourceId,
+        documentId: document.id,
+        documentSlug: document.slug,
+        pageNumbers: inRangePages,
+        quality,
+        supportable: false,
+        reasonCode: "source-document-needs-review",
+        reason: `The extracted document is ${document.reviewStatus}; source triage is not complete.`,
+      };
+    }
+
+    if (!hasReadablePages(document.slug, inRangePages)) {
+      return {
+        sourceId,
+        documentId: document.id,
+        documentSlug: document.slug,
+        pageNumbers: inRangePages,
+        quality,
+        supportable: false,
+        reasonCode: "low-quality-page-evidence",
+        reason: "The cited pages do not contain an A/B readable Sinhala evidence page.",
+      };
+    }
+
+    return {
+      sourceId,
+      documentId: document.id,
+      documentSlug: document.slug,
+      pageNumbers: inRangePages,
+      quality,
+      supportable: true,
+      reasonCode: "supportable",
+      reason: "The source ID, extracted document, page range, and readable page evidence agree.",
+    };
+  } catch {
     return {
       pageNumbers: [],
       quality: "missing",
@@ -438,106 +579,6 @@ export function evaluateSourceReference(
       reason: "Claim-level source ID and exact page/section evidence are required.",
     };
   }
-
-  const resolution = resolveSourceDocument(reference.sourceId);
-  if (resolution.status !== "found") {
-    const isAmbiguous = resolution.status === "ambiguous-document";
-    return {
-      sourceId: reference.sourceId,
-      pageNumbers: [],
-      quality: "missing",
-      supportable: false,
-      reasonCode: isAmbiguous ? "ambiguous-source-document" : "unknown-source",
-      reason:
-        resolution.status === "missing-source"
-          ? "The source ID is not present in the canonical source catalog."
-          : resolution.status === "missing-document"
-          ? "The supplied source catalog has no matching extracted document."
-          : "The source filename maps to more than one extracted document.",
-    };
-  }
-
-  const document = resolution.document;
-  const locator = explicitPageReferences(reference.pageOrSection, document.originalFilename);
-  if (locator.mismatchedDocument) {
-    return {
-      sourceId: reference.sourceId,
-      documentId: document.id,
-      documentSlug: document.slug,
-      pageNumbers: [],
-      quality: "missing",
-      supportable: false,
-      reasonCode: "mismatched-source-document",
-      reason: "The page locator names a PDF other than the document selected by its source ID.",
-    };
-  }
-
-  const pageNumbers = locator.pageNumbers;
-  const inRangePages = pageNumbers.filter((page) => page <= document.pageCount);
-  const quality = qualityForPages(document.slug, inRangePages);
-
-  if (locator.malformed || pageNumbers.length === 0) {
-    return {
-      sourceId: reference.sourceId,
-      documentId: document.id,
-      documentSlug: document.slug,
-      pageNumbers: [],
-      quality: "missing",
-      supportable: false,
-      reasonCode: "missing-page-evidence",
-      reason: "No exact numeric page evidence was supplied.",
-    };
-  }
-
-  if (inRangePages.length !== pageNumbers.length) {
-    return {
-      sourceId: reference.sourceId,
-      documentId: document.id,
-      documentSlug: document.slug,
-      pageNumbers: [],
-      quality: "missing",
-      supportable: false,
-      reasonCode: "page-out-of-range",
-      reason: "At least one cited page number falls outside the extracted document page range.",
-    };
-  }
-
-  if (document.reviewStatus !== "Source Triaged") {
-    return {
-      sourceId: reference.sourceId,
-      documentId: document.id,
-      documentSlug: document.slug,
-      pageNumbers: inRangePages,
-      quality,
-      supportable: false,
-      reasonCode: "source-document-needs-review",
-      reason: `The extracted document is ${document.reviewStatus}; source triage is not complete.`,
-    };
-  }
-
-  if (!hasReadablePages(document.slug, inRangePages)) {
-    return {
-      sourceId: reference.sourceId,
-      documentId: document.id,
-      documentSlug: document.slug,
-      pageNumbers: inRangePages,
-      quality,
-      supportable: false,
-      reasonCode: "low-quality-page-evidence",
-      reason: "The cited pages do not contain an A/B readable Sinhala evidence page.",
-    };
-  }
-
-  return {
-    sourceId: reference.sourceId,
-    documentId: document.id,
-    documentSlug: document.slug,
-    pageNumbers: inRangePages,
-    quality,
-    supportable: true,
-    reasonCode: "supportable",
-    reason: "The source ID, extracted document, page range, and readable page evidence agree.",
-  };
 }
 
 
@@ -561,7 +602,7 @@ function isCanonicalGradeBandArray(value: unknown): value is PublicGradeBand[] {
 }
 
 function hasCanonicalQuestionShape(question: unknown): boolean {
-  return isQuestion(question);
+  return isQuestion(question) && isPublicQuestionType(readOwnDataField(question, "type"));
 }
 
 function bandContainsSourceGrade(band: string, sourceGrades: string[]): boolean {
@@ -584,10 +625,12 @@ function gradeScopeMatchesSource(gradeBands: string[], sourceId: string | undefi
 }
 
 export function getTalaFieldDisposition(talaOrId: string | unknown): TalaFieldDisposition | undefined {
-  const supplied = typeof talaOrId === "string" ? undefined : getRecordShape(talaOrId);
-  const talaId = typeof talaOrId === "string" ? talaOrId : typeof supplied?.id === "string" ? supplied.id : "";
-  const entry = talaFieldDispositions.talas.find((candidate) => candidate.talaId === talaId);
-  if (!entry) return undefined;
+  try {
+    const supplied = typeof talaOrId === "string" ? undefined : getRecordShape(talaOrId);
+    const suppliedId = readOwnDataField(supplied, "id");
+    const talaId = typeof talaOrId === "string" ? talaOrId : typeof suppliedId === "string" ? suppliedId : "";
+    const entry = talaFieldDispositions.talas.find((candidate) => candidate.talaId === talaId);
+    if (!entry) return undefined;
   const tala = (supplied ?? (talasData as Array<{
     id: string;
     context_si?: string;
@@ -634,7 +677,10 @@ export function getTalaFieldDisposition(talaOrId: string | unknown): TalaFieldDi
       hasExactEvidence(bol)
     ) &&
     Array.isArray(tala?.bols) && tala.bols.length === entry.bols.length;
-  return { ...entry, allRequiredFieldsVerified };
+    return { ...entry, allRequiredFieldsVerified };
+  } catch {
+    return undefined;
+  }
 }
 
 function collectDependencyDispositions(
@@ -732,46 +778,57 @@ function hasCanonicalRuntimeShape(
 }
 
 export function getPublicationDecision(input: PublicationInput): PublicationDecision {
-  const { id, gradeBands, sourceReference } = input;
-  const sourceEvidence = evaluateSourceReference(sourceReference);
-  const reasonCodes: PublicationReasonCode[] = [];
+  try {
+    const value = isRecord(input) ? input : {};
+    const idValue = readOwnDataField(value, "id");
+    const id = typeof idValue === "string" ? idValue : "";
+    const gradeBands = getGradeBands(value);
+    const referenceValue = readOwnDataField(value, "sourceReference");
+    const sourceReference = isSourceReference(referenceValue) ? referenceValue : undefined;
+    const sourceEvidence = evaluateSourceReference(sourceReference);
+    const reasonCodes: PublicationReasonCode[] = [];
 
-  if (hasUnsupportedGrade(gradeBands) || (gradeBands.length > 0 && !hasPublicGrade(gradeBands))) {
-    reasonCodes.push("unsupported-grade");
+    if (hasUnsupportedGrade(gradeBands) || (gradeBands.length > 0 && !hasPublicGrade(gradeBands))) {
+      reasonCodes.push("unsupported-grade");
+    }
+    if (KNOWN_QUARANTINED_ENTITY_IDS.has(id)) reasonCodes.push("known-forensic-issue");
+    if (gradeBands.length === 0) reasonCodes.push("missing-grade-scope");
+    if (gradeBands.length > 0 && !gradeScopeMatchesSource(gradeBands, sourceReference ? readOwnDataField(sourceReference, "sourceId") as string : undefined)) {
+      reasonCodes.push("source-grade-mismatch");
+    }
+    if (sourceEvidence.reasonCode !== "supportable") reasonCodes.push(sourceEvidence.reasonCode);
+
+    const sourceId = sourceReference ? readOwnDataField(sourceReference, "sourceId") : undefined;
+    const quarantined = hasUnsupportedGrade(gradeBands) || KNOWN_QUARANTINED_ENTITY_IDS.has(id);
+    const publicByEvidence =
+      hasPublicGrade(gradeBands) &&
+      gradeScopeMatchesSource(gradeBands, typeof sourceId === "string" ? sourceId : undefined) &&
+      sourceEvidence.supportable;
+    const state: PublicationState = quarantined
+      ? "quarantined"
+      : publicByEvidence
+      ? "public"
+      : "needs-review";
+
+    return {
+      state,
+      isPublic: state === "public",
+      gradeBands,
+      reasonCodes: Array.from(new Set(reasonCodes)),
+      sourceEvidence,
+      reviewState: "needs-review",
+      nestedDispositions: [],
+      withheldFields: [],
+    };
+  } catch {
+    return failClosedRecordDecision(["malformed-record"]);
   }
-  if (KNOWN_QUARANTINED_ENTITY_IDS.has(id)) reasonCodes.push("known-forensic-issue");
-  if (gradeBands.length === 0) reasonCodes.push("missing-grade-scope");
-  if (gradeBands.length > 0 && !gradeScopeMatchesSource(gradeBands, sourceReference?.sourceId)) {
-    reasonCodes.push("source-grade-mismatch");
-  }
-  if (sourceEvidence.reasonCode !== "supportable") reasonCodes.push(sourceEvidence.reasonCode);
-
-  const quarantined = hasUnsupportedGrade(gradeBands) || KNOWN_QUARANTINED_ENTITY_IDS.has(id);
-  const publicByEvidence =
-    hasPublicGrade(gradeBands) &&
-    gradeScopeMatchesSource(gradeBands, sourceReference?.sourceId) &&
-    sourceEvidence.supportable;
-  const state: PublicationState = quarantined
-    ? "quarantined"
-    : publicByEvidence
-    ? "public"
-    : "needs-review";
-
-  return {
-    state,
-    isPublic: state === "public",
-    gradeBands,
-    reasonCodes: Array.from(new Set(reasonCodes)),
-    sourceEvidence,
-    reviewState: "needs-review",
-    nestedDispositions: [],
-    withheldFields: [],
-  };
 }
 
 function getQuizContainerPublicationDecision(record: unknown): PublicationDecision {
   const value = getRecordShape(record);
-  const id = isNonBlankString(value.id) ? value.id : "";
+  const rawId = readOwnDataField(value, "id");
+  const id = isNonBlankString(rawId) ? rawId : "";
   const gradeBands = getGradeBands(value);
   const reasonCodes: PublicationReasonCode[] = [];
   if (gradeBands.length === 0) reasonCodes.push("missing-grade-scope");
@@ -804,13 +861,10 @@ function failClosedRecordDecision(reasonCodes: PublicationReasonCode[]): Publica
 }
 
 function getRecordPublicationDecisionInternal(record: unknown, decisionStack: Set<string>): PublicationDecision {
-  const graphSafety = inspectGraph(record);
-  if (!graphSafety.safe) return failClosedRecordDecision(["malformed-record"]);
-
   const knownKind = getKnownContentKind(record);
   if (!knownKind) return failClosedRecordDecision(["unknown-record-kind", "malformed-record"]);
 
-  const hasValidRuntimeShape = hasCanonicalRuntimeShape(record, knownKind, graphSafety);
+  const hasValidRuntimeShape = hasCanonicalRuntimeShape(record, knownKind);
   const value = getRecordShape(record);
   const recordId = typeof value.id === "string" ? value.id : "";
   const isQuiz = (quizzesData as Array<{ id: string }>).some((quiz) => quiz.id === recordId);
@@ -942,47 +996,69 @@ function getRecordPublicationDecisionInternal(record: unknown, decisionStack: Se
 }
 
 export function getRecordPublicationDecision(record: unknown): PublicationDecision {
-  const decision = getRecordPublicationDecisionInternal(record, new Set<string>());
-  if (!decision.isPublic) return decision;
-  return {
-    ...decision,
-    publicProjection: sanitizePublicRecord(record, decision),
-  };
+  try {
+    const decision = getRecordPublicationDecisionInternal(record, new Set<string>());
+    if (!decision.isPublic) return decision;
+    return {
+      ...decision,
+      publicProjection: sanitizePublicRecord(record, decision),
+    };
+  } catch {
+    return failClosedRecordDecision(["malformed-record"]);
+  }
 }
 
 export const getQuizPublicationDecision = getRecordPublicationDecision;
 
 export function getContextClaimPublicationDecision(record: unknown): ContextClaimPublicationDecision {
-  const value = getRecordShape(record);
-  const hasContext = typeof value.context_si === "string" && value.context_si.trim().length > 0;
-  const hasReference = isSourceReference(value.contextSourceReference);
-  const contextSourceReference: SourceReference | undefined = hasReference
-    ? (value.contextSourceReference as SourceReference)
-    : undefined;
-  const present = Object.prototype.hasOwnProperty.call(value, "context_si") ||
-    Object.prototype.hasOwnProperty.call(value, "contextSourceReference");
-  const sourceEvidence = evaluateSourceReference(contextSourceReference);
-  if (!present) {
-    return { present: false, isPublic: false, reasonCode: "no-context-claim", sourceEvidence };
-  }
-  if (!hasContext || !hasReference) {
-    return { present: true, isPublic: false, reasonCode: "unpaired-context-claim", sourceEvidence };
-  }
-  const declaredGrades = getGradeBands(value);
-  if (!gradeScopeMatchesSource(declaredGrades, contextSourceReference?.sourceId)) {
+  try {
+    const value = getRecordShape(record);
+    const contextValue = readOwnDataField(value, "context_si");
+    const referenceValue = readOwnDataField(value, "contextSourceReference");
+    const hasContext = typeof contextValue === "string" && contextValue.trim().length > 0;
+    const hasReference = isSourceReference(referenceValue);
+    const contextSourceReference: SourceReference | undefined = hasReference
+      ? referenceValue
+      : undefined;
+    const hasOwnField = (field: string): boolean => {
+      try {
+        return Object.getOwnPropertyDescriptor(value, field) !== undefined;
+      } catch {
+        return false;
+      }
+    };
+    const present = hasOwnField("context_si") || hasOwnField("contextSourceReference");
+    const sourceEvidence = evaluateSourceReference(contextSourceReference);
+    if (!present) {
+      return { present: false, isPublic: false, reasonCode: "no-context-claim", sourceEvidence };
+    }
+    if (!hasContext || !hasReference) {
+      return { present: true, isPublic: false, reasonCode: "unpaired-context-claim", sourceEvidence };
+    }
+    const declaredGrades = getGradeBands(value);
+    const sourceId = readOwnDataField(contextSourceReference, "sourceId");
+    if (!gradeScopeMatchesSource(declaredGrades, typeof sourceId === "string" ? sourceId : undefined)) {
+      return {
+        present: true,
+        isPublic: false,
+        reasonCode: "source-grade-mismatch",
+        sourceEvidence,
+      };
+    }
+    return {
+      present: true,
+      isPublic: sourceEvidence.supportable,
+      reasonCode: sourceEvidence.reasonCode,
+      sourceEvidence,
+    };
+  } catch {
     return {
       present: true,
       isPublic: false,
-      reasonCode: "source-grade-mismatch",
-      sourceEvidence,
+      reasonCode: "unpaired-context-claim",
+      sourceEvidence: evaluateSourceReference(undefined),
     };
   }
-  return {
-    present: true,
-    isPublic: sourceEvidence.supportable,
-    reasonCode: sourceEvidence.reasonCode,
-    sourceEvidence,
-  };
 }
 
 export function createUnverifiedReviewMetadata(): ReviewMetadata {
@@ -991,35 +1067,43 @@ export function createUnverifiedReviewMetadata(): ReviewMetadata {
 
 export function sanitizePublicRecord<T>(record: T, suppliedDecision?: PublicationDecision): T {
   if (!record || typeof record !== "object") return record;
-  const kind = getKnownContentKind(record);
-  const projected = kind ? projectPublicRecord(record, kind) : undefined;
-  const value = (isRecord(projected) ? projected : undefined) as Record<string, unknown> | undefined;
-  if (!value) return {} as T;
-  if (isMetadataBearingKind(kind)) value.reviewMetadata = createUnverifiedReviewMetadata();
-  if ("published" in value) value.published = false;
-  const decision = suppliedDecision ?? getRecordPublicationDecisionInternal(record, new Set<string>());
-  const contextDecision = getContextClaimPublicationDecision(record);
-  if (contextDecision.present && !contextDecision.isPublic) {
-    delete value.context_si;
-    delete value.contextSourceReference;
+  try {
+    const kind = getKnownContentKind(record);
+    const projected = kind ? projectPublicRecord(record, kind) : undefined;
+    const value = (isRecord(projected) ? projected : undefined) as Record<string, unknown> | undefined;
+    if (!value) return {} as T;
+    if (isMetadataBearingKind(kind)) value.reviewMetadata = createUnverifiedReviewMetadata();
+    if ("published" in value) value.published = false;
+    const decision = suppliedDecision ?? getRecordPublicationDecisionInternal(record, new Set<string>());
+    const contextDecision = getContextClaimPublicationDecision(record);
+    if (contextDecision.present && !contextDecision.isPublic) {
+      delete value.context_si;
+      delete value.contextSourceReference;
+    }
+    decision.nestedDispositions.forEach((disposition) => {
+      if (disposition.isPublic || disposition.blocking) return;
+      if (disposition.path === "nextRecommendedLessonId") delete value.nextRecommendedLessonId;
+      if (disposition.path === "quizId") delete value.quizId;
+      if (disposition.path === "nextRecommendedPathId") delete value.nextRecommendedPathId;
+    });
+    return value as T;
+  } catch {
+    return {} as T;
   }
-  decision.nestedDispositions.forEach((disposition) => {
-    if (disposition.isPublic || disposition.blocking) return;
-    if (disposition.path === "nextRecommendedLessonId") delete value.nextRecommendedLessonId;
-    if (disposition.path === "quizId") delete value.quizId;
-    if (disposition.path === "nextRecommendedPathId") delete value.nextRecommendedPathId;
-  });
-  return value as T;
 }
 
 export function sanitizeReviewRecord<T>(record: T): T {
   if (!record || typeof record !== "object") return record;
-  const kind = getKnownContentKind(record);
-  const value = cloneBoundedRecord(record) as Record<string, unknown> | undefined;
-  if (!value) return {} as T;
-  if (isMetadataBearingKind(kind)) value.reviewMetadata = createUnverifiedReviewMetadata();
-  if ("published" in value) value.published = false;
-  return value as T;
+  try {
+    const value = cloneBoundedRecord(record) as Record<string, unknown> | undefined;
+    if (!value || !isRecord(value)) return {} as T;
+    const kind = getKnownContentKind(value);
+    if (isMetadataBearingKind(kind)) value.reviewMetadata = createUnverifiedReviewMetadata();
+    if ("published" in value) value.published = false;
+    return value as T;
+  } catch {
+    return {} as T;
+  }
 }
 
 export function formatPublicSourceReference(reference: SourceReference): string {

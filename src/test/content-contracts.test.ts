@@ -19,7 +19,87 @@ import {
 } from "@/lib/validation/content-contracts";
 import { getRecordPublicationDecision } from "@/lib/data/publication-policy";
 
+const canonicalCatalogs: Array<[ContentEntityKind, readonly unknown[]]> = [
+  ["lesson", lessons],
+  ["raga", ragas],
+  ["tala", talas],
+  ["instrument", instruments],
+  ["cultural-tradition", culturalTraditions],
+  ["theatre-tradition", theatreTraditions],
+  ["glossary", glossary],
+  ["learning-path", learningPaths],
+  ["quiz", quizzes],
+  ["exam-paper", examPapers],
+  ["source", sources],
+];
+
+const canonicalQuestions: unknown[] = [
+  ...(quizzes as Array<{ questions: unknown[] }>).flatMap((quiz) => quiz.questions),
+  ...(examPapers as Array<{ partA_MCQ: unknown[]; partB_Structured: unknown[] }>).flatMap(
+    (paper) => [...paper.partA_MCQ, ...paper.partB_Structured]
+  ),
+];
+
+const expectedLegacyContractDebt: Partial<Record<ContentEntityKind, readonly string[]>> = {
+  lesson: ["les-swara-02"],
+  instrument: ["inst-tabla", "inst-violin"],
+  glossary: [
+    "term-sound", "term-ahata-nada", "term-anahata-nada", "term-swara",
+    "term-shuddha-swara", "term-vikruta-swara", "term-komala-swara", "term-theevra-swara",
+    "term-saptaka", "term-mandra-saptaka", "term-madhya-saptaka", "term-tara-saptaka",
+    "term-alankara", "term-thata", "term-laya", "term-matra", "term-vibhaga", "term-tala",
+    "term-sam", "term-tali", "term-khali", "term-theka", "term-avarta", "term-raga",
+    "term-arohana", "term-avarohana", "term-vadi", "term-samvadi", "term-jati", "term-pakad",
+    "term-gana-samaya", "term-pancha-turya", "term-athatha", "term-vithatha",
+    "term-vithathathatha", "term-ghana", "term-sushira", "term-tabla",
+  ],
+  "learning-path": ["path-notation-composition"],
+  quiz: ["quiz-les-swara-02"],
+};
+
+const expectedLegacyQuestionDebt = ["q-swara-var-01", "q-swara-var-02", "q-swara-var-03"];
+
 describe("closed runtime content contracts", () => {
+  it("validates every imported catalog record, nested question, and allowlisted projection", () => {
+    for (const [kind, records] of canonicalCatalogs) {
+      const invalidIds: string[] = [];
+      for (const record of records) {
+        const id = String((record as { id?: string }).id);
+        const contract = validateContentRecord(record, kind);
+        if (!contract.isValid) {
+          invalidIds.push(id);
+          expect(getRecordPublicationDecision(record), `${kind}:${id} legacy debt containment`).toMatchObject({
+            isPublic: false,
+            reasonCodes: expect.arrayContaining(["malformed-record"]),
+          });
+          continue;
+        }
+        expect(contract, `${kind}:${id}`).toMatchObject({ kind, isValid: true, issues: [] });
+        const candidate = structuredClone(record) as Record<string, unknown>;
+        candidate.untrustedExtra = "withheld";
+        const projection = projectPublicRecord(candidate, kind) as Record<string, unknown>;
+        expect(projection, `${kind}:${id} projection`).toBeDefined();
+        expect(projection.untrustedExtra).toBeUndefined();
+        for (const key of Object.keys(record as object)) {
+          expect(projection, `${kind}:${id} field ${key}`).toHaveProperty(key);
+        }
+      }
+      expect(invalidIds, `${kind} explicit legacy contract debt`).toEqual(expectedLegacyContractDebt[kind] ?? []);
+    }
+    const invalidQuestionIds: string[] = [];
+    for (const question of canonicalQuestions) {
+      const id = String((question as { id?: string }).id);
+      const contract = validateContentRecord(question, "question");
+      if (!contract.isValid) {
+        invalidQuestionIds.push(id);
+        continue;
+      }
+      expect(contract, `question:${id}`).toMatchObject({ kind: "question", isValid: true, issues: [] });
+      expect(projectPublicRecord(question, "question")).toBeDefined();
+    }
+    expect(invalidQuestionIds).toEqual(expectedLegacyQuestionDebt);
+  });
+
   it.each([
     ["lesson", lessons[0]],
     ["raga", ragas[0]],
@@ -61,10 +141,14 @@ describe("closed runtime content contracts", () => {
     ["lesson review metadata", "lesson", lessons[0], (record) => { delete record.reviewMetadata; }],
     ["lesson optional English title", "lesson", lessons[0], (record) => { record.title_en = 42; }],
     ["lesson nested section", "lesson", lessons[0], (record) => { record.contentSections = [null]; }],
+    ["lesson activity swara", "lesson", lessons[0], (record) => { (record.listenActivity as Record<string, unknown>).notes = ["INVALID"]; }],
     ["lesson practice Tala target", "lesson", lessons[0], (record) => { (record.guidedPractice as Record<string, unknown>).targetTalaId = 42; }],
     ["lesson difficulty", "lesson", lessons[0], (record) => { record.difficulty = "INVALID"; }],
     ["lesson strand", "lesson", lessons[0], (record) => { record.strandId = "strand-unknown"; }],
     ["raga characteristics", "raga", ragas[0], (record) => { delete record.characteristics_si; }],
+    ["raga sample phrase swara", "raga", ragas[0], (record) => {
+      ((record.samplePhrases as Array<Record<string, unknown>>)[0]).swaras = ["INVALID"];
+    }],
     ["tala aliases", "tala", talas[0], (record) => { delete record.aliases_si; }],
     ["tala orphan context reference", "tala", talas[0], (record) => {
       delete record.context_si;
@@ -162,6 +246,18 @@ describe("closed runtime content contracts", () => {
     const malformedOptional = structuredClone(quizzes[0].questions[0]) as Record<string, unknown>;
     malformedOptional.audioTalaId = 42;
     expect(validateContentRecord(malformedOptional, "question").isValid).toBe(false);
+
+    const unsupportedPublicQuiz = structuredClone(quizzes[0]) as Record<string, unknown>;
+    const unsupportedQuestion = (unsupportedPublicQuiz.questions as Array<Record<string, unknown>>)[0];
+    unsupportedQuestion.type = "audio-id";
+    unsupportedQuestion.audioNotes = ["S"];
+    delete unsupportedQuestion.options_si;
+    delete unsupportedQuestion.correctAnswerIds;
+    expect(validateContentRecord(unsupportedPublicQuiz, "quiz").isValid).toBe(true);
+    expect(getRecordPublicationDecision(unsupportedPublicQuiz)).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["malformed-record", "nested-question-unpublishable"]),
+    });
   });
 
   it("validates source-catalog records without dereferencing malformed input", () => {
@@ -260,5 +356,62 @@ describe("closed runtime content contracts", () => {
       isPublic: false,
       reasonCodes: expect.arrayContaining(["malformed-record"]),
     });
+  });
+
+  it("rejects inherited, accessor, proxy, and dangerous-key records without invoking hostile code", () => {
+    const inherited = Object.create(structuredClone(ragas[0])) as Record<string, unknown>;
+    expect(validateContentRecord(inherited, "raga").isValid).toBe(false);
+
+    let accessorCalls = 0;
+    const accessor = structuredClone(ragas[0]) as Record<string, unknown>;
+    Object.defineProperty(accessor, "name_si", {
+      enumerable: true,
+      get() {
+        accessorCalls += 1;
+        return "hostile";
+      },
+    });
+    expect(() => getRecordPublicationDecision(accessor)).not.toThrow();
+    expect(getRecordPublicationDecision(accessor)).toMatchObject({ isPublic: false });
+    expect(accessorCalls).toBe(0);
+
+    const hostileProxy = new Proxy(structuredClone(ragas[0]) as Record<string, unknown>, {
+      ownKeys() {
+        throw new Error("hostile ownKeys");
+      },
+    });
+    expect(() => validateContentRecord(hostileProxy, "raga")).not.toThrow();
+    expect(validateContentRecord(hostileProxy, "raga").isValid).toBe(false);
+
+    const dangerous = structuredClone(ragas[0]) as Record<string, unknown>;
+    Object.defineProperty(dangerous, "__proto__", { enumerable: true, value: { polluted: true } });
+    expect(validateContentRecord(dangerous, "raga").isValid).toBe(false);
+  });
+
+  it("projects shared objects by projection kind without cross-kind corruption or amplification", () => {
+    const candidate = structuredClone(lessons[0]) as Record<string, unknown>;
+    const sharedSection = (candidate.contentSections as Array<Record<string, unknown>>)[0];
+    candidate.contentSections = [sharedSection, sharedSection];
+    const sameKindProjection = projectPublicRecord(candidate, "lesson") as Record<string, unknown>;
+    const projectedSections = sameKindProjection.contentSections as unknown[];
+    expect(projectedSections[0]).toBe(projectedSections[1]);
+
+    const crossKindShared = {
+      question_si: "ප්‍රශ්නය",
+      options_si: ["අ", "ආ"],
+      correctIndex: 0,
+      explanation_si: "විස්තරය",
+      title_si: "පුහුණුව",
+      instruction_si: "උපදෙස්",
+      interactiveTool: "ear-training",
+    };
+    candidate.diagnosticQuestion = crossKindShared;
+    candidate.guidedPractice = crossKindShared;
+    const crossKindProjection = projectPublicRecord(candidate, "lesson") as Record<string, unknown>;
+    expect(crossKindProjection.diagnosticQuestion).not.toBe(crossKindProjection.guidedPractice);
+    expect(crossKindProjection.diagnosticQuestion).toHaveProperty("question_si");
+    expect(crossKindProjection.diagnosticQuestion).not.toHaveProperty("interactiveTool");
+    expect(crossKindProjection.guidedPractice).toHaveProperty("interactiveTool");
+    expect(crossKindProjection.guidedPractice).not.toHaveProperty("question_si");
   });
 });

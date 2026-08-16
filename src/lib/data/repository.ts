@@ -12,7 +12,6 @@ import {
   GradeBandType,
   ReviewStatus,
   ReviewMetadata,
-  ContentReviewStatus,
 } from "@/types/content";
 
 export {
@@ -52,6 +51,60 @@ import {
   validateContentRecord,
   type ContentEntityKind,
 } from "@/lib/validation/content-contracts";
+
+const COMPLETED_REVIEW_STATUSES = new Set<ReviewStatus>([
+  "Rights & Source Verification",
+  "Published",
+]);
+
+function hasUniqueRecordIds(items: readonly unknown[]): boolean {
+  const ids = new Set<string>();
+  for (const item of items) {
+    if (!isRecord(item)) return false;
+    let rawId: unknown;
+    try {
+      rawId = item.id;
+    } catch {
+      return false;
+    }
+    const id = typeof rawId === "string" ? rawId.trim() : "";
+    if (!id || ids.has(id)) return false;
+    ids.add(id);
+  }
+  return true;
+}
+
+function hasKnownReviewEvidence(value: unknown): value is ReviewMetadata {
+  try {
+    if (!isReviewMetadata(value) || !isRecord(value)) return false;
+    const metadata = value as unknown as ReviewMetadata;
+    if (!COMPLETED_REVIEW_STATUSES.has(metadata.status)) return false;
+    const isUnknown = (field: string): boolean => {
+      const normalized = field.trim().toLowerCase();
+      return normalized === UNKNOWN_PROVENANCE.toLowerCase() ||
+        normalized === "unknown / unverified" || normalized === "unknown";
+    };
+    if ([
+      metadata.reviewer,
+      metadata.reviewDate,
+      metadata.lastVerifiedDate,
+      metadata.changeNotes,
+      metadata.license,
+    ].some(isUnknown)) return false;
+    if (metadata.changeNotes.trim().startsWith("Publication containment baseline:")) return false;
+    return !isUnknown(metadata.reuseStatus);
+  } catch {
+    return false;
+  }
+}
+
+function readRawReviewMetadata(lesson: Record<string, unknown>): unknown {
+  try {
+    return lesson.reviewMetadata;
+  } catch {
+    return undefined;
+  }
+}
 
 export interface SourceCatalogView {
   id: string;
@@ -93,6 +146,7 @@ class ContentRepository {
   private examPapers: unknown[] = examPapersData as unknown[];
 
   private selectPublic<T>(items: readonly unknown[]): T[] {
+    if (!hasUniqueRecordIds(items)) return [];
     return items.flatMap((item) => {
       const decision = getRecordPublicationDecision(item);
       return decision.isPublic && decision.publicProjection
@@ -109,6 +163,9 @@ class ContentRepository {
   }
 
   private summarize(items: readonly unknown[]): PublicationCollectionSummary {
+    if (!hasUniqueRecordIds(items)) {
+      return { raw: items.length, public: 0, quarantined: 0, needsReview: items.length };
+    }
     const decisions = items.map((item) => getRecordPublicationDecision(item));
     return {
       raw: items.length,
@@ -125,6 +182,7 @@ class ContentRepository {
   // Sources: public transparency metadata is deliberately sanitized. The raw
   // publisher/year/location/license values are not provenance evidence.
   public getSources(): SourceCatalogView[] {
+    if (!hasUniqueRecordIds(this.sources)) return [];
     return this.sources.flatMap((candidate) => {
       if (!validateContentRecord(candidate, "source").isValid || !isRecord(candidate)) return [];
       const source = candidate as {
@@ -389,10 +447,19 @@ class ContentRepository {
     const lesson = this.lessons.find((candidate) => isRecord(candidate) && candidate.id === lessonId);
     if (!isRecord(lesson) || typeof isPublished !== "boolean") return false;
 
+    const requestsPublication = newStatus === "Published" || isPublished;
+    if (isPublished && newStatus !== "Published") return false;
+    const rawMetadata = readRawReviewMetadata(lesson);
+    if (requestsPublication && !hasKnownReviewEvidence(rawMetadata)) return false;
+    if (requestsPublication) {
+      const publication = getRecordPublicationDecision(lesson);
+      if (!publication.isPublic || !publication.sourceEvidence.supportable) return false;
+    }
+
     const safeCandidate = sanitizeReviewRecord(lesson);
     if (!validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) return false;
-    const nextMetadata: ReviewMetadata = isReviewMetadata(safeCandidate.reviewMetadata)
-      ? { ...(safeCandidate.reviewMetadata as unknown as ReviewMetadata) }
+    const nextMetadata: ReviewMetadata = isReviewMetadata(rawMetadata)
+      ? { ...(rawMetadata as unknown as ReviewMetadata) }
       : createUnverifiedReviewMetadata();
     nextMetadata.status = newStatus;
     nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
@@ -411,10 +478,20 @@ class ContentRepository {
     const lesson = this.lessons.find((candidate) => isRecord(candidate) && candidate.id === lessonId);
     if (!isRecord(lesson)) return false;
 
+    const rawMetadata = readRawReviewMetadata(lesson);
+    if (newStatus === "Published") {
+      if (!hasKnownReviewEvidence(rawMetadata)) return false;
+      if (typeof reviewer !== "string" || typeof notes !== "string" ||
+        !reviewer.trim() || !notes.trim() ||
+        [UNKNOWN_PROVENANCE, "Unknown / Unverified", "unknown"].includes(reviewer.trim())) return false;
+      const publication = getRecordPublicationDecision(lesson);
+      if (!publication.isPublic || !publication.sourceEvidence.supportable) return false;
+    }
+
     const safeCandidate = sanitizeReviewRecord(lesson);
     if (!validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) return false;
-    const nextMetadata: ReviewMetadata = isReviewMetadata(safeCandidate.reviewMetadata)
-      ? { ...(safeCandidate.reviewMetadata as unknown as ReviewMetadata) }
+    const nextMetadata: ReviewMetadata = isReviewMetadata(rawMetadata)
+      ? { ...(rawMetadata as unknown as ReviewMetadata) }
       : createUnverifiedReviewMetadata();
     nextMetadata.status = newStatus;
     nextMetadata.reviewer = reviewer;

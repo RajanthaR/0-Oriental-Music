@@ -27,9 +27,7 @@ export default function InstrumentDetailPage() {
   const cancelOwnedAudio = useCallback(() => {
     audioGenerationRef.current += 1;
     sequenceHandleRef.current?.();
-    sequenceHandleRef.current = null;
     tablaHandlesRef.current.forEach((handle) => handle());
-    tablaHandlesRef.current.clear();
     audioTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
     audioTimersRef.current.clear();
     if (completionTimerRef.current !== null) {
@@ -72,13 +70,19 @@ export default function InstrumentDetailPage() {
         const timerId = window.setTimeout(() => {
           audioTimersRef.current.delete(timerId);
           if (!mountedRef.current || audioGenerationRef.current !== generation) return;
-          const handle = tablaSynth.playBol(bol, 400, () => {
-            if (mountedRef.current && audioGenerationRef.current === generation) setAudioError(true);
+          let handle: TablaPlaybackHandle;
+          handle = tablaSynth.playBol(bol, 400, () => {
+            if (mountedRef.current && audioGenerationRef.current === generation && tablaHandlesRef.current.has(handle)) {
+              setAudioError(true);
+            }
           });
           tablaHandlesRef.current.add(handle);
           void handle.ready.then((played) => {
-            if (!mountedRef.current || audioGenerationRef.current !== generation) return;
+            if (!mountedRef.current || audioGenerationRef.current !== generation || !tablaHandlesRef.current.has(handle)) return;
             if (!played) setAudioError(true);
+          });
+          void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
+            tablaHandlesRef.current.delete(handle);
           });
         }, i * 400);
         audioTimersRef.current.add(timerId);
@@ -86,8 +90,8 @@ export default function InstrumentDetailPage() {
       completionTimerRef.current = window.setTimeout(() => {
         completionTimerRef.current = null;
         if (!mountedRef.current || audioGenerationRef.current !== generation) return;
+        audioGenerationRef.current += 1;
         tablaHandlesRef.current.forEach((handle) => handle());
-        tablaHandlesRef.current.clear();
         setIsPlayingAudio(false);
       }, 2000);
     } else if (instrument.id === "inst-flute") {
@@ -95,8 +99,12 @@ export default function InstrumentDetailPage() {
       sequenceHandleRef.current = handle;
       void handle.ready.then((played) => {
         if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
-        sequenceHandleRef.current = null;
         if (!played) setAudioError(true);
+      });
+      void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
+        const isCurrentHandle = sequenceHandleRef.current === handle;
+        if (isCurrentHandle) sequenceHandleRef.current = null;
+        if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
         setIsPlayingAudio(false);
       });
     } else {
@@ -104,8 +112,12 @@ export default function InstrumentDetailPage() {
       sequenceHandleRef.current = handle;
       void handle.ready.then((played) => {
         if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
-        sequenceHandleRef.current = null;
         if (!played) setAudioError(true);
+      });
+      void (handle.finished ?? handle.ready.then(() => undefined)).then(() => {
+        const isCurrentHandle = sequenceHandleRef.current === handle;
+        if (isCurrentHandle) sequenceHandleRef.current = null;
+        if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
         setIsPlayingAudio(false);
       });
     }

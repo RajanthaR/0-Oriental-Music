@@ -2,8 +2,10 @@
 
 This matrix closes the sixteen independently validated findings from review run
 `20260815-235819-p02r4`. That run is preserved as blocked historical evidence;
-it is not acceptance evidence for this closeout. The controlling closeout plan
-is `docs/plans/2026-08-16-001-fix-phase-2-pr-merge-ready-plan.md`.
+it is not acceptance evidence for this closeout. The earlier
+`docs/plans/2026-08-16-001-fix-phase-2-pr-merge-ready-plan.md` remains historical;
+the controlling closeout plan is
+`docs/plans/2026-08-16-002-fix-phase-2-final-contract-closeout-plan.md`.
 
 The closeout uses the authorized whole-entity quarantine decision. A tala is
 not public or playable when a required learner-visible context, structure,
@@ -118,12 +120,12 @@ full original-base-to-HEAD diff.
 
 | ID | Severity | Validated defect | Implementation disposition | Regression evidence |
 |---|---:|---|---|---|
-| `P02-FINAL-01` | P1 | Missing Lesson `reviewMetadata` could pass the public guard and crash a detail route. | Complete raw metadata is mandatory; malformed raw content fails closed, while bounded review/public projections use safe unverified metadata. | `src/test/content-contracts.test.ts:61`, `src/test/publication-containment.test.ts:82` |
-| `P02-FINAL-02` | P2 | Nonblank invalid difficulty, strand, and checkpoint values bypassed finite-domain checks. | Shared dependency-free finite unions reject invalid values in records and nested questions/activities. | `src/test/content-contracts.test.ts:119`, `src/test/content-contracts.test.ts:135` |
-| `P02-FINAL-03` | P2 | Instrument, CulturalTradition, TheatreTradition, LearningPath, and other known guards omitted required fields or nested shapes. | All imported catalogs are unknown input; a closed known-kind classifier and complete entity contracts are shared by validation, publication, repository reads, and allowlisted projections. | `src/test/content-contracts.test.ts:48`, `src/test/content-contracts.test.ts:58` |
-| `P02-FINAL-04` | P2 | Deep acyclic records overflowed recursive graph inspection. | Iterative own-property traversal enforces depth 256 and 10,000 unique-node limits, permits shared DAGs, and rejects cycles/sparse or oversized containers. | `src/test/content-contracts.test.ts:217`, `src/test/content-contracts.test.ts:249` |
+| `P02-FINAL-01` | P1 | Missing Lesson `reviewMetadata` could pass the public guard and crash a detail route. | Complete raw metadata is mandatory; malformed raw content fails closed, while bounded review/public projections use safe unverified metadata. | `src/test/content-contracts.test.ts:172`, `src/test/publication-containment.test.ts:81` |
+| `P02-FINAL-02` | P2 | Nonblank invalid difficulty, strand, and checkpoint values bypassed finite-domain checks. | Shared dependency-free finite unions reject invalid values in records and nested questions/activities. | `src/test/content-contracts.test.ts:203`, `src/test/content-contracts.test.ts:230` |
+| `P02-FINAL-03` | P2 | Instrument, CulturalTradition, TheatreTradition, LearningPath, and other known guards omitted required fields or nested shapes. | All imported catalogs are unknown input; a closed known-kind classifier and complete entity contracts are shared by validation, publication, repository reads, and allowlisted projections. | `src/test/content-contracts.test.ts:63`, `src/lib/validation/content-contracts.ts:624` |
+| `P02-FINAL-04` | P2 | Deep acyclic records overflowed recursive graph inspection. | Iterative own-property traversal enforces depth 256 and 10,000 unique-node limits, permits shared DAGs, and rejects cycles/sparse or oversized containers. | `src/test/content-contracts.test.ts:313`, `src/test/content-contracts.test.ts:361`, `src/test/content-contracts.test.ts:391`, `src/lib/validation/content-contracts.ts:829` |
 | `P02-FINAL-05` | P3 | Nonblank bidi/zero-width input normalized to empty and matched every public field through `includes("")`. | Featured results remain only for genuinely empty/whitespace input; normalized-empty nonblank input returns no results. | `src/test/search-engine.test.ts:79` |
-| `P02-FINAL-06` | P2 | Swara sequence playback continued after component unmount. | Caller-owned tone/sequence handles cancel initialization, active nodes, delays, callbacks, replacement, Strict Mode, and unmount work; Promise APIs remain compatibility wrappers. | `src/test/synth.test.ts:163`, `src/test/synth.test.ts:279`, `src/test/components.test.tsx:449`, `src/test/components.test.tsx:470` |
+| `P02-FINAL-06` | P2 | Swara sequence playback continued after component unmount. | Caller-owned tone/sequence handles cancel initialization, active nodes, delays, callbacks, replacement, Strict Mode, and unmount work; Promise APIs remain compatibility wrappers. | `src/test/synth.test.ts:163`, `src/test/components.test.tsx:392`, `src/test/components.test.tsx:455`, `src/test/components.test.tsx:476` |
 
 The rejected Deepchandi finding, all earlier run IDs and blocked verdicts, and
 the original-PDF/notation/OCR/SME limitations above remain unchanged. The
