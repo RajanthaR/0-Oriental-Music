@@ -68,7 +68,28 @@ function expectSemanticReference(reference: SemanticReference, label: string): v
   expect(source, `${label} symbol ${reference.symbol}`).toContain(reference.symbol);
   if (reference.line !== undefined) {
     expect(reference.line, `${label} line`).toBeGreaterThan(0);
+    const anchoredLine = source.split(/\r?\n/)[reference.line - 1];
+    expect(anchoredLine, `${label} exact anchored line`).toContain(reference.symbol);
   }
+}
+
+function referenceLabel(reference: SemanticReference, includeLine: boolean): string {
+  return includeLine && reference.line !== undefined
+    ? `${reference.path}:${reference.line} (${reference.symbol})`
+    : `${reference.path}#${reference.symbol}`;
+}
+
+function parseTraceabilityRows(markdown: string): Map<string, string[]> {
+  const rows = new Map<string, string[]>();
+  for (const line of markdown.split(/\r?\n/)) {
+    const match = line.match(/^\|\s*`([^`]+)`\s*\|/);
+    if (!match || !ACCEPTANCE_HARDENING_FINDING_IDS.includes(match[1] as typeof ACCEPTANCE_HARDENING_FINDING_IDS[number])) continue;
+    const cells = line.split("|").slice(1, -1).map((cell) =>
+      cell.trim().replace(/^`|`$/g, "").replace(/^\*\*|\*\*$/g, ""),
+    );
+    rows.set(match[1], cells.slice(1));
+  }
+  return rows;
 }
 
 describe("Phase 2 final contract closeout", () => {
@@ -101,6 +122,7 @@ describe("Phase 2 final contract closeout", () => {
     expect(exactTable).toBeDefined();
     const tableIds = Array.from(exactTable?.matchAll(/^\|\s*`([^`]+)`\s*\|/gm) ?? [], (match) => match[1]);
     expect(tableIds).toEqual([...ACCEPTANCE_HARDENING_FINDING_IDS]);
+    const traceabilityRows = parseTraceabilityRows(exactTable ?? "");
 
     for (const findingId of ACCEPTANCE_HARDENING_FINDING_IDS) {
       const entry = traceability[findingId];
@@ -111,6 +133,13 @@ describe("Phase 2 final contract closeout", () => {
       expectSemanticReference(entry.fix, `${findingId} fix`);
       expectSemanticReference(entry.anchor, `${findingId} anchor`);
       expect(closeout, `${findingId} closeout row`).toContain(`| \`${findingId}\` |`);
+      expect(traceabilityRows.get(findingId), `${findingId} exact traceability cells`).toEqual([
+        entry.reviewEvidence.split("/").pop(),
+        referenceLabel(entry.test, true),
+        referenceLabel(entry.fix, false),
+        referenceLabel(entry.anchor, true),
+        entry.disposition,
+      ]);
     }
 
     expect(correctionLog).toContain("P02-FINAL-06");

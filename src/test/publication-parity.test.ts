@@ -328,6 +328,40 @@ describe("cycle-two publication parity and freshness", () => {
     },
   );
 
+  it.each(dependencyFixtures)(
+    "proves %s through repository list, lookup, search catalog, and summary boundaries",
+    (fixture) => {
+      const missingId = `missing-${fixture.field.replace(/[^a-zA-Z0-9]/g, "-")}`;
+      const candidate = fixture.make(missingId);
+      const parent = fixture.kind === "lesson"
+        ? { catalog: lessons, id: "les-intro-01", summary: "lessons" as const, list: () => repository.getLessons(), direct: (id: string) => repository.getLessonById(id), search: "lessons" as const }
+        : fixture.kind === "quiz"
+        ? { catalog: quizzes, id: "quiz-les-intro-01", summary: "quizzes" as const, list: () => repository.getQuizzes(), direct: (id: string) => repository.getQuizById(id), search: undefined }
+        : { catalog: learningPaths, id: "path-sound-nada", summary: "learningPaths" as const, list: () => repository.getLearningPaths(), direct: (id: string) => repository.getLearningPathById(id), search: undefined };
+      const index = parent.catalog.findIndex((record) => record.id === parent.id);
+      if (index < 0) throw new Error(`Missing repository dependency fixture: ${parent.id}`);
+      const original = parent.catalog[index];
+      candidate.id = parent.id;
+      try {
+        parent.catalog[index] = candidate;
+        const decision = getRecordPublicationDecision(candidate);
+        const list = parent.list();
+        expect(list.some((record) => record.id === parent.id), `${fixture.field} list`).toBe(decision.isPublic);
+        expect(Boolean(parent.direct(parent.id)), `${fixture.field} lookup`).toBe(decision.isPublic);
+        expect(repository.getPublicationSummary()[parent.summary].public, `${fixture.field} summary`).toBe(list.length);
+        if (parent.search) {
+          expect(repository.getPublicSearchCatalogs()[parent.search].some((record) => record.id === parent.id), `${fixture.field} search catalog`)
+            .toBe(decision.isPublic);
+        }
+        if (!fixture.blocking && decision.isPublic) {
+          expect(parent.direct(parent.id)).not.toHaveProperty(fixture.field);
+        }
+      } finally {
+        parent.catalog[index] = original;
+      }
+    },
+  );
+
   it("keeps repository lists, direct lookups, search catalogs, and summaries aligned", () => {
     const searchable = [
       {
@@ -502,6 +536,25 @@ describe("cycle-two publication parity and freshness", () => {
       expect(repository.getTalaById(String(tala.id))).toBeUndefined();
       expect(getRecordPublicationDecision(tala).isPublic).toBe(false);
     }
+  });
+
+  it("fails the complete publication operation closed on malformed page-quality metadata", () => {
+    const page = sourcePageQuality.find(
+      (candidate) => candidate.documentSlug === "grade_10_nadaya" && candidate.pageNumber === 2,
+    );
+    expect(page).toBeDefined();
+    if (!page) return;
+    const original = page.hasSinhalaText;
+    try {
+      page.hasSinhalaText = "false";
+      const summary = repository.getPublicationSummary();
+      expect(Object.values(summary).every((entry) => entry.public === 0)).toBe(true);
+      expect(repository.getLessons()).toEqual([]);
+      expect(repository.getRagas()).toEqual([]);
+    } finally {
+      page.hasSinhalaText = original;
+    }
+    expect(repository.getPublicationSummary().lessons.public).toBeGreaterThan(0);
   });
 
   it("enforces shared-DAG, cycle, depth, sparse-array, and node-budget boundaries", () => {

@@ -617,6 +617,39 @@ export function validatePublicCollection(
   records: unknown
 ): PublicationValidationResult {
   const issues: ValidationIssue[] = [];
+  const kindByLabel: Readonly<Record<string, ContentEntityKind>> = {
+    Lesson: "lesson",
+    lessons: "lesson",
+    Raga: "raga",
+    ragas: "raga",
+    Tala: "tala",
+    talas: "tala",
+    Instrument: "instrument",
+    instruments: "instrument",
+    CulturalTradition: "cultural-tradition",
+    culturalTraditions: "cultural-tradition",
+    TheatreTradition: "theatre-tradition",
+    theatreTraditions: "theatre-tradition",
+    Glossary: "glossary",
+    glossary: "glossary",
+    LearningPath: "learning-path",
+    learningPaths: "learning-path",
+    Quiz: "quiz",
+    quizzes: "quiz",
+    ExamPaper: "exam-paper",
+    exams: "exam-paper",
+    Source: "source",
+    sources: "source",
+    Question: "question",
+    questions: "question",
+  };
+  const expectedKind = kindByLabel[entityType];
+  if (!expectedKind) {
+    return {
+      isValid: false,
+      issues: [baselineIssue(entityType, "catalog", "entityType", "Public collection declares an unknown entity kind.")],
+    };
+  }
 
   const snapshot = cloneBoundedRecord(records);
   if (!Array.isArray(snapshot)) {
@@ -636,6 +669,10 @@ export function validatePublicCollection(
       issues.push(baselineIssue(entityType, id, "id", "Public collection IDs must be unique, non-empty normalized strings."));
     } else {
       seenIds.add(normalizedId);
+    }
+    if (!validateContentRecord(value, expectedKind).isValid) {
+      issues.push(baselineIssue(entityType, id, "record", `Public record does not satisfy the declared ${expectedKind} contract.`));
+      return;
     }
     const decision = getRecordPublicationDecision(value);
     const gradeBands = decision.gradeBands;

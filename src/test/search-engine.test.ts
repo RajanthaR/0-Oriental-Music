@@ -10,6 +10,9 @@ describe("Search Engine & Sinhala Normalizer Suite", () => {
     expect(normalizeSinhalaText("නා\u200Eදය")).toBe(normalizeSinhalaText("නාදය"));
     expect(normalizeSinhalaText("නා\u202Eදය")).toBe(normalizeSinhalaText("නාදය"));
     expect(normalizeSinhalaText("නා\u2066දය")).toBe(normalizeSinhalaText("නාදය"));
+    for (let codePoint = 0x2060; codePoint <= 0x2065; codePoint += 1) {
+      expect(normalizeSinhalaText(`නා${String.fromCodePoint(codePoint)}දය`)).toBe(normalizeSinhalaText("නාදය"));
+    }
   });
 
   it("keeps the Dadra retrieval spelling contained when the tala is quarantined", () => {

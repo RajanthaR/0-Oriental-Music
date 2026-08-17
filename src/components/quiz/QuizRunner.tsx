@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Quiz, Question } from "@/types/content";
 import { CheckCircle2, XCircle, Award, RotateCcw, ArrowRight, ArrowUp, ArrowDown, Sparkles } from "lucide-react";
 import { ProgressStorage } from "@/lib/storage/progress-storage";
 import {
   MAX_ARRAY_ITEMS,
+  cloneBoundedRecord,
   isNonBlankString,
   isRecord,
   projectPublicRecord,
@@ -35,13 +36,14 @@ function isDenseArray(value: unknown): value is unknown[] {
 
 function getUsableQuiz(quiz: unknown): QuizRunnerQuiz | null {
   try {
-    if (!isRecord(quiz) || !isNonBlankString(quiz.id) || !isNonBlankString(quiz.title_si) ||
-      typeof quiz.passingScorePercent !== "number" || !Number.isFinite(quiz.passingScorePercent) ||
-      quiz.passingScorePercent < 1 || quiz.passingScorePercent > 100) {
+    const snapshot = cloneBoundedRecord(quiz);
+    if (!isRecord(snapshot) || !isNonBlankString(snapshot.id) || !isNonBlankString(snapshot.title_si) ||
+      typeof snapshot.passingScorePercent !== "number" || !Number.isFinite(snapshot.passingScorePercent) ||
+      snapshot.passingScorePercent < 1 || snapshot.passingScorePercent > 100) {
       return null;
     }
 
-    const rawQuestions = quiz.questions;
+    const rawQuestions = snapshot.questions;
     if (!isDenseArray(rawQuestions) || rawQuestions.length === 0 || rawQuestions.length > MAX_ARRAY_ITEMS) return null;
 
     const questions: Question[] = [];
@@ -58,9 +60,9 @@ function getUsableQuiz(quiz: unknown): QuizRunnerQuiz | null {
     }
 
     return {
-      id: quiz.id,
-      title_si: quiz.title_si,
-      passingScorePercent: quiz.passingScorePercent,
+      id: snapshot.id,
+      title_si: snapshot.title_si,
+      passingScorePercent: snapshot.passingScorePercent,
       questions,
     };
   } catch {
@@ -87,7 +89,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
   const [scoreCount, setScoreCount] = useState(0);
 
-  const usableQuiz = getUsableQuiz(quiz);
+  const usableQuiz = useMemo(() => getUsableQuiz(quiz), [quiz]);
   if (!usableQuiz) return <QuizUnavailable />;
 
   const question = usableQuiz.questions[currentIdx];

@@ -113,7 +113,7 @@ export interface SourceDocumentSummary {
  * blocked centrally until a later phase supplies claim-level correction
  * evidence. A route must never decide this independently.
  */
-export const KNOWN_QUARANTINED_ENTITY_IDS = new Set([
+const KNOWN_QUARANTINED_ENTITY_IDS = new Set([
   "les-raga-bhairav",
   "les-exam-skills",
   "raga-bhairav",
@@ -126,6 +126,10 @@ export const KNOWN_QUARANTINED_ENTITY_IDS = new Set([
   "term-ahata-nada",
   "term-anahata-nada",
 ]);
+
+export function isKnownQuarantinedEntityId(value: unknown): boolean {
+  return typeof value === "string" && KNOWN_QUARANTINED_ENTITY_IDS.has(value.trim());
+}
 
 type SourceDocumentRecord = {
   id: string;
@@ -309,6 +313,26 @@ function captureEvaluationArray(value: unknown): unknown[] | undefined {
   return Array.isArray(snapshot) ? snapshot : undefined;
 }
 
+function isSourceDocumentRecord(value: unknown): value is SourceDocumentRecord {
+  const hasText = (field: string) => {
+    const candidate = isRecord(value) ? readOwnDataField(value, field) : undefined;
+    return typeof candidate === "string" && candidate.trim().length > 0;
+  };
+  return isRecord(value) && hasText("id") && hasText("slug") && hasText("originalFilename") &&
+    Number.isSafeInteger(readOwnDataField(value, "pageCount")) &&
+    (readOwnDataField(value, "pageCount") as number) > 0 && hasText("reviewStatus");
+}
+
+function isSourcePageQualityRecord(value: unknown): value is SourcePageQualityRecord {
+  const confidence = isRecord(value) ? readOwnDataField(value, "confidence") : undefined;
+  const documentSlug = isRecord(value) ? readOwnDataField(value, "documentSlug") : undefined;
+  return isRecord(value) && typeof documentSlug === "string" && documentSlug.trim().length > 0 &&
+    Number.isSafeInteger(readOwnDataField(value, "pageNumber")) &&
+    (readOwnDataField(value, "pageNumber") as number) > 0 &&
+    (confidence === "A" || confidence === "B" || confidence === "C" || confidence === "D") &&
+    typeof readOwnDataField(value, "hasSinhalaText") === "boolean";
+}
+
 function declaredArrayLength(value: unknown): number {
   try {
     if (!Array.isArray(value)) return 0;
@@ -377,7 +401,9 @@ export function createPublicationEvaluationContext(
   const capturedDocuments = captureEvaluationArray(sourceDocumentsData);
   const capturedPageQuality = captureEvaluationArray(sourcePageQualityData);
   const capturedDispositions = captureEvaluationValue(musicalCoreFieldDispositionsData);
-  if (!capturedDocuments || !capturedPageQuality || capturedDispositions === undefined) safe = false;
+  if (!capturedDocuments || !capturedDocuments.every(isSourceDocumentRecord) ||
+    !capturedPageQuality || !capturedPageQuality.every(isSourcePageQualityRecord) ||
+    capturedDispositions === undefined) safe = false;
 
   Object.freeze(capturedCatalogs);
   const context: PublicationEvaluationContext = Object.freeze({
@@ -899,6 +925,7 @@ export function getTalaFieldDisposition(
   context: PublicationEvaluationContext = createPublicationEvaluationContext(),
 ): TalaFieldDisposition | undefined {
   try {
+    if (!getSafeEvaluationState(context)) return undefined;
     const suppliedSnapshot = typeof talaOrId === "string" ? undefined : captureEvaluationValue(talaOrId, false);
     const supplied = isRecord(suppliedSnapshot) ? suppliedSnapshot : undefined;
     const suppliedId = readOwnDataField(supplied, "id");
@@ -1081,7 +1108,7 @@ function getBasePublicationDecision(
     if (hasUnsupportedGrade(gradeBands) || (gradeBands.length > 0 && !hasPublicGrade(gradeBands))) {
       reasonCodes.push("unsupported-grade");
     }
-    if (KNOWN_QUARANTINED_ENTITY_IDS.has(id)) reasonCodes.push("known-forensic-issue");
+    if (isKnownQuarantinedEntityId(id)) reasonCodes.push("known-forensic-issue");
     if (gradeBands.length === 0) reasonCodes.push("missing-grade-scope");
     if (gradeBands.length > 0 && !gradeScopeMatchesSource(gradeBands, sourceReference ? readOwnDataField(sourceReference, "sourceId") as string : undefined, context)) {
       reasonCodes.push("source-grade-mismatch");
@@ -1089,7 +1116,7 @@ function getBasePublicationDecision(
     if (sourceEvidence.reasonCode !== "supportable") reasonCodes.push(sourceEvidence.reasonCode);
 
     const sourceId = sourceReference ? readOwnDataField(sourceReference, "sourceId") : undefined;
-    const quarantined = hasUnsupportedGrade(gradeBands) || KNOWN_QUARANTINED_ENTITY_IDS.has(id);
+    const quarantined = hasUnsupportedGrade(gradeBands) || isKnownQuarantinedEntityId(id);
     const publicByEvidence =
       hasPublicGrade(gradeBands) &&
       gradeScopeMatchesSource(gradeBands, typeof sourceId === "string" ? sourceId : undefined, context) &&
@@ -1126,10 +1153,10 @@ function getQuizContainerPublicationDecision(
   const reasonCodes: PublicationReasonCode[] = [];
   if (gradeBands.length === 0) reasonCodes.push("missing-grade-scope");
   if (!hasPublicGrade(gradeBands)) reasonCodes.push("unsupported-grade");
-  if (KNOWN_QUARANTINED_ENTITY_IDS.has(id)) reasonCodes.push("known-forensic-issue");
-  const isPublic = hasPublicGrade(gradeBands) && !KNOWN_QUARANTINED_ENTITY_IDS.has(id);
+  if (isKnownQuarantinedEntityId(id)) reasonCodes.push("known-forensic-issue");
+  const isPublic = hasPublicGrade(gradeBands) && !isKnownQuarantinedEntityId(id);
   return {
-    state: KNOWN_QUARANTINED_ENTITY_IDS.has(id) ? "quarantined" : isPublic ? "public" : "needs-review",
+    state: isKnownQuarantinedEntityId(id) ? "quarantined" : isPublic ? "public" : "needs-review",
     isPublic,
     gradeBands,
     reasonCodes: Array.from(new Set(reasonCodes)),

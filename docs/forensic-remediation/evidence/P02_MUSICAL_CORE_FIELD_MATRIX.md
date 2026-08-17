@@ -127,10 +127,10 @@ Deepchandi retrieval-spelling boundaries above remain `needs-review`.
 |---|---|---|
 | `P02-FINAL-01` | Missing raw review metadata fails publication closed; bounded projections use explicit unverified metadata. | `src/test/content-contracts.test.ts:241`; `src/test/publication-containment.test.ts:84` |
 | `P02-FINAL-02` | Every finite-domain field is checked against the dependency-free closed union. | `src/test/content-contracts.test.ts:241`; `src/test/content-contracts.test.ts:268` |
-| `P02-FINAL-03` | Every imported record and nested question is audited; listed legacy contract debt remains nonpublic. | `src/test/content-contracts.test.ts:101`; `src/lib/validation/content-contracts.ts:602`; `src/lib/validation/content-contracts.ts:702` |
-| `P02-FINAL-04` | Iterative graph inspection/projection rejects cycles, hostile descriptors, and depth/node overruns while preserving projection-kind identity. | `src/test/content-contracts.test.ts:368`; `src/lib/validation/content-contracts.ts:819`; `src/lib/validation/content-contracts.ts:950` |
-| `P02-FINAL-05` | Nonblank normalized-empty hostile search returns no results. | `src/lib/search/search-engine.ts:84`, `src/lib/search/search-engine.ts:137`; `src/test/search-engine.test.ts:80` |
-| `P02-FINAL-06` | Caller-owned Swara handles survive readiness and cancel replacement/unmount work without cross-caller effects. | `src/test/synth.test.ts:199`; `src/test/synth.test.ts:293`; `src/test/components.test.tsx:471 (cancels owned Swara tone and scale work)`; `src/test/components.test.tsx:555 (retains ready Swara ownership until finished)` |
+| `P02-FINAL-03` | Every imported record and nested question is audited; listed legacy contract debt remains nonpublic. | `src/test/content-contracts.test.ts:101`; `src/lib/validation/content-contracts.ts:606`; `src/lib/validation/content-contracts.ts:706` |
+| `P02-FINAL-04` | Iterative graph inspection/projection rejects cycles, hostile descriptors, and depth/node overruns while preserving projection-kind identity. | `src/test/content-contracts.test.ts:368`; `src/lib/validation/content-contracts.ts:833 (inspectGraph)`; `src/lib/validation/content-contracts.ts:985 (projectPublicRecord)` |
+| `P02-FINAL-05` | Nonblank normalized-empty hostile search returns no results. | `src/lib/search/search-engine.ts:84`, `src/lib/search/search-engine.ts:136`; `src/test/search-engine.test.ts:83` |
+| `P02-FINAL-06` | Caller-owned Swara handles survive readiness and cancel replacement/unmount work without cross-caller effects. | `src/test/synth.test.ts:199`; `src/test/synth.test.ts:293`; `src/test/components.test.tsx:551 (cancels owned Swara tone and scale work)`; `src/test/components.test.tsx:635 (retains ready Swara ownership until finished)` |
 
 ## Acceptance-hardening runtime boundary
 
@@ -187,9 +187,25 @@ finding-level mapping required by `V15` and `V23`; both remain
 
 | Cycle-2 finding | Semantic repair evidence | Disposition |
 |---|---|---|
-| `V15` | `src/test/musical-core.test.ts:386 (verifies bounded quarantine status for out-of-scope entities)`; `src/lib/data/publication-policy.ts:884 (gradeScopeMatchesSource)`; `src/test/publication-containment.test.ts:683 (requires each public grade band to contain a grade established by its source)`; `src/test/components.test.tsx:555 (retains ready Swara ownership until finished)`; `src/test/search-engine.test.ts:20 (should not discover quarantined Bhairav or Roopak claims)`; closeout and correction-log rows now carry these symbols/headings. | **FIXED-PENDING-REREVIEW** |
+| `V15` | `src/test/musical-core.test.ts:386 (verifies bounded quarantine status for out-of-scope entities)`; `src/lib/data/publication-policy.ts:910 (gradeScopeMatchesSource)`; `src/test/publication-containment.test.ts:816 (requires each public grade band to contain a grade established by its source)`; `src/test/components.test.tsx:635 (retains ready Swara ownership until finished)`; `src/test/search-engine.test.ts:23 (should not discover quarantined Bhairav or Roopak claims)`; closeout and correction-log rows now carry these symbols/headings. | **FIXED-PENDING-REREVIEW** |
 | `V23` | `src/test/review-closeout.test.ts` exact scoped ID and semantic mapping assertions; `data/forensic-ledger.json` `acceptanceHardeningInput.traceability` mirrors test/fix/anchor/disposition fields. | **FIXED-PENDING-REREVIEW** |
 
 The rejected Deepchandi retrieval-only disposition, all prior blocked run IDs,
 and the whole-entity quarantine/original-PDF/notation/OCR/SME boundaries are
 preserved. No cycle-2 fix is acceptance evidence or a release/PR authorization.
+
+## Acceptance-hardening cycle 3 application-boundary matrix
+
+Run `20260817-033648-p02-acceptance-c3-1ebef39b` added no musical field or
+source claim. Its fourteen validated findings are application/test integrity
+work only and remain pending the final acceptance review.
+
+| Boundary | Evidence | Disposition |
+|---|---|---|
+| Quarantine/source evidence | `src/lib/data/publication-policy.ts:130`, `:316`, `:326`, `:923`; `src/test/publication-containment.test.ts:130`, `:718`. | **FIXED-PENDING-ACCEPTANCE-REVIEW** |
+| Quiz/collection/source identity | `src/components/quiz/QuizRunner.tsx:37`; `src/lib/validation/content-validator.ts:615`; `src/test/quiz-runner.test.tsx:175`; `src/test/publication-containment.test.ts:699`, `:706`. | **FIXED-PENDING-ACCEPTANCE-REVIEW** |
+| Search/dependency parity | `src/lib/search/normalize-sinhala.ts:14`; `src/test/search-engine.test.ts:12`; `src/test/publication-parity.test.ts:332`. | **FIXED-PENDING-ACCEPTANCE-REVIEW** |
+| Traceability/audio/privacy test integrity | `src/test/review-closeout.test.ts:64`, `:136`; `src/test/components.test.tsx:891`; `src/test/pitch.test.ts:389`; `src/test/synth.test.ts:57`; `src/test/publication-containment.test.ts:143`. | **FIXED-PENDING-ACCEPTANCE-REVIEW** |
+
+All eight Talas remain whole-entity quarantined. Deepchandi remains a rejected
+retrieval-only variant finding; original-PDF/manual/SME work is still deferred.

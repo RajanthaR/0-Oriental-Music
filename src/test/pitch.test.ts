@@ -414,12 +414,39 @@ describe("PitchDetector resource ownership", () => {
       value: vi.fn(() => 1),
     });
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("network upload is forbidden"));
+    const xhrOpenSpy = vi.spyOn(XMLHttpRequest.prototype, "open");
+    const xhrSendSpy = vi.spyOn(XMLHttpRequest.prototype, "send");
+    const websocketDescriptor = Object.getOwnPropertyDescriptor(globalThis, "WebSocket");
+    const websocketSpy = vi.fn(function () { throw new Error("network upload is forbidden"); });
+    Object.defineProperty(globalThis, "WebSocket", { configurable: true, writable: true, value: websocketSpy });
+    const beaconDescriptor = Object.getOwnPropertyDescriptor(navigator, "sendBeacon");
+    const beaconSpy = vi.fn(() => { throw new Error("network upload is forbidden"); });
+    Object.defineProperty(navigator, "sendBeacon", { configurable: true, writable: true, value: beaconSpy });
 
-    const detector = new PitchDetector();
-    await expect(detector.startListening(() => undefined)).resolves.toBe(true);
-    expect(fetchSpy).not.toHaveBeenCalled();
-    detector.stopListening();
-    expect(track.stop).toHaveBeenCalledTimes(1);
+    try {
+      const detector = new PitchDetector();
+      await expect(detector.startListening(() => undefined)).resolves.toBe(true);
+      detector.stopListening();
+      expect(track.stop).toHaveBeenCalledTimes(1);
+
+      Object.defineProperty(navigator, "mediaDevices", {
+        configurable: true,
+        value: { getUserMedia: vi.fn().mockRejectedValue(new Error("permission denied")) },
+      });
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+      await expect(new PitchDetector().startListening(() => undefined)).resolves.toBe(false);
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(xhrOpenSpy).not.toHaveBeenCalled();
+      expect(xhrSendSpy).not.toHaveBeenCalled();
+      expect(websocketSpy).not.toHaveBeenCalled();
+      expect(beaconSpy).not.toHaveBeenCalled();
+    } finally {
+      if (websocketDescriptor) Object.defineProperty(globalThis, "WebSocket", websocketDescriptor);
+      else delete (globalThis as { WebSocket?: unknown }).WebSocket;
+      if (beaconDescriptor) Object.defineProperty(navigator, "sendBeacon", beaconDescriptor);
+      else delete (navigator as { sendBeacon?: unknown }).sendBeacon;
+    }
   });
 
   it("cleans all resources when a detection callback throws", async () => {

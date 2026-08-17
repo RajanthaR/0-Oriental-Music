@@ -172,6 +172,29 @@ describe("QuizRunner runtime boundary", () => {
     expect(recordQuizAttempt).not.toHaveBeenCalled();
   });
 
+  it("uses one detached question snapshot when a hostile proxy changes on later reads", () => {
+    const target = validQuestion() as unknown as Record<string, unknown>;
+    let ownKeysCalls = 0;
+    const question = new Proxy(target, {
+      ownKeys(current) {
+        ownKeysCalls += 1;
+        if (ownKeysCalls > 1) {
+          current.type = "matching";
+          delete current.options_si;
+          delete current.correctAnswerIds;
+        }
+        return Reflect.ownKeys(current);
+      },
+    });
+
+    render(<QuizRunner quiz={quizWithQuestions([question])} />);
+
+    expect(screen.getByText("ස්වරය තෝරන්න")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "ස" })).toBeInTheDocument();
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+    expect(ownKeysCalls).toBe(1);
+  });
+
   it("renders a safe unavailable state for duplicate question IDs", () => {
     const recordQuizAttempt = vi.spyOn(ProgressStorage, "recordQuizAttempt");
 

@@ -320,7 +320,8 @@ export function isSourceReference(value: unknown): value is { sourceId: string; 
   const sourceId = read(value, "sourceId");
   const pageOrSection = read(value, "pageOrSection");
   const notes = read(value, "notes");
-  return isNonBlankString(sourceId) && isNonBlankString(pageOrSection) &&
+  return isNonBlankString(sourceId) && sourceId === sourceId.trim() &&
+    isNonBlankString(pageOrSection) &&
     (notes === undefined || isNonBlankString(notes));
 }
 

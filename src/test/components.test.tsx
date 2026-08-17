@@ -902,6 +902,11 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     view.rerender(<RhythmTapGame bpm={120} totalBeats={3} onComplete={secondComplete} />);
     act(() => { vi.advanceTimersByTime(500); });
     expect(screen.getByText("ස්පන්දනය: 2 / 3")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "තාල පහරට තට්ටු කරන්න" }));
+    fireEvent.click(screen.getByRole("button", { name: "අවසන් කරන්න" }));
+    expect(firstComplete).not.toHaveBeenCalled();
+    expect(secondComplete).toHaveBeenCalledTimes(1);
+    expect(secondComplete).toHaveBeenCalledWith(expect.any(Number));
     view.unmount();
   });
 

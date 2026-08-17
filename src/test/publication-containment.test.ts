@@ -17,7 +17,7 @@ import {
   getSourceCorpusInventory,
   getSourceDocumentSummary,
   getTalaFieldDisposition,
-  KNOWN_QUARANTINED_ENTITY_IDS,
+  isKnownQuarantinedEntityId,
   UNKNOWN_PROVENANCE,
   sanitizePublicRecord,
   sanitizeReviewRecord,
@@ -107,7 +107,7 @@ describe("Prompt 1 publication containment", () => {
     publicCollections.forEach((record) => {
       expect(getRecordPublicationDecision(record).isPublic).toBe(true);
       expect(getRecordPublicationDecision(record).gradeBands).not.toContain("12-13");
-      expect(KNOWN_QUARANTINED_ENTITY_IDS.has(record.id)).toBe(false);
+      expect(isKnownQuarantinedEntityId(record.id)).toBe(false);
     });
   });
 
@@ -127,6 +127,17 @@ describe("Prompt 1 publication containment", () => {
     expect(repository.getTalaById("tala-dadra")).toBeUndefined();
     expect(repository.getTalaById("tala-lawani")).toBeUndefined();
     expect(repository.getTalaById("tala-khemta")).toBeUndefined();
+    expect(isKnownQuarantinedEntityId("  raga-bhairav  ")).toBe(true);
+    const paddedBhairav = structuredClone(ragasData.find((raga) => raga.id === "raga-bhairav"));
+    expect(paddedBhairav).toBeDefined();
+    if (paddedBhairav) {
+      paddedBhairav.id = "  raga-bhairav  ";
+      expect(getRecordPublicationDecision(paddedBhairav)).toMatchObject({
+        isPublic: false,
+        state: "quarantined",
+        reasonCodes: expect.arrayContaining(["known-forensic-issue"]),
+      });
+    }
   });
 
   it("prevents CMS review status updates from leaking quarantined records into public getters", () => {
@@ -135,8 +146,6 @@ describe("Prompt 1 publication containment", () => {
     expect(repository.getLessons().some((l) => l.id === "les-raga-bhairav")).toBe(false);
     expect(repository.getLessonById("les-raga-bhairav")).toBeUndefined();
 
-    // Reset in-memory test mutation so baseline remains pure
-    repository.updateLessonReviewStatus("les-raga-bhairav", "Needs Revision", false);
   });
 
   it("keeps malformed raw lessons nonpublic while review and CMS paths fail safely", () => {
@@ -688,6 +697,25 @@ describe("Prompt 1 publication containment", () => {
 
     const rawBhairav = ragasData.find((raga) => raga.id === "raga-bhairav");
     expect(validatePublicCollection("Raga", [rawBhairav])).toMatchObject({ isValid: false });
+    const publicLesson = repository.getLessons()[0];
+    expect(publicLesson).toBeDefined();
+    expect(validatePublicCollection("Raga", [publicLesson])).toMatchObject({ isValid: false });
+    expect(validatePublicCollection("Bogus", [publicLesson])).toMatchObject({ isValid: false });
+  });
+
+  it("rejects padded source IDs consistently across publication and validation", () => {
+    const lesson = structuredClone(lessonsData.find((candidate) => candidate.id === "les-intro-01"));
+    expect(lesson).toBeDefined();
+    if (!lesson) return;
+    lesson.sourceReference.sourceId = " SRC-G10-NADA ";
+    expect(getRecordPublicationDecision(lesson)).toMatchObject({ isPublic: false });
+    expect(validatePublicCollection("Lesson", [lesson])).toMatchObject({ isValid: false });
+  });
+
+  it("withholds Tala dispositions from unsafe registered evaluation contexts", () => {
+    const unsafe = createPublicationEvaluationContext({ lessons: undefined });
+    expect(unsafe.safe).toBe(false);
+    expect(getTalaFieldDisposition("tala-khemta", unsafe)).toBeUndefined();
   });
 
   it("rejects filename digits, out-of-range pages, and mismatched PDF locators", () => {

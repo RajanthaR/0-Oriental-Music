@@ -62,12 +62,15 @@ describe("Audio Synthesis Engine & Tuning Suite", () => {
     }
     Object.defineProperty(window, "AudioContext", { configurable: true, value: ThrowingAudioContext });
     Object.defineProperty(window, "webkitAudioContext", { configurable: true, value: ThrowingAudioContext });
-    await expect(swaraSynth.playSwaraTone("S")).resolves.toBe(false);
-    const playback = tablaSynth.playBol("ධා");
-    await expect(playback.ready).resolves.toBe(false);
-    expect(() => playback()).not.toThrow();
-    Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
-    Object.defineProperty(window, "webkitAudioContext", { configurable: true, value: originalWebkitAudioContext });
+    try {
+      await expect(swaraSynth.playSwaraTone("S")).resolves.toBe(false);
+      const playback = tablaSynth.playBol("ධා");
+      await expect(playback.ready).resolves.toBe(false);
+      expect(() => playback()).not.toThrow();
+    } finally {
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
+      Object.defineProperty(window, "webkitAudioContext", { configurable: true, value: originalWebkitAudioContext });
+    }
 
     expect(normalizePracticeBpm(-1, 80)).toBe(80);
     expect(normalizePracticeBpm(Number.POSITIVE_INFINITY, 80)).toBe(80);
