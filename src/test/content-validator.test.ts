@@ -244,6 +244,24 @@ describe("Content Validation Suite", () => {
     expect(validatePublicCollection("Raga", [first, spaced])).toMatchObject({ isValid: false });
   });
 
+  it("rejects standalone question collection labels because questions are nested quiz/exam records", () => {
+    const question = repository.getQuizzes()[0]?.questions[0];
+    expect(question).toBeDefined();
+    if (!question) return;
+
+    for (const label of ["Question", "questions"]) {
+      const report = validatePublicCollection(label, [question]);
+      expect(report.isValid).toBe(false);
+      expect(report.issues).toEqual([
+        expect.objectContaining({
+          entityType: label,
+          field: "entityType",
+          message: expect.stringContaining("unsupported"),
+        }),
+      ]);
+    }
+  });
+
   it("rejects non-array top-level catalogs instead of treating them as empty", () => {
     const report = validateContent(null, {}, "ragas", false, 42, undefined);
     expect(report.isValid).toBe(false);

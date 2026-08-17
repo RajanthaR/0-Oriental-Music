@@ -316,3 +316,44 @@ follow-up preserves that run as blocked findings input, not acceptance evidence.
 The omitted validator numbers were rejected or deduplicated and remain in the
 run artifacts. All eight Talas remain whole-entity quarantined; Deepchandi and
 the original-PDF/notation/OCR/SME boundaries are unchanged.
+
+## Acceptance-hardening review cycle 1 (20 validated findings; pending rereview)
+
+Run `20260817-p02-hardening-c1-06568d6f` reviewed the complete diff from
+`beba1479f473b3413b3f2de48a27c558e1937c6f` through
+`06568d6f0d777771ef139e6fdd21d1bc73d8c5e7`. Eleven required Luna/MAX
+reviewers completed. Twenty synthesized findings survived and each received an
+independent validator artifact: 20 validated, 0 rejected, 0 failed, and no
+degraded P0/P1 evidence. Artifacts are under
+`C:/tmp/compound-engineering/ce-code-review/20260817-p02-hardening-c1-06568d6f/`.
+
+The following repairs are `FIXED-PENDING-REREVIEW`. This run is not final
+acceptance and does not authorize a push, ready PR, merge, deployment, source
+promotion, or change to the whole-entity Tala quarantine.
+
+| ID | Validator artifact | Validated issue | Stable regression | Final implementation anchor | Disposition |
+|---|---|---|---|---|---|
+| `AH-C1-V01` | `validator-01-notation-remove-cancel.json` | Removing an arranged note did not cancel its active preview. | `src/test/swara-consumers.test.tsx#cancels a NotationArranger tone when its arranged item is removed` | `src/components/audio/NotationArranger.tsx#handleRemoveItem` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V02` | `validator-02-tabla-immediate-rollback.json` | Immediate Tabla callback failure lacked rollback proof. | `src/test/synth.test.ts#rolls back earlier Tabla timers when an immediate stroke callback fails` | `src/lib/audio/tabla.ts#playBol` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V03` | `validator-03-tala-success-settlement.json` | Successful Tala handles lacked ownership-settlement coverage. | `src/test/components.test.tsx#releases a Tala handle only after ready and finished settle` | `src/components/audio/TalaVisualizer.tsx#TalaVisualizer` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V04` | `validator-04-pitch-analyser-failure.json` | Analyser-read failure cleanup was unproved. | `src/test/pitch.test.ts#cleans the active graph when analyser sampling throws` | `src/lib/audio/pitch.ts#PitchDetector` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V05` | `validator-05-pitch-active-replacement.json` | Active microphone replacement ownership was unproved. | `src/test/pitch.test.ts#releases an active session before installing a replacement` | `src/lib/audio/pitch.ts#startListening` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V06` | `validator-06-grade-input-snapshot.json` | Direct publication input bypassed the bounded snapshot. | `src/test/publication-containment.test.ts#bounds direct publication-input grade normalization` | `src/lib/data/publication-policy.ts#toPublicationInput` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V07` | `validator-07-ownkeys-width.json` | Own-key traversal could materialize an over-wide container before rejecting it. | `src/test/content-contracts.test.ts#bounds descriptor reads while rejecting over-wide objects` | `src/lib/validation/content-contracts.ts#safeOwnEntries` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V08` | `validator-08-question-collection.json` | A standalone Question collection label could not resolve a canonical kind. | `src/test/content-validator.test.ts#rejects standalone question collection labels because questions are nested quiz/exam records` | `src/lib/validation/content-validator.ts#validatePublicCollection` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V09` | `validator-09-source-collection.json` | Source transparency rows were incorrectly passed through curriculum gates. | `src/test/source-metadata-consistency.test.ts#validates raw and repository source collections through the transparency boundary` | `src/lib/validation/content-validator.ts#validateSourceTransparencyCollection` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V10` | `validator-10-grade-band-guard.json` | The exported grade-band guard could throw or accept sparse/oversized arrays. | `src/test/content-contracts.test.ts#rejects sparse, oversized, and hostile grade-band arrays without throwing` | `src/lib/validation/content-contracts.ts#isGradeBandArray` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V11` | `validator-11-nested-question-ids.json` | Nested Quiz/Exam question IDs were not canonicalized for duplicate detection. | `src/test/content-contracts.test.ts#uses canonical IDs for duplicate nested Quiz and Exam questions` | `src/lib/validation/content-contracts.ts#canonicalQuestionIds` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V12` | `validator-12-swara-callback-failure.json` | A throwing Swara callback could strand the owned handle. | `src/test/swara-consumers.test.tsx#releases a Swara tone when onNotePlay throws` | `src/components/audio/SwaraKeyboard.tsx#SwaraKeyboard` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V13` | `validator-13-rhythm-cleanup.json` | Rhythm cleanup stopped after the first throwing cancellation. | `src/test/components.test.tsx#continues Rhythm cleanup when an owned handle cancellation throws` | `src/components/audio/RhythmTapGame.tsx#clearPlayback` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V14` | `validator-14-tala-cleanup.json` | Tala timer/audio cleanup was not failure atomic. | `src/test/components.test.tsx#contains throwing Tala cleanup and reports synchronous Tabla failure` | `src/components/audio/TalaVisualizer.tsx#cancelPlayback` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V15` | `validator-15-projection-parity.json` | A public decision could survive with no bounded projection. | `src/test/publication-containment.test.ts#downgrades a public decision when its bounded projection cannot be produced` | `src/lib/data/publication-policy.ts#evaluatePublicationBatch` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V16` | `validator-16-duplicate-page-evidence.json` | Duplicate or invalid source-page rows could certify missing evidence. | `src/test/publication-parity.test.ts#rejects duplicate, missing, unknown, and out-of-range source-page evidence` | `src/lib/data/publication-policy.ts#hasValidPageQualityRegistry` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V17` | `validator-17-duplicate-tala-dispositions.json` | Duplicate Tala disposition IDs used the first row. | `src/test/publication-parity.test.ts#fails Tala publication closed when disposition IDs are duplicated` | `src/lib/data/publication-policy.ts#getTalaFieldDisposition` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V18` | `validator-18-pitch-reentrant-stop.json` | Pitch detection could emit after a re-entrant stop. | `src/test/pitch.test.ts#rechecks ownership when stop is re-entered during frame registration` | `src/lib/audio/pitch.ts#PitchDetector` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V19` | `validator-19-queued-tala-tick.json` | A queued Tala tick could execute after completion or unmount. | `src/test/components.test.tsx#suppresses queued Tala callbacks after completion and unmount` | `src/components/audio/TalaVisualizer.tsx#timerGenerationRef` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V20` | `validator-20-invisible-record-ids.json` | Invisible controls allowed duplicate record identities. | `src/test/publication-containment.test.ts#rejects invisible-control record identities across the checked batch` | `src/lib/validation/content-contracts.ts#normalizeEntityId` | **FIXED-PENDING-REREVIEW** |
+
+The rejected Deepchandi retrieval-only finding, all earlier blocked review
+verdicts, and the original-PDF, notation, OCR/corrupt-glyph, and SME-review
+boundaries remain historical and unchanged.

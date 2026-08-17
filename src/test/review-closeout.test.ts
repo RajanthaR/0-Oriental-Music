@@ -37,6 +37,10 @@ const FINAL_ACCEPTANCE_FOLLOWUP_IDS = [
   "FA-V01", "FA-V03", "FA-V04", "FA-V05", "FA-V06", "FA-V07", "FA-V08",
   "FA-V09", "FA-V10", "FA-V11", "FA-V14", "FA-V15", "FA-V16", "FA-V17",
 ] as const;
+const ACCEPTANCE_HARDENING_CYCLE_1_IDS = Array.from(
+  { length: 20 },
+  (_, index) => `AH-C1-V${String(index + 1).padStart(2, "0")}`,
+);
 
 const rawLessons = lessonsData as unknown as RawRecord[];
 const rawRagas = ragasData as unknown as RawRecord[];
@@ -198,6 +202,45 @@ describe("Phase 2 final contract closeout", () => {
       const path = reference.slice(0, separator);
       const symbol = reference.slice(separator + 1);
       expect(readWorkspaceFile(path), `${id} ${symbol}`).toContain(symbol);
+    }
+  });
+
+  it("traces all twenty acceptance-hardening cycle-1 validators without changing historical boundaries", () => {
+    const closeout = readWorkspaceFile("docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md");
+    const correctionLog = readWorkspaceFile("docs/FORENSIC_CORRECTION_LOG.md");
+    const fieldMatrix = readWorkspaceFile("docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md");
+    const ledger = JSON.parse(readWorkspaceFile("data/forensic-ledger.json")) as Record<string, unknown>;
+    const cycle = ledger.acceptanceHardeningReviewCycle1 as Record<string, unknown>;
+
+    expect(cycle.reviewRunId).toBe("20260817-p02-hardening-c1-06568d6f");
+    expect(cycle.originalBase).toBe("beba1479f473b3413b3f2de48a27c558e1937c6f");
+    expect(cycle.reviewedHead).toBe("06568d6f0d777771ef139e6fdd21d1bc73d8c5e7");
+    expect(cycle.reviewersCompleted).toBe(11);
+    expect(cycle.validatorsDispatched).toBe(20);
+    expect(cycle.validatorsValidated).toBe(20);
+    expect(cycle.validatorsRejected).toBe(0);
+    expect(cycle.validatorsFailed).toBe(0);
+    expect(cycle.degradedP0P1).toBe(0);
+    expect(cycle.validatedFindingIds).toEqual(ACCEPTANCE_HARDENING_CYCLE_1_IDS);
+    expect(cycle.status).toContain("not acceptance evidence");
+
+    const traceability = cycle.semanticTraceability as Record<string, string>;
+    expect(Object.keys(traceability)).toEqual(ACCEPTANCE_HARDENING_CYCLE_1_IDS);
+    for (const id of ACCEPTANCE_HARDENING_CYCLE_1_IDS) {
+      expect(closeout).toContain(`| \`${id}\` |`);
+      const reference = traceability[id];
+      const separator = reference.indexOf("#");
+      expect(separator, `${id} separator`).toBeGreaterThan(0);
+      const path = reference.slice(0, separator);
+      const symbol = reference.slice(separator + 1);
+      expect(readWorkspaceFile(path), `${id} ${symbol}`).toContain(symbol);
+    }
+
+    expect(correctionLog).toContain("Phase 2 acceptance-hardening review cycle 1");
+    expect(fieldMatrix).toContain("Acceptance-hardening review cycle 1 boundary");
+    for (const document of [closeout, correctionLog, fieldMatrix]) {
+      expect(document).toContain("All eight Talas");
+      expect(document).toContain("Deepchandi");
     }
   });
 

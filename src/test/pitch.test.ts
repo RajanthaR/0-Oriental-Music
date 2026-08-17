@@ -227,6 +227,40 @@ describe("PitchDetector resource ownership", () => {
     expect(callback).not.toHaveBeenCalled();
   });
 
+  it("cleans the active graph when analyser sampling throws", async () => {
+    const { stream, track } = createStream();
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: vi.fn().mockResolvedValue(stream) },
+    });
+    const source = { connect: vi.fn(), disconnect: vi.fn() };
+    const close = vi.fn().mockResolvedValue(undefined);
+    class ThrowingSamplingContext {
+      state = "running";
+      sampleRate = 44100;
+      close = close;
+      createMediaStreamSource() {
+        return source;
+      }
+      createAnalyser() {
+        return {
+          fftSize: 2048,
+          getFloatTimeDomainData: () => { throw new Error("analyser sampling failed"); },
+        };
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: ThrowingSamplingContext });
+    const callback = vi.fn();
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    await expect(new PitchDetector().startListening(callback)).resolves.toBe(false);
+    expect(source.disconnect).toHaveBeenCalledTimes(1);
+    expect(track.stop).toHaveBeenCalledTimes(1);
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(callback).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalledWith("Pitch detection error:", expect.any(Error));
+  });
+
   it("stops a late stream when stopped while permission is pending", async () => {
     const { stream, track } = createStream();
     let resolveStream!: (value: MediaStream) => void;
@@ -291,6 +325,71 @@ describe("PitchDetector resource ownership", () => {
     expect(second.track.stop).toHaveBeenCalledTimes(1);
   });
 
+  it("releases an active session before installing a replacement", async () => {
+    const first = createStream();
+    const second = createStream();
+    const getUserMedia = vi.fn()
+      .mockResolvedValueOnce(first.stream)
+      .mockResolvedValueOnce(second.stream);
+    Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: { getUserMedia } });
+
+    const contexts: Array<{ close: ReturnType<typeof vi.fn>; source: { connect: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn> } }> = [];
+    class WorkingContext {
+      state = "running";
+      sampleRate = 44100;
+      source = { connect: vi.fn(), disconnect: vi.fn() };
+      close = vi.fn().mockResolvedValue(undefined);
+
+      constructor() {
+        contexts.push(this);
+      }
+
+      createMediaStreamSource() {
+        return this.source;
+      }
+
+      createAnalyser() {
+        return {
+          fftSize: 2048,
+          getFloatTimeDomainData: (buffer: Float32Array) => buffer.fill(0),
+        };
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: WorkingContext });
+    const frames: Array<() => void> = [];
+    Object.defineProperty(globalThis, "requestAnimationFrame", {
+      configurable: true,
+      writable: true,
+      value: vi.fn((callback: () => void) => {
+        frames.push(callback);
+        return frames.length - 1;
+      }),
+    });
+    Object.defineProperty(globalThis, "cancelAnimationFrame", {
+      configurable: true,
+      writable: true,
+      value: vi.fn(),
+    });
+
+    const firstCallback = vi.fn();
+    const secondCallback = vi.fn();
+    const detector = new PitchDetector();
+    await expect(detector.startListening(firstCallback)).resolves.toBe(true);
+    const firstCallbackCount = firstCallback.mock.calls.length;
+    await expect(detector.startListening(secondCallback)).resolves.toBe(true);
+
+    expect(first.track.stop).toHaveBeenCalledTimes(1);
+    expect(contexts[0].source.disconnect).toHaveBeenCalledTimes(1);
+    expect(contexts[0].close).toHaveBeenCalledTimes(1);
+    expect(secondCallback).toHaveBeenCalledTimes(1);
+    frames[0]?.();
+    expect(firstCallback).toHaveBeenCalledTimes(firstCallbackCount);
+
+    detector.stopListening();
+    expect(second.track.stop).toHaveBeenCalledTimes(1);
+    expect(contexts[1].close).toHaveBeenCalledTimes(1);
+  });
+
   it("cancels animation frame zero and suppresses callbacks after stop", async () => {
     const { stream, track } = createStream();
     Object.defineProperty(navigator, "mediaDevices", {
@@ -340,6 +439,50 @@ describe("PitchDetector resource ownership", () => {
     expect(cancelAnimationFrame).toHaveBeenCalledWith(0);
     scheduled?.();
     expect(onPitchDetected).toHaveBeenCalledTimes(1);
+    expect(track.stop).toHaveBeenCalledTimes(1);
+    expect(close).toHaveBeenCalledTimes(1);
+  });
+
+  it("rechecks ownership when stop is re-entered during frame registration", async () => {
+    const { stream, track } = createStream();
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: vi.fn().mockResolvedValue(stream) },
+    });
+    const close = vi.fn().mockResolvedValue(undefined);
+    class WorkingContext {
+      state = "running";
+      sampleRate = 44100;
+      close = close;
+      createMediaStreamSource() {
+        return { connect: vi.fn(), disconnect: vi.fn() };
+      }
+      createAnalyser() {
+        return { fftSize: 2048, getFloatTimeDomainData: (buffer: Float32Array) => buffer.fill(0) };
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: WorkingContext });
+    const cancelAnimationFrame = vi.fn();
+    let detector!: PitchDetector;
+    Object.defineProperty(globalThis, "requestAnimationFrame", {
+      configurable: true,
+      writable: true,
+      value: vi.fn(() => {
+        detector.stopListening();
+        return 9;
+      }),
+    });
+    Object.defineProperty(globalThis, "cancelAnimationFrame", {
+      configurable: true,
+      writable: true,
+      value: cancelAnimationFrame,
+    });
+
+    const callback = vi.fn();
+    detector = new PitchDetector();
+    await expect(detector.startListening(callback)).resolves.toBe(false);
+    expect(cancelAnimationFrame).toHaveBeenCalledWith(9);
+    expect(callback).toHaveBeenCalledTimes(1);
     expect(track.stop).toHaveBeenCalledTimes(1);
     expect(close).toHaveBeenCalledTimes(1);
   });

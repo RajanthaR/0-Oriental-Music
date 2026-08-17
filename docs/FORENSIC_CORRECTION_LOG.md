@@ -176,3 +176,23 @@ symbol mappings are recorded in the “Final-acceptance follow-up” section of
 `docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md` and mirrored by
 `data/forensic-ledger.json#finalAcceptanceFollowup`. No curriculum or musical
 fact is promoted; all eight Talas remain quarantined.
+
+## Phase 2 acceptance-hardening review cycle 1
+
+Run `20260817-p02-hardening-c1-06568d6f` reviewed original base
+`beba1479f473b3413b3f2de48a27c558e1937c6f` through implementation head
+`06568d6f0d777771ef139e6fdd21d1bc73d8c5e7`. Eleven Luna/MAX reviewers and
+twenty independent validators completed: 20 validated, 0 rejected, 0 failed,
+and no degraded P0/P1 evidence. The complete one-to-one mapping is in
+`docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md#Acceptance-hardening review cycle 1 (20 validated findings; pending rereview)`
+and `data/forensic-ledger.json#acceptanceHardeningReviewCycle1`.
+
+| Finding group | Applied correction | Stable evidence | Disposition |
+|---|---|---|---|
+| `AH-C1-V01`–`AH-C1-V05`, `AH-C1-V12`–`AH-C1-V14`, `AH-C1-V18`–`AH-C1-V19` | Complete caller/session-owned Swara, Tabla, Tala, Rhythm, and Pitch cleanup, settlement, callback, and re-entrancy behavior. | `src/test/swara-consumers.test.tsx`; `src/test/components.test.tsx`; `src/test/synth.test.ts`; `src/test/pitch.test.ts` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V06`–`AH-C1-V11`, `AH-C1-V20` | Bound publication input, object/key traversal, grade arrays, source/question collection semantics, and canonical nested/top-level identities. | `src/test/content-contracts.test.ts`; `src/test/content-validator.test.ts`; `src/test/source-metadata-consistency.test.ts`; `src/test/publication-containment.test.ts` | **FIXED-PENDING-REREVIEW** |
+| `AH-C1-V15`–`AH-C1-V17` | Downgrade missing projections and reject duplicate/invalid source-page and Tala-disposition evidence. | `src/test/publication-containment.test.ts`; `src/test/publication-parity.test.ts` | **FIXED-PENDING-REREVIEW** |
+
+This is review-fix traceability, not acceptance evidence. All eight Talas remain
+whole-entity quarantined; no musical/source field is promoted; prior blocked
+runs and the rejected Deepchandi finding remain unchanged.

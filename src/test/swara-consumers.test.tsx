@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { SwaraKeyboard } from "@/components/audio/SwaraKeyboard";
@@ -99,6 +99,63 @@ describe("Swara playback rejection consumers", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("නාදය ආරම්භ කළ නොහැක");
     view.unmount();
+  });
+
+  it("cancels a NotationArranger tone when its arranged item is removed", () => {
+    const cancel = vi.fn();
+    const neverSettled = new Promise<void>(() => undefined);
+    audioMocks.playSwaraToneHandle.mockReturnValueOnce(Object.assign(cancel, {
+      ready: Promise.resolve(true),
+      finished: neverSettled,
+    }));
+    const view = render(<NotationArranger />);
+
+    fireEvent.click(screen.getByRole("button", { name: "ස" }));
+    expect(cancel).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTitle("ඉවත් කිරීමට ක්ලික් කරන්න"));
+    expect(cancel).toHaveBeenCalledTimes(1);
+
+    view.unmount();
+    expect(cancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("releases a Swara tone when onNotePlay throws", () => {
+    const cancel = vi.fn();
+    const neverReady = new Promise<boolean>(() => undefined);
+    const neverFinished = new Promise<void>(() => undefined);
+    audioMocks.playSwaraToneHandle.mockReturnValueOnce(Object.assign(cancel, {
+      ready: neverReady,
+      finished: neverFinished,
+    }));
+    const view = render(<SwaraKeyboard onNotePlay={() => { throw new Error("consumer failed"); }} />);
+
+    expect(() => fireEvent.click(screen.getByRole("button", { name: "ස (ෂඩ්ජ) ස්වරය" }))).not.toThrow();
+    expect(cancel).toHaveBeenCalledTimes(1);
+    view.unmount();
+    expect(cancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not schedule owned Swara work after a synchronous unmount callback", () => {
+    vi.useFakeTimers();
+    const cancel = vi.fn();
+    const neverReady = new Promise<boolean>(() => undefined);
+    const neverFinished = new Promise<void>(() => undefined);
+    audioMocks.playSwaraToneHandle.mockReturnValueOnce(Object.assign(cancel, {
+      ready: neverReady,
+      finished: neverFinished,
+    }));
+
+    const Parent = () => {
+      const [visible, setVisible] = useState(true);
+      return visible ? <SwaraKeyboard onNotePlay={() => setVisible(false)} /> : null;
+    };
+    const view = render(<Parent />);
+    fireEvent.click(screen.getByRole("button", { name: "ස (ෂඩ්ජ) ස්වරය" }));
+    act(() => { vi.advanceTimersByTime(1000); });
+
+    expect(cancel).toHaveBeenCalledTimes(1);
+    view.unmount();
+    vi.useRealTimers();
   });
 
   it("contains rejected EarTraining tone promises", async () => {

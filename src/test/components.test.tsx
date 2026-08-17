@@ -598,6 +598,53 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     expect(cancels[1]).toHaveBeenCalledTimes(1);
   });
 
+  it("releases a Tala handle only after ready and finished settle", async () => {
+    const tala = getKhemtaFixture();
+    let resolveReady!: (played: boolean) => void;
+    let resolveFinished!: () => void;
+    const cancel = vi.fn();
+    const handle = Object.assign(cancel, {
+      ready: new Promise<boolean>((resolve) => { resolveReady = resolve; }),
+      finished: new Promise<void>((resolve) => { resolveFinished = resolve; }),
+    });
+    audioMocks.playBol.mockReturnValue(handle);
+    const view = render(<TalaVisualizer tala={tala} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
+    await act(async () => {
+      resolveReady(true);
+      await Promise.resolve();
+    });
+    expect(cancel).not.toHaveBeenCalled();
+
+    await act(async () => {
+      resolveFinished();
+      await Promise.resolve();
+    });
+    view.unmount();
+    expect(cancel).not.toHaveBeenCalled();
+  });
+
+  it("contains throwing Tala cleanup and reports synchronous Tabla failure", async () => {
+    const tala = getKhemtaFixture();
+    const cancel = vi.fn(() => { throw new Error("cancel failed"); });
+    audioMocks.playBol.mockReturnValue(Object.assign(cancel, {
+      ready: Promise.resolve(true),
+      finished: new Promise<void>(() => undefined),
+    }));
+    const view = render(<TalaVisualizer tala={tala} />);
+    fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
+    expect(() => fireEvent.click(screen.getByRole("button", { name: "නවත්වන්න" }))).not.toThrow();
+    expect(cancel).toHaveBeenCalledTimes(1);
+    view.unmount();
+
+    audioMocks.playBol.mockImplementation(() => { throw new Error("tabla setup failed"); });
+    const replacement = render(<TalaVisualizer tala={tala} />);
+    expect(() => fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }))).not.toThrow();
+    expect(await screen.findByRole("status")).toHaveTextContent("තබ්ලා නාදය ආරම්භ කළ නොහැක");
+    replacement.unmount();
+  });
+
   it("keeps active Swara playback when an equivalent highlight array is recreated", () => {
     const cancel = vi.fn();
     const neverReady = new Promise<boolean>(() => undefined);
@@ -932,6 +979,36 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     view.unmount();
   });
 
+  it("continues Rhythm cleanup when an owned handle cancellation throws", () => {
+    vi.useFakeTimers();
+    const firstCancel = vi.fn(() => { throw new Error("first cancellation failed"); });
+    const secondCancel = vi.fn();
+    const neverFinished = new Promise<void>(() => undefined);
+    audioMocks.playBol
+      .mockReturnValueOnce(Object.assign(firstCancel, { ready: Promise.resolve(true), finished: neverFinished }))
+      .mockReturnValueOnce(Object.assign(secondCancel, { ready: Promise.resolve(true), finished: neverFinished }));
+
+    const view = render(<RhythmTapGame bpm={120} totalBeats={4} />);
+    fireEvent.click(screen.getByRole("button", { name: "අරඹන්න" }));
+    act(() => { vi.advanceTimersByTime(500); });
+    fireEvent.click(screen.getByRole("button", { name: "තාල පහරට තට්ටු කරන්න" }));
+    expect(() => fireEvent.click(screen.getByRole("button", { name: "නැවත මුලට" }))).not.toThrow();
+    expect(firstCancel).toHaveBeenCalledTimes(1);
+    expect(secondCancel).toHaveBeenCalledTimes(1);
+    view.unmount();
+  });
+
+  it("keeps Rhythm visual timing available when Tabla creation throws", () => {
+    vi.useFakeTimers();
+    audioMocks.playBol.mockImplementation(() => { throw new Error("tabla creation failed"); });
+    const view = render(<RhythmTapGame bpm={120} totalBeats={2} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "අරඹන්න" }));
+    expect(() => act(() => { vi.advanceTimersByTime(500); })).not.toThrow();
+    expect(screen.getByText("මෙම උපාංගයේ තබ්ලා නාදය ආරම්භ කළ නොහැක. දෘශ්‍ය ස්පන්දනයට අනුව පුහුණු වන්න.")).toBeInTheDocument();
+    view.unmount();
+  });
+
   it("suppresses stale Tala unavailable callbacks after reset and replacement", () => {
     const unavailableCallbacks: Array<() => void> = [];
     audioMocks.playBol.mockImplementation((_bol, _duration, onUnavailable) => {
@@ -951,6 +1028,31 @@ describe("Interactive Audio & Quiz Components Suite", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
     act(() => { unavailableCallbacks[1](); });
     expect(screen.getByRole("status")).toHaveTextContent("තබ්ලා නාදය ආරම්භ කළ නොහැක");
+  });
+
+  it("suppresses queued Tala callbacks after completion and unmount", async () => {
+    const tala = getKhemtaFixture();
+    const unavailableCallbacks: Array<() => void> = [];
+    let resolveFinished!: () => void;
+    audioMocks.playBol.mockImplementation((_bol, _duration, onUnavailable) => {
+      unavailableCallbacks.push(onUnavailable ?? (() => undefined));
+      return Object.assign(vi.fn(), {
+        ready: Promise.resolve(true),
+        finished: new Promise<void>((resolve) => { resolveFinished = resolve; }),
+      });
+    });
+    const view = render(<TalaVisualizer tala={tala} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "තාලය අරඹන්න" }));
+    await act(async () => {
+      resolveFinished();
+      await Promise.resolve();
+    });
+    act(() => { unavailableCallbacks[0]?.(); });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+
+    view.unmount();
+    act(() => { unavailableCallbacks[0]?.(); });
   });
 
   it("contains rejected Tala ready and finished promises across reset, replacement, and unmount", async () => {

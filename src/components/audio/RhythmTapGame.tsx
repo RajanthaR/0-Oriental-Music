@@ -40,24 +40,62 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
 
   const trackPlayback = useCallback((handle: TablaPlaybackHandle) => {
     playbackHandlesRef.current.add(handle);
-    void Promise.resolve(handle.ready).catch(() => undefined);
-    void Promise.resolve(handle.finished).then(
-      () => playbackHandlesRef.current.delete(handle),
-      () => playbackHandlesRef.current.delete(handle),
-    );
+    let malformed = false;
+    try {
+      void Promise.resolve(handle.ready).catch(() => undefined);
+    } catch {
+      malformed = true;
+    }
+    try {
+      void Promise.resolve(handle.finished).then(
+        () => playbackHandlesRef.current.delete(handle),
+        () => playbackHandlesRef.current.delete(handle),
+      );
+    } catch {
+      malformed = true;
+    }
+    if (malformed) {
+      playbackHandlesRef.current.delete(handle);
+      try {
+        handle();
+      } catch {
+        // A malformed/partially torn-down handle must not block other cleanup.
+      }
+    }
   }, []);
 
   const clearPlayback = useCallback(() => {
-    playbackHandlesRef.current.forEach((cancel) => cancel());
+    const handles = Array.from(playbackHandlesRef.current);
     playbackHandlesRef.current.clear();
+    handles.forEach((cancel) => {
+      try {
+        cancel();
+      } catch {
+        // One failed cancellation must not strand the remaining session work.
+      }
+    });
   }, []);
 
   const clearTimers = useCallback(() => {
     sessionGenerationRef.current += 1;
-    if (timerRef.current !== null) clearInterval(timerRef.current as number);
-    if (finishTimerRef.current !== null) clearTimeout(finishTimerRef.current as number);
+    const timer = timerRef.current;
     timerRef.current = null;
+    if (timer !== null) {
+      try {
+        clearInterval(timer as number);
+      } catch {
+        // Timer cancellation is best-effort during browser teardown.
+      }
+    }
+    const finishTimer = finishTimerRef.current;
     finishTimerRef.current = null;
+    if (finishTimer !== null) {
+      try {
+        clearTimeout(finishTimer as number);
+      } catch {
+        // Timer cancellation is best-effort during browser teardown.
+      }
+    }
     clearPlayback();
   }, [clearPlayback]);
 
@@ -66,6 +104,21 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
     setFeedbackText("මෙම උපාංගයේ තබ්ලා නාදය ආරම්භ කළ නොහැක. දෘශ්‍ය ස්පන්දනයට අනුව පුහුණු වන්න.");
     setFeedbackColor("text-primary");
   }, []);
+
+  const playTablaStroke = useCallback((bol: string, generation: number) => {
+    let ownedHandle: TablaPlaybackHandle | undefined;
+    const reportUnavailable = () => {
+      if (ownedHandle !== undefined && !playbackHandlesRef.current.has(ownedHandle)) return;
+      reportAudioUnavailable(generation);
+    };
+    try {
+      const handle = tablaSynth.playBol(bol, beatIntervalMs, reportUnavailable);
+      ownedHandle = handle;
+      trackPlayback(handle);
+    } catch {
+      reportUnavailable();
+    }
+  }, [beatIntervalMs, reportAudioUnavailable, trackPlayback]);
 
   const handleFinish = useCallback(() => {
     if (!mountedRef.current) return;
@@ -127,14 +180,18 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
         beatCount++;
         setCurrentBeat(beatCount);
         expectedBeatTimesRef.current.push(Date.now());
-        const handle = tablaSynth.playBol("ධා", beatIntervalMs, () => {
-          reportAudioUnavailable(sessionGeneration);
-        });
-        trackPlayback(handle);
+        playTablaStroke("ධා", sessionGeneration);
 
         if (beatCount >= safeTotalBeats) {
-          if (timerRef.current !== null) clearInterval(timerRef.current as number);
+          const activeTimer = timerRef.current;
           timerRef.current = null;
+          if (activeTimer !== null) {
+            try {
+              clearInterval(activeTimer as number);
+            } catch {
+              // Timer cancellation is best-effort; completion still settles.
+            }
+          }
           finishTimerRef.current = setTimeout(() => {
             if (mountedRef.current && sessionGenerationRef.current === sessionGeneration) {
               handleFinish();
@@ -146,17 +203,14 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
       clearTimers();
     }
     return clearTimers;
-  }, [isPlaying, safeTotalBeats, beatIntervalMs, clearTimers, handleFinish, reportAudioUnavailable, trackPlayback]);
+  }, [isPlaying, safeTotalBeats, beatIntervalMs, clearTimers, handleFinish, playTablaStroke]);
 
   const handleTap = () => {
     if (!isPlaying) return;
     const now = Date.now();
     tapTimesRef.current.push(now);
     const sessionGeneration = sessionGenerationRef.current;
-    const handle = tablaSynth.playBol("තින්", beatIntervalMs, () => {
-      reportAudioUnavailable(sessionGeneration);
-    });
-    trackPlayback(handle);
+    playTablaStroke("තින්", sessionGeneration);
 
     // Find closest expected beat
     const expected = expectedBeatTimesRef.current[expectedBeatTimesRef.current.length - 1];

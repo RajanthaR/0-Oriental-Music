@@ -171,15 +171,20 @@ export class PitchDetector {
       transferred = true;
 
       const detect = () => {
-        if (
-          this.generation !== generation ||
-          !this.isListening ||
-          this.analyser !== analyser ||
-          this.audioCtx !== activeContext
-        ) return true;
+        const ownsResources = () => (
+          this.generation === generation &&
+          this.isListening &&
+          this.analyser === analyser &&
+          this.audioCtx === activeContext
+        );
+        if (!ownsResources()) return true;
 
         try {
           analyser.getFloatTimeDomainData(this.buffer as any);
+          // Browser analyser methods and test doubles can synchronously stop or
+          // replace a session. Do not emit a result from an operation that no
+          // longer owns the detector.
+          if (!ownsResources()) return false;
           const { freq, clarity } = this.autoCorrelate(this.buffer, activeContext.sampleRate);
 
           if (freq > 60 && freq < 1200 && clarity > 0.82) {
@@ -189,25 +194,42 @@ export class PitchDetector {
             onPitchDetected(null);
           }
 
-          if (
-            this.generation !== generation ||
-            !this.isListening ||
-            this.analyser !== analyser ||
-            this.audioCtx !== activeContext
-          ) return false;
+          if (!ownsResources()) return false;
 
-          this.animFrameId = requestAnimationFrame(detect);
+          const nextFrame = requestAnimationFrame(detect);
+          if (!ownsResources()) {
+            // A re-entrant stop can happen while requestAnimationFrame is
+            // registering the callback, before its id can be stored. Avoid
+            // cancelling a replacement session's frame.
+            if (!this.isListening || (this.analyser === analyser && this.audioCtx === activeContext)) {
+              try {
+                cancelAnimationFrame(nextFrame);
+              } catch {
+                // The frame may already have fired during teardown.
+              }
+            }
+            return false;
+          }
+          this.animFrameId = nextFrame;
           return true;
         } catch (error) {
-          console.error("Pitch detection error:", error);
-          if (this.generation === generation) this.stopListening();
+          try {
+            console.error("Pitch detection error:", error);
+          } catch {
+            // Diagnostics must not prevent ownership cleanup.
+          }
+          if (ownsResources()) this.stopListening();
           return false;
         }
       };
 
       return detect();
     } catch (err) {
-      console.error("Microphone access error:", err);
+      try {
+        console.error("Microphone access error:", err);
+      } catch {
+        // Diagnostics must not prevent ownership cleanup.
+      }
       if (transferred && this.generation === generation) {
         this.disposeCurrentResources();
       } else {

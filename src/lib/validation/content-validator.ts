@@ -34,6 +34,7 @@ import {
   isMappedTalaBolToken,
   isRecord,
   isValidSwaraToken,
+  projectPublicRecord,
   readOwnDataField,
   validateContentRecord,
   type ContentEntityKind,
@@ -570,6 +571,147 @@ function baselineIssue(
   return { entityType, entityId, field, message, severity };
 }
 
+const SOURCE_PUBLIC_FIELDS = [
+  "id",
+  "title",
+  "originalFilename",
+  "publisher",
+  "grades",
+  "year",
+  "language",
+  "tier",
+  "location",
+  "status",
+  "license",
+  "url",
+] as const;
+
+const SOURCE_TRANSPARENCY_FIELDS = ["evidenceState", "evidenceQuality"] as const;
+
+const SANITIZED_SOURCE_METADATA: Readonly<Record<string, string>> = {
+  publisher: UNKNOWN_PROVENANCE,
+  year: UNKNOWN_PROVENANCE,
+  location: UNKNOWN_PROVENANCE,
+  license: UNKNOWN_PROVENANCE,
+  tier: "මූලාශ්‍ර වාර්තාව (සනාථ නොකළ)",
+  status: "Unverified / source review pending",
+};
+
+function sourceValuesMatch(left: unknown, right: unknown): boolean {
+  try {
+    return JSON.stringify(left) === JSON.stringify(right);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Sources are a public transparency catalog, not curricular records.  The
+ * repository validates raw source shape, then exposes an allowlisted,
+ * unknown/unverified projection with evidence summary fields.  Keep this
+ * boundary separate from the grade/sourceReference publication decision used
+ * by learner-visible claims.
+ */
+function validateSourceTransparencyCollection(
+  entityType: string,
+  records: unknown,
+): PublicationValidationResult {
+  try {
+    const issues: ValidationIssue[] = [];
+    const snapshot = cloneBoundedRecord(records);
+    if (!Array.isArray(snapshot)) {
+      return {
+        isValid: false,
+        issues: [baselineIssue(entityType, "catalog", "records", "Source transparency collection must be a bounded dense plain-data array.")],
+      };
+    }
+
+    const repositorySources = repository.getSources();
+    const repositoryById = new Map<string, Record<string, unknown>>();
+    repositorySources.forEach((source) => {
+      const id = typeof source.id === "string" ? source.id.trim() : "";
+      if (id) repositoryById.set(id, source as unknown as Record<string, unknown>);
+    });
+
+    const seenIds = new Set<string>();
+    snapshot.forEach((candidate, index) => {
+      const rawId = readOwnDataField(candidate, "id");
+      const normalizedId = typeof rawId === "string" ? rawId.trim() : "";
+      const id = normalizedId || `${entityType}-${index}`;
+      if (!normalizedId || seenIds.has(normalizedId)) {
+        issues.push(baselineIssue(entityType, id, "id", "Source transparency IDs must be unique, non-empty normalized strings."));
+      } else {
+        seenIds.add(normalizedId);
+      }
+
+      const contract = validateContentRecord(candidate, "source");
+      if (!contract.isValid) {
+        issues.push(baselineIssue(entityType, id, "record", "Source transparency record does not satisfy the source contract."));
+        return;
+      }
+
+      const projection = projectPublicRecord(candidate, "source");
+      if (!projection || !isRecord(projection) || !validateContentRecord(projection, "source").isValid) {
+        issues.push(baselineIssue(entityType, id, "projection", "Source transparency record could not be safely projected."));
+        return;
+      }
+
+      Object.entries(SANITIZED_SOURCE_METADATA).forEach(([field, expected]) => {
+        if (readOwnDataField(projection, field) !== expected) {
+          issues.push(baselineIssue(entityType, id, `projection.${field}`, "Source transparency projection must retain the existing unknown/unverified metadata."));
+        }
+      });
+
+      const reprojected = projectPublicRecord(projection, "source");
+      if (!reprojected || !isRecord(reprojected) || SOURCE_PUBLIC_FIELDS.some((field) =>
+        !sourceValuesMatch(readOwnDataField(projection, field), readOwnDataField(reprojected, field))
+      )) {
+        issues.push(baselineIssue(entityType, id, "projection", "Source transparency projection must be stable when projected again."));
+      }
+
+      const repositorySource = repositoryById.get(normalizedId);
+      if (repositorySource) {
+        SOURCE_PUBLIC_FIELDS.forEach((field) => {
+          if (!sourceValuesMatch(readOwnDataField(projection, field), readOwnDataField(repositorySource, field))) {
+            issues.push(baselineIssue(entityType, id, `projection.${field}`, "Source transparency projection disagrees with repository.getSources()."));
+          }
+        });
+      }
+
+      const hasTransparencyFields = SOURCE_TRANSPARENCY_FIELDS.some((field) =>
+        readOwnDataField(candidate, field) !== undefined
+      );
+      if (hasTransparencyFields) {
+        if (!repositorySource) {
+          issues.push(baselineIssue(entityType, id, "evidenceState", "Source evidence summary must resolve through repository.getSources()."));
+        } else {
+          SOURCE_PUBLIC_FIELDS.forEach((field) => {
+            if (!sourceValuesMatch(readOwnDataField(candidate, field), readOwnDataField(repositorySource, field))) {
+              issues.push(baselineIssue(entityType, id, field, "Sanitized source transparency fields disagree with repository.getSources()."));
+            }
+          });
+          SOURCE_TRANSPARENCY_FIELDS.forEach((field) => {
+            const value = readOwnDataField(candidate, field);
+            if (typeof value !== "string" || !value.trim() || !sourceValuesMatch(value, readOwnDataField(repositorySource, field))) {
+              issues.push(baselineIssue(entityType, id, field, "Source evidence summary disagrees with repository.getSources()."));
+            }
+          });
+        }
+      }
+    });
+
+    return {
+      isValid: issues.every((issue) => issue.severity !== "error"),
+      issues,
+    };
+  } catch {
+    return {
+      isValid: false,
+      issues: [baselineIssue(entityType, "catalog", "records", "Source transparency collection could not be safely validated.")],
+    };
+  }
+}
+
 export function validateCoverageSnapshot(
   coverageInput: unknown
 ): PublicationValidationResult {
@@ -663,15 +805,18 @@ export function validatePublicCollection(
     exams: "exam-paper",
     Source: "source",
     sources: "source",
-    Question: "question",
-    questions: "question",
   };
-  const expectedKind = kindByLabel[entityType];
+  const requestedEntityType = typeof entityType === "string" ? entityType : "unknown";
+  const expectedKind = kindByLabel[requestedEntityType];
   if (!expectedKind) {
     return {
       isValid: false,
-      issues: [baselineIssue(entityType, "catalog", "entityType", "Public collection declares an unknown entity kind.")],
+      issues: [baselineIssue(requestedEntityType, "catalog", "entityType", `Public collection entity type '${requestedEntityType}' is unsupported.`)],
     };
+  }
+
+  if (expectedKind === "source") {
+    return validateSourceTransparencyCollection(requestedEntityType, records);
   }
 
   const snapshot = cloneBoundedRecord(records);
@@ -693,7 +838,6 @@ export function validatePublicCollection(
     "learning-path": "learningPaths",
     quiz: "quizzes",
     "exam-paper": "examPapers",
-    source: "sources",
   };
   const catalogKey = catalogByKind[expectedKind];
   const evaluationContext = createPublicationEvaluationContext(

@@ -22,6 +22,7 @@ import {
   UNKNOWN_PROVENANCE,
   sanitizePublicRecord,
   sanitizeReviewRecord,
+  toPublicationInput,
 } from "@/lib/data/publication-policy";
 import quizzesData from "@/data/quizzes.json";
 import examPapersData from "@/data/exam-papers.json";
@@ -36,6 +37,7 @@ import {
   validatePublicCollection,
 } from "@/lib/validation/content-validator";
 import forensicLedgerData from "../../data/forensic-ledger.json";
+import { MAX_GRAPH_NODES } from "@/lib/validation/content-contracts";
 
 describe("Prompt 1 publication containment", () => {
   it("declares the complete blocking and nonblocking dependency matrix", () => {
@@ -1424,5 +1426,111 @@ describe("Prompt 1 publication containment", () => {
     const duplicateResult = validateMusicalCoreFieldDispositions(duplicateRaw, musicalCoreFieldDispositions);
     expect(duplicateResult.isValid).toBe(false);
     expect(duplicateResult.issues.some((issue) => issue.field === "talaId" && issue.message.includes("unique"))).toBe(true);
+  });
+
+  it("bounds direct publication-input grade normalization", () => {
+    const oversized = Array.from({ length: 10_001 }, () => "10-11");
+    expect(toPublicationInput({ id: "oversized", gradeBands: oversized })).toEqual({
+      id: "",
+      gradeBands: [],
+      sourceReference: undefined,
+    });
+
+    const sparse = new Array(2) as string[];
+    sparse[1] = "10-11";
+    expect(toPublicationInput({ id: "sparse", gradeBands: sparse }).gradeBands).toEqual([]);
+
+    const hostile = new Proxy([], {
+      get(_target, key) {
+        if (key === "length") throw new Error("hostile length");
+        return Reflect.get(_target, key);
+      },
+    });
+    expect(() => toPublicationInput({ id: "hostile", gradeBands: hostile })).not.toThrow();
+    expect(toPublicationInput({ id: "hostile", gradeBands: hostile }).gradeBands).toEqual([]);
+  });
+
+  it("rejects invisible-control record identities across the checked batch", () => {
+    const first = structuredClone(ragasData.find((raga) => raga.id === "raga-bilawal"));
+    const second = structuredClone(first) as typeof first;
+    expect(first).toBeDefined();
+    expect(second).toBeDefined();
+    if (!first || !second) return;
+    second.id = `${first.id}\u200B`;
+    const evaluation = evaluatePublicationBatch([first, second]);
+    expect(evaluation.isValid).toBe(true);
+    expect(evaluation.decisions[0]?.isPublic).toBe(true);
+    expect(evaluation.decisions[1]).toMatchObject({
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["malformed-record"]),
+    });
+  });
+
+  it("downgrades a public decision when its bounded projection cannot be produced", () => {
+    const base = structuredClone(lessonsData.find((lesson) => lesson.id === "les-intro-01")) as
+      | Record<string, unknown>
+      | undefined;
+    expect(base).toBeDefined();
+    if (!base) return;
+    const shared = {
+      ...(base.sourceReference as Record<string, unknown>),
+      status: "Published",
+      reviewer: "SME",
+      reviewDate: "2026-08-17",
+      lastVerifiedDate: "2026-08-17",
+      changeNotes: "Projection parity regression",
+      license: "Curriculum Canonical",
+      reuseStatus: "Curriculum Canonical",
+      heading_si: "සංකල්පය",
+      content_si: "සංකල්ප අන්තර්ගතය",
+      question_si: "ප්‍රශ්නය",
+      explanation_si: "පැහැදිලි කිරීම",
+      options_si: ["10-11"],
+      correctIndex: 0,
+      title_si: "පුහුණු ක්‍රියාකාරකම",
+      instruction_si: "පුහුණු වන්න",
+      interactiveTool: "ear-training",
+    } as Record<string, unknown>;
+    const secondShared = {
+      ...shared,
+      term_si: "පදය",
+      meaning_si: "අර්ථය",
+      rowLabel_si: "පේළිය",
+      notes: ["S"],
+      type: "swara-demo",
+    } as Record<string, unknown>;
+    shared.keyTerms = [secondShared];
+    shared.notationTable = [secondShared];
+    const sections: Record<string, unknown>[] = [shared, secondShared];
+    for (let index = 2; index < MAX_GRAPH_NODES - 9; index += 1) {
+      sections.push({ heading_si: `කොටස ${index}`, content_si: "අන්තර්ගතය" });
+    }
+    const candidate = {
+      ...base,
+      id: "les-projection-parity",
+      slug: "les-projection-parity",
+      gradeBands: shared.options_si,
+      prerequisites: [],
+      competencyIds: shared.options_si,
+      recap_si: shared.options_si,
+      contentSections: sections,
+      diagnosticQuestion: shared,
+      listenActivity: secondShared,
+      performActivity: secondShared,
+      guidedPractice: shared,
+      independentPractice: shared,
+      sourceReference: { ...(base.sourceReference as Record<string, unknown>) },
+      reviewMetadata: secondShared,
+      published: true,
+    };
+    const context = createPublicationEvaluationContext({ lessons: [candidate] });
+    const evaluation = evaluatePublicationBatch([candidate], context);
+    expect(evaluation.isValid).toBe(true);
+    expect(evaluation.decisions[0]).toMatchObject({
+      state: "needs-review",
+      isPublic: false,
+      reasonCodes: expect.arrayContaining(["evaluation-failed"]),
+    });
+    expect(evaluation.decisions[0]?.publicProjection).toBeUndefined();
   });
 });

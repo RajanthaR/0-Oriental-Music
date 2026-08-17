@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Tala } from "@/types/content";
-import { tablaSynth } from "@/lib/audio/tabla";
+import { tablaSynth, type TablaPlaybackHandle } from "@/lib/audio/tabla";
 import { normalizePracticeBpm } from "@/lib/audio/tempo";
 import { Play, Square, RotateCcw, Volume2, VolumeX, Hand, Waves } from "lucide-react";
 
@@ -38,6 +38,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
   const audioEnabledRef = useRef(audioEnabled);
   const mountedRef = useRef(true);
   const playbackGenerationRef = useRef(0);
+  const timerGenerationRef = useRef(0);
   const playbackSignature = JSON.stringify({
     id: tala.id,
     matras: tala.matras,
@@ -52,9 +53,15 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
   const matraDurationMs = (60 / bpm) * 1000;
 
   const stopTimer = useCallback(() => {
-    if (timerRef.current !== null) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
+    timerGenerationRef.current += 1;
+    const timer = timerRef.current;
+    timerRef.current = null;
+    if (timer !== null) {
+      try {
+        clearInterval(timer);
+      } catch {
+        // Timer cancellation is best-effort during browser teardown.
+      }
     }
   }, []);
 
@@ -62,7 +69,11 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
     playbackGenerationRef.current += 1;
     const cancel = playbackCancelRef.current;
     playbackCancelRef.current = null;
-    cancel?.();
+    try {
+      cancel?.();
+    } catch {
+      // A failed cancellation must not prevent state/timer cleanup.
+    }
   }, []);
 
   const selectMatra = useCallback((matra: number) => {
@@ -76,35 +87,77 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
     const bol = tala.bols.find((candidate) => candidate.matra === matra);
     if (bol) {
       const generation = playbackGenerationRef.current;
+      let ownedHandle: TablaPlaybackHandle | undefined;
       let unavailableReported = false;
       const reportUnavailable = () => {
-        if (unavailableReported || !mountedRef.current || playbackGenerationRef.current !== generation) return;
+        if (
+          unavailableReported ||
+          !mountedRef.current ||
+          playbackGenerationRef.current !== generation ||
+          (ownedHandle !== undefined && playbackCancelRef.current !== ownedHandle)
+        ) return;
         unavailableReported = true;
         setAudioError(true);
       };
-      const handle = tablaSynth.playBol(bol.bol_si, matraDurationMs, reportUnavailable);
+      let handle: TablaPlaybackHandle;
+      try {
+        handle = tablaSynth.playBol(bol.bol_si, matraDurationMs, reportUnavailable);
+      } catch {
+        reportUnavailable();
+        return;
+      }
+      if (!mountedRef.current || playbackGenerationRef.current !== generation) {
+        try {
+          handle();
+        } catch {
+          // The operation may already be in browser teardown.
+        }
+        return;
+      }
+      ownedHandle = handle;
       playbackCancelRef.current = handle;
-      void Promise.resolve(handle.ready).then(
-        (available) => {
-          if (!available) reportUnavailable();
-        },
-        reportUnavailable,
-      );
-      if (handle.finished) {
-        void Promise.resolve(handle.finished).then(
-          () => {
-            if (playbackCancelRef.current === handle) playbackCancelRef.current = null;
+      const failMalformedHandle = () => {
+        reportUnavailable();
+        if (playbackCancelRef.current === handle) playbackCancelRef.current = null;
+        try {
+          handle();
+        } catch {
+          // The operation may already be in browser teardown.
+        }
+        reportUnavailable();
+      };
+      try {
+        void Promise.resolve(handle.ready).then(
+          (available) => {
+            if (!available) reportUnavailable();
           },
-          () => {
-            if (playbackCancelRef.current === handle) playbackCancelRef.current = null;
-            reportUnavailable();
-          },
+          reportUnavailable,
         );
+      } catch {
+        failMalformedHandle();
+      }
+      try {
+        if (handle.finished) {
+          void Promise.resolve(handle.finished).then(
+            () => {
+              if (mountedRef.current && playbackGenerationRef.current === generation && playbackCancelRef.current === handle) {
+                playbackCancelRef.current = null;
+              }
+          },
+          () => {
+            reportUnavailable();
+            if (playbackCancelRef.current === handle) playbackCancelRef.current = null;
+          },
+          );
+        }
+      } catch {
+        failMalformedHandle();
       }
     }
   }, [cancelPlayback, matraDurationMs, tala.bols]);
 
   const stepNextMatra = useCallback(() => {
+    if (!mountedRef.current) return;
     const next = currentMatraRef.current >= tala.matras ? 1 : currentMatraRef.current + 1;
     selectMatra(next);
     playMatra(next);
@@ -115,10 +168,19 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
       stopTimer();
       return;
     }
-    const timer = setInterval(stepNextMatra, matraDurationMs);
+    const timerGeneration = timerGenerationRef.current;
+    const timer = setInterval(() => {
+      if (!mountedRef.current || timerGenerationRef.current !== timerGeneration) return;
+      stepNextMatra();
+    }, matraDurationMs);
     timerRef.current = timer;
     return () => {
-      clearInterval(timer);
+      timerGenerationRef.current += 1;
+      try {
+        clearInterval(timer);
+      } catch {
+        // Timer cancellation is best-effort during browser teardown.
+      }
       if (timerRef.current === timer) timerRef.current = null;
     };
   }, [isPlaying, matraDurationMs, stepNextMatra, stopTimer]);

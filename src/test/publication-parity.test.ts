@@ -15,7 +15,9 @@ import musicalCoreFieldDispositionsData from "../../data/musical-core-field-disp
 import { repository } from "@/lib/data/repository";
 import {
   DEPENDENCY_FIELD_RULES,
+  createPublicationEvaluationContext,
   evaluatePublicationBatch,
+  evaluateSourceReference,
   getRecordPublicationDecision,
   getTalaFieldDisposition,
   sanitizePublicRecord,
@@ -65,6 +67,10 @@ function recordChild(record: RawRecord, field: string): RawRecord {
 function restoreRecord(target: RawRecord, snapshot: RawRecord): void {
   Object.keys(target).forEach((key) => delete target[key]);
   Object.assign(target, clone(snapshot));
+}
+
+function restoreCatalog(target: RawCatalog, snapshot: RawCatalog): void {
+  target.splice(0, target.length, ...clone(snapshot));
 }
 
 type DependencyFixture = {
@@ -555,6 +561,54 @@ describe("cycle-two publication parity and freshness", () => {
       page.hasSinhalaText = original;
     }
     expect(repository.getPublicationSummary().lessons.public).toBeGreaterThan(0);
+  });
+
+  it("rejects duplicate, missing, unknown, and out-of-range source-page evidence", () => {
+    const before = clone(sourcePageQuality);
+    const pageOne = sourcePageQuality.find(
+      (candidate) => candidate.documentSlug === "grade_7_violin" && candidate.pageNumber === 1,
+    );
+    expect(pageOne).toBeDefined();
+    if (!pageOne) return;
+    try {
+      const retained = sourcePageQuality.filter(
+        (candidate) => !(candidate.documentSlug === "grade_7_violin" && candidate.pageNumber === 2),
+      );
+      sourcePageQuality.splice(0, sourcePageQuality.length, ...retained, clone(pageOne), {
+        ...clone(pageOne),
+        pageNumber: 999,
+      });
+      const context = createPublicationEvaluationContext();
+      expect(context.safe).toBe(false);
+      expect(evaluateSourceReference({
+        sourceId: "SRC-G07-VIOLIN",
+        pageOrSection: "sg7_emus_chap2.1.2_violin.pdf පිටු 1, 2",
+      }, context)).toMatchObject({ supportable: false, reasonCode: "unsafe-evaluation-context" });
+      expect(repository.getInstruments()).toEqual([]);
+    } finally {
+      restoreCatalog(sourcePageQuality, before);
+    }
+  });
+
+  it("fails Tala publication closed when disposition IDs are duplicated", () => {
+    const registryBefore = clone(musicalCoreFieldDispositions);
+    const entry = (musicalCoreFieldDispositions.talas as RawCatalog)
+      .find((candidate) => candidate.talaId === "tala-khemta");
+    expect(entry).toBeDefined();
+    if (!entry) return;
+    try {
+      (musicalCoreFieldDispositions.talas as RawCatalog).push(clone(entry));
+      const context = createPublicationEvaluationContext();
+      expect(context.safe).toBe(false);
+      expect(getTalaFieldDisposition("tala-khemta", context)).toBeUndefined();
+      expect(evaluatePublicationBatch(context.catalogs.talas, context)).toMatchObject({
+        isValid: false,
+        failureReason: "unsafe-container",
+      });
+      expect(repository.getTalas()).toEqual([]);
+    } finally {
+      restoreRecord(musicalCoreFieldDispositions, registryBefore);
+    }
   });
 
   it("enforces shared-DAG, cycle, depth, sparse-array, and node-budget boundaries", () => {

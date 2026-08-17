@@ -28,7 +28,13 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
 
   const cancelPlayback = useCallback(() => {
     generationRef.current += 1;
-    playbackRef.current?.();
+    const playback = playbackRef.current;
+    playbackRef.current = null;
+    try {
+      playback?.();
+    } catch {
+      // Cancellation is best-effort; the UI ownership must still be released.
+    }
   }, []);
 
   useEffect(() => {
@@ -82,6 +88,7 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
   };
 
   const handleRemoveItem = (item: string, idx: number) => {
+    cancelPlayback();
     setAvailableItems((prev) => [...prev, item]);
     setArrangedItems((prev) => prev.filter((_, i) => i !== idx));
     setIsEvaluated(false);

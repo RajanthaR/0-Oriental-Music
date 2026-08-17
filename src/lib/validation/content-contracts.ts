@@ -176,6 +176,13 @@ type SafeOwnEntries = {
  * trust boundary for runtime content: no accessor is invoked and no
  * inherited value is accepted.  All reflective operations are guarded since
  * a Proxy can throw from any of them.
+ *
+ * The enumerable traversal is intentionally incremental and bounded instead
+ * of asking Reflect.ownKeys() for an unbounded key list before applying the
+ * width limit.  JavaScript still lets a Proxy's ownKeys trap materialize an
+ * arbitrarily large list before `for...in` can observe it; that unavoidable
+ * userland limitation is why this function catches every reflective failure
+ * and fails closed, rather than claiming a Proxy allocation bound.
  */
 function safeOwnEntries(value: object): SafeOwnEntries | undefined {
   try {
@@ -187,62 +194,52 @@ function safeOwnEntries(value: object): SafeOwnEntries | undefined {
       return undefined;
     }
 
-    const descriptorKeys = Reflect.ownKeys(value);
-    if (descriptorKeys.some((key) => typeof key !== "string")) return undefined;
-    const maximumOwnKeys = isArray ? MAX_ARRAY_ITEMS + 1 : MAX_GRAPH_NODES;
-    if (descriptorKeys.length > maximumOwnKeys) return undefined;
-
-    const descriptors = new Map<string, PropertyDescriptor>();
-    for (const key of descriptorKeys as string[]) {
-      const descriptor = Object.getOwnPropertyDescriptor(value, key);
-      if (!descriptor) return undefined;
-      descriptors.set(key, descriptor);
-    }
-    const descriptorFor = (key: string): PropertyDescriptor | undefined => descriptors.get(key);
-
     const entries: SafeOwnEntry[] = [];
-    if (isArray) {
-      const lengthDescriptor = descriptorFor("length");
-      if (!lengthDescriptor || !("value" in lengthDescriptor) ||
-          typeof lengthDescriptor.value !== "number" ||
-          !Number.isInteger(lengthDescriptor.value) ||
-          lengthDescriptor.value < 0 || lengthDescriptor.value > MAX_ARRAY_ITEMS) {
-        return undefined;
-      }
-      const length = lengthDescriptor.value;
-      for (const key of descriptorKeys as string[]) {
-        if (key === "length") continue;
-        if (DANGEROUS_JSON_KEYS.has(key)) return undefined;
-        if (!/^\d+$/.test(key)) return undefined;
-        const index = Number(key);
-        if (!Number.isSafeInteger(index) || index < 0 || index >= length || String(index) !== key) return undefined;
-        const descriptor = descriptorFor(key);
-        if (!descriptor) return undefined;
-        if (!descriptor.enumerable || !("value" in descriptor) ||
-            Object.prototype.hasOwnProperty.call(descriptor, "get") ||
-            Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
-      }
-      if (descriptorKeys.length !== length + 1) return undefined;
-      for (let index = 0; index < length; index += 1) {
-        const descriptor = descriptorFor(String(index));
-        if (!descriptor || !descriptor.enumerable || !("value" in descriptor) ||
-            Object.prototype.hasOwnProperty.call(descriptor, "get") ||
-            Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
-        entries.push({ key: String(index), value: descriptor.value });
-      }
-      return { isArray: true, length, entries };
-    }
+    const maximumEntries = isArray ? MAX_ARRAY_ITEMS : MAX_GRAPH_NODES;
 
-    for (const key of descriptorKeys as string[]) {
-      if (DANGEROUS_JSON_KEYS.has(key)) return undefined;
-      const descriptor = descriptorFor(key);
-      if (!descriptor) return undefined;
-      if (!descriptor.enumerable || !("value" in descriptor) ||
+    // `for...in` exposes enumerable string keys one at a time.  Descriptor
+    // reads identify inherited keys without invoking a getter and let us
+    // reject enumerable accessors before their values are touched.
+    for (const key in value) {
+      const descriptor = Object.getOwnPropertyDescriptor(value, key);
+      if (!descriptor) continue;
+      if (entries.length >= maximumEntries) return undefined;
+      if (DANGEROUS_JSON_KEYS.has(key) || !descriptor.enumerable || !("value" in descriptor) ||
           Object.prototype.hasOwnProperty.call(descriptor, "get") ||
           Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
       entries.push({ key, value: descriptor.value });
     }
-    return { isArray: false, length: entries.length, entries };
+
+    // Non-enumerable and symbol properties are outside the JSON content
+    // model and are intentionally ignored.  Avoiding a second own-key scan
+    // also ensures a stateful Proxy cannot change the record between capture
+    // passes; every accepted field comes from the single descriptor snapshot
+    // above and public projections remain explicit allowlists.
+
+    if (!isArray) {
+      return { isArray: false, length: entries.length, entries };
+    }
+
+    const lengthDescriptor = Object.getOwnPropertyDescriptor(value, "length");
+    if (!lengthDescriptor || lengthDescriptor.enumerable || !("value" in lengthDescriptor) ||
+        typeof lengthDescriptor.value !== "number" || !Number.isInteger(lengthDescriptor.value) ||
+        lengthDescriptor.value < 0 || lengthDescriptor.value > MAX_ARRAY_ITEMS ||
+        entries.length !== lengthDescriptor.value) return undefined;
+
+    const indexedEntries: SafeOwnEntry[] = [];
+    indexedEntries.length = lengthDescriptor.value;
+    for (const entry of entries) {
+      if (entry.key === "length" || !/^\d+$/.test(entry.key)) return undefined;
+      const index = Number(entry.key);
+      if (!Number.isSafeInteger(index) || index < 0 || index >= lengthDescriptor.value || String(index) !== entry.key || indexedEntries[index]) {
+        return undefined;
+      }
+      indexedEntries[index] = entry;
+    }
+    for (let index = 0; index < indexedEntries.length; index += 1) {
+      if (!indexedEntries[index]) return undefined;
+    }
+    return { isArray: true, length: lengthDescriptor.value, entries: indexedEntries };
   } catch {
     return undefined;
   }
@@ -319,7 +316,26 @@ function isGradeBand(value: unknown): value is RuntimeGradeBand {
 }
 
 export function isGradeBandArray(value: unknown, allowEmpty = false): value is RuntimeGradeBand[] {
-  return Array.isArray(value) && (allowEmpty || value.length > 0) && value.every(isGradeBand);
+  const snapshot = captureSafeSnapshot(value);
+  return Array.isArray(snapshot) && (allowEmpty || snapshot.length > 0) && snapshot.every(isGradeBand);
+}
+
+// Keep this explicit rather than using Unicode property escapes: the project
+// intentionally type-checks without an ES2015 `target`, while these ranges
+// cover ASCII/C1 controls, zero-width markers, and the bidi format controls
+// that can make two visible IDs look identical.
+const FORBIDDEN_ENTITY_ID_CONTROLS = /[\u0000-\u001F\u007F-\u009F\u00AD\u0600-\u0605\u061C\u180E\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/;
+
+/**
+ * Return one canonical identity for entity and nested-question IDs.  Invalid
+ * values return undefined so callers cannot accidentally use an empty or
+ * control-bearing string as an identity key.
+ */
+export function normalizeEntityId(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const normalized = value.normalize("NFC").trim();
+  if (!normalized || FORBIDDEN_ENTITY_ID_CONTROLS.test(normalized)) return undefined;
+  return normalized;
 }
 
 export function isCurriculumStrandId(value: unknown): value is CurriculumStrandId {
@@ -489,8 +505,20 @@ function isOrderingItem(value: unknown): boolean {
   return isRecord(value) && hasRequiredStrings(value, ["id", "text_si"]) && isInteger(value.correctIndex) && value.correctIndex >= 0;
 }
 
+function canonicalQuestionIds(questions: readonly unknown[]): string[] | undefined {
+  const ids: string[] = [];
+  for (const question of questions) {
+    if (!isRecord(question)) return undefined;
+    const id = normalizeEntityId(read(question, "id"));
+    if (!id) return undefined;
+    ids.push(id);
+  }
+  return ids;
+}
+
 function isQuestionShape(value: unknown): boolean {
   if (!isRecord(value) || !hasRequiredStrings(value, ["id", "type", "prompt_si", "explanation_si", "strandId"])) return false;
+  if (!normalizeEntityId(read(value, "id"))) return false;
   const type = read(value, "type");
   const gradeBands = read(value, "gradeBands");
   const difficulty = read(value, "difficulty");
@@ -687,8 +715,8 @@ function isQuiz(value: Record<string, unknown>): boolean {
   if (!hasRequiredStrings(value, ["id", "title_si", "lessonId"]) || !isGradeBandArray(value.gradeBands) ||
       !isFiniteNumber(value.passingScorePercent) || value.passingScorePercent < 1 || value.passingScorePercent > 100 ||
       !Array.isArray(value.questions) || value.questions.length === 0 || !value.questions.every(isQuestionShape)) return false;
-  const ids = value.questions.map((question) => (question as Record<string, unknown>).id);
-  return new Set(ids).size === ids.length;
+  const ids = canonicalQuestionIds(value.questions);
+  return !!ids && new Set(ids).size === ids.length;
 }
 
 function isExamPaper(value: Record<string, unknown>): boolean {
@@ -696,8 +724,8 @@ function isExamPaper(value: Record<string, unknown>): boolean {
       !isStringArray(value.instructions_si) || !Array.isArray(value.partA_MCQ) || value.partA_MCQ.length === 0 || !value.partA_MCQ.every(isQuestionShape) ||
       !Array.isArray(value.partB_Structured) || value.partB_Structured.length === 0 || !value.partB_Structured.every(isQuestionShape) ||
       !isSourceReference(value.sourceReference) || !isReviewMetadata(value.reviewMetadata)) return false;
-  const ids = [...value.partA_MCQ, ...value.partB_Structured].map((question) => (question as Record<string, unknown>).id);
-  return new Set(ids).size === ids.length;
+  const ids = canonicalQuestionIds([...value.partA_MCQ, ...value.partB_Structured]);
+  return !!ids && new Set(ids).size === ids.length;
 }
 
 function isSource(value: Record<string, unknown>): boolean {

@@ -217,3 +217,17 @@ application-contract and audit-integrity repairs only. They do not change any
 musical-core field disposition. Stable mapping lives in
 `P02_CLOSEOUT_FINDINGS.md#Final-acceptance follow-up (14 validated blockers)`;
 all eight Tala records remain quarantined as whole entities.
+
+## Acceptance-hardening review cycle 1 boundary
+
+The twenty findings in run `20260817-p02-hardening-c1-06568d6f` concern
+runtime validation, publication parity, identity safety, and local-audio
+ownership only. Their exact validator-to-test-to-fix mapping is recorded under
+`P02_CLOSEOUT_FINDINGS.md#Acceptance-hardening review cycle 1 (20 validated findings; pending rereview)`
+and `data/forensic-ledger.json#acceptanceHardeningReviewCycle1`.
+
+They do not revise any musical-core value in this matrix. All eight Talas stay
+whole-entity quarantined, the Deepchandi finding remains rejected as a
+retrieval-only spelling issue, and original-PDF, notation/layout, OCR/corrupt
+glyph, and SME review remain deferred. The review cycle is
+`FIXED-PENDING-REREVIEW`, not acceptance evidence.

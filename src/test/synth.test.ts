@@ -96,6 +96,28 @@ describe("Audio Synthesis Engine & Tuning Suite", () => {
     expect(cleared).toEqual([1]);
   });
 
+  it("rolls back earlier Tabla timers when an immediate stroke callback fails", () => {
+    const cleared: number[] = [];
+    let nextTimer = 1;
+    const timerApi = {
+      set: (callback: () => void) => nextTimer++,
+      clear: (timer: number) => { cleared.push(timer); },
+    };
+
+    expect(() => scheduleTablaPlan(
+      [
+        { bol: "පළමු", kind: "open", delayMs: 100 },
+        { bol: "දෙවන", kind: "open", delayMs: 0 },
+        { bol: "තෙවන", kind: "open", delayMs: 200 },
+      ],
+      (stroke) => {
+        if (stroke.bol === "දෙවන") throw new Error("immediate stroke failed");
+      },
+      timerApi,
+    )).toThrow("immediate stroke failed");
+    expect(cleared).toEqual([1]);
+  });
+
   it("cancels remaining Tabla timers when a delayed stroke callback fails", () => {
     const callbacks = new Map<number, () => void>();
     const cleared: number[] = [];

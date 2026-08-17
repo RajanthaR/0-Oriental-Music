@@ -10,6 +10,7 @@ import {
   isRecord,
   isQuestion,
   isSourceReference as isContractSourceReference,
+  normalizeEntityId,
   readOwnDataField,
   projectPublicRecord,
   validateContentRecord,
@@ -336,6 +337,39 @@ function isSourcePageQualityRecord(value: unknown): value is SourcePageQualityRe
     typeof readOwnDataField(value, "hasSinhalaText") === "boolean";
 }
 
+function hasValidPageQualityRegistry(
+  documents: SourceDocumentRecord[],
+  pages: SourcePageQualityRecord[],
+): boolean {
+  const pageCountsBySlug = new Map<string, number>();
+  for (const document of documents) {
+    if (pageCountsBySlug.has(document.slug)) return false;
+    pageCountsBySlug.set(document.slug, document.pageCount);
+  }
+  const seenPages = new Set<string>();
+  for (const page of pages) {
+    const pageCount = pageCountsBySlug.get(page.documentSlug);
+    const key = `${page.documentSlug}:${page.pageNumber}`;
+    if (pageCount === undefined || page.pageNumber > pageCount || seenPages.has(key)) return false;
+    seenPages.add(key);
+  }
+  return true;
+}
+
+function hasUniqueDispositionIds(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  const talas = readOwnDataField(value, "talas");
+  if (!Array.isArray(talas)) return false;
+  const seenIds = new Set<string>();
+  for (const entry of talas) {
+    if (!isRecord(entry)) return false;
+    const talaId = normalizeRecordId(readOwnDataField(entry, "talaId"));
+    if (!talaId || seenIds.has(talaId)) return false;
+    seenIds.add(talaId);
+  }
+  return true;
+}
+
 function registerKnownKinds(
   knownKinds: Map<string, ContentEntityKind | "ambiguous">,
   kind: ContentEntityKind,
@@ -352,7 +386,7 @@ function registerKnownKinds(
 }
 
 function normalizeRecordId(value: unknown): string {
-  return typeof value === "string" ? value.trim() : "";
+  return normalizeEntityId(value) ?? "";
 }
 
 type CatalogInputRead = { present: boolean; safe: boolean; value?: unknown };
@@ -392,9 +426,12 @@ export function createPublicationEvaluationContext(
   const capturedDocuments = captureEvaluationArray(sourceDocumentsData);
   const capturedPageQuality = captureEvaluationArray(sourcePageQualityData);
   const capturedDispositions = captureEvaluationValue(musicalCoreFieldDispositionsData);
+  const sourceDocuments = (capturedDocuments ?? []) as SourceDocumentRecord[];
+  const sourcePages = (capturedPageQuality ?? []) as SourcePageQualityRecord[];
   if (!capturedDocuments || !capturedDocuments.every(isSourceDocumentRecord) ||
     !capturedPageQuality || !capturedPageQuality.every(isSourcePageQualityRecord) ||
-    capturedDispositions === undefined) safe = false;
+    !hasValidPageQualityRegistry(sourceDocuments, sourcePages) ||
+    capturedDispositions === undefined || !hasUniqueDispositionIds(capturedDispositions)) safe = false;
 
   Object.freeze(capturedCatalogs);
   const context: PublicationEvaluationContext = Object.freeze({
@@ -402,8 +439,8 @@ export function createPublicationEvaluationContext(
     safe,
   });
   const state: PublicationEvaluationState = {
-    sourceDocuments: (capturedDocuments ?? []) as SourceDocumentRecord[],
-    sourcePageQuality: (capturedPageQuality ?? []) as SourcePageQualityRecord[],
+    sourceDocuments,
+    sourcePageQuality: sourcePages,
     musicalCoreFieldDispositions: capturedDispositions,
     knownKinds: new Map<string, ContentEntityKind | "ambiguous">(),
     snapshots: new WeakMap<object, Record<string, unknown>>(),
@@ -608,10 +645,26 @@ function explicitPageReferences(pageOrSection: string, expectedFilename: string)
 }
 
 
+function uniquePageEvidence(
+  documentSlug: string,
+  pageNumbers: number[],
+  context: PublicationEvaluationContext,
+): SourcePageQualityRecord[] | undefined {
+  const requestedPages = new Set(pageNumbers);
+  const evidenceByPage = new Map<number, SourcePageQualityRecord>();
+  for (const page of getEvaluationState(context).sourcePageQuality) {
+    if (page.documentSlug !== documentSlug || !requestedPages.has(page.pageNumber)) continue;
+    if (evidenceByPage.has(page.pageNumber)) return undefined;
+    evidenceByPage.set(page.pageNumber, page);
+  }
+  if (evidenceByPage.size !== requestedPages.size) return undefined;
+  return pageNumbers.map((pageNumber) => evidenceByPage.get(pageNumber) as SourcePageQualityRecord);
+}
+
 function qualityForPages(documentSlug: string, pageNumbers: number[], context: PublicationEvaluationContext): EvidenceQuality {
-  const qualities = getEvaluationState(context).sourcePageQuality
-    .filter((page) => page.documentSlug === documentSlug && pageNumbers.includes(page.pageNumber))
-    .map((page) => page.confidence);
+  const evidence = uniquePageEvidence(documentSlug, pageNumbers, context);
+  if (!evidence) return "missing";
+  const qualities = evidence.map((page) => page.confidence);
 
   if (qualities.length === 0) return "missing";
   
@@ -623,15 +676,10 @@ function qualityForPages(documentSlug: string, pageNumbers: number[], context: P
 }
 
 function hasReadablePages(documentSlug: string, pageNumbers: number[], context: PublicationEvaluationContext): boolean {
-  const citedPages = getEvaluationState(context).sourcePageQuality.filter(
-    (page) => page.documentSlug === documentSlug && pageNumbers.includes(page.pageNumber)
-  );
-  return (
-    citedPages.length === pageNumbers.length &&
-    citedPages.every(
-      (page) => (page.confidence === "A" || page.confidence === "B") && page.hasSinhalaText
-    )
-  );
+  const citedPages = uniquePageEvidence(documentSlug, pageNumbers, context);
+  return Boolean(citedPages?.every(
+    (page) => (page.confidence === "A" || page.confidence === "B") && page.hasSinhalaText
+  ));
 }
 
 function getRecordShape(record: unknown): PublicationRecordShape {
@@ -649,7 +697,9 @@ function resolveRecordSourceReference(value: PublicationRecordShape): SourceRefe
 
 export function toPublicationInput(record: unknown): PublicationInput {
   try {
-    const value = getRecordShape(record);
+    const snapshot = cloneBoundedRecord(record);
+    if (!snapshot) return { id: "", gradeBands: [], sourceReference: undefined };
+    const value = getRecordShape(snapshot);
     const id = readOwnDataField(value, "id");
     return {
       id: typeof id === "string" ? id : "",
@@ -952,7 +1002,9 @@ export function getTalaFieldDisposition(
       ? dispositionRegistry as typeof talaFieldDispositions
       : undefined;
     const entries = registry && Array.isArray(registry.talas) ? registry.talas : [];
-    const entry = entries.find((candidate) => normalizeRecordId(candidate.talaId) === talaId);
+    const matchingEntries = entries.filter((candidate) => normalizeRecordId(candidate.talaId) === talaId);
+    if (matchingEntries.length !== 1) return undefined;
+    const entry = matchingEntries[0];
     if (!entry) return undefined;
   const tala = (supplied ?? context.catalogs.talas.find((candidate) => normalizeRecordId(readOwnDataField(candidate, "id")) === talaId)) as {
     id?: unknown;
@@ -1411,7 +1463,8 @@ export function evaluatePublicationBatch(
       if (!isRecord(record)) return false;
       const id = readOwnDataField(record, "id");
       if (typeof id !== "string" || !id.trim()) return false;
-      const normalizedId = id.trim();
+      const normalizedId = normalizeRecordId(id);
+      if (!normalizedId) return false;
       if (seenIds.has(normalizedId)) return true;
       seenIds.add(normalizedId);
       return false;
@@ -1426,9 +1479,18 @@ export function evaluatePublicationBatch(
       if (isRecord(record)) getEvaluationState(evaluationContext).snapshots.set(record, record);
       const decision = getRecordPublicationDecisionInternal(record, evaluationContext, record);
       if (!decision.isPublic) return decision;
+      const publicProjection = sanitizePublicRecordWithDecision(record, decision, evaluationContext);
+      if (!publicProjection) {
+        return {
+          ...decision,
+          state: "needs-review" as const,
+          isPublic: false,
+          reasonCodes: Array.from(new Set([...decision.reasonCodes, "evaluation-failed" as const])),
+        };
+      }
       return {
         ...decision,
-        publicProjection: sanitizePublicRecordWithDecision(record, decision, evaluationContext),
+        publicProjection,
       };
     });
     return { isValid: true, decisions };

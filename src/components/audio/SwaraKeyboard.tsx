@@ -52,7 +52,13 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
 
   const cancelPlayback = useCallback(() => {
     generationRef.current += 1;
-    playbackRef.current?.();
+    const playback = playbackRef.current;
+    playbackRef.current = null;
+    try {
+      playback?.();
+    } catch {
+      // Cancellation is best-effort; the UI ownership must still be released.
+    }
     if (highlightTimerRef.current !== null) {
       window.clearTimeout(highlightTimerRef.current);
       highlightTimerRef.current = null;
@@ -94,7 +100,24 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
     const generation = generationRef.current;
     setPlayingKey(baseKey);
     setAudioUnavailable(false);
-    const handle = swaraSynth.playSwaraToneHandle(fullNote, 0.7, 261.63, timbre);
+    let handle: SwaraPlaybackHandle;
+    try {
+      handle = swaraSynth.playSwaraToneHandle(fullNote, 0.7, 261.63, timbre);
+    } catch {
+      if (mountedRef.current && generationRef.current === generation) {
+        setAudioUnavailable(true);
+        setPlayingKey(null);
+      }
+      return;
+    }
+    if (!mountedRef.current || generationRef.current !== generation) {
+      try {
+        handle();
+      } catch {
+        // The operation may already be in browser teardown.
+      }
+      return;
+    }
     playbackRef.current = handle;
     void handle.ready.then(
       (played) => {
@@ -128,8 +151,17 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
         setPlayingKey(null);
       },
     );
-    if (onNotePlay) {
-      onNotePlay(fullNote);
+    try {
+      onNotePlay?.(fullNote);
+    } catch {
+      // Consumer callbacks cannot retain a voice after they fail.
+      if (mountedRef.current && generationRef.current === generation && playbackRef.current === handle) {
+        cancelPlayback();
+      }
+      return;
+    }
+    if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) {
+      return;
     }
     highlightTimerRef.current = window.setTimeout(() => {
       highlightTimerRef.current = null;
@@ -160,10 +192,27 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
     const scale = highlightNotes.length > 0
       ? highlightNotes
       : ["S", "R", "G", "M", "P", "D", "N", "S'"];
-    const handle = swaraSynth.playSequenceHandle(scale, 0.5, (_index, note) => {
-      if (!mountedRef.current || generationRef.current !== generation) return;
-      setPlayingKey(note.replace(/[.̣'̇]/g, ""));
-    }, 261.63, timbre);
+    let handle: SwaraPlaybackHandle;
+    try {
+      handle = swaraSynth.playSequenceHandle(scale, 0.5, (_index, note) => {
+        if (!mountedRef.current || generationRef.current !== generation) return;
+        setPlayingKey(note.replace(/[.̣'̇]/g, ""));
+      }, 261.63, timbre);
+    } catch {
+      if (mountedRef.current && generationRef.current === generation) {
+        setAudioUnavailable(true);
+        setIsPlayingScale(false);
+      }
+      return;
+    }
+    if (!mountedRef.current || generationRef.current !== generation) {
+      try {
+        handle();
+      } catch {
+        // The operation may already be in browser teardown.
+      }
+      return;
+    }
     playbackRef.current = handle;
     void handle.ready.then(
       (played) => {

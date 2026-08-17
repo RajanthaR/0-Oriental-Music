@@ -13,6 +13,9 @@ import sources from "@/data/sources.json";
 import {
   cloneBoundedRecord,
   inspectGraph,
+  isGradeBandArray,
+  MAX_GRAPH_NODES,
+  normalizeEntityId,
   projectPublicRecord,
   validateContentRecord,
   type ContentEntityKind,
@@ -321,6 +324,32 @@ describe("closed runtime content contracts", () => {
     });
   });
 
+  it("canonicalizes entity IDs and rejects invisible or control-bearing identities", () => {
+    expect(normalizeEntityId("  q-e\u0301  ")).toBe("q-é");
+    expect(normalizeEntityId("q\u200b-id")).toBeUndefined();
+    expect(normalizeEntityId("q\u2066-id")).toBeUndefined();
+    expect(normalizeEntityId("q\u0000-id")).toBeUndefined();
+    expect(normalizeEntityId("q\n-id")).toBeUndefined();
+    expect(normalizeEntityId("   ")).toBeUndefined();
+  });
+
+  it("uses canonical IDs for duplicate nested Quiz and Exam questions", () => {
+    const quiz = structuredClone(quizzes[0]) as Record<string, unknown>;
+    const quizQuestions = quiz.questions as Array<Record<string, unknown>>;
+    quizQuestions[1].id = `  ${String(quizQuestions[0].id).normalize("NFD")}  `;
+    expect(validateContentRecord(quiz, "quiz").isValid).toBe(false);
+
+    const exam = structuredClone(examPapers[0]) as Record<string, unknown>;
+    const examPartA = exam.partA_MCQ as Array<Record<string, unknown>>;
+    const examPartB = exam.partB_Structured as Array<Record<string, unknown>>;
+    examPartB[0].id = `\u00a0${String(examPartA[0].id)}\u00a0`;
+    expect(validateContentRecord(exam, "exam-paper").isValid).toBe(false);
+
+    const invalidQuestionId = structuredClone(quizzes[0]) as Record<string, unknown>;
+    (invalidQuestionId.questions as Array<Record<string, unknown>>)[0].id = "q\u200d-id";
+    expect(validateContentRecord(invalidQuestionId, "quiz").isValid).toBe(false);
+  });
+
   it("never accepts a caller-supplied snapshot as contract evidence", () => {
     const malformed = structuredClone(ragas[0]) as unknown as Record<string, unknown>;
     delete malformed.characteristics_si;
@@ -564,7 +593,7 @@ describe("closed runtime content contracts", () => {
     });
   });
 
-  it("rejects over-wide objects before reading their property descriptors", () => {
+  it("bounds descriptor reads while rejecting over-wide objects", () => {
     const target: Record<string, unknown> = {};
     for (let index = 0; index <= 10_000; index += 1) target[`field-${index}`] = index;
     let descriptorReads = 0;
@@ -576,8 +605,36 @@ describe("closed runtime content contracts", () => {
     });
 
     expect(cloneBoundedRecord(hostileWidth)).toBeUndefined();
+    expect(descriptorReads).toBeGreaterThan(0);
+    expect(descriptorReads).toBeLessThanOrEqual(2 * (MAX_GRAPH_NODES + 1));
+    descriptorReads = 0;
     expect(inspectGraph(hostileWidth)).toMatchObject({ safe: false, reason: "unreadable" });
-    expect(descriptorReads).toBe(0);
+    expect(descriptorReads).toBeGreaterThan(0);
+    expect(descriptorReads).toBeLessThanOrEqual(2 * (MAX_GRAPH_NODES + 1));
+  });
+
+  it("rejects sparse, oversized, and hostile grade-band arrays without throwing", () => {
+    const sparse: unknown[] = [];
+    sparse.length = 2;
+    sparse[0] = "10-11";
+    expect(() => isGradeBandArray(sparse)).not.toThrow();
+    expect(isGradeBandArray(sparse)).toBe(false);
+
+    const oversized = Array.from({ length: 10_001 }, () => "10-11");
+    expect(() => isGradeBandArray(oversized)).not.toThrow();
+    expect(isGradeBandArray(oversized)).toBe(false);
+
+    const hostile = new Proxy(["10-11"], {
+      get(target, property, receiver) {
+        if (property === "length" || property === "every") throw new Error("hostile array access");
+        return Reflect.get(target, property, receiver);
+      },
+      ownKeys() {
+        throw new Error("hostile array ownKeys");
+      },
+    });
+    expect(() => isGradeBandArray(hostile)).not.toThrow();
+    expect(isGradeBandArray(hostile)).toBe(false);
   });
 
   it("rejects inherited, accessor, proxy, and dangerous-key records without invoking hostile code", () => {
@@ -604,6 +661,16 @@ describe("closed runtime content contracts", () => {
     });
     expect(() => validateContentRecord(hostileProxy, "raga")).not.toThrow();
     expect(validateContentRecord(hostileProxy, "raga").isValid).toBe(false);
+
+    const nonEnumerable = structuredClone(ragas[0]) as Record<string, unknown>;
+    Object.defineProperty(nonEnumerable, "hidden", { enumerable: false, value: "withheld" });
+    expect(validateContentRecord(nonEnumerable, "raga").isValid).toBe(true);
+    expect(projectPublicRecord(nonEnumerable, "raga")).not.toHaveProperty("hidden");
+
+    const symbolKey = structuredClone(ragas[0]) as Record<string, unknown>;
+    Object.defineProperty(symbolKey, Symbol("hidden"), { enumerable: true, value: "withheld" });
+    expect(validateContentRecord(symbolKey, "raga").isValid).toBe(true);
+    expect(Object.getOwnPropertySymbols(projectPublicRecord(symbolKey, "raga") ?? {})).toEqual([]);
 
     const dangerous = structuredClone(ragas[0]) as Record<string, unknown>;
     Object.defineProperty(dangerous, "__proto__", { enumerable: true, value: { polluted: true } });

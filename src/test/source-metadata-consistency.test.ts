@@ -9,12 +9,36 @@ import { projectPublicRecord } from "@/lib/validation/content-contracts";
 import {
   SELECTED_PHASE_2_SOURCE_IDS,
   validateMusicalCoreFieldDispositions,
+  validatePublicCollection,
   validateSelectedSourceMetadata,
 } from "@/lib/validation/content-validator";
 
 const humanCatalog = readFileSync(resolve(process.cwd(), "SOURCES.md"), "utf8");
 
 describe("selected Phase 2 source metadata", () => {
+  it("validates raw and repository source collections through the transparency boundary", () => {
+    expect(validatePublicCollection("Source", runtimeSources)).toEqual({ isValid: true, issues: [] });
+    expect(validatePublicCollection("sources", repository.getSources())).toEqual({ isValid: true, issues: [] });
+  });
+
+  it("rejects forged fields on an already-sanitized repository source row", () => {
+    const sanitized = structuredClone(repository.getSources()[0]) as unknown as Record<string, unknown>;
+    sanitized.publisher = "fabricated";
+    const result = validatePublicCollection("sources", [sanitized]);
+    expect(result.isValid).toBe(false);
+    expect(result.issues.some((issue) => issue.field === "publisher")).toBe(true);
+  });
+
+  it("fails closed for hostile source collection containers", () => {
+    const hostile = new Proxy([], {
+      ownKeys() {
+        throw new Error("hostile source collection");
+      },
+    });
+    expect(() => validatePublicCollection("Source", hostile)).not.toThrow();
+    expect(validatePublicCollection("Source", hostile)).toMatchObject({ isValid: false });
+  });
+
   it("uses the same unknown provenance representation in direct and repository source projections", () => {
     const repositorySources = repository.getSources();
     for (const rawSource of runtimeSources) {
