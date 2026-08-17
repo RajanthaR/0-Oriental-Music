@@ -73,14 +73,14 @@ export default function AdminReviewDashboardPage() {
     const isPublished = newStatus === "Published";
     const updated = repository.updateLessonReviewStatus(lessonId, newStatus, isPublished);
     setLessons(repository.getLessons({ visibility: "review" }));
-    setUpdateNotice(updated
+    setUpdateNotice(updated.ok
       ? {
           kind: "success",
           message: `පාඩම් අංක ${lessonId} සමාලෝචන පාරදත්ත '${newStatus}' ලෙස සටහන් විය. ප්‍රකාශන සීමා ප්‍රතිපත්තිය තවදුරටත් බලපැවැත්වේ.`,
         }
       : {
           kind: "error",
-          message: `පාඩම් අංක ${lessonId} සඳහා '${newStatus}' තත්ත්වය සටහන් කළ නොහැකි විය. මූලාශ්‍ර හා සමාලෝචන සාක්ෂි පරීක්ෂා කරන්න.`,
+          message: `පාඩම් අංක ${lessonId} සඳහා '${newStatus}' තත්ත්වය සටහන් කළ නොහැකි විය (${updated.reasonCode}). මූලාශ්‍ර හා සමාලෝචන සාක්ෂි පරීක්ෂා කරන්න.`,
         });
     setTimeout(() => setUpdateNotice(null), 3000);
   };

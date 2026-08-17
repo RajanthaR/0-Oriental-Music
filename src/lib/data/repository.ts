@@ -47,6 +47,9 @@ import {
   sanitizeReviewRecord,
   createUnverifiedReviewMetadata,
   type PublicationEvaluationContext,
+  type PublicationCatalogInputs,
+  type PublicationDecision,
+  type PublicationReasonCode,
   type SourceDocumentSummary,
 } from "@/lib/data/publication-policy";
 import {
@@ -108,23 +111,6 @@ function normalizeRecordId(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function findUniqueRecordById(items: readonly unknown[], id: string): Record<string, unknown> | undefined {
-  try {
-    const normalizedId = normalizeRecordId(id);
-    if (!normalizedId) return undefined;
-    let match: Record<string, unknown> | undefined;
-    for (const candidate of items) {
-      if (!isRecord(candidate)) continue;
-      if (normalizeRecordId(readOwnDataField(candidate, "id")) !== normalizedId) continue;
-      if (match) return undefined;
-      match = candidate;
-    }
-    return match;
-  } catch {
-    return undefined;
-  }
-}
-
 function findUniqueRecordIndex(items: readonly unknown[], id: string): number {
   const normalizedId = normalizeRecordId(id);
   if (!normalizedId) return -1;
@@ -163,6 +149,30 @@ export interface PublicationCollectionSummary {
   failureReasons: readonly string[];
 }
 
+export type CmsMutationReasonCode =
+  | "updated"
+  | "record-not-found"
+  | "invalid-request"
+  | "status-publication-mismatch"
+  | "missing-review-evidence"
+  | "publication-ineligible"
+  | "malformed-review-metadata"
+  | PublicationReasonCode;
+
+export interface CmsMutationResult {
+  ok: boolean;
+  reasonCode: CmsMutationReasonCode;
+  decision?: PublicationDecision;
+}
+
+function cmsFailure(reasonCode: CmsMutationReasonCode, decision?: PublicationDecision): CmsMutationResult {
+  return { ok: false, reasonCode, ...(decision ? { decision } : {}) };
+}
+
+function cmsSuccess(): CmsMutationResult {
+  return { ok: true, reasonCode: "updated" };
+}
+
 export interface PublicSearchCatalogs {
   lessons: Lesson[];
   ragas: Raga[];
@@ -188,7 +198,7 @@ class ContentRepository {
   private quizzes: unknown[] = quizzesData as unknown[];
   private examPapers: unknown[] = examPapersData as unknown[];
 
-  private createEvaluationContext(): PublicationEvaluationContext {
+  private createEvaluationContext(overrides: PublicationCatalogInputs = {}): PublicationEvaluationContext {
     return createPublicationEvaluationContext({
       sources: this.sources,
       lessons: this.lessons,
@@ -201,6 +211,7 @@ class ContentRepository {
       learningPaths: this.learningPaths,
       quizzes: this.quizzes,
       examPapers: this.examPapers,
+      ...overrides,
     });
   }
 
@@ -549,41 +560,52 @@ class ContentRepository {
     lessonId: string,
     newStatus: ReviewStatus,
     isPublished: boolean = false
-  ): boolean {
+  ): CmsMutationResult {
     try {
       const context = this.createEvaluationContext();
-      if (!context.safe || !hasUniqueRecordIds(context.catalogs.lessons)) return false;
-      const lesson = findUniqueRecordById(context.catalogs.lessons, lessonId);
-      const rawIndex = findUniqueRecordIndex(this.lessons, lessonId);
-      if (!lesson || rawIndex < 0 || typeof isPublished !== "boolean") return false;
+      if (!context.safe) return cmsFailure("unsafe-container");
+      if (!hasUniqueRecordIds(context.catalogs.lessons)) return cmsFailure("duplicate-record-id");
+      const snapshotIndex = findUniqueRecordIndex(context.catalogs.lessons, lessonId);
+      const lesson = snapshotIndex >= 0 && isRecord(context.catalogs.lessons[snapshotIndex])
+        ? context.catalogs.lessons[snapshotIndex]
+        : undefined;
+      if (!lesson || snapshotIndex < 0) return cmsFailure("record-not-found");
+      if (typeof isPublished !== "boolean") return cmsFailure("invalid-request");
 
-      if ((newStatus === "Published") !== isPublished) return false;
+      if ((newStatus === "Published") !== isPublished) return cmsFailure("status-publication-mismatch");
       const requestsPublication = newStatus === "Published" || isPublished;
       const rawMetadata = readRawReviewMetadata(lesson);
-      if (requestsPublication && !hasKnownReviewEvidence(rawMetadata)) return false;
+      if (requestsPublication && !hasKnownReviewEvidence(rawMetadata)) return cmsFailure("missing-review-evidence");
       if (requestsPublication) {
         const publication = getRecordPublicationDecision(lesson, context);
-        if (!publication.isPublic || !publication.sourceEvidence.supportable) return false;
+        if (!publication.isPublic || !publication.sourceEvidence.supportable) {
+          return cmsFailure(publication.reasonCodes[0] ?? "publication-ineligible", publication);
+        }
       }
 
       const safeCandidate = sanitizeReviewRecord(lesson, context);
-      if (!validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) return false;
+      if (!safeCandidate || !validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) {
+        return cmsFailure("malformed-record");
+      }
       const metadataSnapshot = cloneBoundedRecord(rawMetadata);
       const nextMetadata: ReviewMetadata = isReviewMetadata(metadataSnapshot)
         ? metadataSnapshot as unknown as ReviewMetadata
         : createUnverifiedReviewMetadata();
       nextMetadata.status = newStatus;
       if (!requestsPublication) nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
-      if (!isReviewMetadata(nextMetadata)) return false;
+      if (!isReviewMetadata(nextMetadata)) return cmsFailure("malformed-review-metadata");
       const replacement = cloneBoundedRecord(lesson);
-      if (!isRecord(replacement)) return false;
+      if (!isRecord(replacement)) return cmsFailure("malformed-record");
       replacement.reviewMetadata = nextMetadata;
       replacement.published = isPublished;
-      if (!validateContentRecord(replacement, "lesson").isValid) return false;
-      this.lessons[rawIndex] = replacement;
-      return true;
+      if (!validateContentRecord(replacement, "lesson").isValid) return cmsFailure("malformed-record");
+      const nextLessons = cloneBoundedRecord(context.catalogs.lessons);
+      if (!Array.isArray(nextLessons)) return cmsFailure("unsafe-container");
+      nextLessons[snapshotIndex] = replacement;
+      this.lessons = nextLessons;
+      return cmsSuccess();
     } catch {
-      return false;
+      return cmsFailure("evaluation-failed");
     }
   }
 
@@ -592,28 +614,35 @@ class ContentRepository {
     newStatus: ReviewStatus,
     reviewer: string,
     notes: string
-  ): boolean {
+  ): CmsMutationResult {
     try {
       const context = this.createEvaluationContext();
-      if (!context.safe || !hasUniqueRecordIds(context.catalogs.lessons)) return false;
-      const lesson = findUniqueRecordById(context.catalogs.lessons, lessonId);
-      const rawIndex = findUniqueRecordIndex(this.lessons, lessonId);
-      if (!lesson || rawIndex < 0) return false;
+      if (!context.safe) return cmsFailure("unsafe-container");
+      if (!hasUniqueRecordIds(context.catalogs.lessons)) return cmsFailure("duplicate-record-id");
+      const snapshotIndex = findUniqueRecordIndex(context.catalogs.lessons, lessonId);
+      const lesson = snapshotIndex >= 0 && isRecord(context.catalogs.lessons[snapshotIndex])
+        ? context.catalogs.lessons[snapshotIndex]
+        : undefined;
+      if (!lesson || snapshotIndex < 0) return cmsFailure("record-not-found");
 
       const rawMetadata = readRawReviewMetadata(lesson);
       if (newStatus === "Published") {
-        if (!hasKnownReviewEvidence(rawMetadata) || !isRecord(rawMetadata)) return false;
+        if (!hasKnownReviewEvidence(rawMetadata) || !isRecord(rawMetadata)) return cmsFailure("missing-review-evidence");
         if (typeof reviewer !== "string" || typeof notes !== "string" ||
           !reviewer.trim() || !notes.trim() ||
-          [UNKNOWN_PROVENANCE, "Unknown / Unverified", "unknown"].includes(reviewer.trim())) return false;
+          [UNKNOWN_PROVENANCE, "Unknown / Unverified", "unknown"].includes(reviewer.trim())) return cmsFailure("invalid-request");
         if (reviewer.trim() !== String(readOwnDataField(rawMetadata, "reviewer")).trim() ||
-          notes.trim() !== String(readOwnDataField(rawMetadata, "changeNotes")).trim()) return false;
+          notes.trim() !== String(readOwnDataField(rawMetadata, "changeNotes")).trim()) return cmsFailure("missing-review-evidence");
         const publication = getRecordPublicationDecision(lesson, context);
-        if (!publication.isPublic || !publication.sourceEvidence.supportable) return false;
+        if (!publication.isPublic || !publication.sourceEvidence.supportable) {
+          return cmsFailure(publication.reasonCodes[0] ?? "publication-ineligible", publication);
+        }
       }
 
       const safeCandidate = sanitizeReviewRecord(lesson, context);
-      if (!validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) return false;
+      if (!safeCandidate || !validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) {
+        return cmsFailure("malformed-record");
+      }
       const metadataSnapshot = cloneBoundedRecord(rawMetadata);
       const nextMetadata: ReviewMetadata = isReviewMetadata(metadataSnapshot)
         ? metadataSnapshot as unknown as ReviewMetadata
@@ -624,16 +653,19 @@ class ContentRepository {
         nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
         nextMetadata.changeNotes = notes;
       }
-      if (!isReviewMetadata(nextMetadata)) return false;
+      if (!isReviewMetadata(nextMetadata)) return cmsFailure("malformed-review-metadata");
       const replacement = cloneBoundedRecord(lesson);
-      if (!isRecord(replacement)) return false;
+      if (!isRecord(replacement)) return cmsFailure("malformed-record");
       replacement.reviewMetadata = nextMetadata;
       replacement.published = newStatus === "Published";
-      if (!validateContentRecord(replacement, "lesson").isValid) return false;
-      this.lessons[rawIndex] = replacement;
-      return true;
+      if (!validateContentRecord(replacement, "lesson").isValid) return cmsFailure("malformed-record");
+      const nextLessons = cloneBoundedRecord(context.catalogs.lessons);
+      if (!Array.isArray(nextLessons)) return cmsFailure("unsafe-container");
+      nextLessons[snapshotIndex] = replacement;
+      this.lessons = nextLessons;
+      return cmsSuccess();
     } catch {
-      return false;
+      return cmsFailure("evaluation-failed");
     }
   }
 }

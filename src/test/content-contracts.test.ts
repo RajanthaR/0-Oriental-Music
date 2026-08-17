@@ -74,6 +74,10 @@ function assertProjectionRetainsNestedFields(raw: unknown, projected: unknown, p
   }
   const projectedRecord = projected as Record<string, unknown>;
   for (const key of Object.keys(raw)) {
+    if (key === "isCorrect" && /\.options_si\[\d+\]$/.test(path)) {
+      expect(Object.prototype.hasOwnProperty.call(projectedRecord, key), `${path}.${key} withheld`).toBe(false);
+      continue;
+    }
     expect(Object.prototype.hasOwnProperty.call(projectedRecord, key), `${path}.${key} retained`).toBe(true);
     assertProjectionRetainsNestedFields((raw as Record<string, unknown>)[key], projectedRecord[key], `${path}.${key}`);
   }
@@ -413,6 +417,10 @@ describe("closed runtime content contracts", () => {
       }
       const projection = projectPublicRecord(candidate, "question") as Record<string, unknown>;
       expect(projection, type).toBeDefined();
+      if (Array.isArray(projection.options_si)) {
+        expect(projection.options_si.every((option) =>
+          option && typeof option === "object" && !("isCorrect" in option))).toBe(true);
+      }
       for (const field of Object.keys(forgedValues)) {
         if (!allowed.includes(field)) expect(projection, `${type}:${field}`).not.toHaveProperty(field);
       }
@@ -552,8 +560,24 @@ describe("closed runtime content contracts", () => {
     expect(() => getRecordPublicationDecision(hostileRecord)).not.toThrow();
     expect(getRecordPublicationDecision(hostileRecord)).toMatchObject({
       isPublic: false,
-      reasonCodes: expect.arrayContaining(["malformed-record"]),
+      reasonCodes: expect.arrayContaining(["unsafe-container"]),
     });
+  });
+
+  it("rejects over-wide objects before reading their property descriptors", () => {
+    const target: Record<string, unknown> = {};
+    for (let index = 0; index <= 10_000; index += 1) target[`field-${index}`] = index;
+    let descriptorReads = 0;
+    const hostileWidth = new Proxy(target, {
+      getOwnPropertyDescriptor(current, property) {
+        descriptorReads += 1;
+        return Reflect.getOwnPropertyDescriptor(current, property);
+      },
+    });
+
+    expect(cloneBoundedRecord(hostileWidth)).toBeUndefined();
+    expect(inspectGraph(hostileWidth)).toMatchObject({ safe: false, reason: "unreadable" });
+    expect(descriptorReads).toBe(0);
   });
 
   it("rejects inherited, accessor, proxy, and dangerous-key records without invoking hostile code", () => {

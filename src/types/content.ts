@@ -297,6 +297,9 @@ export type RenderableQuestionType = Exclude<QuestionType, "audio-id" | "notatio
 export interface AnswerOption {
   id: string;
   text_si: string;
+}
+
+export interface RawAnswerOption extends AnswerOption {
   isCorrect?: boolean;
 }
 
@@ -312,7 +315,7 @@ export interface RawQuestion {
   /** Runtime validation narrows this to the canonical curriculum-strand set. */
   strandId: string;
   prompt_si: string;
-  options_si?: AnswerOption[];
+  options_si?: RawAnswerOption[];
   correctAnswerIds?: string[]; // for mcq & multi-select
   matchingPairs?: { left_si: string; right_si: string }[];
   orderingItems?: { id: string; text_si: string; correctIndex: number }[];

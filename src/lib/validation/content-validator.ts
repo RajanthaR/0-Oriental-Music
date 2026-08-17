@@ -19,9 +19,11 @@ import coverageData from "../../../data/content-coverage.json";
 import musicalCoreFieldDispositionsData from "../../../data/musical-core-field-dispositions.json";
 import {
   evaluateSourceReference,
+  evaluatePublicationBatch,
   createPublicationEvaluationContext,
   getRecordPublicationDecision,
   UNKNOWN_PROVENANCE,
+  type PublicationCatalogInputs,
 } from "@/lib/data/publication-policy";
 import { repository } from "@/lib/data/repository";
 import { normalizeSinhalaText } from "@/lib/search/normalize-sinhala";
@@ -383,10 +385,21 @@ export function validateMusicalCoreFieldDispositions(
   ) {
     issues.push({ entityType: "TalaFieldDisposition", entityId: "registry", field: "policy", message: "Registry must explicitly record the unclosed structure field under whole-entity quarantine", severity: "error" });
   }
-  const entryById = new Map(entries.map((entry) => [entry.talaId, entry]));
-  if (entryById.size !== entries.length) {
-    issues.push({ entityType: "TalaFieldDisposition", entityId: "registry", field: "talaId", message: "Registry tala IDs must be unique", severity: "error" });
-  }
+  const entryById = new Map<string, (typeof entries)[number]>();
+  entries.forEach((entry, index) => {
+    const normalizedId = typeof entry.talaId === "string" ? entry.talaId.trim() : "";
+    if (!normalizedId || normalizedId !== entry.talaId || entryById.has(normalizedId)) {
+      issues.push({
+        entityType: "TalaFieldDisposition",
+        entityId: normalizedId || String(index),
+        field: "talaId",
+        message: "Registry tala IDs must be non-blank, normalized, and unique",
+        severity: "error",
+      });
+      return;
+    }
+    entryById.set(normalizedId, entry);
+  });
   const hasExactEvidence = (reference: unknown, status: string): boolean => {
     if (!isRecord(reference) || typeof reference.sourceId !== "string" || typeof reference.pageOrSection !== "string") return false;
     const decision = evaluateSourceReference(reference as unknown as SourceReference, evaluationContext);
@@ -403,13 +416,23 @@ export function validateMusicalCoreFieldDispositions(
       issues.push({ entityType: "TalaFieldDisposition", entityId: String(index), field: "talaId", message: "Disposition input must identify a tala", severity: "error" });
       return;
     }
-    const id = candidate.id;
+    const id = candidate.id.trim();
+    if (!id || id !== candidate.id || seen.has(id)) {
+      issues.push({
+        entityType: "TalaFieldDisposition",
+        entityId: id || String(index),
+        field: "talaId",
+        message: "Disposition input Tala IDs must be normalized and unique",
+        severity: "error",
+      });
+      return;
+    }
+    seen.add(id);
     const entry = entryById.get(id);
     if (!entry) {
       issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: "record", message: "Every tala must have a closed-world field disposition", severity: "error" });
       return;
     }
-    seen.add(id);
     if (!entry.context || !entry.theka || !Array.isArray(entry.bols)) {
       issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: "fields", message: "Context, theka, and bols disposition rows are required", severity: "error" });
       return;
@@ -659,6 +682,36 @@ export function validatePublicCollection(
     };
   }
 
+  const catalogByKind: Partial<Record<ContentEntityKind, keyof PublicationCatalogInputs>> = {
+    lesson: "lessons",
+    raga: "ragas",
+    tala: "talas",
+    instrument: "instruments",
+    "cultural-tradition": "culturalTraditions",
+    "theatre-tradition": "theatreTraditions",
+    glossary: "glossary",
+    "learning-path": "learningPaths",
+    quiz: "quizzes",
+    "exam-paper": "examPapers",
+    source: "sources",
+  };
+  const catalogKey = catalogByKind[expectedKind];
+  const evaluationContext = createPublicationEvaluationContext(
+    catalogKey ? { [catalogKey]: snapshot } as PublicationCatalogInputs : {},
+  );
+  const publicationBatch = evaluatePublicationBatch(snapshot, evaluationContext);
+  if (!publicationBatch.isValid || publicationBatch.decisions.length !== snapshot.length) {
+    return {
+      isValid: false,
+      issues: [baselineIssue(
+        entityType,
+        "catalog",
+        "publication",
+        `Public collection evaluation failed (${publicationBatch.failureReason ?? "incomplete-decision-batch"}).`,
+      )],
+    };
+  }
+
   const seenIds = new Set<string>();
   snapshot.forEach((record, index) => {
     const value = record;
@@ -674,7 +727,7 @@ export function validatePublicCollection(
       issues.push(baselineIssue(entityType, id, "record", `Public record does not satisfy the declared ${expectedKind} contract.`));
       return;
     }
-    const decision = getRecordPublicationDecision(value);
+    const decision = publicationBatch.decisions[index];
     const gradeBands = decision.gradeBands;
 
     if (!decision.isPublic) {
@@ -1089,6 +1142,14 @@ export function validateContent(
   const instrumentRecords = structuralRecords("Instrument", instruments) as unknown as Instrument[];
   const culturalRecords = structuralRecords("CulturalTradition", culturalTraditions) as unknown as CulturalTradition[];
   const theatreRecords = structuralRecords("TheatreTradition", theatreTraditions) as unknown as TheatreTradition[];
+  const evaluationContext = createPublicationEvaluationContext({
+    lessons: lessonRecords,
+    ragas: ragaRecords,
+    talas: talaRecords,
+    instruments: instrumentRecords,
+    culturalTraditions: culturalRecords,
+    theatreTraditions: theatreRecords,
+  });
   const allEntities = [
     ...lessonRecords.map((item) => ({ type: "Lesson", item })),
     ...ragaRecords.map((item) => ({ type: "Raga", item })),
@@ -1458,14 +1519,16 @@ export function validateContent(
       }));
     });
   });
+  const glossaryPublication = evaluatePublicationBatch(glossaryData, evaluationContext);
   issues.push(...validateCatalogIdentityContracts(
     rawCatalogs,
-    glossaryData.filter((term) => getRecordPublicationDecision(term).isPublic),
+    glossaryData.filter((_term, index) => glossaryPublication.decisions[index]?.isPublic),
     terminologyData
   ));
 
-  allEntities.forEach(({ type, item }) => {
-    const decision = getRecordPublicationDecision(item);
+  const entityPublication = evaluatePublicationBatch(allEntities.map(({ item }) => item), evaluationContext);
+  allEntities.forEach(({ type, item }, index) => {
+    const decision = entityPublication.decisions[index] ?? getRecordPublicationDecision(item, evaluationContext);
     if (!decision.isPublic) {
       issues.push({
         entityType: type,

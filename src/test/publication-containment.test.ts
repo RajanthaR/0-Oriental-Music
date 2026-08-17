@@ -14,6 +14,7 @@ import {
   getContextClaimPublicationDecision,
   getRecordPublicationDecision,
   getPublicationDecision,
+  getPublicationCatalogRawCount,
   getSourceCorpusInventory,
   getSourceDocumentSummary,
   getTalaFieldDisposition,
@@ -142,14 +143,17 @@ describe("Prompt 1 publication containment", () => {
 
   it("prevents CMS review status updates from leaking quarantined records into public getters", () => {
     const success = repository.updateLessonReviewStatus("les-raga-bhairav", "Published", true);
-    expect(success).toBe(false);
+    expect(success).toMatchObject({ ok: false });
     expect(repository.getLessons().some((l) => l.id === "les-raga-bhairav")).toBe(false);
     expect(repository.getLessonById("les-raga-bhairav")).toBeUndefined();
 
   });
 
   it("keeps malformed raw lessons nonpublic while review and CMS paths fail safely", () => {
-    const lessonCatalog = lessonsData as unknown as Array<Record<string, unknown>>;
+    const mutableRepository = repository as unknown as { lessons: Array<Record<string, unknown>> };
+    const originalCatalog = mutableRepository.lessons;
+    const lessonCatalog = structuredClone(originalCatalog);
+    mutableRepository.lessons = lessonCatalog;
     const rawIndex = lessonCatalog.findIndex((lesson) => lesson.id === "les-intro-01");
     const raw = lessonCatalog[rawIndex];
     expect(raw).toBeDefined();
@@ -163,14 +167,14 @@ describe("Prompt 1 publication containment", () => {
       });
       expect(repository.getLessons({ visibility: "review" }).find((lesson) => lesson.id === raw.id)?.reviewMetadata)
         .toMatchObject({ status: "Needs Revision" });
-      expect(repository.updateLessonStatus(String(raw.id), "Needs Revision", "Review Agent", "Safe repair")).toBe(true);
-      const repaired = lessonCatalog[rawIndex];
+      expect(repository.updateLessonStatus(String(raw.id), "Needs Revision", "Review Agent", "Safe repair")).toMatchObject({ ok: true });
+      const repaired = mutableRepository.lessons[rawIndex];
       expect(repaired.reviewMetadata).toMatchObject({ status: "Needs Revision", reviewer: "Review Agent" });
 
       repaired.title_si = null;
-      expect(repository.updateLessonStatus(String(repaired.id), "Needs Revision", "Review Agent", "Invalid record")).toBe(false);
+      expect(repository.updateLessonStatus(String(repaired.id), "Needs Revision", "Review Agent", "Invalid record")).toMatchObject({ ok: false });
     } finally {
-      lessonCatalog[rawIndex] = original;
+      mutableRepository.lessons = originalCatalog;
     }
   });
 
@@ -222,6 +226,37 @@ describe("Prompt 1 publication containment", () => {
       decisions: [],
       failureReason: "unsafe-container",
     });
+
+    const unsafeContext = createPublicationEvaluationContext({ lessons: undefined });
+    expect(getRecordPublicationDecision(lessonsData[0], unsafeContext)).toMatchObject({
+      isPublic: false,
+      reasonCodes: ["unsafe-container"],
+    });
+    expect(sanitizeReviewRecord(lessonsData[0], unsafeContext)).toBeUndefined();
+  });
+
+  it("derives raw catalog counts from the exact detached snapshot", () => {
+    const target = [structuredClone(ragasData[0])];
+    let mutated = false;
+    const stateful = new Proxy(target, {
+      ownKeys(current) {
+        if (!mutated) {
+          mutated = true;
+          current.push(structuredClone(ragasData[1]));
+        }
+        return Reflect.ownKeys(current);
+      },
+    });
+    const context = createPublicationEvaluationContext({ ragas: stateful });
+    expect(context.safe).toBe(true);
+    expect(getPublicationCatalogRawCount(context, "ragas")).toBe(context.catalogs.ragas.length);
+    expect(context.catalogs.ragas).toHaveLength(2);
+  });
+
+  it("validates caller-owned catalog records with the same publication snapshot", () => {
+    const customRaga = structuredClone(ragasData[0]) as unknown as Record<string, unknown>;
+    customRaga.id = "raga-custom-snapshot";
+    expect(validatePublicCollection("Raga", [customRaga])).toEqual({ isValid: true, issues: [] });
   });
 
   it("never substitutes trusted defaults for explicitly malformed catalog inputs", () => {
@@ -263,7 +298,7 @@ describe("Prompt 1 publication containment", () => {
     expect(evaluatePublicationBatch(context.catalogs.ragas, context).decisions.every(
       (decision) => decision.reasonCodes.includes("duplicate-record-id"),
     )).toBe(true);
-    expect(sanitizeReviewRecord(first, context)).toMatchObject({ id: "raga-bilawal" });
+    expect(sanitizeReviewRecord(first, context)).toBeUndefined();
 
     const mutableRepository = repository as unknown as { ragas: unknown[] };
     const original = mutableRepository.ragas;
@@ -289,7 +324,7 @@ describe("Prompt 1 publication containment", () => {
     try {
       mutableLessons.lessons = [lessonA, lessonB];
       expect(repository.getLessons({ visibility: "review" })).toEqual([]);
-      expect(repository.updateLessonReviewStatus(String(lessonA.id), "Needs Revision", false)).toBe(false);
+      expect(repository.updateLessonReviewStatus(String(lessonA.id), "Needs Revision", false)).toMatchObject({ ok: false });
     } finally {
       mutableLessons.lessons = originalLessons;
     }
@@ -375,7 +410,11 @@ describe("Prompt 1 publication containment", () => {
   });
 
   it("fails CMS operations safely for hostile IDs and metadata containers", () => {
-    const raw = lessonsData.find((lesson) => lesson.id === "les-intro-01") as unknown as Record<string, unknown>;
+    const mutableRepository = repository as unknown as { lessons: Array<Record<string, unknown>> };
+    const originalCatalog = mutableRepository.lessons;
+    const lessonCatalog = structuredClone(originalCatalog);
+    mutableRepository.lessons = lessonCatalog;
+    const raw = lessonCatalog.find((lesson) => lesson.id === "les-intro-01") as Record<string, unknown>;
     const originalMetadata = raw.reviewMetadata;
     const hostileMetadata = new Proxy(structuredClone(originalMetadata) as Record<string, unknown>, {
       ownKeys() {
@@ -386,30 +425,74 @@ describe("Prompt 1 publication containment", () => {
       raw.reviewMetadata = hostileMetadata;
       expect(() => repository.updateLessonStatus("les-intro-01", "Needs Revision", "Reviewer", "Notes"))
         .not.toThrow();
-      expect(repository.updateLessonStatus("les-intro-01", "Needs Revision", "Reviewer", "Notes")).toBe(false);
+      expect(repository.updateLessonStatus("les-intro-01", "Needs Revision", "Reviewer", "Notes")).toMatchObject({ ok: false });
 
       const hostileId = new Proxy({ toString: () => "les-intro-01" }, {
         getPrototypeOf() {
           throw new Error("hostile id");
         },
       });
-      expect(() => (repository.updateLessonReviewStatus as unknown as (...args: unknown[]) => boolean)(
+      expect(() => (repository.updateLessonReviewStatus as unknown as (...args: unknown[]) => unknown)(
         hostileId,
         "Needs Revision",
         false,
       )).not.toThrow();
-      expect((repository.updateLessonReviewStatus as unknown as (...args: unknown[]) => boolean)(
+      expect((repository.updateLessonReviewStatus as unknown as (...args: unknown[]) => unknown)(
         hostileId,
         "Needs Revision",
         false,
-      )).toBe(false);
+      )).toMatchObject({ ok: false });
     } finally {
       raw.reviewMetadata = originalMetadata;
+      mutableRepository.lessons = originalCatalog;
+    }
+  });
+
+  it("returns stable structured CMS rejection reasons", () => {
+    expect(repository.updateLessonReviewStatus("les-intro-01", "Published", false)).toMatchObject({
+      ok: false,
+      reasonCode: "status-publication-mismatch",
+    });
+    expect(repository.updateLessonReviewStatus("les-intro-01", "Published", true)).toMatchObject({
+      ok: false,
+      reasonCode: "missing-review-evidence",
+    });
+    expect(repository.updateLessonStatus("missing-lesson", "Needs Revision", "Reviewer", "Notes")).toMatchObject({
+      ok: false,
+      reasonCode: "record-not-found",
+    });
+  });
+
+  it("replaces the validated lesson snapshot without writing through a mutable catalog", () => {
+    const mutableRepository = repository as unknown as { lessons: unknown[] };
+    const original = mutableRepository.lessons;
+    const target = structuredClone(original);
+    let numericWrites = 0;
+    const hostileCatalog = new Proxy(target, {
+      set(current, property, value, receiver) {
+        if (typeof property === "string" && /^\d+$/.test(property)) numericWrites += 1;
+        return Reflect.set(current, property, value, receiver);
+      },
+    });
+    mutableRepository.lessons = hostileCatalog;
+    try {
+      expect(repository.updateLessonReviewStatus("les-intro-01", "Needs Revision", false)).toMatchObject({ ok: true });
+      expect(numericWrites).toBe(0);
+      expect(mutableRepository.lessons).not.toBe(hostileCatalog);
+      expect(mutableRepository.lessons.map((candidate) =>
+        candidate && typeof candidate === "object" ? (candidate as { id?: unknown }).id : undefined,
+      )).toEqual(target.map((candidate) =>
+        candidate && typeof candidate === "object" ? (candidate as { id?: unknown }).id : undefined,
+      ));
+    } finally {
+      mutableRepository.lessons = original;
     }
   });
 
   it("keeps CMS publication evidence immutable and applies status changes atomically", () => {
     const mutableRepository = repository as unknown as { lessons: unknown[] };
+    const originalCatalog = mutableRepository.lessons;
+    mutableRepository.lessons = structuredClone(originalCatalog);
     const index = mutableRepository.lessons.findIndex(
       (candidate) => candidate && typeof candidate === "object" && (candidate as Record<string, unknown>).id === "les-intro-01",
     );
@@ -438,7 +521,7 @@ describe("Prompt 1 publication containment", () => {
         "Published",
         "FORGED REVIEWER",
         "forged notes",
-      )).toBe(false);
+      )).toMatchObject({ ok: false });
       expect(mutableRepository.lessons[index]).toBe(lesson);
       expect(lesson.reviewMetadata).toEqual(verifiedMetadata);
       expect(lesson.published).toBe(false);
@@ -448,7 +531,7 @@ describe("Prompt 1 publication containment", () => {
         "Published",
         verifiedMetadata.reviewer,
         verifiedMetadata.changeNotes,
-      )).toBe(true);
+      )).toMatchObject({ ok: true });
       const replacement = mutableRepository.lessons[index] as Record<string, unknown>;
       expect(replacement).not.toBe(lesson);
       expect(replacement.published).toBe(true);
@@ -460,12 +543,14 @@ describe("Prompt 1 publication containment", () => {
       expect(lesson.published).toBe(false);
       expect(lesson.reviewMetadata).toEqual(verifiedMetadata);
     } finally {
-      mutableRepository.lessons[index] = original;
+      mutableRepository.lessons = originalCatalog;
     }
   });
 
   it("evaluates CMS publication against the same repository source snapshot", () => {
     const mutableRepository = repository as unknown as { lessons: unknown[]; sources: unknown[] };
+    const originalCatalog = mutableRepository.lessons;
+    mutableRepository.lessons = structuredClone(originalCatalog);
     const index = mutableRepository.lessons.findIndex(
       (candidate) => candidate && typeof candidate === "object" && (candidate as Record<string, unknown>).id === "les-intro-01",
     );
@@ -485,17 +570,17 @@ describe("Prompt 1 publication containment", () => {
     mutableRepository.lessons[index] = lesson;
     mutableRepository.sources = [];
     try {
-      expect(repository.updateLessonReviewStatus("les-intro-01", "Published", true)).toBe(false);
+      expect(repository.updateLessonReviewStatus("les-intro-01", "Published", true)).toMatchObject({ ok: false });
       expect(repository.updateLessonStatus(
         "les-intro-01",
         "Published",
         "Verified reviewer fixture",
         "Verified claim-level evidence fixture",
-      )).toBe(false);
+      )).toMatchObject({ ok: false });
       expect(mutableRepository.lessons[index]).toBe(lesson);
       expect(lesson.published).toBe(false);
     } finally {
-      mutableRepository.lessons[index] = originalLesson;
+      mutableRepository.lessons = originalCatalog;
       mutableRepository.sources = originalSources;
     }
   });
@@ -514,7 +599,7 @@ describe("Prompt 1 publication containment", () => {
     });
     expect(getRecordPublicationDecision(candidate)).toMatchObject({
       isPublic: false,
-      reasonCodes: expect.arrayContaining(["malformed-record"]),
+      reasonCodes: expect.arrayContaining(["unsafe-container"]),
     });
     expect(getterCalls).toBe(0);
   });
@@ -564,12 +649,16 @@ describe("Prompt 1 publication containment", () => {
   });
 
   it("rebuilds identity containment when a catalog mutates without changing length", () => {
-    const catalog = lessonsData as unknown as Array<Record<string, unknown>>;
+    const mutableRepository = repository as unknown as { lessons: Array<Record<string, unknown>> };
+    const originalCatalog = mutableRepository.lessons;
+    const catalog = structuredClone(originalCatalog);
+    mutableRepository.lessons = catalog;
     const original = catalog[1];
     const replacement = structuredClone(catalog[0]);
     catalog[1] = replacement;
     try {
-      expect(getRecordPublicationDecision(replacement)).toMatchObject({
+      const context = createPublicationEvaluationContext({ lessons: catalog });
+      expect(getRecordPublicationDecision(replacement, context)).toMatchObject({
         isPublic: false,
         reasonCodes: expect.arrayContaining(["unknown-record-kind", "malformed-record"]),
       });
@@ -581,6 +670,7 @@ describe("Prompt 1 publication containment", () => {
       });
     } finally {
       catalog[1] = original;
+      mutableRepository.lessons = originalCatalog;
     }
   });
 
@@ -739,6 +829,16 @@ describe("Prompt 1 publication containment", () => {
       sourceId: "SRC-G10-NADA",
       pageOrSection: "SG10_EMUS_CHAP8_NADAYA.PDF පිටුව 2",
     }).supportable).toBe(true);
+
+    const excessiveTerms = Array.from({ length: 257 }, () => "2").join(",");
+    expect(evaluateSourceReference({
+      sourceId: "SRC-G10-NADA",
+      pageOrSection: `sg10_emus_chap8_nadaya.pdf පිටු ${excessiveTerms}`,
+    })).toMatchObject({ supportable: false, reasonCode: "missing-page-evidence" });
+    expect(evaluateSourceReference({
+      sourceId: "SRC-G10-NADA",
+      pageOrSection: "sg10_emus_chap8_nadaya.pdf පිටු 1-1000,1-1000",
+    })).toMatchObject({ supportable: false, reasonCode: "missing-page-evidence" });
 
     [
       "sg10_emus_chap8_nadaya.pdf wrong.pdf පිටුව 2",
@@ -1142,7 +1242,7 @@ describe("Prompt 1 publication containment", () => {
     expect(() => getRecordPublicationDecision(bilawal)).not.toThrow();
     expect(getRecordPublicationDecision(bilawal)).toMatchObject({
       isPublic: false,
-      reasonCodes: expect.arrayContaining(["malformed-record"]),
+      reasonCodes: expect.arrayContaining(["unsafe-container"]),
     });
   });
 
@@ -1318,5 +1418,11 @@ describe("Prompt 1 publication containment", () => {
     expect(result.isValid).toBe(false);
     expect(result.issues.some((issue) => issue.field === "talas")).toBe(true);
     expect(result.issues.some((issue) => issue.message.includes("IDs must be unique"))).toBe(true);
+
+    const duplicateRaw = structuredClone(talasData);
+    duplicateRaw.push(structuredClone(duplicateRaw[0]));
+    const duplicateResult = validateMusicalCoreFieldDispositions(duplicateRaw, musicalCoreFieldDispositions);
+    expect(duplicateResult.isValid).toBe(false);
+    expect(duplicateResult.issues.some((issue) => issue.field === "talaId" && issue.message.includes("unique"))).toBe(true);
   });
 });

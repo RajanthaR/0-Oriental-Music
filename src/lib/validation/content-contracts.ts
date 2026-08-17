@@ -187,13 +187,22 @@ function safeOwnEntries(value: object): SafeOwnEntries | undefined {
       return undefined;
     }
 
-    const descriptors = Object.getOwnPropertyDescriptors(value);
-    const descriptorKeys = Reflect.ownKeys(descriptors);
+    const descriptorKeys = Reflect.ownKeys(value);
     if (descriptorKeys.some((key) => typeof key !== "string")) return undefined;
+    const maximumOwnKeys = isArray ? MAX_ARRAY_ITEMS + 1 : MAX_GRAPH_NODES;
+    if (descriptorKeys.length > maximumOwnKeys) return undefined;
+
+    const descriptors = new Map<string, PropertyDescriptor>();
+    for (const key of descriptorKeys as string[]) {
+      const descriptor = Object.getOwnPropertyDescriptor(value, key);
+      if (!descriptor) return undefined;
+      descriptors.set(key, descriptor);
+    }
+    const descriptorFor = (key: string): PropertyDescriptor | undefined => descriptors.get(key);
 
     const entries: SafeOwnEntry[] = [];
     if (isArray) {
-      const lengthDescriptor = descriptors.length;
+      const lengthDescriptor = descriptorFor("length");
       if (!lengthDescriptor || !("value" in lengthDescriptor) ||
           typeof lengthDescriptor.value !== "number" ||
           !Number.isInteger(lengthDescriptor.value) ||
@@ -207,14 +216,15 @@ function safeOwnEntries(value: object): SafeOwnEntries | undefined {
         if (!/^\d+$/.test(key)) return undefined;
         const index = Number(key);
         if (!Number.isSafeInteger(index) || index < 0 || index >= length || String(index) !== key) return undefined;
-        const descriptor = descriptors[key];
+        const descriptor = descriptorFor(key);
+        if (!descriptor) return undefined;
         if (!descriptor.enumerable || !("value" in descriptor) ||
             Object.prototype.hasOwnProperty.call(descriptor, "get") ||
             Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
       }
       if (descriptorKeys.length !== length + 1) return undefined;
       for (let index = 0; index < length; index += 1) {
-        const descriptor = descriptors[String(index)];
+        const descriptor = descriptorFor(String(index));
         if (!descriptor || !descriptor.enumerable || !("value" in descriptor) ||
             Object.prototype.hasOwnProperty.call(descriptor, "get") ||
             Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
@@ -225,7 +235,8 @@ function safeOwnEntries(value: object): SafeOwnEntries | undefined {
 
     for (const key of descriptorKeys as string[]) {
       if (DANGEROUS_JSON_KEYS.has(key)) return undefined;
-      const descriptor = descriptors[key];
+      const descriptor = descriptorFor(key);
+      if (!descriptor) return undefined;
       if (!descriptor.enumerable || !("value" in descriptor) ||
           Object.prototype.hasOwnProperty.call(descriptor, "get") ||
           Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
@@ -933,7 +944,7 @@ const NESTED_FIELDS: Record<ProjectionKind, readonly string[]> = {
   "featured-song": ["songTitle_si", "ragaOrRagadhari_si", "tala_si", "lyricsSnippet_si", "context_si"],
   "glossary-audio": ["type", "notes", "talaId"],
   "path-step": ["stepNumber", "lessonId", "checkpointType", "requiredForNext"],
-  "answer-option": ["id", "text_si", "isCorrect"],
+  "answer-option": ["id", "text_si"],
   "matching-pair": ["left_si", "right_si"],
   "ordering-item": ["id", "text_si", "correctIndex"],
   lesson: PUBLIC_FIELDS.lesson,

@@ -39,6 +39,30 @@ export const DEFAULT_ROOT_FREQ = 261.63; // C4
 
 export type SwaraTimbre = "harmonium" | "flute" | "sitar" | "pure";
 
+/** Maximum number of notes accepted by one caller-owned sequence operation. */
+const MAX_SWARA_SEQUENCE_LENGTH = 256;
+
+function snapshotValidSwaraSequence(input: unknown): string[] | undefined {
+  try {
+    if (!Array.isArray(input)) return undefined;
+    const length = input.length;
+    if (!Number.isSafeInteger(length) || length <= 0 || length > MAX_SWARA_SEQUENCE_LENGTH) return undefined;
+
+    const snapshot = new Array<string>(length);
+    for (let index = 0; index < length; index += 1) {
+      if (!Object.prototype.hasOwnProperty.call(input, index)) return undefined;
+      const swara = input[index];
+      if (typeof swara !== "string" || !Object.prototype.hasOwnProperty.call(SWARA_SEMITONES, swara)) {
+        return undefined;
+      }
+      snapshot[index] = swara;
+    }
+    return snapshot;
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * A caller-owned Swara playback operation.
  *
@@ -98,30 +122,38 @@ export class SwaraSynthEngine {
     return () => {
       if (cleaned) return;
       cleaned = true;
-      if (timerRef.current !== undefined && typeof window !== "undefined") {
-        window.clearTimeout(timerRef.current);
-        timerRef.current = undefined;
+      const timerId = timerRef.current;
+      timerRef.current = undefined;
+      try {
+        if (timerId !== undefined && typeof window !== "undefined") {
+          try {
+            window.clearTimeout(timerId);
+          } catch {
+            // Timer cancellation is best-effort; owned nodes still need cleanup.
+          }
+        }
+        oscillators.forEach((oscillator) => {
+          try {
+            oscillator.stop();
+          } catch {
+            // The oscillator may already have reached its scheduled stop time.
+          }
+          try {
+            oscillator.disconnect();
+          } catch {
+            // Disconnection is best-effort during browser teardown.
+          }
+        });
+        gains.forEach((gain) => {
+          try {
+            gain.disconnect();
+          } catch {
+            // Disconnection is best-effort during browser teardown.
+          }
+        });
+      } finally {
+        onFinished();
       }
-      oscillators.forEach((oscillator) => {
-        try {
-          oscillator.stop();
-        } catch {
-          // The oscillator may already have reached its scheduled stop time.
-        }
-        try {
-          oscillator.disconnect();
-        } catch {
-          // Disconnection is best-effort during browser teardown.
-        }
-      });
-      gains.forEach((gain) => {
-        try {
-          gain.disconnect();
-        } catch {
-          // Disconnection is best-effort during browser teardown.
-        }
-      });
-      onFinished();
     };
   }
 
@@ -372,6 +404,15 @@ export class SwaraSynthEngine {
     const safeDuration = typeof noteDurationSec === "number" && isFinite(noteDurationSec) && noteDurationSec > 0
       ? noteDurationSec
       : 0.6;
+    const sequence = snapshotValidSwaraSequence(swaras);
+
+    if (!sequence) {
+      resolveReady(false);
+      resolveFinished();
+      return createPlaybackHandle(() => {
+        cancelled = true;
+      }, ready, finished);
+    }
 
     const maybeFinishSequence = () => {
       if (!finishedResolved && sequenceFinished && activeTones.size === 0) {
@@ -381,17 +422,34 @@ export class SwaraSynthEngine {
     };
 
     const cancelActiveTones = () => {
-      activeTones.forEach((tone) => tone());
+      activeTones.forEach((tone) => {
+        try {
+          tone();
+        } catch {
+          // One child cancellation must not strand the remaining owned tones.
+        }
+      });
+    };
+
+    const clearDelayTimer = () => {
+      const pendingTimer = timerId;
+      timerId = undefined;
+      if (pendingTimer === undefined || typeof window === "undefined") return;
+      try {
+        window.clearTimeout(pendingTimer);
+      } catch {
+        // Timer cancellation is best-effort; the delay promise is still released.
+      }
     };
 
     const runSequence = async () => {
       try {
-        for (let index = 0; index < swaras.length; index += 1) {
+        for (let index = 0; index < sequence.length; index += 1) {
           if (cancelled) {
             resolveReady(false);
             return;
           }
-          const swara = swaras[index];
+          const swara = sequence[index];
           onStep?.(index, swara);
           if (cancelled) {
             resolveReady(false);
@@ -427,10 +485,7 @@ export class SwaraSynthEngine {
         resolveReady(!cancelled);
         maybeFinishSequence();
       } catch {
-        if (timerId !== undefined) {
-          window.clearTimeout(timerId);
-          timerId = undefined;
-        }
+        clearDelayTimer();
         resolveDelay?.();
         resolveDelay = undefined;
         sequenceFinished = true;
@@ -450,10 +505,7 @@ export class SwaraSynthEngine {
     return createPlaybackHandle(() => {
       if (cancelled) return;
       cancelled = true;
-      if (timerId !== undefined) {
-        window.clearTimeout(timerId);
-        timerId = undefined;
-      }
+      clearDelayTimer();
       resolveDelay?.();
       resolveDelay = undefined;
       sequenceFinished = true;

@@ -383,6 +383,292 @@ describe("Audio Synthesis Engine & Tuning Suite", () => {
     }
   });
 
+  it("fails closed for malformed Swara sequence inputs before callbacks or audio", async () => {
+    const malformedInputs: Array<[string, unknown]> = [
+      ["empty", []],
+      ["non-array string", "S"],
+      ["array-like object", { length: 1, 0: "S" }],
+      ["sparse array", new Array(1)],
+      ["malformed token", ["S", 42]],
+      ["unknown token", ["X"]],
+      ["overlong array", new Array(257).fill("S")],
+    ];
+
+    for (const [label, input] of malformedInputs) {
+      const steps: unknown[] = [];
+      const handle = new SwaraSynthEngine().playSequenceHandle(
+        input as string[],
+        0.01,
+        (_index, swara) => steps.push(swara),
+      );
+
+      await expect(handle.ready, label).resolves.toBe(false);
+      await expect(handle.finished, label).resolves.toBeUndefined();
+      expect(steps, label).toEqual([]);
+      expect(() => handle(), label).not.toThrow();
+    }
+  });
+
+  it("returns failure-atomic handles for hostile Tabla durations", async () => {
+    const hostileDurations: unknown[] = [
+      Symbol("hostile"),
+      Number.NaN,
+      Number.POSITIVE_INFINITY,
+      0,
+      -100,
+      {},
+      { valueOf: () => 250 },
+      { valueOf: () => { throw new Error("coercion failed"); } },
+    ];
+
+    for (const duration of hostileDurations) {
+      let handle: ReturnType<TablaSynthEngine["playBol"]> | undefined;
+      expect(() => {
+        handle = new TablaSynthEngine().playBol("ධා", duration as number);
+      }).not.toThrow();
+      expect(handle).toBeDefined();
+      await expect(handle!.ready).resolves.toBe(false);
+      await expect(handle!.finished).resolves.toBeUndefined();
+      expect(() => handle!()).not.toThrow();
+    }
+  });
+
+  it("settles Swara cleanup when clearTimeout throws", async () => {
+    const originalAudioContext = window.AudioContext;
+    const oscillators: Array<{ stop: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn> }> = [];
+    class FakeAudioContext {
+      state = "running";
+      currentTime = 0;
+      destination = {};
+      createGain() {
+        return {
+          gain: {
+            setValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+          },
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+        };
+      }
+      createOscillator() {
+        const oscillator = {
+          type: "sine",
+          frequency: { setValueAtTime: vi.fn() },
+          connect: vi.fn(),
+          start: vi.fn(),
+          stop: vi.fn(),
+          disconnect: vi.fn(),
+        };
+        oscillators.push(oscillator);
+        return oscillator;
+      }
+    }
+    vi.useFakeTimers();
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: FakeAudioContext });
+    const originalClearTimeout = window.clearTimeout;
+    const clearTimeoutMock = vi.fn(() => {
+      throw new Error("timer clear failed");
+    });
+    Object.defineProperty(window, "clearTimeout", { configurable: true, value: clearTimeoutMock });
+    try {
+      const handle = new SwaraSynthEngine().playSwaraToneHandle("S", 1);
+      await expect(handle.ready).resolves.toBe(true);
+      expect(() => handle()).not.toThrow();
+      let finished = false;
+      void handle.finished.then(() => { finished = true; });
+      await Promise.resolve();
+      expect(finished).toBe(true);
+      expect(clearTimeoutMock).toHaveBeenCalled();
+      oscillators.forEach((oscillator) => expect(oscillator.disconnect).toHaveBeenCalledTimes(1));
+    } finally {
+      Object.defineProperty(window, "clearTimeout", { configurable: true, value: originalClearTimeout });
+      vi.clearAllTimers();
+      vi.useRealTimers();
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
+    }
+  });
+
+  it("settles Swara sequence ownership when timer clearing throws", async () => {
+    const originalAudioContext = window.AudioContext;
+    const oscillators: Array<{ stop: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn> }> = [];
+    class FakeAudioContext {
+      state = "running";
+      currentTime = 0;
+      destination = {};
+      createGain() {
+        return {
+          gain: {
+            setValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+          },
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+        };
+      }
+      createOscillator() {
+        const oscillator = {
+          type: "sine",
+          frequency: { setValueAtTime: vi.fn() },
+          connect: vi.fn(),
+          start: vi.fn(),
+          stop: vi.fn(),
+          disconnect: vi.fn(),
+        };
+        oscillators.push(oscillator);
+        return oscillator;
+      }
+    }
+    vi.useFakeTimers();
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: FakeAudioContext });
+    const originalClearTimeout = window.clearTimeout;
+    const clearTimeoutMock = vi.fn(() => {
+      throw new Error("timer clear failed");
+    });
+    Object.defineProperty(window, "clearTimeout", { configurable: true, value: clearTimeoutMock });
+    try {
+      const handle = new SwaraSynthEngine().playSequenceHandle(["S", "R"], 1);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(() => handle()).not.toThrow();
+      await expect(handle.ready).resolves.toBe(false);
+      let finished = false;
+      void handle.finished.then(() => { finished = true; });
+      await Promise.resolve();
+      expect(finished).toBe(true);
+      expect(clearTimeoutMock).toHaveBeenCalled();
+      oscillators.forEach((oscillator) => expect(oscillator.disconnect).toHaveBeenCalledTimes(1));
+    } finally {
+      Object.defineProperty(window, "clearTimeout", { configurable: true, value: originalClearTimeout });
+      vi.clearAllTimers();
+      vi.useRealTimers();
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
+    }
+  });
+
+  it("settles Tabla ownership when active-stroke timer clearing throws", async () => {
+    const originalAudioContext = window.AudioContext;
+    const oscillators: Array<{ stop: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn> }> = [];
+    class FakeAudioContext {
+      state = "running";
+      currentTime = 0;
+      destination = {};
+      createGain() {
+        return {
+          gain: {
+            setValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+          },
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+        };
+      }
+      createOscillator() {
+        const oscillator = {
+          type: "sine",
+          frequency: {
+            setValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+          },
+          connect: vi.fn(),
+          start: vi.fn(),
+          stop: vi.fn(),
+          disconnect: vi.fn(),
+        };
+        oscillators.push(oscillator);
+        return oscillator;
+      }
+    }
+    vi.useFakeTimers();
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: FakeAudioContext });
+    const originalClearTimeout = window.clearTimeout;
+    const clearTimeoutMock = vi.fn(() => {
+      throw new Error("timer clear failed");
+    });
+    Object.defineProperty(window, "clearTimeout", { configurable: true, value: clearTimeoutMock });
+    try {
+      const handle = new TablaSynthEngine().playBol("ධා");
+      await expect(handle.ready).resolves.toBe(true);
+      expect(() => vi.advanceTimersByTime(1000)).not.toThrow();
+      let finished = false;
+      void handle.finished.then(() => { finished = true; });
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(finished).toBe(true);
+      expect(clearTimeoutMock).toHaveBeenCalled();
+      oscillators.forEach((oscillator) => expect(oscillator.disconnect).toHaveBeenCalledTimes(1));
+    } finally {
+      Object.defineProperty(window, "clearTimeout", { configurable: true, value: originalClearTimeout });
+      vi.clearAllTimers();
+      vi.useRealTimers();
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
+    }
+  });
+
+  it("isolates Tabla owner cancellation when timer clearing throws", async () => {
+    const originalAudioContext = window.AudioContext;
+    const oscillators: Array<{ stop: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn> }> = [];
+    class FakeAudioContext {
+      state = "running";
+      currentTime = 0;
+      destination = {};
+      createGain() {
+        return {
+          gain: {
+            setValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+          },
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+        };
+      }
+      createOscillator() {
+        const oscillator = {
+          type: "sine",
+          frequency: {
+            setValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn(),
+          },
+          connect: vi.fn(),
+          start: vi.fn(),
+          stop: vi.fn(),
+          disconnect: vi.fn(),
+        };
+        oscillators.push(oscillator);
+        return oscillator;
+      }
+    }
+    vi.useFakeTimers();
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: FakeAudioContext });
+    const originalClearTimeout = window.clearTimeout;
+    const clearTimeoutMock = vi.fn(() => {
+      throw new Error("timer clear failed");
+    });
+    Object.defineProperty(window, "clearTimeout", { configurable: true, value: clearTimeoutMock });
+    try {
+      const handle = new TablaSynthEngine().playBol("ධනක", 600);
+      await expect(handle.ready).resolves.toBe(true);
+      expect(() => handle()).not.toThrow();
+      let finished = false;
+      void handle.finished.then(() => { finished = true; });
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(finished).toBe(true);
+      expect(clearTimeoutMock).toHaveBeenCalled();
+      oscillators.forEach((oscillator) => expect(oscillator.disconnect).toHaveBeenCalledTimes(1));
+    } finally {
+      Object.defineProperty(window, "clearTimeout", { configurable: true, value: originalClearTimeout });
+      vi.clearAllTimers();
+      vi.useRealTimers();
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
+    }
+  });
+
   it("defers the first sequence callback until the caller owns the handle", async () => {
     const steps: string[] = [];
     let handle: ReturnType<SwaraSynthEngine["playSequenceHandle"]> | undefined;

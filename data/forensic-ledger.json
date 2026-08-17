@@ -67,156 +67,354 @@
     "traceability": {
       "C3-01": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-01.json",
-        "test": { "path": "src/test/review-closeout.test.ts", "symbol": "rejects every CMS status/published mismatch" },
-        "fix": { "path": "src/lib/data/repository.ts", "symbol": "updateLessonReviewStatus" },
-        "anchor": { "path": "src/lib/data/repository.ts", "line": 548, "symbol": "updateLessonReviewStatus" },
+        "test": {
+          "path": "src/test/review-closeout.test.ts",
+          "symbol": "rejects every CMS status/published mismatch"
+        },
+        "fix": {
+          "path": "src/lib/data/repository.ts",
+          "symbol": "updateLessonReviewStatus"
+        },
+        "anchor": {
+          "path": "src/lib/data/repository.ts",
+          "symbol": "updateLessonReviewStatus"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-02": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-02.json",
-        "test": { "path": "src/test/review-closeout.test.ts", "symbol": "recomputes publication summaries" },
-        "fix": { "path": "src/lib/data/repository.ts", "symbol": "getPublicationSummary" },
-        "anchor": { "path": "src/lib/data/repository.ts", "line": 507, "symbol": "getPublicationSummary" },
+        "test": {
+          "path": "src/test/review-closeout.test.ts",
+          "symbol": "recomputes publication summaries"
+        },
+        "fix": {
+          "path": "src/lib/data/repository.ts",
+          "symbol": "getPublicationSummary"
+        },
+        "anchor": {
+          "path": "src/lib/data/repository.ts",
+          "symbol": "getPublicationSummary"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-03": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-03.json",
-        "test": { "path": "src/test/source-metadata-consistency.test.ts", "line": 18, "symbol": "unknown provenance representation" },
-        "fix": { "path": "src/lib/validation/content-contracts.ts", "symbol": "projectPublicRecord" },
-        "anchor": { "path": "src/lib/validation/content-contracts.ts", "line": 985, "symbol": "projectPublicRecord" },
+        "test": {
+          "path": "src/test/source-metadata-consistency.test.ts",
+          "symbol": "unknown provenance representation"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-contracts.ts",
+          "symbol": "projectPublicRecord"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-contracts.ts",
+          "symbol": "projectPublicRecord"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-04": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-04.json",
-        "test": { "path": "src/test/publication-containment.test.ts", "line": 201, "symbol": "duplicate IDs" },
-        "fix": { "path": "src/lib/data/publication-policy.ts", "symbol": "evaluatePublicationBatch" },
-        "anchor": { "path": "src/lib/data/publication-policy.ts", "line": 1375, "symbol": "evaluatePublicationBatch" },
+        "test": {
+          "path": "src/test/publication-containment.test.ts",
+          "symbol": "duplicate IDs"
+        },
+        "fix": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "evaluatePublicationBatch"
+        },
+        "anchor": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "evaluatePublicationBatch"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-05": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-05.json",
-        "test": { "path": "src/test/content-contracts.test.ts", "line": 475, "symbol": "detached snapshot" },
-        "fix": { "path": "src/lib/data/publication-policy.ts", "symbol": "captureEvaluationValue" },
-        "anchor": { "path": "src/lib/data/publication-policy.ts", "line": 289, "symbol": "captureEvaluationValue" },
+        "test": {
+          "path": "src/test/content-contracts.test.ts",
+          "symbol": "detached snapshot"
+        },
+        "fix": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "captureEvaluationValue"
+        },
+        "anchor": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "captureEvaluationValue"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-06": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-06.json",
-        "test": { "path": "src/test/review-closeout.test.ts", "symbol": "fails closed for duplicate top-level IDs" },
-        "fix": { "path": "src/lib/validation/content-validator.ts", "symbol": "validatePublicCollection" },
-        "anchor": { "path": "src/lib/validation/content-validator.ts", "line": 615, "symbol": "validatePublicCollection" },
+        "test": {
+          "path": "src/test/review-closeout.test.ts",
+          "symbol": "fails closed for duplicate top-level IDs"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validatePublicCollection"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validatePublicCollection"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-07": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-07.json",
-        "test": { "path": "src/test/content-contracts.test.ts", "line": 342, "symbol": "unknown or ambiguous kinds" },
-        "fix": { "path": "src/lib/validation/content-contracts.ts", "symbol": "projectPublicRecord" },
-        "anchor": { "path": "src/lib/validation/content-contracts.ts", "line": 985, "symbol": "projectPublicRecord" },
+        "test": {
+          "path": "src/test/content-contracts.test.ts",
+          "symbol": "unknown or ambiguous kinds"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-contracts.ts",
+          "symbol": "projectPublicRecord"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-contracts.ts",
+          "symbol": "projectPublicRecord"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-08": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-08.json",
-        "test": { "path": "src/test/publication-containment.test.ts", "line": 566, "symbol": "identity containment" },
-        "fix": { "path": "src/lib/data/publication-policy.ts", "symbol": "createPublicationEvaluationContext" },
-        "anchor": { "path": "src/lib/data/publication-policy.ts", "line": 386, "symbol": "createPublicationEvaluationContext" },
+        "test": {
+          "path": "src/test/publication-containment.test.ts",
+          "symbol": "identity containment"
+        },
+        "fix": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "createPublicationEvaluationContext"
+        },
+        "anchor": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "createPublicationEvaluationContext"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-09": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-09.json",
-        "test": { "path": "src/test/content-validator.test.ts", "line": 144, "symbol": "malformed tala fields" },
-        "fix": { "path": "src/lib/validation/content-validator.ts", "symbol": "validateMusicalCoreFieldDispositions" },
-        "anchor": { "path": "src/lib/validation/content-validator.ts", "line": 332, "symbol": "validateMusicalCoreFieldDispositions" },
+        "test": {
+          "path": "src/test/content-validator.test.ts",
+          "symbol": "malformed tala fields"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validateMusicalCoreFieldDispositions"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validateMusicalCoreFieldDispositions"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-10": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-10.json",
-        "test": { "path": "src/test/source-metadata-consistency.test.ts", "line": 79, "symbol": "ambiguous extracted-document mappings" },
-        "fix": { "path": "src/lib/validation/content-validator.ts", "symbol": "validateSelectedSourceMetadata" },
-        "anchor": { "path": "src/lib/validation/content-validator.ts", "line": 229, "symbol": "validateSelectedSourceMetadata" },
+        "test": {
+          "path": "src/test/source-metadata-consistency.test.ts",
+          "symbol": "ambiguous extracted-document mappings"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validateSelectedSourceMetadata"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validateSelectedSourceMetadata"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-11": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-11.json",
-        "test": { "path": "src/test/publication-containment.test.ts", "line": 59, "symbol": "declarative %s dependency rule" },
-        "fix": { "path": "src/lib/data/publication-policy.ts", "symbol": "DEPENDENCY_FIELD_RULES" },
-        "anchor": { "path": "src/lib/data/publication-policy.ts", "line": 225, "symbol": "DEPENDENCY_FIELD_RULES" },
+        "test": {
+          "path": "src/test/publication-containment.test.ts",
+          "symbol": "declarative %s dependency rule"
+        },
+        "fix": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "DEPENDENCY_FIELD_RULES"
+        },
+        "anchor": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "DEPENDENCY_FIELD_RULES"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-12": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-12.json",
-        "test": { "path": "src/test/source-metadata-consistency.test.ts", "line": 79, "symbol": "ambiguous extracted-document mappings" },
-        "fix": { "path": "src/lib/validation/content-validator.ts", "symbol": "validateSelectedSourceMetadata" },
-        "anchor": { "path": "src/lib/validation/content-validator.ts", "line": 229, "symbol": "validateSelectedSourceMetadata" },
+        "test": {
+          "path": "src/test/source-metadata-consistency.test.ts",
+          "symbol": "ambiguous extracted-document mappings"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validateSelectedSourceMetadata"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validateSelectedSourceMetadata"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-13": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-13.json",
-        "test": { "path": "src/test/review-closeout.test.ts", "symbol": "resolves current musical-core anchors" },
-        "fix": { "path": "docs/FORENSIC_CORRECTION_LOG.md", "symbol": "P02-FINAL-06" },
-        "anchor": { "path": "docs/FORENSIC_CORRECTION_LOG.md", "line": 71, "symbol": "P02-FINAL-06" },
+        "test": {
+          "path": "src/test/review-closeout.test.ts",
+          "symbol": "resolves current musical-core anchors"
+        },
+        "fix": {
+          "path": "docs/FORENSIC_CORRECTION_LOG.md",
+          "symbol": "P02-FINAL-06"
+        },
+        "anchor": {
+          "path": "docs/FORENSIC_CORRECTION_LOG.md",
+          "symbol": "P02-FINAL-06"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-14": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-14.json",
-        "test": { "path": "src/test/content-contracts.test.ts", "line": 384, "symbol": "discriminator-compatible fields" },
-        "fix": { "path": "src/lib/validation/content-contracts.ts", "symbol": "projectPublicRecord" },
-        "anchor": { "path": "src/lib/validation/content-contracts.ts", "line": 985, "symbol": "projectPublicRecord" },
+        "test": {
+          "path": "src/test/content-contracts.test.ts",
+          "symbol": "discriminator-compatible fields"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-contracts.ts",
+          "symbol": "projectPublicRecord"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-contracts.ts",
+          "symbol": "projectPublicRecord"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-15": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-15.json",
-        "test": { "path": "src/test/quiz-runner.test.tsx", "line": 198, "symbol": "duplicate question IDs" },
-        "fix": { "path": "src/components/quiz/QuizRunner.tsx", "symbol": "getUsableQuiz" },
-        "anchor": { "path": "src/components/quiz/QuizRunner.tsx", "line": 37, "symbol": "getUsableQuiz" },
+        "test": {
+          "path": "src/test/quiz-runner.test.tsx",
+          "symbol": "duplicate question IDs"
+        },
+        "fix": {
+          "path": "src/components/quiz/QuizRunner.tsx",
+          "symbol": "getUsableQuiz"
+        },
+        "anchor": {
+          "path": "src/components/quiz/QuizRunner.tsx",
+          "symbol": "getUsableQuiz"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-16": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-16.json",
-        "test": { "path": "src/test/search-engine.test.ts", "line": 83, "symbol": "normalized-empty controls" },
-        "fix": { "path": "src/lib/search/search-engine.ts", "symbol": "classifySearchQuery" },
-        "anchor": { "path": "src/lib/search/search-engine.ts", "line": 84, "symbol": "classifySearchQuery" },
+        "test": {
+          "path": "src/test/search-engine.test.ts",
+          "symbol": "normalized-empty controls"
+        },
+        "fix": {
+          "path": "src/lib/search/search-engine.ts",
+          "symbol": "classifySearchQuery"
+        },
+        "anchor": {
+          "path": "src/lib/search/search-engine.ts",
+          "symbol": "classifySearchQuery"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-17": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-17.json",
-        "test": { "path": "src/test/components.test.tsx", "line": 891, "symbol": "rhythm session" },
-        "fix": { "path": "src/components/audio/RhythmTapGame.tsx", "symbol": "RhythmTapGame" },
-        "anchor": { "path": "src/components/audio/RhythmTapGame.tsx", "line": 8, "symbol": "RhythmTapGame" },
+        "test": {
+          "path": "src/test/components.test.tsx",
+          "symbol": "rhythm session"
+        },
+        "fix": {
+          "path": "src/components/audio/RhythmTapGame.tsx",
+          "symbol": "RhythmTapGame"
+        },
+        "anchor": {
+          "path": "src/components/audio/RhythmTapGame.tsx",
+          "symbol": "RhythmTapGame"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-18": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-18.json",
-        "test": { "path": "src/test/components.test.tsx", "line": 913, "symbol": "completed rhythm playback handles" },
-        "fix": { "path": "src/components/audio/TalaVisualizer.tsx", "symbol": "TalaVisualizer" },
-        "anchor": { "path": "src/components/audio/TalaVisualizer.tsx", "line": 9, "symbol": "TalaVisualizer" },
+        "test": {
+          "path": "src/test/components.test.tsx",
+          "symbol": "completed rhythm playback handles"
+        },
+        "fix": {
+          "path": "src/components/audio/TalaVisualizer.tsx",
+          "symbol": "TalaVisualizer"
+        },
+        "anchor": {
+          "path": "src/components/audio/TalaVisualizer.tsx",
+          "symbol": "TalaVisualizer"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-19": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-19.json",
-        "test": { "path": "src/test/components.test.tsx", "line": 935, "symbol": "stale Tala unavailable callbacks" },
-        "fix": { "path": "src/components/audio/TalaVisualizer.tsx", "symbol": "TalaVisualizer" },
-        "anchor": { "path": "src/components/audio/TalaVisualizer.tsx", "line": 9, "symbol": "TalaVisualizer" },
+        "test": {
+          "path": "src/test/components.test.tsx",
+          "symbol": "stale Tala unavailable callbacks"
+        },
+        "fix": {
+          "path": "src/components/audio/TalaVisualizer.tsx",
+          "symbol": "TalaVisualizer"
+        },
+        "anchor": {
+          "path": "src/components/audio/TalaVisualizer.tsx",
+          "symbol": "TalaVisualizer"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "C3-20": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-20.json",
-        "test": { "path": "src/test/components.test.tsx", "line": 1003, "symbol": "Tabla promises reject" },
-        "fix": { "path": "src/lib/audio/tabla.ts", "symbol": "scheduleTablaPlan" },
-        "anchor": { "path": "src/lib/audio/tabla.ts", "line": 46, "symbol": "scheduleTablaPlan" },
+        "test": {
+          "path": "src/test/components.test.tsx",
+          "symbol": "Tabla promises reject"
+        },
+        "fix": {
+          "path": "src/lib/audio/tabla.ts",
+          "symbol": "scheduleTablaPlan"
+        },
+        "anchor": {
+          "path": "src/lib/audio/tabla.ts",
+          "symbol": "scheduleTablaPlan"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "P02-PITCH-OWNERSHIP-001": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/metadata.json authorizedAdditionalFindings",
-        "test": { "path": "src/test/pitch.test.ts", "line": 230, "symbol": "late stream" },
-        "fix": { "path": "src/lib/audio/pitch.ts", "symbol": "startListening" },
-        "anchor": { "path": "src/lib/audio/pitch.ts", "line": 114, "symbol": "startListening" },
+        "test": {
+          "path": "src/test/pitch.test.ts",
+          "symbol": "late stream"
+        },
+        "fix": {
+          "path": "src/lib/audio/pitch.ts",
+          "symbol": "startListening"
+        },
+        "anchor": {
+          "path": "src/lib/audio/pitch.ts",
+          "symbol": "startListening"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       },
       "P02-PROJECT-SCOPE-001": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/metadata.json authorizedAdditionalFindings",
-        "test": { "path": "src/test/review-closeout.test.ts", "symbol": "records the acceptance-hardening scope" },
-        "fix": { "path": "AGENTS.md", "symbol": "current verified public curriculum boundary" },
-        "anchor": { "path": "AGENTS.md", "line": 3, "symbol": "current verified public curriculum boundary" },
+        "test": {
+          "path": "src/test/review-closeout.test.ts",
+          "symbol": "records the acceptance-hardening scope"
+        },
+        "fix": {
+          "path": "AGENTS.md",
+          "symbol": "current verified public curriculum boundary"
+        },
+        "anchor": {
+          "path": "AGENTS.md",
+          "symbol": "current verified public curriculum boundary"
+        },
         "disposition": "FIXED-PENDING-REREVIEW"
       }
     },
@@ -257,7 +455,8 @@
     ],
     "optionalEvidenceFields": [
       "exactSection",
-      "exactPageOrSection"
+      "exactPageOrSection",
+      "semanticReferences"
     ],
     "severityValues": [
       "P0",
@@ -1126,12 +1325,24 @@
         {
           "path": "src/lib/validation/content-contracts.ts",
           "locator": "isReviewMetadata / isLesson / projectPublicRecord",
-          "exactSection": "content-contracts.ts:327,602,950 - complete raw metadata validation and allowlisted safe projection"
+          "exactSection": "isReviewMetadata, validateContentRecord, and projectPublicRecord",
+          "semanticReferences": [
+            {
+              "path": "src/lib/validation/content-contracts.ts",
+              "symbol": "isReviewMetadata, validateContentRecord, and projectPublicRecord"
+            }
+          ]
         },
         {
           "path": "src/test/content-contracts.test.ts",
           "locator": "lesson review metadata mutation",
-          "exactSection": "content-contracts.test.ts:241 and publication-containment.test.ts:84 - missing metadata returns malformed-record and cannot publish"
+          "exactSection": "tests: rejects both CMS publication entry points when raw metadata is synthesized or incomplete; rejects every required route-rendered Raga and Lesson shape",
+          "semanticReferences": [
+            {
+              "path": "src/test/content-contracts.test.ts",
+              "symbol": "tests: rejects both CMS publication entry points when raw metadata is synthesized or incomplete; rejects every required route-rendered Raga and Lesson shape"
+            }
+          ]
         }
       ],
       "disposition": "require valid raw review metadata before publication, report malformed forensic input, and synthesize explicit unverified metadata only in bounded review/public projections",
@@ -1150,12 +1361,24 @@
         {
           "path": "src/lib/validation/content-contracts.ts",
           "locator": "finite union constants and entity-specific validators",
-          "exactSection": "content-contracts.ts:25,474,602-676 - dependency-free finite-domain membership checks"
+          "exactSection": "DIFFICULTY_LEVELS, REVIEW_STATUSES, REUSE_STATUSES, AUDIO_ACTIVITY_TYPES, PRACTICE_TOOLS, and CHECKPOINT_TYPES",
+          "semanticReferences": [
+            {
+              "path": "src/lib/validation/content-contracts.ts",
+              "symbol": "DIFFICULTY_LEVELS, REVIEW_STATUSES, REUSE_STATUSES, AUDIO_ACTIVITY_TYPES, PRACTICE_TOOLS, and CHECKPOINT_TYPES"
+            }
+          ]
         },
         {
           "path": "src/test/content-contracts.test.ts",
           "locator": "invalid finite-domain mutation matrix",
-          "exactSection": "content-contracts.test.ts:241,268 - invalid nonblank values fail their complete runtime contracts"
+          "exactSection": "tests: rejects unsupported finite-domain values across every known entity contract",
+          "semanticReferences": [
+            {
+              "path": "src/test/content-contracts.test.ts",
+              "symbol": "tests: rejects unsupported finite-domain values across every known entity contract"
+            }
+          ]
         }
       ],
       "disposition": "centralize finite domains in dependency-free contracts and fail every unsupported literal closed before source or dependency evaluation",
@@ -1174,12 +1397,24 @@
         {
           "path": "src/lib/validation/content-contracts.ts",
           "locator": "identifyContentKind / validateContentRecord",
-          "exactSection": "content-contracts.ts:602-702,772 - closed known-kind classifier and complete entity/nested contract table"
+          "exactSection": "KIND_SIGNATURES, identifyContentKind, and validateContentRecord",
+          "semanticReferences": [
+            {
+              "path": "src/lib/validation/content-contracts.ts",
+              "symbol": "KIND_SIGNATURES, identifyContentKind, and validateContentRecord"
+            }
+          ]
         },
         {
           "path": "src/test/content-contracts.test.ts",
           "locator": "canonical entity and malformed-field tables",
-          "exactSection": "content-contracts.test.ts:101,241,351 - every imported record and nested required field is exercised as unknown runtime input"
+          "exactSection": "tests: validates every imported catalog record, nested question, and allowlisted projection",
+          "semanticReferences": [
+            {
+              "path": "src/test/content-contracts.test.ts",
+              "symbol": "tests: validates every imported catalog record, nested question, and allowlisted projection"
+            }
+          ]
         }
       ],
       "disposition": "treat all imported catalogs as unknown arrays, reject unknown or ambiguous kinds, and use the same complete contract for validation, publication, repository reads, and allowlisted projections",
@@ -1198,12 +1433,24 @@
         {
           "path": "src/lib/validation/content-contracts.ts",
           "locator": "inspectGraph / projectPublicRecord / cloneBoundedJson",
-          "exactSection": "content-contracts.ts:819,950 - iterative own-property traversal and projection with depth 256 and 10000 unique-node budgets"
+          "exactSection": "inspectGraph and projectPublicRecord",
+          "semanticReferences": [
+            {
+              "path": "src/lib/validation/content-contracts.ts",
+              "symbol": "inspectGraph and projectPublicRecord"
+            }
+          ]
         },
         {
           "path": "src/test/content-contracts.test.ts",
           "locator": "shared DAG, cycle, depth, width, sparse-array, and oversized-collection cases",
-          "exactSection": "content-contracts.test.ts:351,368 - shared DAG, hostile graph, at-limit, and projection regressions"
+          "exactSection": "tests: accepts shared DAGs but rejects cycles and graph budget overruns",
+          "semanticReferences": [
+            {
+              "path": "src/test/content-contracts.test.ts",
+              "symbol": "tests: accepts shared DAGs but rejects cycles and graph budget overruns"
+            }
+          ]
         }
       ],
       "disposition": "replace recursive JSON walking with bounded iterative traversal; count shared DAG nodes once and reject cycles, sparse arrays, depth overflow, node overflow, and oversized containers as malformed-record",
@@ -1222,12 +1469,24 @@
         {
           "path": "src/lib/search/search-engine.ts",
           "locator": "SearchIndex.search normalized-query guard",
-          "exactSection": "search-engine.ts:84,137 - raw blank featured results are distinct from normalized-empty hostile input"
+          "exactSection": "classifySearchQuery, searchFilter, and SearchIndex.search",
+          "semanticReferences": [
+            {
+              "path": "src/lib/search/search-engine.ts",
+              "symbol": "classifySearchQuery, searchFilter, and SearchIndex.search"
+            }
+          ]
         },
         {
           "path": "src/test/search-engine.test.ts",
           "locator": "raw-empty and normalized-empty control regression",
-          "exactSection": "search-engine.test.ts:80 - bidi and zero-width-only nonblank queries return no results"
+          "exactSection": "tests: treats raw-empty and normalized-empty queries as different states",
+          "semanticReferences": [
+            {
+              "path": "src/test/search-engine.test.ts",
+              "symbol": "tests: treats raw-empty and normalized-empty queries as different states"
+            }
+          ]
         }
       ],
       "disposition": "preserve featured results only for genuinely empty or whitespace input and return no results when a nonblank query has no normalized or transliterated search text",
@@ -1246,12 +1505,24 @@
         {
           "path": "src/lib/audio/synth.ts",
           "locator": "SwaraPlaybackHandle / playSwaraToneHandle / playSequenceHandle",
-          "exactSection": "synth.ts:50,201,350 - idempotent cancellation, readiness/finished promises, timer cleanup, and active node stop/disconnect"
+          "exactSection": "SwaraPlaybackHandle, playSwaraToneHandle, and playSequenceHandle",
+          "semanticReferences": [
+            {
+              "path": "src/lib/audio/synth.ts",
+              "symbol": "SwaraPlaybackHandle, playSwaraToneHandle, and playSequenceHandle"
+            }
+          ]
         },
         {
           "path": "src/test/synth.test.ts and src/test/components.test.tsx",
           "locator": "initialization, active-node, delay, StrictMode, replacement, unmount, and co-mounted ownership regressions",
-          "exactSection": "synth.test.ts:199,293 and components.test.tsx:471,555 - no later note, callback, unavailable state, or cross-caller cancellation"
+          "exactSection": "tests: cancels owned Swara tone and scale work; retains ready Swara ownership until finished",
+          "semanticReferences": [
+            {
+              "path": "src/test/synth.test.ts and src/test/components.test.tsx",
+              "symbol": "tests: cancels owned Swara tone and scale work; retains ready Swara ownership until finished"
+            }
+          ]
         }
       ],
       "disposition": "introduce caller-owned Swara handles, keep Promise wrappers for compatibility, and migrate every current page/component consumer to replacement and unmount cleanup without autoplay",
@@ -1725,27 +1996,22 @@
     "currentSemanticAnchors": [
       {
         "path": "src/test/musical-core.test.ts",
-        "line": 386,
         "symbol": "verifies bounded quarantine status for out-of-scope entities"
       },
       {
         "path": "src/lib/data/publication-policy.ts",
-        "line": 910,
         "symbol": "gradeScopeMatchesSource"
       },
       {
         "path": "src/test/publication-containment.test.ts",
-        "line": 816,
         "symbol": "requires each public grade band to contain a grade established by its source"
       },
       {
         "path": "src/test/components.test.tsx",
-        "line": 635,
         "symbol": "retains ready Swara ownership until finished"
       },
       {
         "path": "src/test/search-engine.test.ts",
-        "line": 23,
         "symbol": "should not discover quarantined Bhairav or Roopak claims"
       }
     ],
@@ -1776,26 +2042,154 @@
     },
     "fixCommitSubject": "fix(review): close cycle-three acceptance findings",
     "validatedFindings": [
-      { "id": "C3-V01", "artifact": "validator-01-whitespace-quarantine-id.json", "test": "src/test/publication-containment.test.ts:130", "fix": "src/lib/data/publication-policy.ts:130 (isKnownQuarantinedEntityId)", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" },
-      { "id": "C3-V02", "artifact": "validator-02-page-metadata.json", "test": "src/test/publication-parity.test.ts:541", "fix": "src/lib/data/publication-policy.ts:316 (isSourceDocumentRecord)", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" },
-      { "id": "C3-V03", "artifact": "validator-03-unsafe-tala-context.json", "test": "src/test/publication-containment.test.ts:715", "fix": "src/lib/data/publication-policy.ts:923 (getTalaFieldDisposition)", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" },
-      { "id": "C3-V04", "artifact": "validator-04-mutable-quarantine-registry.json", "test": "src/test/publication-containment.test.ts:130", "fix": "src/lib/data/publication-policy.ts:130 (private registry predicate)", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" },
-      { "id": "C3-V05", "artifact": "validator-05-quizrunner-snapshot.json", "test": "src/test/quiz-runner.test.tsx:175", "fix": "src/components/quiz/QuizRunner.tsx:37 (getUsableQuiz)", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" },
-      { "id": "C3-V06", "artifact": "validator-06-public-collection-kind.json", "test": "src/test/publication-containment.test.ts:699", "fix": "src/lib/validation/content-validator.ts:615 (validatePublicCollection)", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" },
-      { "id": "C3-V07", "artifact": "validator-07-source-id-normalization.json", "test": "src/test/publication-containment.test.ts:706", "fix": "src/lib/validation/content-contracts.ts:318 (isSourceReference)", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" },
-      { "id": "C3-V08", "artifact": "validator-08-search-controls.json", "test": "src/test/search-engine.test.ts:12", "fix": "src/lib/search/normalize-sinhala.ts:14", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" },
-      { "id": "C3-V09", "artifact": "validator-09-dependency-boundary-tests.json", "test": "src/test/publication-parity.test.ts:332", "fix": "repository/list/lookup/search/summary dependency parity regression", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" },
-      { "id": "C3-V10", "artifact": "validator-10-traceability-anchors.json", "test": "src/test/review-closeout.test.ts:64,136", "fix": "exact-line semantic anchors and six-column ledger parity", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" },
-      { "id": "C3-V11", "artifact": "validator-11-rhythm-rerender-test.json", "test": "src/test/components.test.tsx:891", "fix": "complete latest-callback rhythm session regression", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" },
-      { "id": "C3-V12", "artifact": "validator-12-microphone-privacy-test.json", "test": "src/test/pitch.test.ts:389", "fix": "fetch/XHR/WebSocket/beacon zero-upload guards", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" },
-      { "id": "C3-V13", "artifact": "validator-13-synth-mock-restoration.json", "test": "src/test/synth.test.ts:57", "fix": "failure-safe AudioContext restoration", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" },
-      { "id": "C3-V14", "artifact": "validator-14-cms-test-restoration.json", "test": "src/test/publication-containment.test.ts:143", "fix": "remove rejected-operation mutating reset", "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW" }
+      {
+        "id": "C3-V01",
+        "artifact": "validator-01-whitespace-quarantine-id.json",
+        "test": "src/test/publication-containment.test.ts:130",
+        "fix": "src/lib/data/publication-policy.ts:130 (isKnownQuarantinedEntityId)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V02",
+        "artifact": "validator-02-page-metadata.json",
+        "test": "src/test/publication-parity.test.ts:541",
+        "fix": "src/lib/data/publication-policy.ts:316 (isSourceDocumentRecord)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V03",
+        "artifact": "validator-03-unsafe-tala-context.json",
+        "test": "src/test/publication-containment.test.ts:715",
+        "fix": "src/lib/data/publication-policy.ts:923 (getTalaFieldDisposition)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V04",
+        "artifact": "validator-04-mutable-quarantine-registry.json",
+        "test": "src/test/publication-containment.test.ts:130",
+        "fix": "src/lib/data/publication-policy.ts:130 (private registry predicate)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V05",
+        "artifact": "validator-05-quizrunner-snapshot.json",
+        "test": "src/test/quiz-runner.test.tsx:175",
+        "fix": "src/components/quiz/QuizRunner.tsx:37 (getUsableQuiz)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V06",
+        "artifact": "validator-06-public-collection-kind.json",
+        "test": "src/test/publication-containment.test.ts:699",
+        "fix": "src/lib/validation/content-validator.ts:615 (validatePublicCollection)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V07",
+        "artifact": "validator-07-source-id-normalization.json",
+        "test": "src/test/publication-containment.test.ts:706",
+        "fix": "src/lib/validation/content-contracts.ts:318 (isSourceReference)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V08",
+        "artifact": "validator-08-search-controls.json",
+        "test": "src/test/search-engine.test.ts:12",
+        "fix": "src/lib/search/normalize-sinhala.ts:14",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V09",
+        "artifact": "validator-09-dependency-boundary-tests.json",
+        "test": "src/test/publication-parity.test.ts:332",
+        "fix": "repository/list/lookup/search/summary dependency parity regression",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V10",
+        "artifact": "validator-10-traceability-anchors.json",
+        "test": "src/test/review-closeout.test.ts:64,136",
+        "fix": "exact-line semantic anchors and six-column ledger parity",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V11",
+        "artifact": "validator-11-rhythm-rerender-test.json",
+        "test": "src/test/components.test.tsx:891",
+        "fix": "complete latest-callback rhythm session regression",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V12",
+        "artifact": "validator-12-microphone-privacy-test.json",
+        "test": "src/test/pitch.test.ts:389",
+        "fix": "fetch/XHR/WebSocket/beacon zero-upload guards",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V13",
+        "artifact": "validator-13-synth-mock-restoration.json",
+        "test": "src/test/synth.test.ts:57",
+        "fix": "failure-safe AudioContext restoration",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V14",
+        "artifact": "validator-14-cms-test-restoration.json",
+        "test": "src/test/publication-containment.test.ts:143",
+        "fix": "remove rejected-operation mutating reset",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      }
     ],
     "status": "Third fix cycle complete locally; mandatory read-only acceptance review pending; not acceptance evidence",
     "historicalPreservation": [
       "The rejected Deepchandi retrieval-only finding remains rejected.",
       "All eight Talas remain whole-entity quarantined.",
       "Earlier blocked and fix-cycle runs remain historical findings input.",
+      "No push, ready PR, merge, deployment, or musical-source promotion is authorized by this entry."
+    ]
+  },
+  "finalAcceptanceFollowup": {
+    "reviewRunId": "20260817-054012-p02-final-acceptance-a17068ff",
+    "reviewedHead": "b1fba4a2278a38501023488c9fd9e8c703b723fd",
+    "artifactRoot": "C:/tmp/compound-engineering/ce-code-review/20260817-054012-p02-final-acceptance-a17068ff/",
+    "validatedFindingIds": [
+      "FA-V01",
+      "FA-V03",
+      "FA-V04",
+      "FA-V05",
+      "FA-V06",
+      "FA-V07",
+      "FA-V08",
+      "FA-V09",
+      "FA-V10",
+      "FA-V11",
+      "FA-V14",
+      "FA-V15",
+      "FA-V16",
+      "FA-V17"
+    ],
+    "semanticTraceability": {
+      "FA-V01": "src/lib/validation/content-validator.ts#validatePublicCollection",
+      "FA-V03": "src/lib/validation/content-contracts.ts#safeOwnEntries",
+      "FA-V04": "src/lib/data/publication-policy.ts#createPublicationEvaluationContext",
+      "FA-V05": "src/lib/validation/content-validator.ts#validateMusicalCoreFieldDispositions",
+      "FA-V06": "src/lib/audio/synth.ts#snapshotValidSwaraSequence",
+      "FA-V07": "src/lib/audio/tabla.ts#planTablaBol",
+      "FA-V08": "src/lib/data/publication-policy.ts#getRecordPublicationDecision",
+      "FA-V09": "src/lib/data/publication-policy.ts#sanitizeReviewRecord",
+      "FA-V10": "src/lib/data/repository.ts#CmsMutationResult",
+      "FA-V11": "src/types/content.ts#AnswerOption",
+      "FA-V14": "src/test/review-closeout.test.ts#records the acceptance-hardening scope without rewriting blocked review history",
+      "FA-V15": "src/test/synth.test.ts#settles Swara cleanup when clearTimeout throws",
+      "FA-V16": "src/lib/data/repository.ts#updateLessonReviewStatus",
+      "FA-V17": "src/lib/data/publication-policy.ts#parseSourceLocator"
+    },
+    "status": "All validated blockers fixed locally; fresh mandatory rereview pending; not acceptance evidence",
+    "historicalPreservation": [
+      "The acceptance run remains blocked findings input.",
+      "All eight Talas remain whole-entity quarantined.",
+      "The rejected Deepchandi retrieval-only finding remains rejected.",
       "No push, ready PR, merge, deployment, or musical-source promotion is authorized by this entry."
     ]
   },

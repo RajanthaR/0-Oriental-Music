@@ -33,6 +33,10 @@ const ACCEPTANCE_HARDENING_FINDING_IDS = [
 ] as const;
 
 const CYCLE_2_FINDING_IDS = ["V15", "V23"] as const;
+const FINAL_ACCEPTANCE_FOLLOWUP_IDS = [
+  "FA-V01", "FA-V03", "FA-V04", "FA-V05", "FA-V06", "FA-V07", "FA-V08",
+  "FA-V09", "FA-V10", "FA-V11", "FA-V14", "FA-V15", "FA-V16", "FA-V17",
+] as const;
 
 const rawLessons = lessonsData as unknown as RawRecord[];
 const rawRagas = ragasData as unknown as RawRecord[];
@@ -172,6 +176,31 @@ describe("Phase 2 final contract closeout", () => {
     }
   });
 
+  it("traces every final-acceptance blocker by stable path and symbol", () => {
+    const closeout = readWorkspaceFile("docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md");
+    const correctionLog = readWorkspaceFile("docs/FORENSIC_CORRECTION_LOG.md");
+    const fieldMatrix = readWorkspaceFile("docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md");
+    const ledger = JSON.parse(readWorkspaceFile("data/forensic-ledger.json")) as Record<string, unknown>;
+    const followup = ledger.finalAcceptanceFollowup as Record<string, unknown>;
+    expect(followup.reviewRunId).toBe("20260817-054012-p02-final-acceptance-a17068ff");
+    expect(followup.validatedFindingIds).toEqual([...FINAL_ACCEPTANCE_FOLLOWUP_IDS]);
+    expect(followup.status).toContain("not acceptance evidence");
+    expect(correctionLog).toContain("Phase 2 final-acceptance follow-up");
+    expect(fieldMatrix).toContain("Final-acceptance follow-up boundary");
+
+    const traceability = followup.semanticTraceability as Record<string, string>;
+    expect(Object.keys(traceability)).toEqual([...FINAL_ACCEPTANCE_FOLLOWUP_IDS]);
+    for (const id of FINAL_ACCEPTANCE_FOLLOWUP_IDS) {
+      expect(closeout).toContain(`| \`${id}\` |`);
+      const reference = traceability[id];
+      const separator = reference.indexOf("#");
+      expect(separator, `${id} separator`).toBeGreaterThan(0);
+      const path = reference.slice(0, separator);
+      const symbol = reference.slice(separator + 1);
+      expect(readWorkspaceFile(path), `${id} ${symbol}`).toContain(symbol);
+    }
+  });
+
   it("recomputes publication summaries from current inputs without memoized identity", () => {
     const first = repository.getPublicationSummary();
     const second = repository.getPublicationSummary();
@@ -183,7 +212,7 @@ describe("Phase 2 final contract closeout", () => {
     const originalLesson = rawLessons[lessonIndex];
     const originalSnapshot = structuredClone(originalLesson);
     try {
-      expect(repository.updateLessonReviewStatus("les-intro-01", "Needs Revision", false)).toBe(true);
+      expect(repository.updateLessonReviewStatus("les-intro-01", "Needs Revision", false)).toMatchObject({ ok: true });
       const afterMutation = repository.getPublicationSummary();
       expect(afterMutation).not.toBe(second);
       expect(afterMutation).toStrictEqual(second);
@@ -255,45 +284,49 @@ describe("Phase 2 final contract closeout", () => {
   });
 
   it("rejects both CMS publication entry points when raw metadata is synthesized or incomplete", () => {
-    const lessonIndex = rawLessons.findIndex((candidate) => candidate.id === "les-intro-01");
+    const mutableRepository = repository as unknown as { lessons: RawRecord[] };
+    const originalCatalog = mutableRepository.lessons;
+    mutableRepository.lessons = structuredClone(originalCatalog);
+    const lessonIndex = mutableRepository.lessons.findIndex((candidate) => candidate.id === "les-intro-01");
     expect(lessonIndex).toBeGreaterThanOrEqual(0);
-    const originalLesson = rawLessons[lessonIndex];
+    const originalLesson = mutableRepository.lessons[lessonIndex];
     const originalSnapshot = structuredClone(originalLesson);
     try {
-      expect(repository.updateLessonReviewStatus("les-intro-01", "Published", true)).toBe(false);
-      expect(repository.updateLessonStatus("les-intro-01", "Published", "Release Agent", "publish")).toBe(false);
-      expect(findRawRecord(rawLessons, "les-intro-01").reviewMetadata).toEqual(originalSnapshot.reviewMetadata);
-      expect(findRawRecord(rawLessons, "les-intro-01").published).toBe(originalSnapshot.published);
+      expect(repository.updateLessonReviewStatus("les-intro-01", "Published", true)).toMatchObject({ ok: false });
+      expect(repository.updateLessonStatus("les-intro-01", "Published", "Release Agent", "publish")).toMatchObject({ ok: false });
+      expect(findRawRecord(mutableRepository.lessons, "les-intro-01").reviewMetadata).toEqual(originalSnapshot.reviewMetadata);
+      expect(findRawRecord(mutableRepository.lessons, "les-intro-01").published).toBe(originalSnapshot.published);
 
-      const malformedLesson = findRawRecord(rawLessons, "les-intro-01");
+      const malformedLesson = findRawRecord(mutableRepository.lessons, "les-intro-01");
       delete malformedLesson.reviewMetadata;
-      expect(repository.updateLessonReviewStatus("les-intro-01", "Needs Revision", false)).toBe(true);
-      const repairedLesson = findRawRecord(rawLessons, "les-intro-01");
+      expect(repository.updateLessonReviewStatus("les-intro-01", "Needs Revision", false)).toMatchObject({ ok: true });
+      const repairedLesson = findRawRecord(mutableRepository.lessons, "les-intro-01");
       expect((repairedLesson.reviewMetadata as RawRecord).reviewer).toBe(UNKNOWN_PROVENANCE);
       expect((repairedLesson.reviewMetadata as RawRecord).license).toBe(UNKNOWN_PROVENANCE);
     } finally {
-      rawLessons[lessonIndex] = originalLesson;
-      Object.assign(originalLesson, originalSnapshot);
+      mutableRepository.lessons = originalCatalog;
     }
   });
 
   it("rejects every CMS status/published mismatch without changing raw state", () => {
-    const lessonIndex = rawLessons.findIndex((candidate) => candidate.id === "les-intro-01");
+    const mutableRepository = repository as unknown as { lessons: RawRecord[] };
+    const originalCatalog = mutableRepository.lessons;
+    mutableRepository.lessons = structuredClone(originalCatalog);
+    const lessonIndex = mutableRepository.lessons.findIndex((candidate) => candidate.id === "les-intro-01");
     expect(lessonIndex).toBeGreaterThanOrEqual(0);
-    const originalLesson = rawLessons[lessonIndex];
+    const originalLesson = mutableRepository.lessons[lessonIndex];
     const originalSnapshot = structuredClone(originalLesson);
     try {
-      const lesson = findRawRecord(rawLessons, "les-intro-01");
+      const lesson = findRawRecord(mutableRepository.lessons, "les-intro-01");
       lesson.reviewMetadata = completeReviewMetadata();
       lesson.published = false;
-      expect(repository.updateLessonReviewStatus("les-intro-01", "Published", false)).toBe(false);
-      expect(repository.updateLessonReviewStatus("les-intro-01", "Rights & Source Verification", true)).toBe(false);
-      const unchangedLesson = findRawRecord(rawLessons, "les-intro-01");
+      expect(repository.updateLessonReviewStatus("les-intro-01", "Published", false)).toMatchObject({ ok: false });
+      expect(repository.updateLessonReviewStatus("les-intro-01", "Rights & Source Verification", true)).toMatchObject({ ok: false });
+      const unchangedLesson = findRawRecord(mutableRepository.lessons, "les-intro-01");
       expect(unchangedLesson.reviewMetadata).toEqual(completeReviewMetadata());
       expect(unchangedLesson.published).toBe(false);
     } finally {
-      rawLessons[lessonIndex] = originalLesson;
-      Object.assign(originalLesson, originalSnapshot);
+      mutableRepository.lessons = originalCatalog;
     }
   });
 
@@ -312,44 +345,48 @@ describe("Phase 2 final contract closeout", () => {
   });
 
   it("allows publication only from complete raw review evidence and a public source decision", () => {
-    const lessonIndex = rawLessons.findIndex((candidate) => candidate.id === "les-intro-01");
+    const mutableRepository = repository as unknown as { lessons: RawRecord[] };
+    const originalCatalog = mutableRepository.lessons;
+    mutableRepository.lessons = structuredClone(originalCatalog);
+    const lessonIndex = mutableRepository.lessons.findIndex((candidate) => candidate.id === "les-intro-01");
     expect(lessonIndex).toBeGreaterThanOrEqual(0);
-    const originalLesson = rawLessons[lessonIndex];
+    const originalLesson = mutableRepository.lessons[lessonIndex];
     const originalSnapshot = structuredClone(originalLesson);
     try {
-      const lesson = findRawRecord(rawLessons, "les-intro-01");
+      const lesson = findRawRecord(mutableRepository.lessons, "les-intro-01");
       lesson.reviewMetadata = completeReviewMetadata();
       lesson.published = false;
-      expect(repository.updateLessonReviewStatus("les-intro-01", "Published", true)).toBe(true);
-      const publishedLesson = findRawRecord(rawLessons, "les-intro-01");
+      expect(repository.updateLessonReviewStatus("les-intro-01", "Published", true)).toMatchObject({ ok: true });
+      const publishedLesson = findRawRecord(mutableRepository.lessons, "les-intro-01");
       expect(publishedLesson).not.toBe(lesson);
       expect(publishedLesson.published).toBe(true);
       expect((publishedLesson.reviewMetadata as RawRecord).status).toBe("Published");
     } finally {
-      rawLessons[lessonIndex] = originalLesson;
-      Object.assign(originalLesson, originalSnapshot);
+      mutableRepository.lessons = originalCatalog;
     }
   });
 
   it("rejects complete-looking CMS metadata when the source/publication gate is not public", () => {
-    const lessonIndex = rawLessons.findIndex((candidate) => candidate.id === "les-intro-01");
+    const mutableRepository = repository as unknown as { lessons: RawRecord[] };
+    const originalCatalog = mutableRepository.lessons;
+    mutableRepository.lessons = structuredClone(originalCatalog);
+    const lessonIndex = mutableRepository.lessons.findIndex((candidate) => candidate.id === "les-intro-01");
     expect(lessonIndex).toBeGreaterThanOrEqual(0);
-    const originalLesson = rawLessons[lessonIndex];
+    const originalLesson = mutableRepository.lessons[lessonIndex];
     const originalSnapshot = structuredClone(originalLesson);
     try {
-      const lesson = findRawRecord(rawLessons, "les-intro-01");
+      const lesson = findRawRecord(mutableRepository.lessons, "les-intro-01");
       lesson.reviewMetadata = completeReviewMetadata();
       lesson.sourceReference = {
         ...(originalSnapshot.sourceReference as RawRecord),
         pageOrSection: "sg10_emus_chap8_nadaya.pdf පිටු 9999",
       };
-      expect(repository.updateLessonStatus("les-intro-01", "Published", "Release Agent", "publish")).toBe(false);
-      const unchangedLesson = findRawRecord(rawLessons, "les-intro-01");
+      expect(repository.updateLessonStatus("les-intro-01", "Published", "Release Agent", "publish")).toMatchObject({ ok: false });
+      const unchangedLesson = findRawRecord(mutableRepository.lessons, "les-intro-01");
       expect(unchangedLesson.published).toBe(originalSnapshot.published);
       expect((unchangedLesson.reviewMetadata as RawRecord).status).toBe("Rights & Source Verification");
     } finally {
-      rawLessons[lessonIndex] = originalLesson;
-      Object.assign(originalLesson, originalSnapshot);
+      mutableRepository.lessons = originalCatalog;
     }
   });
 

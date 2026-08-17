@@ -11,8 +11,12 @@ type IsNever<T> = [T] extends [never] ? true : false;
 type RenderableQuestionOmitsForensicFields = Assert<
   IsNever<Extract<keyof Question, "audioNotes" | "audioTalaId" | "diagramSvg">>
 >;
+type RenderableAnswerOmitsCorrectness = Assert<
+  IsNever<Extract<keyof Extract<Question, { type: "mcq" }>["options_si"][number], "isCorrect">>
+>;
 
 const renderableQuestionHasNoForensicFields: RenderableQuestionOmitsForensicFields = true;
+const renderableAnswerHasNoCorrectness: RenderableAnswerOmitsCorrectness = true;
 
 function validQuestion(): Question {
   return {
@@ -131,6 +135,10 @@ afterEach(() => {
 });
 
 describe("QuizRunner runtime boundary", () => {
+  it("keeps public answer options free of raw correctness flags at compile time", () => {
+    expect(renderableQuestionHasNoForensicFields).toBe(true);
+    expect(renderableAnswerHasNoCorrectness).toBe(true);
+  });
   it("keeps forensic fields on RawQuestion while excluding them from Question", () => {
     expect(renderableQuestionHasNoForensicFields).toBe(true);
 

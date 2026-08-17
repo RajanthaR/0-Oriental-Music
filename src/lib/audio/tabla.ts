@@ -162,6 +162,7 @@ export function classifyTablaBol(bolName: string): TablaStrokeKind {
 }
 
 export function planTablaBol(bolName: string, matraDurationMs: number = 500): PlannedTablaStroke[] {
+  if (typeof matraDurationMs !== "number" || !Number.isFinite(matraDurationMs) || matraDurationMs <= 0) return [];
   const expanded = expandTablaBol(bolName);
   if (expanded.length === 0) return [];
   const subdivisionMs = Math.max(1, matraDurationMs) / expanded.length;
@@ -245,9 +246,16 @@ export class TablaSynthEngine {
     const cleanup = () => {
       if (finished) return;
       finished = true;
-      window.clearTimeout(timerId);
-      this.cleanupNodes(oscillators, gains);
-      resolveFinished();
+      try {
+        try {
+          window.clearTimeout(timerId);
+        } catch {
+          // Timer cancellation is best-effort; owned nodes still need cleanup.
+        }
+        this.cleanupNodes(oscillators, gains);
+      } finally {
+        resolveFinished();
+      }
     };
     const timerId = window.setTimeout(cleanup, durationMs);
     return { cancel: cleanup, finished: finishedPromise };
@@ -418,12 +426,24 @@ export class TablaSynthEngine {
     } catch (error) {
       // A combined bol may have started one side before the other side
       // failed. Roll the completed side back before propagating the failure.
-      strokes.forEach((stroke) => stroke.cancel());
+      strokes.forEach((stroke) => {
+        try {
+          stroke.cancel();
+        } catch {
+          // Preserve the original construction failure after best-effort rollback.
+        }
+      });
       throw error;
     }
     if (strokes.length === 0) return undefined;
     return {
-      cancel: () => strokes.forEach((stroke) => stroke.cancel()),
+      cancel: () => strokes.forEach((stroke) => {
+        try {
+          stroke.cancel();
+        } catch {
+          // One child cancellation must not strand the remaining owned stroke.
+        }
+      }),
       finished: Promise.all(strokes.map((stroke) => stroke.finished)).then(() => undefined),
     };
   }
@@ -450,6 +470,23 @@ export class TablaSynthEngine {
     let cancelScheduled: () => void = () => undefined;
     const pendingDelayed = { current: 0 };
     const activeStrokes = new Set<ActiveTablaStroke>();
+    const cancelActiveStrokes = () => {
+      activeStrokes.forEach((stroke) => {
+        try {
+          stroke.cancel();
+        } catch {
+          // One child cancellation must not strand the remaining owned strokes.
+        }
+      });
+      activeStrokes.clear();
+    };
+    const clearScheduled = () => {
+      try {
+        cancelScheduled();
+      } catch {
+        // Scheduling cleanup is best-effort; owned active strokes still settle.
+      }
+    };
     const unavailable = () => {
       if (cancelled || unavailableReported) return false;
       failed = true;
@@ -463,21 +500,9 @@ export class TablaSynthEngine {
       } catch {
         // Treat observer failure as an unavailable audio result.
       } finally {
-        try {
-          cancelScheduled();
-        } catch {
-          // Scheduling cleanup is best effort; individual timer clears are
-          // guarded by scheduleTablaPlan as well.
-        }
+        clearScheduled();
         pendingDelayed.current = 0;
-        activeStrokes.forEach((stroke) => {
-          try {
-            stroke.cancel();
-          } catch {
-            // A partially created stroke must not block the remaining cleanup.
-          }
-        });
-        activeStrokes.clear();
+        cancelActiveStrokes();
         finishIfIdle(pendingDelayed, activeStrokes);
       }
       return false;
@@ -492,7 +517,24 @@ export class TablaSynthEngine {
         cancelled = true;
       }, ready, finished);
     }
-    const plan = planTablaBol(bolName, matraDurationMs);
+    const unavailableHandle = (): TablaPlaybackHandle => {
+      const ready = Promise.resolve(unavailable());
+      if (!finishedResolved) {
+        finishedResolved = true;
+        resolveFinished();
+      }
+      return createPlaybackHandle(() => {
+        cancelled = true;
+      }, ready, finished);
+    };
+    const invalidDuration = typeof matraDurationMs !== "number" || !Number.isFinite(matraDurationMs) || matraDurationMs <= 0;
+    if (invalidDuration) return unavailableHandle();
+    let plan: PlannedTablaStroke[];
+    try {
+      plan = planTablaBol(bolName, matraDurationMs);
+    } catch {
+      return unavailableHandle();
+    }
     if (plan.length === 0) {
       finishedResolved = true;
       resolveFinished();
@@ -526,7 +568,7 @@ export class TablaSynthEngine {
         clear: (timer) => window.clearTimeout(timer),
       });
       if (failed) {
-        cancelScheduled();
+        clearScheduled();
         pendingDelayed.current = 0;
         finishIfIdle(pendingDelayed, activeStrokes);
       }
@@ -536,10 +578,9 @@ export class TablaSynthEngine {
     return createPlaybackHandle(() => {
       if (cancelled) return;
       cancelled = true;
-      cancelScheduled();
+      clearScheduled();
       pendingDelayed.current = 0;
-      activeStrokes.forEach((stroke) => stroke.cancel());
-      activeStrokes.clear();
+      cancelActiveStrokes();
       if (!finishedResolved) {
         finishedResolved = true;
         resolveFinished();

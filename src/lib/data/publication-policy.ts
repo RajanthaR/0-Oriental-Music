@@ -65,6 +65,9 @@ export type PublicationReasonCode =
   | "duplicate-record-id"
   | "malformed-record"
   | "unknown-record-kind"
+  | "unsafe-container"
+  | "non-array"
+  | "evaluation-failed"
   | SourceEvidenceFailureCode;
 
 export type SourceEvidenceReasonCode = SourceEvidenceFailureCode | "supportable";
@@ -333,18 +336,6 @@ function isSourcePageQualityRecord(value: unknown): value is SourcePageQualityRe
     typeof readOwnDataField(value, "hasSinhalaText") === "boolean";
 }
 
-function declaredArrayLength(value: unknown): number {
-  try {
-    if (!Array.isArray(value)) return 0;
-    const descriptor = Object.getOwnPropertyDescriptor(value, "length");
-    return descriptor && "value" in descriptor && Number.isSafeInteger(descriptor.value) && descriptor.value >= 0
-      ? descriptor.value
-      : 0;
-  } catch {
-    return 0;
-  }
-}
-
 function registerKnownKinds(
   knownKinds: Map<string, ContentEntityKind | "ambiguous">,
   kind: ContentEntityKind,
@@ -393,10 +384,10 @@ export function createPublicationEvaluationContext(
     const supplied = readCatalogInput(catalogInputs, key);
     if (!supplied.safe) safe = false;
     const rawCatalog = supplied.present ? supplied.value : defaultCatalog;
-    rawCounts[key] = declaredArrayLength(rawCatalog);
     const snapshot = captureEvaluationArray(rawCatalog);
     if (!snapshot) safe = false;
     capturedCatalogs[key] = snapshot ?? [];
+    rawCounts[key] = snapshot?.length ?? readDeclaredArrayLength(rawCatalog);
   }
   const capturedDocuments = captureEvaluationArray(sourceDocumentsData);
   const capturedPageQuality = captureEvaluationArray(sourcePageQualityData);
@@ -430,6 +421,19 @@ export function createPublicationEvaluationContext(
     });
   }
   return context;
+}
+
+function readDeclaredArrayLength(value: unknown): number {
+  try {
+    if (!Array.isArray(value)) return 0;
+    const descriptor = Object.getOwnPropertyDescriptor(value, "length");
+    if (!descriptor || !("value" in descriptor)) return 0;
+    return typeof descriptor.value === "number" && Number.isSafeInteger(descriptor.value) && descriptor.value >= 0
+      ? descriptor.value
+      : 0;
+  } catch {
+    return 0;
+  }
 }
 
 export function getPublicationCatalogRawCount(
@@ -547,6 +551,12 @@ type LocatorParseResult = {
 };
 
 function parseSourceLocator(pageOrSection: string, expectedFilename: string): LocatorParseResult {
+  const MAX_LOCATOR_LENGTH = 4_096;
+  const MAX_LOCATOR_TERMS = 256;
+  const MAX_LOCATOR_PAGES = 1_024;
+  if (pageOrSection.length > MAX_LOCATOR_LENGTH || expectedFilename.length > MAX_LOCATOR_LENGTH) {
+    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
+  }
   if (/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/.test(pageOrSection) || /[\uFF0E\uFE52\uFF61]/.test(pageOrSection)) {
     return { pageNumbers: [], mismatchedDocument: false, malformed: true };
   }
@@ -568,12 +578,19 @@ function parseSourceLocator(pageOrSection: string, expectedFilename: string): Lo
   if (!pageClause) {
     return { pageNumbers: [], mismatchedDocument: false, malformed: true };
   }
+  const pageTokens = pageClause.split(",");
+  if (pageTokens.length > MAX_LOCATOR_TERMS) {
+    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
+  }
   const pages = new Set<number>();
-  for (const token of pageClause.split(",")) {
+  for (const token of pageTokens) {
     const range = token.trim().split(/\s*[-–]\s*/);
     const start = Number(range[0]);
     const end = range[1] === undefined ? start : Number(range[1]);
     if (!Number.isInteger(start) || !Number.isInteger(end) || start < 1 || end < start || end - start > 1000) {
+      return { pageNumbers: [], mismatchedDocument: false, malformed: true };
+    }
+    if (pages.size + (end - start + 1) > MAX_LOCATOR_PAGES) {
       return { pageNumbers: [], mismatchedDocument: false, malformed: true };
     }
     for (let page = start; page <= end; page += 1) pages.add(page);
@@ -1357,8 +1374,11 @@ export function getRecordPublicationDecision(
   record: unknown,
   evaluationContext: PublicationEvaluationContext = createPublicationEvaluationContext(),
 ): PublicationDecision {
-  return getRecordPublicationDecisions([record], evaluationContext)[0] ??
-    failClosedRecordDecision(["malformed-record"], evaluationContext);
+  const evaluation = evaluatePublicationBatch([record], evaluationContext);
+  return evaluation.decisions[0] ?? failClosedRecordDecision(
+    [evaluation.failureReason ?? "malformed-record"],
+    evaluationContext,
+  );
 }
 
 /**
@@ -1543,18 +1563,19 @@ function sanitizePublicRecordWithDecision<T>(
 export function sanitizeReviewRecord<T>(
   record: T,
   context: PublicationEvaluationContext = createPublicationEvaluationContext(),
-): T {
-  if (!record || typeof record !== "object") return record;
+): T | undefined {
+  if (!record || typeof record !== "object") return undefined;
   try {
-    if (!context.safe) return {} as T;
+    if (!context.safe) return undefined;
     const value = captureEvaluationValue(record, false) as Record<string, unknown> | undefined;
-    if (!value || !isRecord(value)) return {} as T;
+    if (!value || !isRecord(value)) return undefined;
     const kind = getKnownContentKind(value, context);
+    if (!kind) return undefined;
     if (isMetadataBearingKind(kind)) value.reviewMetadata = createUnverifiedReviewMetadata();
     if ("published" in value) value.published = false;
     return value as T;
   } catch {
-    return {} as T;
+    return undefined;
   }
 }
 

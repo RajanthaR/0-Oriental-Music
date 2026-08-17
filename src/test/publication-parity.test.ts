@@ -569,7 +569,7 @@ describe("cycle-two publication parity and freshness", () => {
     mutualB.next = mutualA;
     expect(inspectGraph(direct)).toMatchObject({ safe: false, reason: "cycle" });
     expect(inspectGraph(mutualA)).toMatchObject({ safe: false, reason: "cycle" });
-    expect(getRecordPublicationDecision(direct).reasonCodes).toContain("malformed-record");
+    expect(getRecordPublicationDecision(direct).reasonCodes).toContain("unsafe-container");
 
     const atDepthLimit: RawRecord = {};
     let cursor = atDepthLimit;

@@ -123,14 +123,14 @@ curriculum claim. This matrix remains limited to source-grounded fields, and
 the unresolved original-PDF, notation/layout, OCR-glyph, Lawani-context, and
 Deepchandi retrieval-spelling boundaries above remain `needs-review`.
 
-| Runtime issue | Final application disposition | Line-qualified regression anchor |
+| Runtime issue | Final application disposition | Stable semantic regression anchor |
 |---|---|---|
-| `P02-FINAL-01` | Missing raw review metadata fails publication closed; bounded projections use explicit unverified metadata. | `src/test/content-contracts.test.ts:241`; `src/test/publication-containment.test.ts:84` |
-| `P02-FINAL-02` | Every finite-domain field is checked against the dependency-free closed union. | `src/test/content-contracts.test.ts:241`; `src/test/content-contracts.test.ts:268` |
-| `P02-FINAL-03` | Every imported record and nested question is audited; listed legacy contract debt remains nonpublic. | `src/test/content-contracts.test.ts:101`; `src/lib/validation/content-contracts.ts:606`; `src/lib/validation/content-contracts.ts:706` |
-| `P02-FINAL-04` | Iterative graph inspection/projection rejects cycles, hostile descriptors, and depth/node overruns while preserving projection-kind identity. | `src/test/content-contracts.test.ts:368`; `src/lib/validation/content-contracts.ts:833 (inspectGraph)`; `src/lib/validation/content-contracts.ts:985 (projectPublicRecord)` |
-| `P02-FINAL-05` | Nonblank normalized-empty hostile search returns no results. | `src/lib/search/search-engine.ts:84`, `src/lib/search/search-engine.ts:136`; `src/test/search-engine.test.ts:83` |
-| `P02-FINAL-06` | Caller-owned Swara handles survive readiness and cancel replacement/unmount work without cross-caller effects. | `src/test/synth.test.ts:199`; `src/test/synth.test.ts:293`; `src/test/components.test.tsx:551 (cancels owned Swara tone and scale work)`; `src/test/components.test.tsx:635 (retains ready Swara ownership until finished)` |
+| `P02-FINAL-01` | Missing raw review metadata fails publication closed; bounded projections use explicit unverified metadata. | `src/lib/validation/content-contracts.ts#isReviewMetadata`; test `rejects both CMS publication entry points when raw metadata is synthesized or incomplete` |
+| `P02-FINAL-02` | Every finite-domain field is checked against the dependency-free closed union. | `src/lib/validation/content-contracts.ts#DIFFICULTY_LEVELS`; test `rejects unsupported finite-domain values across every known entity contract` |
+| `P02-FINAL-03` | Every imported record and nested question is audited; listed legacy contract debt remains nonpublic. | `src/lib/validation/content-contracts.ts#KIND_SIGNATURES`; test `validates every imported catalog record, nested question, and allowlisted projection` |
+| `P02-FINAL-04` | Iterative graph inspection/projection rejects cycles, hostile descriptors, and depth/node overruns while preserving projection-kind identity. | `src/lib/validation/content-contracts.ts#inspectGraph`; test `accepts shared DAGs but rejects cycles and graph budget overruns` |
+| `P02-FINAL-05` | Nonblank normalized-empty hostile search returns no results. | `src/lib/search/search-engine.ts#classifySearchQuery`; test `treats raw-empty and normalized-empty queries as different states` |
+| `P02-FINAL-06` | Caller-owned Swara handles survive readiness and cancel replacement/unmount work without cross-caller effects. | `src/lib/audio/synth.ts#SwaraPlaybackHandle`; tests `cancels owned Swara tone and scale work` and `retains ready Swara ownership until finished` |
 
 ## Acceptance-hardening runtime boundary
 
@@ -187,7 +187,7 @@ finding-level mapping required by `V15` and `V23`; both remain
 
 | Cycle-2 finding | Semantic repair evidence | Disposition |
 |---|---|---|
-| `V15` | `src/test/musical-core.test.ts:386 (verifies bounded quarantine status for out-of-scope entities)`; `src/lib/data/publication-policy.ts:910 (gradeScopeMatchesSource)`; `src/test/publication-containment.test.ts:816 (requires each public grade band to contain a grade established by its source)`; `src/test/components.test.tsx:635 (retains ready Swara ownership until finished)`; `src/test/search-engine.test.ts:23 (should not discover quarantined Bhairav or Roopak claims)`; closeout and correction-log rows now carry these symbols/headings. | **FIXED-PENDING-REREVIEW** |
+| `V15` | `src/test/musical-core.test.ts#verifies bounded quarantine status for out-of-scope entities`; `src/lib/data/publication-policy.ts#gradeScopeMatchesSource`; `src/test/publication-containment.test.ts#requires each public grade band to contain a grade established by its source`; `src/test/components.test.tsx#retains ready Swara ownership until finished`; `src/test/search-engine.test.ts#should not discover quarantined Bhairav or Roopak claims`; closeout and correction-log rows now carry these symbols/headings. | **FIXED-PENDING-REREVIEW** |
 | `V23` | `src/test/review-closeout.test.ts` exact scoped ID and semantic mapping assertions; `data/forensic-ledger.json` `acceptanceHardeningInput.traceability` mirrors test/fix/anchor/disposition fields. | **FIXED-PENDING-REREVIEW** |
 
 The rejected Deepchandi retrieval-only disposition, all prior blocked run IDs,
@@ -209,3 +209,11 @@ work only and remain pending the final acceptance review.
 
 All eight Talas remain whole-entity quarantined. Deepchandi remains a rejected
 retrieval-only variant finding; original-PDF/manual/SME work is still deferred.
+
+## Final-acceptance follow-up boundary
+
+The 14 findings from `20260817-054012-p02-final-acceptance-a17068ff` are
+application-contract and audit-integrity repairs only. They do not change any
+musical-core field disposition. Stable mapping lives in
+`P02_CLOSEOUT_FINDINGS.md#Final-acceptance follow-up (14 validated blockers)`;
+all eight Tala records remain quarantined as whole entities.

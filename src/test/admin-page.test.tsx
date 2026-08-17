@@ -12,7 +12,10 @@ afterEach(() => {
 describe("Admin review status feedback", () => {
   it("reports a rejected CMS mutation as an error instead of success", async () => {
     vi.useFakeTimers();
-    const update = vi.spyOn(repository, "updateLessonReviewStatus").mockReturnValue(false);
+    const update = vi.spyOn(repository, "updateLessonReviewStatus").mockReturnValue({
+      ok: false,
+      reasonCode: "missing-review-evidence",
+    });
     const view = render(<AdminReviewDashboardPage />);
 
     const controls = screen.getAllByRole("combobox", { name: "තත්ත්වය වෙනස් කරන්න" });
