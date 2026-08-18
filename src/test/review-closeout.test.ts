@@ -41,6 +41,14 @@ const ACCEPTANCE_HARDENING_CYCLE_1_IDS = Array.from(
   { length: 20 },
   (_, index) => `AH-C1-V${String(index + 1).padStart(2, "0")}`,
 );
+const ACCEPTANCE_HARDENING_CYCLE_2_VALIDATED_IDS = Array.from(
+  { length: 10 },
+  (_, index) => `AH-C2-V${String(index + 1).padStart(2, "0")}`,
+);
+const ACCEPTANCE_HARDENING_CYCLE_2_ADDITIONAL_IDS = Array.from(
+  { length: 6 },
+  (_, index) => `AH-C2-R${String(index + 1).padStart(2, "0")}`,
+);
 
 const rawLessons = lessonsData as unknown as RawRecord[];
 const rawRagas = ragasData as unknown as RawRecord[];
@@ -244,6 +252,75 @@ describe("Phase 2 final contract closeout", () => {
     }
   });
 
+  it("records the incomplete cycle-2 input run without converting missing coverage into zero findings", () => {
+    const closeout = readWorkspaceFile("docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md");
+    const correctionLog = readWorkspaceFile("docs/FORENSIC_CORRECTION_LOG.md");
+    const fieldMatrix = readWorkspaceFile("docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md");
+    const ledger = JSON.parse(readWorkspaceFile("data/forensic-ledger.json")) as Record<string, unknown>;
+    const cycle = ledger.acceptanceHardeningReviewCycle2 as Record<string, unknown>;
+    const allIds = [
+      ...ACCEPTANCE_HARDENING_CYCLE_2_VALIDATED_IDS,
+      ...ACCEPTANCE_HARDENING_CYCLE_2_ADDITIONAL_IDS,
+    ];
+
+    expect(cycle.findingsInputRunId).toBe("20260817-p02-hardening-c2-2af0d18");
+    expect(cycle.findingsInputOriginalBase).toBe("beba1479f473b3413b3f2de48a27c558e1937c6f");
+    expect(cycle.findingsInputReviewedHead).toBe("2af0d182ab0077338964432da5f75de9401f83ec");
+    expect(cycle.originalBase).toBe("beba1479f473b3413b3f2de48a27c558e1937c6f");
+    expect(cycle.implementationHead).toBe("2af0d182ab0077338964432da5f75de9401f83ec");
+
+    // The input run is recorded as incomplete coverage, never as a clean result.
+    expect(cycle.findingsInputReviewersRequired).toBe(11);
+    expect(cycle.findingsInputReviewerArtifactsProduced).toBe(10);
+    expect(cycle.findingsInputMissingReviewerArtifacts).toEqual(["frontend-races"]);
+    expect(cycle.findingsInputValidatorsDispatched).toBe(0);
+    expect(cycle.findingsInputValidatorArtifactsProduced).toBe(0);
+    expect(cycle.findingsInputTerminationCause).toContain("deactivated_workspace");
+    expect(cycle.findingsInputStatus).toContain("INCOMPLETE");
+    expect(cycle.findingsInputStatus).toContain("not a zero-findings result");
+    expect(cycle.findingsInputStatus).toContain("not acceptance evidence");
+    expect(cycle.status).toContain("not acceptance evidence");
+    expect(cycle.reviewModelPolicy).toContain("superseded");
+
+    expect(cycle.validatedFindingIds).toEqual(ACCEPTANCE_HARDENING_CYCLE_2_VALIDATED_IDS);
+    expect(cycle.authorizedAdditionalFindings).toEqual(ACCEPTANCE_HARDENING_CYCLE_2_ADDITIONAL_IDS);
+
+    // Every finding maps to a regression test and a fix anchor that both resolve.
+    const traceability = cycle.semanticTraceability as Record<string, string>;
+    const fixSymbols = cycle.fixSymbols as Record<string, string>;
+    expect(Object.keys(traceability)).toEqual(allIds);
+    expect(Object.keys(fixSymbols)).toEqual(allIds);
+    for (const id of allIds) {
+      expect(closeout, `${id} closeout row`).toContain(`| \`${id}\` |`);
+      for (const [label, reference] of [["test", traceability[id]], ["fix", fixSymbols[id]]] as const) {
+        const separator = reference.indexOf("#");
+        expect(separator, `${id} ${label} separator`).toBeGreaterThan(0);
+        const path = reference.slice(0, separator);
+        const symbol = reference.slice(separator + 1);
+        expect(path, `${id} ${label} path`).toMatch(/^(?:src|docs|data|AGENTS\.md)/);
+        expect(readWorkspaceFile(path), `${id} ${label} ${symbol}`).toContain(symbol);
+      }
+    }
+
+    expect(closeout).toContain("Acceptance-hardening review cycle 2 (incomplete input run");
+    expect(correctionLog).toContain("Phase 2 acceptance-hardening review cycle 2");
+    expect(fieldMatrix).toContain("Acceptance-hardening review cycle 2 boundary");
+
+    // Preserved boundaries and history.
+    for (const document of [closeout, correctionLog, fieldMatrix]) {
+      expect(document).toContain("All eight Talas");
+      expect(document).toContain("Deepchandi");
+      expect(document).toContain("20260817-p02-hardening-c2-2af0d18");
+    }
+    expect(closeout).toContain("20260817-p02-hardening-c1-06568d6f");
+    expect(closeout).toContain("20260816-191000-p02-final-contract-c3");
+    const preservation = cycle.historicalPreservation as string[];
+    expect(preservation.some((entry) => entry.includes("never described as zero findings"))).toBe(true);
+    expect(preservation.some((entry) => entry.includes("Deepchandi"))).toBe(true);
+    expect(preservation.some((entry) => entry.includes("whole-entity quarantined"))).toBe(true);
+    expect(preservation.some((entry) => entry.includes("Grades 6-11"))).toBe(true);
+  });
+
   it("recomputes publication summaries from current inputs without memoized identity", () => {
     const first = repository.getPublicationSummary();
     const second = repository.getPublicationSummary();
@@ -254,15 +331,25 @@ describe("Phase 2 final contract closeout", () => {
     expect(lessonIndex).toBeGreaterThanOrEqual(0);
     const originalLesson = rawLessons[lessonIndex];
     const originalSnapshot = structuredClone(originalLesson);
+    // A successful CMS mutation replaces the repository's private catalog with a
+    // detached clone, so the private field must be restored too. Without this the
+    // repository would stay bound to that clone for the rest of the file and any
+    // later in-place freshness assertion would pass vacuously.
+    const mutableRepository = repository as unknown as { lessons: RawRecord[] };
+    const originalCatalog = mutableRepository.lessons;
     try {
       expect(repository.updateLessonReviewStatus("les-intro-01", "Needs Revision", false)).toMatchObject({ ok: true });
       const afterMutation = repository.getPublicationSummary();
       expect(afterMutation).not.toBe(second);
       expect(afterMutation).toStrictEqual(second);
     } finally {
+      mutableRepository.lessons = originalCatalog;
       rawLessons[lessonIndex] = originalLesson;
       Object.assign(originalLesson, originalSnapshot);
     }
+    // The repository observes the restored in-place catalog again.
+    expect(mutableRepository.lessons).toBe(originalCatalog);
+    expect(repository.getPublicationSummary()).toStrictEqual(first);
   });
 
   it("recomputes public decisions when source-page evidence changes without a content mutation", () => {

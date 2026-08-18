@@ -56,6 +56,7 @@ import {
   isRecord,
   isReviewMetadata,
   cloneBoundedRecord,
+  normalizeEntityId,
   readOwnDataField,
   projectPublicRecord,
   validateContentRecord,
@@ -71,8 +72,10 @@ function hasUniqueRecordIds(items: readonly unknown[]): boolean {
   const ids = new Set<string>();
   for (const item of items) {
     if (!isRecord(item)) return false;
-    const rawId = readOwnDataField(item, "id");
-    const id = typeof rawId === "string" ? rawId.trim() : "";
+    // Canonical identity, not a bare trim: control-bearing and canonically
+    // equivalent IDs must collide here exactly as they do in publication policy,
+    // so listing, direct lookup, validation, and summaries agree.
+    const id = normalizeRecordId(readOwnDataField(item, "id"));
     if (!id || ids.has(id)) return false;
     ids.add(id);
   }
@@ -108,7 +111,15 @@ function readRawReviewMetadata(lesson: Record<string, unknown>): unknown {
 }
 
 function normalizeRecordId(value: unknown): string {
-  return typeof value === "string" ? value.trim() : "";
+  return normalizeEntityId(value) ?? "";
+}
+
+// Every direct-ID lookup must resolve the same canonical identity the listing,
+// validation, decision, and summary boundaries already use. A bare `===` let a
+// padded or canonically equivalent identifier be listed but never looked up.
+function matchesRecordId(candidateId: unknown, requestedId: unknown): boolean {
+  const requested = normalizeRecordId(requestedId);
+  return requested !== "" && normalizeRecordId(candidateId) === requested;
 }
 
 function findUniqueRecordIndex(items: readonly unknown[], id: string): number {
@@ -330,7 +341,7 @@ class ContentRepository {
   }
 
   public getSourceById(id: string): SourceCatalogView | undefined {
-    return this.getSources().find((source) => source.id === id);
+    return this.getSources().find((source) => matchesRecordId(source.id, id));
   }
 
   // Strands are derived from publicly discoverable lessons, not from the raw
@@ -348,7 +359,7 @@ class ContentRepository {
   }
 
   public getStrandById(id: string): StrandInfo | undefined {
-    return this.getStrands().find((strand) => strand.id === id);
+    return this.getStrands().find((strand) => matchesRecordId(strand.id, id));
   }
 
   // Lessons
@@ -390,7 +401,7 @@ class ContentRepository {
   }
 
   public getLessonById(id: string): Lesson | undefined {
-    return this.getLessons().find((lesson) => lesson.id === id || lesson.slug === id);
+    return this.getLessons().find((lesson) => matchesRecordId(lesson.id, id) || matchesRecordId(lesson.slug, id));
   }
 
   // Ragas
@@ -406,7 +417,7 @@ class ContentRepository {
   }
 
   public getRagaById(id: string): Raga | undefined {
-    return this.getRagas().find((raga) => raga.id === id);
+    return this.getRagas().find((raga) => matchesRecordId(raga.id, id));
   }
 
   // Talas
@@ -420,7 +431,7 @@ class ContentRepository {
   }
 
   public getTalaById(id: string): Tala | undefined {
-    return this.getTalas().find((tala) => tala.id === id);
+    return this.getTalas().find((tala) => matchesRecordId(tala.id, id));
   }
 
   // Instruments
@@ -435,7 +446,7 @@ class ContentRepository {
   }
 
   public getInstrumentById(id: string): Instrument | undefined {
-    return this.getInstruments().find((instrument) => instrument.id === id);
+    return this.getInstruments().find((instrument) => matchesRecordId(instrument.id, id));
   }
 
   // Traditions
@@ -449,7 +460,7 @@ class ContentRepository {
   }
 
   public getCulturalTraditionById(id: string): CulturalTradition | undefined {
-    return this.getCulturalTraditions().find((tradition) => tradition.id === id);
+    return this.getCulturalTraditions().find((tradition) => matchesRecordId(tradition.id, id));
   }
 
   public getTheatreTraditions(query?: string): TheatreTradition[] {
@@ -462,7 +473,7 @@ class ContentRepository {
   }
 
   public getTheatreTraditionById(id: string): TheatreTradition | undefined {
-    return this.getTheatreTraditions().find((tradition) => tradition.id === id);
+    return this.getTheatreTraditions().find((tradition) => matchesRecordId(tradition.id, id));
   }
 
   // Glossary
@@ -491,7 +502,7 @@ class ContentRepository {
   }
 
   public getLearningPathById(id: string): LearningPath | undefined {
-    return this.getLearningPaths().find((path) => path.id === id);
+    return this.getLearningPaths().find((path) => matchesRecordId(path.id, id));
   }
 
   // Quizzes & Exams
@@ -500,7 +511,7 @@ class ContentRepository {
   }
 
   public getQuizById(id: string): Quiz | undefined {
-    return this.getQuizzes().find((quiz) => quiz.id === id);
+    return this.getQuizzes().find((quiz) => matchesRecordId(quiz.id, id));
   }
 
   public getExamPapers(gradeBand?: GradeBandType): ExamPaper[] {
@@ -512,7 +523,7 @@ class ContentRepository {
   }
 
   public getExamPaperById(id: string): ExamPaper | undefined {
-    return this.getExamPapers().find((paper) => paper.id === id);
+    return this.getExamPapers().find((paper) => matchesRecordId(paper.id, id));
   }
 
   public getPublicationSummary(): Record<string, PublicationCollectionSummary> {

@@ -2273,5 +2273,89 @@
       "SME and Sinhala review records",
       "regression tests and final publication decision"
     ]
+  },
+  "acceptanceHardeningReviewCycle2": {
+    "findingsInputRunId": "20260817-p02-hardening-c2-2af0d18",
+    "findingsInputArtifactRoot": "C:/tmp/compound-engineering/ce-code-review/20260817-p02-hardening-c2-2af0d18/",
+    "findingsInputOriginalBase": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "findingsInputReviewedHead": "2af0d182ab0077338964432da5f75de9401f83ec",
+    "findingsInputReviewersRequired": 11,
+    "findingsInputReviewerArtifactsProduced": 10,
+    "findingsInputMissingReviewerArtifacts": [
+      "frontend-races"
+    ],
+    "findingsInputValidatorsDispatched": 0,
+    "findingsInputValidatorArtifactsProduced": 0,
+    "findingsInputTerminationCause": "402 Payment Required; code deactivated_workspace",
+    "findingsInputStatus": "INCOMPLETE run preserved as historical findings input; the missing frontend-races artifact and the zero validator artifacts are absent coverage, not a zero-findings result, and this run is not acceptance evidence",
+    "originalBase": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "implementationHead": "2af0d182ab0077338964432da5f75de9401f83ec",
+    "validatedFindingIds": [
+      "AH-C2-V01",
+      "AH-C2-V02",
+      "AH-C2-V03",
+      "AH-C2-V04",
+      "AH-C2-V05",
+      "AH-C2-V06",
+      "AH-C2-V07",
+      "AH-C2-V08",
+      "AH-C2-V09",
+      "AH-C2-V10"
+    ],
+    "authorizedAdditionalFindings": [
+      "AH-C2-R01",
+      "AH-C2-R02",
+      "AH-C2-R03",
+      "AH-C2-R04",
+      "AH-C2-R05",
+      "AH-C2-R06"
+    ],
+    "semanticTraceability": {
+      "AH-C2-V01": "src/test/quiz-runner.test.tsx#renders a safe unavailable state for question IDs that differ only by %s",
+      "AH-C2-V02": "src/test/sources-page.test.tsx#renders an honest unavailable state for %s",
+      "AH-C2-V03": "src/test/source-metadata-consistency.test.ts#canonical source identity parity",
+      "AH-C2-V04": "src/test/content-validator.test.ts#accepts a valid aggregate Quiz that carries no direct source reference",
+      "AH-C2-V05": "src/test/swara-consumers.test.tsx#continues EarTraining cleanup after Next, replacement, and unmount cancellations throw",
+      "AH-C2-V06": "src/test/swara-consumers.test.tsx#clears every remaining instrument timer when an owned Tabla cancellation throws",
+      "AH-C2-V07": "src/test/synth.test.ts#fails closed for the prototype-key Tabla bol %s without throwing",
+      "AH-C2-V08": "src/test/publication-parity.test.ts#makes the evaluation context unsafe for a verified-looking registry with %s",
+      "AH-C2-V09": "src/test/graph-boundary.test.ts#traverses %s alone but fails the combined catalog closed without throwing",
+      "AH-C2-V10": "src/test/publication-parity.test.ts#refreshes every consumer when only the source-document reviewStatus changes",
+      "AH-C2-R01": "src/test/pitch.test.ts#releases an active session when stream.getTracks() throws on stop",
+      "AH-C2-R02": "src/test/synth.test.ts#cannot strand Tabla playback ownership when a timer callback registers synchronously",
+      "AH-C2-R03": "src/test/graph-boundary.test.ts#withholds %s from every public surface",
+      "AH-C2-R04": "src/test/sources-page.test.tsx#renders the extracted-corpus counts while the corpus is certifiable",
+      "AH-C2-R05": "src/test/audio-cleanup.test.ts#cancels every owned handle even when an earlier cancellation throws",
+      "AH-C2-R06": "src/test/review-closeout.test.ts#recomputes publication summaries from current inputs without memoized identity"
+    },
+    "fixSymbols": {
+      "AH-C2-V01": "src/components/quiz/QuizRunner.tsx#canonicalQuestionIds",
+      "AH-C2-V02": "src/lib/data/publication-policy.ts#getSourceCorpusInventory",
+      "AH-C2-V03": "src/lib/data/repository.ts#matchesRecordId",
+      "AH-C2-V04": "src/lib/validation/content-validator.ts#quizAggregateEvidenceIssues",
+      "AH-C2-V05": "src/components/audio/EarTrainingModule.tsx#cancelPlayback",
+      "AH-C2-V06": "src/lib/audio/cleanup.ts#releaseHandleSet",
+      "AH-C2-V07": "src/lib/audio/tabla.ts#COMPOUND_BOL_CELLS",
+      "AH-C2-V08": "src/lib/validation/disposition-registry.ts#inspectDispositionRegistry",
+      "AH-C2-V09": "src/test/graph-boundary.test.ts#expectBoundedFailClosed",
+      "AH-C2-V10": "src/test/publication-parity.test.ts#readEveryConsumer",
+      "AH-C2-R01": "src/lib/audio/pitch.ts#stopStream",
+      "AH-C2-R02": "src/lib/audio/tabla.ts#scheduleTablaPlan",
+      "AH-C2-R03": "src/test/graph-boundary.test.ts#withholds %s from every public surface",
+      "AH-C2-R04": "src/app/sources/page.tsx#inventory.available",
+      "AH-C2-R05": "src/lib/audio/cleanup.ts#runIsolatedCleanup",
+      "AH-C2-R06": "src/test/review-closeout.test.ts#mutableRepository.lessons = originalCatalog"
+    },
+    "reviewModelPolicy": "The original gpt-5.6-luna/MAX reviewer specification is superseded: the deactivated external workspace cannot dispatch it. This cycle uses Claude Opus 5 at high effort for every reviewer and validator, and the adversarial lens uses the review skill's documented in-process fallback with the peer skip reason recorded in Coverage.",
+    "status": "All ten remaining cycle-2 candidate findings and six authorized additional regressions are fixed locally with focused regressions; a complete fresh original-base review is still pending; not acceptance evidence and no push, ready PR, merge, or deployment is authorized",
+    "historicalPreservation": [
+      "Earlier blocked runs and their verdicts remain unchanged.",
+      "The incomplete cycle-2 infrastructure run is preserved and is never described as zero findings.",
+      "The rejected Deepchandi retrieval-only finding remains rejected.",
+      "All eight Talas remain whole-entity quarantined.",
+      "Original-PDF, notation/layout, OCR/corrupt-glyph, and SME review remain deferred.",
+      "No musical fact, publisher, year, location, licence, organization, reviewer, review date, or publication state is invented or promoted.",
+      "The public curriculum boundary remains Grades 6-11; Grade 12-13 and A/L records stay quarantined in raw audit data."
+    ]
   }
 }

@@ -10,6 +10,7 @@ import learningPathsData from "@/data/learning-paths.json";
 import quizzesData from "@/data/quizzes.json";
 import examPapersData from "@/data/exam-papers.json";
 import sourcesData from "@/data/sources.json";
+import sourceDocumentsData from "../../data/source-documents.json";
 import sourcePageQualityData from "../../data/source-page-quality.json";
 import musicalCoreFieldDispositionsData from "../../data/musical-core-field-dispositions.json";
 import { repository } from "@/lib/data/repository";
@@ -19,6 +20,7 @@ import {
   evaluatePublicationBatch,
   evaluateSourceReference,
   getRecordPublicationDecision,
+  getSourceCorpusInventory,
   getTalaFieldDisposition,
   sanitizePublicRecord,
   type PublicationCatalogSnapshot,
@@ -28,6 +30,8 @@ import {
   validateContentRecord,
   type ContentEntityKind,
 } from "@/lib/validation/content-contracts";
+import { inspectDispositionRegistry } from "@/lib/validation/disposition-registry";
+import { validateMusicalCoreFieldDispositions } from "@/lib/validation/content-validator";
 
 type RawRecord = Record<string, unknown>;
 type RawCatalog = RawRecord[];
@@ -43,6 +47,7 @@ const learningPaths = learningPathsData as unknown as RawCatalog;
 const quizzes = quizzesData as unknown as RawCatalog;
 const examPapers = examPapersData as unknown as RawCatalog;
 const sources = sourcesData as unknown as RawCatalog;
+const sourceDocuments = sourceDocumentsData as unknown as RawCatalog;
 const sourcePageQuality = sourcePageQualityData as unknown as RawCatalog;
 const musicalCoreFieldDispositions = musicalCoreFieldDispositionsData as unknown as RawRecord;
 
@@ -648,5 +653,417 @@ describe("cycle-two publication parity and freshness", () => {
       safe: false,
       reason: "node-limit",
     });
+  });
+
+  it("reports an available source-corpus inventory for the current safe corpus", () => {
+    const inventory = getSourceCorpusInventory();
+    expect(inventory.available).toBe(true);
+    if (!inventory.available) throw new Error("Expected an available source-corpus inventory");
+    expect(inventory.sourceDocuments).toBe(sourceDocuments.length);
+    expect(inventory.sourcePages).toBe(
+      sourceDocuments.reduce((sum, document) => sum + Number(document.pageCount), 0),
+    );
+    expect(inventory.sourceRecords).toBeGreaterThan(0);
+    expect(Object.values(inventory.qualityCounts).reduce((sum, count) => sum + count, 0))
+      .toBe(sourcePageQuality.length);
+  });
+
+  it.each([
+    [
+      "a malformed source document",
+      () => { sourceDocuments[0].pageCount = "17"; },
+    ],
+    [
+      "a source document with a blank review status",
+      () => { sourceDocuments[0].reviewStatus = "   "; },
+    ],
+    [
+      "a duplicated source-document slug",
+      () => { sourceDocuments[1].slug = sourceDocuments[0].slug; },
+    ],
+    [
+      "a malformed page-quality row",
+      () => { sourcePageQuality[0].confidence = "E"; },
+    ],
+    [
+      "a page-quality row beyond its document page count",
+      () => { sourcePageQuality[0].pageNumber = 100_000; },
+    ],
+    [
+      "a duplicated Tala disposition ID",
+      () => {
+        const rows = musicalCoreFieldDispositions.talas as RawCatalog;
+        rows.push(clone(rows[0]));
+      },
+    ],
+  ])(
+    "returns an explicit unavailable source-corpus inventory for %s",
+    (_label, corrupt) => {
+      const documentSnapshot = clone(sourceDocuments);
+      const pageSnapshot = clone(sourcePageQuality);
+      const dispositionSnapshot = clone(musicalCoreFieldDispositions);
+      try {
+        corrupt();
+        // The counts must never be presented as an ordinary inventory once the
+        // evaluation context can no longer certify the corpus.
+        expect(getSourceCorpusInventory()).toEqual({
+          available: false,
+          reason: "unsafe-evaluation-context",
+        });
+      } finally {
+        restoreCatalog(sourceDocuments, documentSnapshot);
+        restoreCatalog(sourcePageQuality, pageSnapshot);
+        restoreRecord(musicalCoreFieldDispositions, dispositionSnapshot);
+      }
+      expect(getSourceCorpusInventory().available).toBe(true);
+    },
+  );
+
+  it("returns an unavailable inventory for a forged or foreign evaluation context", () => {
+    const forged = Object.freeze({ catalogs: {}, safe: true }) as unknown as Parameters<
+      typeof getSourceCorpusInventory
+    >[0];
+    expect(getSourceCorpusInventory(forged)).toEqual({
+      available: false,
+      reason: "unsafe-evaluation-context",
+    });
+
+    const unsafe = createPublicationEvaluationContext({ lessons: undefined });
+    expect(unsafe.safe).toBe(false);
+    expect(getSourceCorpusInventory(unsafe)).toEqual({
+      available: false,
+      reason: "unsafe-evaluation-context",
+    });
+  });
+});
+
+describe("central Tala disposition-registry contract", () => {
+  const ALL_TALA_IDS = ["tala-dadra", "tala-keherwa", "tala-teental", "tala-jhaptal", "tala-deepchandi", "tala-roopak", "tala-lawani", "tala-khemta"];
+
+  function withRegistry(mutate: (registry: RawRecord) => void, assert: () => void): void {
+    const snapshot = clone(musicalCoreFieldDispositions);
+    try {
+      mutate(musicalCoreFieldDispositions);
+      assert();
+    } finally {
+      restoreRecord(musicalCoreFieldDispositions, snapshot);
+    }
+    // The corpus is certifiable again once the mutation is reverted.
+    expect(createPublicationEvaluationContext().safe).toBe(true);
+  }
+
+  it("accepts the shipped registry through one shared contract", () => {
+    const inspection = inspectDispositionRegistry(musicalCoreFieldDispositions);
+    expect(inspection.issues).toEqual([]);
+    expect(inspection.ok).toBe(true);
+    expect(inspection.entryById.size).toBe(ALL_TALA_IDS.length);
+    // Both consumers reach the same verdict on the same registry.
+    expect(createPublicationEvaluationContext().safe).toBe(true);
+    expect(validateMusicalCoreFieldDispositions()).toEqual({ isValid: true, issues: [] });
+  });
+
+  it.each([
+    ["a drifted policy string", (registry: RawRecord) => { registry.policy = "partial-field-quarantine"; }, "policy"],
+    ["a missing policy declaration", (registry: RawRecord) => { delete registry.policy; }, "policy"],
+    ["a reordered requiredFields list", (registry: RawRecord) => { registry.requiredFields = ["structure", "context", "theka", "bols"]; }, "requiredFields"],
+    ["a truncated requiredFields list", (registry: RawRecord) => { registry.requiredFields = ["context", "theka", "bols"]; }, "requiredFields"],
+    ["an unclosed field outside requiredFields", (registry: RawRecord) => { registry.unclosedRequiredFields = ["structure", "tempo"]; }, "unclosedRequiredFields"],
+    ["a duplicated unclosed field", (registry: RawRecord) => { registry.unclosedRequiredFields = ["structure", "structure"]; }, "unclosedRequiredFields"],
+    ["a missing unclosedRequiredFields list", (registry: RawRecord) => { delete registry.unclosedRequiredFields; }, "unclosedRequiredFields"],
+    ["a non-integer version", (registry: RawRecord) => { registry.version = "1"; }, "version"],
+    ["an emptied issue catalog", (registry: RawRecord) => { registry.issueCatalog = []; }, "issueCatalog"],
+    ["an unresolvable ledger anchor", (registry: RawRecord) => {
+      ((registry.issueCatalog as RawCatalog)[0]).ledgerIssueId = "P02-NOT-IN-LEDGER";
+    }, "issueCatalog"],
+    ["a duplicated issue-catalog ID", (registry: RawRecord) => {
+      const catalog = registry.issueCatalog as RawCatalog;
+      catalog.push(clone(catalog[0]));
+    }, "issueCatalog"],
+    ["a dangling row issue anchor", (registry: RawRecord) => {
+      recordChild((registry.talas as RawCatalog)[0], "context").issueId = "P02-DANGLING-ISSUE";
+    }, "context.issueId"],
+    ["an out-of-domain row status", (registry: RawRecord) => {
+      recordChild((registry.talas as RawCatalog)[0], "theka").status = "approved";
+    }, "theka"],
+    ["a blank row quality", (registry: RawRecord) => {
+      recordChild((registry.talas as RawCatalog)[0], "theka").quality = "   ";
+    }, "theka"],
+    ["a denormalized row talaId", (registry: RawRecord) => {
+      ((registry.talas as RawCatalog)[0]).talaId = " tala-dadra ";
+    }, "talaId"],
+    ["a duplicated row talaId", (registry: RawRecord) => {
+      const rows = registry.talas as RawCatalog;
+      rows.push(clone(rows[0]));
+    }, "talaId"],
+    ["an emptied bol list", (registry: RawRecord) => {
+      ((registry.talas as RawCatalog)[0]).bols = [];
+    }, "fields"],
+    ["a non-sequential bol matra", (registry: RawRecord) => {
+      (((registry.talas as RawCatalog)[0]).bols as RawCatalog)[1].matra = 7;
+    }, "bols[1]"],
+    ["a null bol row", (registry: RawRecord) => {
+      (((registry.talas as RawCatalog)[0]).bols as unknown[])[0] = null;
+    }, "bols[0]"],
+    ["an emptied talas array", (registry: RawRecord) => { registry.talas = []; }, "talas"],
+  ])(
+    "makes the evaluation context unsafe for a verified-looking registry with %s",
+    (_label, mutate, expectedField) => {
+      withRegistry(mutate, () => {
+        const inspection = inspectDispositionRegistry(musicalCoreFieldDispositions);
+        expect(inspection.ok).toBe(false);
+        expect(inspection.issues.some((issue) => issue.field === expectedField)).toBe(true);
+
+        // Publication gating consumes the same verdict: the whole evaluation
+        // context is unsafe, not merely one row.
+        const context = createPublicationEvaluationContext();
+        expect(context.safe).toBe(false);
+        expect(getTalaFieldDisposition("tala-khemta", context)).toBeUndefined();
+        expect(evaluatePublicationBatch(talas, context)).toMatchObject({
+          isValid: false,
+          failureReason: "unsafe-container",
+        });
+        expect(repository.getTalas()).toEqual([]);
+
+        // Forensic validation reports the same structural defect.
+        const validated = validateMusicalCoreFieldDispositions(talas, musicalCoreFieldDispositions);
+        expect(validated.isValid).toBe(false);
+        expect(validated.issues.some((issue) => issue.field === expectedField)).toBe(true);
+
+        // Whole-entity quarantine is preserved for every Tala throughout.
+        ALL_TALA_IDS.forEach((id) => {
+          expect(repository.getTalaById(id)).toBeUndefined();
+        });
+        expect(repository.getPublicationSummary().talas.public).toBe(0);
+      });
+    },
+  );
+
+  it("never throws for hostile registry containers and stays deterministic", () => {
+    const hostile: unknown[] = [
+      null,
+      undefined,
+      42,
+      "registry",
+      [],
+      { talas: null },
+      { talas: [null] },
+      Object.defineProperty({}, "talas", { get() { throw new Error("hostile talas"); }, enumerable: true }),
+      new Proxy({}, { ownKeys() { throw new Error("hostile ownKeys"); } }),
+    ];
+    hostile.forEach((candidate) => {
+      expect(() => inspectDispositionRegistry(candidate)).not.toThrow();
+      const first = inspectDispositionRegistry(candidate);
+      const second = inspectDispositionRegistry(candidate);
+      expect(first.ok).toBe(false);
+      expect(first.issues.length).toBeGreaterThan(0);
+      expect(second.issues).toEqual(first.issues);
+    });
+  });
+
+  it("keeps all eight Talas quarantined even when the registry closes the structure field", () => {
+    // Dropping structure from unclosedRequiredFields is structurally legal, so the
+    // shared contract stays satisfied. The forensic validator must still refuse it,
+    // and per-Tala evidence must still decide publication.
+    withRegistry((registry) => { registry.unclosedRequiredFields = []; }, () => {
+      expect(inspectDispositionRegistry(musicalCoreFieldDispositions).ok).toBe(true);
+      expect(createPublicationEvaluationContext().safe).toBe(true);
+
+      const validated = validateMusicalCoreFieldDispositions(talas, musicalCoreFieldDispositions);
+      expect(validated.isValid).toBe(false);
+      expect(validated.issues.some((issue) => issue.field === "policy")).toBe(true);
+
+      ALL_TALA_IDS.forEach((id) => {
+        expect(repository.getTalaById(id)).toBeUndefined();
+      });
+      expect(repository.getPublicationSummary().talas.public).toBe(0);
+    });
+  });
+});
+
+describe("source-document freshness across every consumer", () => {
+  const RAGA_SOURCE_ID = "SRC-G11-RAGA-ID";
+  const RAGA_DOCUMENT_SLUG = "grade_11_raga_identification";
+  const PUBLIC_RAGA_ID = "raga-bilawal";
+
+  function ragaSourceReference(): RawRecord {
+    const raga = recordById(ragas, PUBLIC_RAGA_ID);
+    return clone(recordChild(raga, "sourceReference"));
+  }
+
+  function sourceDocument(): RawRecord {
+    const document = sourceDocuments.find((candidate) => candidate.slug === RAGA_DOCUMENT_SLUG);
+    if (!document) throw new Error(`Missing source-document fixture: ${RAGA_DOCUMENT_SLUG}`);
+    return document;
+  }
+
+  /**
+   * Read all six consumers through one operation each, so a stale memoized
+   * result in any of them would show up as a disagreement.
+   */
+  function readEveryConsumer() {
+    return {
+      referenceDecision: evaluateSourceReference(ragaSourceReference() as never),
+      projection: repository.getSources().find((source) => source.id === RAGA_SOURCE_ID),
+      documentSummary: repository.getSourceDocumentSummary(RAGA_SOURCE_ID),
+      inventory: getSourceCorpusInventory(),
+      contentList: repository.getRagas().map((raga) => raga.id),
+      directLookup: repository.getRagaById(PUBLIC_RAGA_ID)?.id,
+      publicationSummary: repository.getPublicationSummary().ragas,
+    };
+  }
+
+  function withDocumentMutation(mutate: (document: RawRecord) => void, assert: () => void): void {
+    const documentSnapshot = clone(sourceDocuments);
+    const pageSnapshot = clone(sourcePageQuality);
+    try {
+      mutate(sourceDocument());
+      assert();
+    } finally {
+      restoreCatalog(sourceDocuments, documentSnapshot);
+      restoreCatalog(sourcePageQuality, pageSnapshot);
+    }
+  }
+
+  it("serves the baseline document state through all six consumers", () => {
+    const before = readEveryConsumer();
+    expect(before.referenceDecision.supportable).toBe(true);
+    expect(before.projection?.id).toBe(RAGA_SOURCE_ID);
+    expect(before.documentSummary).toMatchObject({
+      documentSlug: RAGA_DOCUMENT_SLUG,
+      reviewStatus: "Source Triaged",
+      pageCount: 2,
+    });
+    expect(before.inventory.available).toBe(true);
+    expect(before.contentList).toContain(PUBLIC_RAGA_ID);
+    expect(before.directLookup).toBe(PUBLIC_RAGA_ID);
+    expect(before.publicationSummary.public).toBeGreaterThan(0);
+
+    // Nothing is memoized: a second read is a fresh object with equal content.
+    const again = readEveryConsumer();
+    expect(again.publicationSummary).not.toBe(before.publicationSummary);
+    expect(again.publicationSummary).toStrictEqual(before.publicationSummary);
+    expect(again.documentSummary).toStrictEqual(before.documentSummary);
+  });
+
+  it("refreshes every consumer when only the source-document reviewStatus changes", () => {
+    const before = readEveryConsumer();
+    expect(before.directLookup).toBe(PUBLIC_RAGA_ID);
+
+    withDocumentMutation(
+      (document) => { document.reviewStatus = "Review Required"; },
+      () => {
+        const after = readEveryConsumer();
+
+        // 1. source reference decisions
+        expect(after.referenceDecision.supportable).toBe(false);
+        expect(after.referenceDecision.reasonCode).toBe("source-document-needs-review");
+        // 2. source projection stays available but reports the new state
+        expect(after.projection?.id).toBe(RAGA_SOURCE_ID);
+        expect(after.projection?.evidenceState).not.toBe(before.projection?.evidenceState);
+        // 3. document/source summary
+        expect(after.documentSummary.reviewStatus).toBe("Review Required");
+        // 4. source-corpus inventory stays certifiable; only evidence changed
+        expect(after.inventory.available).toBe(true);
+        // 5. content list and 6. direct lookup withhold the dependent record
+        expect(after.contentList).not.toContain(PUBLIC_RAGA_ID);
+        expect(after.directLookup).toBeUndefined();
+        // 7. publication summary agrees with the list in the same operation
+        expect(after.publicationSummary.public).toBeLessThan(before.publicationSummary.public);
+        expect(after.publicationSummary.public).toBe(after.contentList.length);
+        expect(after.publicationSummary.raw).toBe(before.publicationSummary.raw);
+      },
+    );
+
+    // Reverting the single field restores every consumer with no stale result.
+    expect(readEveryConsumer()).toStrictEqual(before);
+  });
+
+  it("refreshes every consumer when only the source-document pageCount shrinks", () => {
+    const before = readEveryConsumer();
+
+    withDocumentMutation(
+      (document) => {
+        // Shrink the document to one page and drop the now out-of-range page row,
+        // so the page registry stays internally consistent and the cited page 2
+        // becomes genuinely out of range rather than merely unregistered.
+        document.pageCount = 1;
+        const kept = sourcePageQuality.filter((page) =>
+          page.documentSlug !== RAGA_DOCUMENT_SLUG || Number(page.pageNumber) <= 1);
+        restoreCatalog(sourcePageQuality, kept);
+      },
+      () => {
+        const after = readEveryConsumer();
+
+        expect(after.referenceDecision.supportable).toBe(false);
+        expect(after.referenceDecision.reasonCode).toBe("page-out-of-range");
+        expect(after.documentSummary.pageCount).toBe(1);
+        expect(after.inventory.available).toBe(true);
+        if (!after.inventory.available) throw new Error("Expected an available inventory");
+        if (!before.inventory.available) throw new Error("Expected an available baseline inventory");
+        expect(after.inventory.sourcePages).toBe(before.inventory.sourcePages - 1);
+        expect(after.contentList).not.toContain(PUBLIC_RAGA_ID);
+        expect(after.directLookup).toBeUndefined();
+        expect(after.publicationSummary.public).toBe(after.contentList.length);
+        expect(after.publicationSummary.public).toBeLessThan(before.publicationSummary.public);
+      },
+    );
+
+    expect(readEveryConsumer()).toStrictEqual(before);
+  });
+
+  it("fails the whole corpus closed when a shrunken pageCount contradicts its page registry", () => {
+    const before = readEveryConsumer();
+
+    withDocumentMutation(
+      (document) => { document.pageCount = 1; },
+      () => {
+        // The page-quality registry still lists page 2, so the corpus can no
+        // longer be certified at all.
+        expect(createPublicationEvaluationContext().safe).toBe(false);
+        const after = readEveryConsumer();
+        expect(after.referenceDecision.supportable).toBe(false);
+        expect(after.referenceDecision.reasonCode).toBe("unsafe-evaluation-context");
+        expect(after.projection).toBeUndefined();
+        expect(after.documentSummary).toEqual({
+          reviewStatus: "Unverified / unsafe evaluation context",
+          pageCount: 0,
+          evidenceQuality: "missing",
+        });
+        expect(after.inventory).toEqual({
+          available: false,
+          reason: "unsafe-evaluation-context",
+        });
+        expect(after.contentList).toEqual([]);
+        expect(after.directLookup).toBeUndefined();
+        expect(after.publicationSummary.public).toBe(0);
+      },
+    );
+
+    expect(readEveryConsumer()).toStrictEqual(before);
+  });
+
+  it("refreshes every consumer for a page-quality downgrade independent of the document row", () => {
+    const before = readEveryConsumer();
+    const pageSnapshot = clone(sourcePageQuality);
+    try {
+      const page = sourcePageQuality.find((candidate) =>
+        candidate.documentSlug === RAGA_DOCUMENT_SLUG && Number(candidate.pageNumber) === 1);
+      if (!page) throw new Error("Missing page-quality fixture");
+      page.confidence = "D";
+
+      const after = readEveryConsumer();
+      // The document row is untouched, so its own state is unchanged...
+      expect(after.documentSummary.reviewStatus).toBe("Source Triaged");
+      expect(after.documentSummary.pageCount).toBe(2);
+      // ...while the evidence decision and every dependent surface refresh.
+      expect(after.referenceDecision.supportable).toBe(false);
+      expect(after.contentList).not.toContain(PUBLIC_RAGA_ID);
+      expect(after.directLookup).toBeUndefined();
+      expect(after.publicationSummary.public).toBe(after.contentList.length);
+    } finally {
+      restoreCatalog(sourcePageQuality, pageSnapshot);
+    }
+
+    expect(readEveryConsumer()).toStrictEqual(before);
   });
 });

@@ -9,6 +9,7 @@ import {
   cloneBoundedRecord,
   isNonBlankString,
   isRecord,
+  normalizeEntityId,
   projectPublicRecord,
   validateContentRecord,
 } from "@/lib/validation/content-contracts";
@@ -37,30 +38,36 @@ function isDenseArray(value: unknown): value is unknown[] {
 function getUsableQuiz(quiz: unknown): QuizRunnerQuiz | null {
   try {
     const snapshot = cloneBoundedRecord(quiz);
-    if (!isRecord(snapshot) || !isNonBlankString(snapshot.id) || !isNonBlankString(snapshot.title_si) ||
+    if (!isRecord(snapshot) || !isNonBlankString(snapshot.title_si) ||
       typeof snapshot.passingScorePercent !== "number" || !Number.isFinite(snapshot.passingScorePercent) ||
       snapshot.passingScorePercent < 1 || snapshot.passingScorePercent > 100) {
       return null;
     }
+    // The quiz ID becomes a progress-storage key, so it must be canonical too.
+    const canonicalQuizId = normalizeEntityId(snapshot.id);
+    if (!canonicalQuizId) return null;
 
     const rawQuestions = snapshot.questions;
     if (!isDenseArray(rawQuestions) || rawQuestions.length === 0 || rawQuestions.length > MAX_ARRAY_ITEMS) return null;
 
     const questions: Question[] = [];
-    const questionIds = new Set<string>();
+    const canonicalQuestionIds = new Set<string>();
     for (let index = 0; index < rawQuestions.length; index += 1) {
       const candidate = rawQuestions[index];
       if (!validateContentRecord(candidate, "question").isValid) return null;
       const projected = projectPublicRecord(candidate, "question");
       if (!isRecord(projected)) return null;
-      const questionId = projected.id;
-      if (!isNonBlankString(questionId) || questionIds.has(questionId)) return null;
-      questionIds.add(questionId);
-      questions.push(projected as unknown as Question);
+      // Compare and store the canonical identity. Padded, NFD-decomposed, or
+      // control-bearing IDs must not survive as distinct questions, because the
+      // renderer keys every answer, ordering, and matching selection on this value.
+      const canonicalId = normalizeEntityId(projected.id);
+      if (!canonicalId || canonicalQuestionIds.has(canonicalId)) return null;
+      canonicalQuestionIds.add(canonicalId);
+      questions.push({ ...(projected as unknown as Question), id: canonicalId });
     }
 
     return {
-      id: snapshot.id,
+      id: canonicalQuizId,
       title_si: snapshot.title_si,
       passingScorePercent: snapshot.passingScorePercent,
       questions,

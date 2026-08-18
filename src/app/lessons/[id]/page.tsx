@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -21,6 +21,7 @@ import { repository } from "@/lib/data/repository";
 import { formatPublicSourceReference } from "@/lib/data/publication-policy";
 import { ProgressStorage } from "@/lib/storage/progress-storage";
 import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
+import { releaseHandleRef, releaseTimerRef } from "@/lib/audio/cleanup";
 import { SwaraKeyboard } from "@/components/audio/SwaraKeyboard";
 import { TalaVisualizer } from "@/components/audio/TalaVisualizer";
 import { RhythmTapGame } from "@/components/audio/RhythmTapGame";
@@ -48,6 +49,14 @@ export default function LessonDetailPage() {
   const sequenceHandleRef = useRef<SwaraPlaybackHandle | null>(null);
   const audioTimerRef = useRef<number | null>(null);
 
+  // Invalidate the generation and surrender ownership before cancelling, so a
+  // throwing sequence cancellation cannot leave the pending timer running.
+  const cancelOwnedAudio = useCallback(() => {
+    audioGenerationRef.current += 1;
+    releaseHandleRef(sequenceHandleRef);
+    releaseTimerRef(audioTimerRef, (timerId) => window.clearTimeout(timerId));
+  }, []);
+
   useEffect(() => {
     if (!lesson) return;
     const p = ProgressStorage.getProgress();
@@ -61,14 +70,9 @@ export default function LessonDetailPage() {
     setAudioError(false);
     return () => {
       mountedRef.current = false;
-      audioGenerationRef.current += 1;
-      sequenceHandleRef.current?.();
-      if (audioTimerRef.current !== null) {
-        window.clearTimeout(audioTimerRef.current);
-        audioTimerRef.current = null;
-      }
+      cancelOwnedAudio();
     };
-  }, [lessonId]);
+  }, [cancelOwnedAudio, lessonId]);
 
   if (!lesson) {
     return (
@@ -88,13 +92,8 @@ export default function LessonDetailPage() {
 
   const handlePlayLessonAudio = async () => {
     if (audioPlaying) return;
-    audioGenerationRef.current += 1;
+    cancelOwnedAudio();
     const generation = audioGenerationRef.current;
-    sequenceHandleRef.current?.();
-    if (audioTimerRef.current !== null) {
-      window.clearTimeout(audioTimerRef.current);
-      audioTimerRef.current = null;
-    }
     setAudioPlaying(true);
     setAudioError(false);
     if (lesson.listenActivity.notes) {

@@ -8,6 +8,7 @@ import { repository } from "@/lib/data/repository";
 import { formatPublicSourceReference } from "@/lib/data/publication-policy";
 import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
 import { tablaSynth, type TablaPlaybackHandle } from "@/lib/audio/tabla";
+import { releaseHandleRef, releaseHandleSet, releaseTimerRef, releaseTimerSet } from "@/lib/audio/cleanup";
 
 export default function InstrumentDetailPage() {
   const params = useParams();
@@ -25,15 +26,14 @@ export default function InstrumentDetailPage() {
   const completionTimerRef = useRef<number | null>(null);
 
   const cancelOwnedAudio = useCallback(() => {
+    // Invalidate the generation and surrender every ownership set before
+    // cancelling. One throwing handle cancellation must not abort the remaining
+    // handles, the pending stroke timers, or the completion timer.
     audioGenerationRef.current += 1;
-    sequenceHandleRef.current?.();
-    tablaHandlesRef.current.forEach((handle) => handle());
-    audioTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
-    audioTimersRef.current.clear();
-    if (completionTimerRef.current !== null) {
-      window.clearTimeout(completionTimerRef.current);
-      completionTimerRef.current = null;
-    }
+    releaseHandleRef(sequenceHandleRef);
+    releaseHandleSet(tablaHandlesRef);
+    releaseTimerSet(audioTimersRef, (timerId) => window.clearTimeout(timerId));
+    releaseTimerRef(completionTimerRef, (timerId) => window.clearTimeout(timerId));
     if (mountedRef.current) setIsPlayingAudio(false);
   }, []);
 
@@ -102,7 +102,7 @@ export default function InstrumentDetailPage() {
         completionTimerRef.current = null;
         if (!mountedRef.current || audioGenerationRef.current !== generation) return;
         audioGenerationRef.current += 1;
-        tablaHandlesRef.current.forEach((handle) => handle());
+        releaseHandleSet(tablaHandlesRef);
         setIsPlayingAudio(false);
       }, 2000);
     } else if (instrument.id === "inst-flute") {

@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Sparkles, Clock, Play, ArrowRight, Music, FileText, CheckCircle2 } from "lucide-react";
 import { repository } from "@/lib/data/repository";
 import { formatPublicSourceReference } from "@/lib/data/publication-policy";
 import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
+import { releaseHandleRef } from "@/lib/audio/cleanup";
 import { SwaraKeyboard } from "@/components/audio/SwaraKeyboard";
 
 export default function RagaDetailPage() {
@@ -21,16 +22,22 @@ export default function RagaDetailPage() {
   const audioGenerationRef = useRef(0);
   const sequenceHandleRef = useRef<SwaraPlaybackHandle | null>(null);
 
+  // Invalidate the generation and surrender ownership before cancelling, so a
+  // throwing sequence cancellation cannot leave a stale handle owned.
+  const cancelOwnedAudio = useCallback(() => {
+    audioGenerationRef.current += 1;
+    releaseHandleRef(sequenceHandleRef);
+  }, []);
+
   useEffect(() => {
     mountedRef.current = true;
     setPlayingPhraseIdx(null);
     setAudioError(false);
     return () => {
       mountedRef.current = false;
-      audioGenerationRef.current += 1;
-      sequenceHandleRef.current?.();
+      cancelOwnedAudio();
     };
-  }, [ragaId]);
+  }, [cancelOwnedAudio, ragaId]);
 
   if (!raga) {
     return (
@@ -45,11 +52,10 @@ export default function RagaDetailPage() {
 
   const playSequence = async (phraseSwaras: string[], idx: number) => {
     if (playingPhraseIdx !== null) return;
-    audioGenerationRef.current += 1;
+    cancelOwnedAudio();
     const generation = audioGenerationRef.current;
     setPlayingPhraseIdx(idx);
     setAudioError(false);
-    sequenceHandleRef.current?.();
     const handle = swaraSynth.playSequenceHandle(phraseSwaras, 0.6, undefined, 261.63, "harmonium");
     sequenceHandleRef.current = handle;
     void handle.ready.then(

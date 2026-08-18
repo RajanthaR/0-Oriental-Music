@@ -357,3 +357,60 @@ promotion, or change to the whole-entity Tala quarantine.
 The rejected Deepchandi retrieval-only finding, all earlier blocked review
 verdicts, and the original-PDF, notation, OCR/corrupt-glyph, and SME-review
 boundaries remain historical and unchanged.
+
+## Acceptance-hardening review cycle 2 (incomplete input run; ten findings closed; pending rereview)
+
+Run `20260817-p02-hardening-c2-2af0d18` reviewed the complete diff from
+`beba1479f473b3413b3f2de48a27c558e1937c6f` through immutable head
+`2af0d182ab0077338964432da5f75de9401f83ec`. Artifacts are under
+`C:/tmp/compound-engineering/ce-code-review/20260817-p02-hardening-c2-2af0d18/`.
+
+**This run is INCOMPLETE and is preserved as historical findings input only.**
+It produced 10 of the 11 required reviewer artifacts; the required
+frontend-races artifact was never produced. Fresh reviewer and validator
+dispatches then failed with `402 Payment Required ... code:"deactivated_workspace"`,
+so **zero** valid validator artifacts exist. The missing reviewer artifact and
+the absent validator wave are missing coverage, **not** a zero-findings result,
+and this run cannot count as acceptance for any finding below.
+
+The original `gpt-5.6-luna` at MAX reviewer specification is superseded for the
+same reason: that workspace is deactivated and cannot dispatch. The fresh
+mandatory review uses Claude Opus 5 at high effort for every reviewer and every
+validator, and satisfies the adversarial lens through the review skill's
+documented in-process fallback with the peer skip reason recorded in Coverage.
+
+The ten surviving candidate findings were each independently reproduced against
+the immutable reviewed head before any fix, and each received a focused failing
+regression first. Six further regressions were authorized as named coverage
+gaps. All sixteen are `FIXED-PENDING-REREVIEW`.
+
+| ID | Reproduced defect | Stable regression | Final implementation anchor | Disposition |
+|---|---|---|---|---|
+| `AH-C2-V01` | `QuizRunner` compared projected question IDs without canonical normalization, so ` q-1 ` and `q-1`, and NFC/NFD-equivalent IDs, survived as distinct questions and aliased each other's answer state. | `src/test/quiz-runner.test.tsx#renders a safe unavailable state for question IDs that differ only by %s` | `src/components/quiz/QuizRunner.tsx#canonicalQuestionIds` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V02` | `getSourceCorpusInventory()` read the evaluation state without checking `context.safe`, returning ordinary-looking counts for a malformed source-document, page-quality, or disposition registry. | `src/test/sources-page.test.tsx#renders an honest unavailable state for %s` | `src/lib/data/publication-policy.ts#getSourceCorpusInventory` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V03` | Source listing, direct lookup, transparency validation, and public-collection validation used bare `trim()` or raw `===` instead of the canonical entity-ID normalizer, so identities behaved differently per surface. | `src/test/source-metadata-consistency.test.ts#canonical source identity parity` | `src/lib/data/repository.ts#matchesRecordId` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V04` | The public validator required direct `sourceEvidence.supportable` for a Quiz, but the Quiz container decision deliberately evaluates an absent reference, so every valid aggregate Quiz failed validation. | `src/test/content-validator.test.ts#accepts a valid aggregate Quiz that carries no direct source reference` | `src/lib/validation/content-validator.ts#quizAggregateEvidenceIssues` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V05` | `EarTrainingModule` invoked the playback cancellation ref directly and never cleared it, so a throwing cancel escaped the unmount effect and stranded the handle. | `src/test/swara-consumers.test.tsx#continues EarTraining cleanup after Next, replacement, and unmount cancellations throw` | `src/components/audio/EarTrainingModule.tsx#cancelPlayback` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V06` | Lesson, Raga, and Instrument detail routes cancelled handles and cleared timers sequentially without isolation, so one throwing cancellation skipped every later timer and handle. | `src/test/swara-consumers.test.tsx#clears every remaining instrument timer when an owned Tabla cancellation throws` | `src/lib/audio/cleanup.ts#releaseHandleSet` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V07` | `expandTablaBol()` indexed a plain object, so `__proto__` resolved to `Object.prototype` and `constructor` to `Object`; `??` never fired and `planTablaBol()` threw. | `src/test/synth.test.ts#fails closed for the prototype-key Tabla bol %s without throwing` | `src/lib/audio/tabla.ts#COMPOUND_BOL_CELLS` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V08` | Publication gating checked only `talas[].talaId` uniqueness while the forensic validator additionally checked policy, required fields, the issue catalog and its ledger resolution, row shape, and the status domain, so an incomplete registry looked verified to publication. | `src/test/publication-parity.test.ts#makes the evaluation context unsafe for a verified-looking registry with %s` | `src/lib/validation/disposition-registry.ts#inspectDispositionRegistry` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V09` | Over-depth, over-node, cycle, sparse, and shared-DAG coverage reached the graph inspector but not the checked batch, repository list, direct lookup, search, or publication summary. | `src/test/graph-boundary.test.ts#traverses %s alone but fails the combined catalog closed without throwing` | `src/test/graph-boundary.test.ts#expectBoundedFailClosed` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V10` | Freshness coverage mutated page quality only; no test mutated source-document `reviewStatus` or `pageCount`, so those gates were never exercised through the six consumers. | `src/test/publication-parity.test.ts#refreshes every consumer when only the source-document reviewStatus changes` | `src/test/publication-parity.test.ts#readEveryConsumer` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-R01` | Microphone cleanup lacked proof that a throwing `stream.getTracks()` still releases the frame, graph node, and context. | `src/test/pitch.test.ts#releases an active session when stream.getTracks() throws on stop` | `src/lib/audio/pitch.ts#stopStream` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-R02` | A timer API that fires its callback during registration had no regression proving playback ownership cannot be stranded. | `src/test/synth.test.ts#cannot strand Tabla playback ownership when a timer callback registers synchronously` | `src/lib/audio/tabla.ts#scheduleTablaPlan` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-R03` | Quarantine coverage relied on counts rather than the exact eight Tala IDs across every public surface. | `src/test/graph-boundary.test.ts#withholds %s from every public surface` | `src/test/graph-boundary.test.ts#withholds %s from every public surface` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-R04` | The source-inventory unavailable UI had no rendering coverage. | `src/test/sources-page.test.tsx#renders the extracted-corpus counts while the corpus is certifiable` | `src/app/sources/page.tsx#inventory.available` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-R05` | Failure-atomic audio cleanup was reimplemented per consumer with no shared, directly tested mechanism. | `src/test/audio-cleanup.test.ts#cancels every owned handle even when an earlier cancellation throws` | `src/lib/audio/cleanup.ts#runIsolatedCleanup` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-R06` | A CMS mutation inside the summary-freshness test permanently rebound the repository to a detached lesson clone, so any later in-place freshness assertion in that file would pass vacuously. | `src/test/review-closeout.test.ts#recomputes publication summaries from current inputs without memoized identity` | `src/test/review-closeout.test.ts#mutableRepository.lessons = originalCatalog` | **FIXED-PENDING-REREVIEW** |
+
+Local verification on this implementation: `npm run test` 18 files / 546 tests
+passed, `npm run type-check` passed, `npm run lint` passed, `npm run build`
+passed, `git diff --check` passed, and the forensic/source/publication JSON
+consistency suites passed. Local functionality is not review acceptance.
+
+All eight Talas remain whole-entity quarantined. No musical fact, publisher,
+year, location, licence, organization, reviewer, review date, or publication
+state is invented or promoted. The rejected Deepchandi retrieval-only finding,
+every earlier blocked run ID and verdict, and the original-PDF, diagram,
+notation, corrupt-glyph, and SME-review boundaries remain historical and
+unchanged.

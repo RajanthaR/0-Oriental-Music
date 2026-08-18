@@ -211,4 +211,109 @@ describe("selected Phase 2 source metadata", () => {
       humanCatalog
     ).isValid).toBe(false);
   });
+
+  describe("canonical source identity parity", () => {
+    const CANONICAL_ID = SELECTED_PHASE_2_SOURCE_IDS[0];
+    const ZERO_WIDTH_SPACE = String.fromCharCode(0x200b);
+    const BIDI_ISOLATE = String.fromCharCode(0x2066);
+    const SOFT_HYPHEN = String.fromCharCode(0x00ad);
+
+    function withRepositorySources<T>(rows: unknown[], run: () => T): T {
+      const mutable = repository as unknown as { sources: unknown[] };
+      const original = mutable.sources;
+      mutable.sources = rows;
+      try {
+        return run();
+      } finally {
+        mutable.sources = original;
+      }
+    }
+
+    function rawSourceRows(): Record<string, unknown>[] {
+      return structuredClone(runtimeSources) as unknown as Record<string, unknown>[];
+    }
+
+    function indexOfCanonical(rows: Record<string, unknown>[]): number {
+      const index = rows.findIndex((row) => row.id === CANONICAL_ID);
+      if (index < 0) throw new Error(`Missing source fixture: ${CANONICAL_ID}`);
+      return index;
+    }
+
+    it.each([
+      ["surrounding whitespace", ` ${CANONICAL_ID}	`],
+      ["a soft hyphen", `${CANONICAL_ID}${SOFT_HYPHEN}`],
+      ["a zero-width space", `${CANONICAL_ID}${ZERO_WIDTH_SPACE}`],
+      ["a bidi isolate", `${BIDI_ISOLATE}${CANONICAL_ID}`],
+    ])("fails the whole source catalog closed for an ID bearing %s", (_label, hostileId) => {
+      const rows = rawSourceRows();
+      rows[indexOfCanonical(rows)].id = hostileId;
+
+      withRepositorySources(rows, () => {
+        // Listing, direct lookup, and the summary must agree: a control-bearing
+        // identity is never a usable public identity on any surface.
+        const listed = repository.getSources();
+        const lookedUp = repository.getSourceById(CANONICAL_ID);
+        const hostileLookup = repository.getSourceById(hostileId);
+        if (hostileId.trim() !== CANONICAL_ID) {
+          // A control-bearing identity is never usable, so the whole catalog fails
+          // closed rather than exposing one unidentifiable row.
+          expect(listed).toEqual([]);
+          expect(lookedUp).toBeUndefined();
+          expect(hostileLookup).toBeUndefined();
+        } else {
+          // A merely padded identity stays resolvable by its canonical form on
+          // every surface, which is the parity the bare `===` lookup broke.
+          expect(lookedUp?.id).toBe(hostileId);
+          expect(hostileLookup?.id).toBe(hostileId);
+          expect(listed.some((source) => source.id === hostileId)).toBe(true);
+        }
+      });
+
+      // The validator reaches the same verdict on the same rows.
+      const validated = validatePublicCollection("Source", rows);
+      if (hostileId.trim() !== CANONICAL_ID) {
+        expect(validated.isValid).toBe(false);
+        expect(validated.issues.some((issue) => issue.field === "id")).toBe(true);
+      } else {
+        expect(validated.issues.some((issue) => issue.field === "id")).toBe(false);
+      }
+    });
+
+    it("rejects canonically equivalent duplicate source IDs on every surface", () => {
+      const rows = rawSourceRows();
+      const index = indexOfCanonical(rows);
+      const duplicate = structuredClone(rows[index]);
+      duplicate.id = ` ${CANONICAL_ID} `;
+      rows.push(duplicate);
+
+      withRepositorySources(rows, () => {
+        expect(repository.getSources()).toEqual([]);
+        expect(repository.getSourceById(CANONICAL_ID)).toBeUndefined();
+        expect(repository.getSourceDocumentSummary(CANONICAL_ID)).toEqual({
+          reviewStatus: "Ambiguous source record ID",
+          pageCount: 0,
+          evidenceQuality: "missing",
+        });
+      });
+
+      const validated = validatePublicCollection("Source", rows);
+      expect(validated.isValid).toBe(false);
+      expect(validated.issues.some((issue) => issue.field === "id")).toBe(true);
+    });
+
+    it("keeps the transparency validator and repository projection on one canonical index", () => {
+      const rows = rawSourceRows();
+      const index = indexOfCanonical(rows);
+      rows[index].id = ` ${CANONICAL_ID}	`;
+
+      withRepositorySources(rows, () => {
+        const projected = repository.getSources();
+        expect(projected.some((source) => source.id.trim() === CANONICAL_ID)).toBe(true);
+        // The padded row still resolves through the transparency boundary, which
+        // proves the validator indexes repository rows canonically rather than by
+        // raw string equality.
+        expect(validatePublicCollection("sources", projected)).toEqual({ isValid: true, issues: [] });
+      });
+    });
+  });
 });

@@ -120,6 +120,92 @@ describe("PitchDetector resource ownership", () => {
     expect(close).toHaveBeenCalledTimes(1);
   });
 
+  it("disconnects the source and closes the context when stream.getTracks() throws", async () => {
+    // A stream can become unavailable mid-teardown (revoked permission, device
+    // unplug). Enumerating its tracks must not abort the rest of cleanup.
+    const hostileStream = {
+      getTracks: () => { throw new Error("stream unavailable"); },
+    } as unknown as MediaStream;
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: vi.fn().mockResolvedValue(hostileStream) },
+    });
+    const source = { connect: vi.fn(), disconnect: vi.fn() };
+    const close = vi.fn().mockResolvedValue(undefined);
+    class FailingAnalyserContext {
+      state = "running";
+      sampleRate = 44100;
+      close = close;
+      createMediaStreamSource() {
+        return source;
+      }
+      createAnalyser() {
+        throw new Error("analyser setup failed");
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: FailingAnalyserContext });
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    const detector = new PitchDetector();
+    await expect(detector.startListening(() => undefined)).resolves.toBe(false);
+    // The throwing track enumeration is contained, and the later cleanup steps
+    // still run.
+    expect(source.disconnect).toHaveBeenCalledTimes(1);
+    expect(close).toHaveBeenCalledTimes(1);
+    // Repeated cleanup remains safe and idempotent.
+    expect(() => detector.stopListening()).not.toThrow();
+    expect(() => detector.stopListening()).not.toThrow();
+  });
+
+  it("releases an active session when stream.getTracks() throws on stop", async () => {
+    const hostileStream = {
+      getTracks: () => { throw new Error("stream unavailable"); },
+    } as unknown as MediaStream;
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: vi.fn().mockResolvedValue(hostileStream) },
+    });
+    const source = { connect: vi.fn(), disconnect: vi.fn() };
+    const close = vi.fn().mockResolvedValue(undefined);
+    class WorkingContext {
+      state = "running";
+      sampleRate = 44100;
+      close = close;
+      createMediaStreamSource() {
+        return source;
+      }
+      createAnalyser() {
+        return {
+          fftSize: 2048,
+          getFloatTimeDomainData: (buffer: Float32Array) => buffer.fill(0),
+        };
+      }
+    }
+    Object.defineProperty(window, "AudioContext", { configurable: true, value: WorkingContext });
+    Object.defineProperty(globalThis, "requestAnimationFrame", {
+      configurable: true,
+      writable: true,
+      value: () => 1,
+    });
+    const cancelAnimationFrame = vi.fn();
+    Object.defineProperty(globalThis, "cancelAnimationFrame", {
+      configurable: true,
+      writable: true,
+      value: cancelAnimationFrame,
+    });
+
+    const detector = new PitchDetector();
+    await expect(detector.startListening(() => undefined)).resolves.toBe(true);
+    expect(source.connect).toHaveBeenCalledTimes(1);
+
+    expect(() => detector.stopListening()).not.toThrow();
+    // The frame, the graph node, and the context are all reclaimed even though
+    // track enumeration threw first.
+    expect(cancelAnimationFrame).toHaveBeenCalledWith(1);
+    expect(source.disconnect).toHaveBeenCalledTimes(1);
+    expect(close).toHaveBeenCalledTimes(1);
+  });
+
   it("disconnects a source and closes the context when analyser creation fails", async () => {
     const { stream, track } = createStream();
     Object.defineProperty(navigator, "mediaDevices", {

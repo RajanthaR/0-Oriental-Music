@@ -25,10 +25,22 @@ export default function SourcesCatalogPage() {
           මෙය මූලාශ්‍ර නාමාවලියක් පමණි. ප්‍රකාශන හිමිකම්, ප්‍රකාශක, වර්ෂය, ස්ථානය සහ සමාලෝචන තොරතුරු සනාථ වී නොමැති අගයන් ලෙස පෙන්වනු ලැබේ. පොදු අන්තර්ගතය සඳහා මූලාශ්‍ර ලේඛනය, නිශ්චිත පිටුව සහ පිටු-ගුණාත්මකභාවය එකට පරීක්ෂා කළ යුතුය.
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-text-secondary">
-          <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">මූලාශ්‍ර වාර්තා</span>{inventory.sourceRecords}</div>
-          <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">උපුටාගත් ලේඛන</span>{inventory.sourceDocuments}</div>
-          <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">පිටු</span>{inventory.sourcePages}</div>
-          <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">පොදු වාර්තා</span>{publicRecords}</div>
+          {inventory.available ? (
+            <>
+              <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">මූලාශ්‍ර වාර්තා</span>{inventory.sourceRecords}</div>
+              <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">උපුටාගත් ලේඛන</span>{inventory.sourceDocuments}</div>
+              <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">පිටු</span>{inventory.sourcePages}</div>
+              <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">පොදු වාර්තා</span>{publicRecords}</div>
+            </>
+          ) : (
+            <div
+              role="alert"
+              className="col-span-2 sm:col-span-4 rounded-xl bg-amber-50 border border-amber-200 p-3 text-amber-950"
+            >
+              <span className="font-bold block text-text">මූලාශ්‍ර ගණන් ලබා ගත නොහැක</span>
+              මූලාශ්‍ර ලේඛන හෝ පිටු-ගුණාත්මක වාර්තා සනාථ කළ නොහැකි බැවින් ගණන් පෙන්වීම වළක්වා ඇත. සමාලෝචනය අවසන් වන තුරු පහත මූලාශ්‍ර ලැයිස්තුව පමණක් භාවිත කරන්න.
+            </div>
+          )}
         </div>
       </div>
 

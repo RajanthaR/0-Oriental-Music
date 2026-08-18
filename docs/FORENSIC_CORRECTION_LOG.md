@@ -196,3 +196,34 @@ and `data/forensic-ledger.json#acceptanceHardeningReviewCycle1`.
 This is review-fix traceability, not acceptance evidence. All eight Talas remain
 whole-entity quarantined; no musical/source field is promoted; prior blocked
 runs and the rejected Deepchandi finding remain unchanged.
+
+## Phase 2 acceptance-hardening review cycle 2
+
+Run `20260817-p02-hardening-c2-2af0d18` reviewed original base
+`beba1479f473b3413b3f2de48a27c558e1937c6f` through implementation head
+`2af0d182ab0077338964432da5f75de9401f83ec`. The run is **incomplete**: 10 of
+11 required reviewer artifacts exist, the frontend-races artifact was never
+produced, and `402 Payment Required ... deactivated_workspace` terminated the
+run before any validator artifact was written. It is preserved as historical
+findings input; the absent artifacts are missing coverage, not zero findings.
+
+The complete sixteen-row mapping is in
+`docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md#Acceptance-hardening review cycle 2 (incomplete input run; ten findings closed; pending rereview)`
+and `data/forensic-ledger.json#acceptanceHardeningReviewCycle2`.
+
+| Finding group | Applied correction | Stable evidence | Disposition |
+|---|---|---|---|
+| `AH-C2-V01`, `AH-C2-V03` | Canonicalize question, quiz, source, and record identities so listing, direct lookup, validation, decisions, and summaries resolve one identity. | `src/test/quiz-runner.test.tsx`; `src/test/source-metadata-consistency.test.ts` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V02`, `AH-C2-R04` | Return an explicit unavailable source-corpus inventory for an uncertifiable corpus and render that state honestly instead of showing counts. | `src/test/publication-parity.test.ts`; `src/test/sources-page.test.tsx` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V04` | Give a public Quiz a dedicated aggregate evidence rule — public parent lesson plus every question's own grade scope and direct page evidence — without weakening either gate. | `src/test/content-validator.test.ts` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V05`, `AH-C2-V06`, `AH-C2-R01`, `AH-C2-R02`, `AH-C2-R05` | Release ownership before cancelling and isolate every cancellation and timer clear through one shared failure-atomic helper used by EarTraining and all three detail routes. | `src/test/audio-cleanup.test.ts`; `src/test/swara-consumers.test.tsx`; `src/test/synth.test.ts`; `src/test/pitch.test.ts` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V07` | Resolve compound Tabla bols through a closed `Map` so prototype keys can never yield an inherited non-array value. | `src/test/synth.test.ts` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V08` | Move every structural registry rule into one central dependency-free contract shared by publication gating and forensic validation; an incomplete, conflicting, or malformed registry now makes the evaluation context unsafe. | `src/test/publication-parity.test.ts` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V09`, `AH-C2-R03` | Prove exact-limit and over-limit graph behaviour and the eight-Tala quarantine through the checked batch, repository list, direct lookup, search, and publication summary. | `src/test/graph-boundary.test.ts` | **FIXED-PENDING-REREVIEW** |
+| `AH-C2-V10`, `AH-C2-R06` | Mutate source-document `reviewStatus` and `pageCount` independently and prove all six consumers refresh from one operation snapshot; repair the CMS test that had detached the repository catalog. | `src/test/publication-parity.test.ts`; `src/test/review-closeout.test.ts` | **FIXED-PENDING-REREVIEW** |
+
+This is review-fix traceability, not acceptance evidence. All eight Talas remain
+whole-entity quarantined; no musical or source field is promoted; the public
+boundary stays Grades 6-11; prior blocked runs and the rejected Deepchandi
+retrieval-only finding remain unchanged. No push, ready PR, merge, or deployment
+is authorized by this entry.

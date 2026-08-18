@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
 import { tablaSynth, type TablaPlaybackHandle } from "@/lib/audio/tabla";
+import { releaseHandleRef } from "@/lib/audio/cleanup";
 import { Play, CheckCircle2, XCircle, RotateCcw, Sparkles, Volume2 } from "lucide-react";
 
 export interface EarTrainingChallenge {
@@ -54,8 +55,11 @@ export const EarTrainingModule: React.FC = () => {
   const playbackRef = useRef<SwaraPlaybackHandle | TablaPlaybackHandle | null>(null);
 
   const cancelPlayback = useCallback(() => {
+    // Invalidate the generation and surrender ownership before cancelling, so a
+    // throwing cancel can neither strand this handle nor abort Next, replacement,
+    // reset, or unmount cleanup that still has to run after it.
     generationRef.current += 1;
-    playbackRef.current?.();
+    releaseHandleRef(playbackRef);
   }, []);
 
   useEffect(() => {

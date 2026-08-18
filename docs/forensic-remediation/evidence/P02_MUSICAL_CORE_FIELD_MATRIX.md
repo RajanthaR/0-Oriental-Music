@@ -231,3 +231,31 @@ whole-entity quarantined, the Deepchandi finding remains rejected as a
 retrieval-only spelling issue, and original-PDF, notation/layout, OCR/corrupt
 glyph, and SME review remain deferred. The review cycle is
 `FIXED-PENDING-REREVIEW`, not acceptance evidence.
+
+## Acceptance-hardening review cycle 2 boundary
+
+The sixteen findings closed against run `20260817-p02-hardening-c2-2af0d18`
+concern runtime identity normalization, aggregate quiz evidence, the central
+Tala disposition-registry contract, bounded-graph coverage at public
+boundaries, source-document freshness, and local-audio cleanup atomicity only.
+Their exact finding-to-test-to-fix mapping is recorded under
+`P02_CLOSEOUT_FINDINGS.md#Acceptance-hardening review cycle 2 (incomplete input run; ten findings closed; pending rereview)`
+and `data/forensic-ledger.json#acceptanceHardeningReviewCycle2`.
+
+That input run is incomplete: the required frontend-races reviewer artifact was
+never produced and no validator artifact exists, because the run terminated with
+`402 Payment Required ... deactivated_workspace`. Those absences are missing
+coverage, not zero findings, and the run is not acceptance evidence.
+
+One correction touches this matrix's subject matter directly. `AH-C2-V08`
+strengthens the registry that governs Tala field dispositions: publication
+gating now shares the complete structural contract with forensic validation, so
+an incomplete, conflicting, or malformed registry makes the whole evaluation
+context unsafe instead of appearing verified. That is a stricter gate, not a new
+musical claim, and it revises no value recorded above.
+
+No musical-core value in this matrix is revised. All eight Talas stay
+whole-entity quarantined, the Deepchandi finding remains rejected as a
+retrieval-only spelling issue, and original-PDF, notation/layout,
+OCR/corrupt-glyph, and SME review remain deferred. The review cycle is
+`FIXED-PENDING-REREVIEW`, not acceptance evidence.

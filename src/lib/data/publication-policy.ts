@@ -30,6 +30,7 @@ import learningPathsData from "@/data/learning-paths.json";
 import sourceDocumentsData from "../../../data/source-documents.json";
 import sourcePageQualityData from "../../../data/source-page-quality.json";
 import musicalCoreFieldDispositionsData from "../../../data/musical-core-field-dispositions.json";
+import { inspectDispositionRegistry } from "@/lib/validation/disposition-registry";
 
 export const UNKNOWN_PROVENANCE = "නොදනී / සනාථ වී නැත";
 
@@ -356,18 +357,17 @@ function hasValidPageQualityRegistry(
   return true;
 }
 
-function hasUniqueDispositionIds(value: unknown): boolean {
-  if (!isRecord(value)) return false;
-  const talas = readOwnDataField(value, "talas");
-  if (!Array.isArray(talas)) return false;
-  const seenIds = new Set<string>();
-  for (const entry of talas) {
-    if (!isRecord(entry)) return false;
-    const talaId = normalizeRecordId(readOwnDataField(entry, "talaId"));
-    if (!talaId || seenIds.has(talaId)) return false;
-    seenIds.add(talaId);
+// Publication gating and forensic validation share one registry contract. An
+// incomplete, conflicting, or malformed registry — a wrong policy, drifted
+// required-field lists, an unresolvable issue anchor, a bad status, or a
+// duplicate/denormalized talaId — makes the evaluation context unsafe rather
+// than leaving publication gating with a weaker subset of the rules.
+function hasCompleteDispositionRegistry(value: unknown): boolean {
+  try {
+    return inspectDispositionRegistry(value).ok;
+  } catch {
+    return false;
   }
-  return true;
 }
 
 function registerKnownKinds(
@@ -431,7 +431,7 @@ export function createPublicationEvaluationContext(
   if (!capturedDocuments || !capturedDocuments.every(isSourceDocumentRecord) ||
     !capturedPageQuality || !capturedPageQuality.every(isSourcePageQualityRecord) ||
     !hasValidPageQualityRegistry(sourceDocuments, sourcePages) ||
-    capturedDispositions === undefined || !hasUniqueDispositionIds(capturedDispositions)) safe = false;
+    capturedDispositions === undefined || !hasCompleteDispositionRegistry(capturedDispositions)) safe = false;
 
   Object.freeze(capturedCatalogs);
   const context: PublicationEvaluationContext = Object.freeze({
@@ -788,19 +788,49 @@ export function getSourceDocumentSummary(
   }
 }
 
-export function getSourceCorpusInventory() {
-  const context = createPublicationEvaluationContext();
-  const state = getEvaluationState(context);
-  const qualityCounts = state.sourcePageQuality.reduce<Record<string, number>>((counts, page) => {
-    counts[page.confidence] = (counts[page.confidence] || 0) + 1;
-    return counts;
-  }, {});
-  return {
-    sourceRecords: getValidatedSourceRecords(context).length,
-    sourceDocuments: state.sourceDocuments.length,
-    sourcePages: state.sourceDocuments.reduce((sum, document) => sum + document.pageCount, 0),
-    qualityCounts,
-  };
+export type SourceCorpusUnavailableReason = "unsafe-evaluation-context" | "inventory-read-failed";
+
+export type SourceCorpusInventory =
+  | {
+      available: true;
+      sourceRecords: number;
+      sourceDocuments: number;
+      sourcePages: number;
+      qualityCounts: Record<string, number>;
+    }
+  | {
+      available: false;
+      reason: SourceCorpusUnavailableReason;
+    };
+
+/**
+ * Report the extracted-source inventory, or an explicit unavailable state.
+ *
+ * The counts are only meaningful when the evaluation context is safe. A
+ * malformed source-document row, page-quality row, page registry, or Tala
+ * disposition registry already clears `context.safe`, and this boundary must not
+ * present numbers derived from that state as an ordinary inventory.
+ */
+export function getSourceCorpusInventory(
+  context: PublicationEvaluationContext = createPublicationEvaluationContext(),
+): SourceCorpusInventory {
+  try {
+    const state = getSafeEvaluationState(context);
+    if (!state) return { available: false, reason: "unsafe-evaluation-context" };
+    const qualityCounts = state.sourcePageQuality.reduce<Record<string, number>>((counts, page) => {
+      counts[page.confidence] = (counts[page.confidence] || 0) + 1;
+      return counts;
+    }, Object.create(null) as Record<string, number>);
+    return {
+      available: true,
+      sourceRecords: getValidatedSourceRecords(context).length,
+      sourceDocuments: state.sourceDocuments.length,
+      sourcePages: state.sourceDocuments.reduce((sum, document) => sum + document.pageCount, 0),
+      qualityCounts,
+    };
+  } catch {
+    return { available: false, reason: "inventory-read-failed" };
+  }
 }
 
 export function evaluateSourceReference(
@@ -1032,7 +1062,10 @@ export function getTalaFieldDisposition(
   const allRequiredFieldsVerified =
     Boolean(tala) &&
     Boolean(registry) &&
-    !registry?.unclosedRequiredFields.includes("structure") &&
+    // Guard the array before reading it: an absent or malformed list must fail
+    // closed here rather than throwing out to the enclosing catch.
+    Array.isArray(registry?.unclosedRequiredFields) &&
+    !registry.unclosedRequiredFields.includes("structure") &&
     contextVerified &&
     entry.theka.status === "verified" &&
     entry.theka.value === tala?.theka_si &&

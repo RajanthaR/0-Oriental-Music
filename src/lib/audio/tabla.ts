@@ -119,15 +119,20 @@ export function scheduleTablaPlan<TTimer>(
   return cancel;
 }
 
+// A Map is a closed lookup: prototype keys such as `__proto__`, `constructor`, or
+// `toString` can never resolve to an inherited non-array value the planner would
+// then try to iterate.
+const COMPOUND_BOL_CELLS: ReadonlyMap<string, readonly string[]> = new Map([
+  ["ධන්න", ["ධ", "න", "න"]],
+  ["ධනක", ["ධ", "න", "ක"]],
+  ["තන්න", ["ත", "න", "න"]],
+]);
+
 export function expandTablaBol(bolName: string): string[] {
   const clean = typeof bolName === "string" ? bolName.trim().toLowerCase() : "";
   if (!clean || clean === "-" || clean === "s") return [];
-  const compoundCells: Record<string, string[]> = {
-    "ධන්න": ["ධ", "න", "න"],
-    "ධනක": ["ධ", "න", "ක"],
-    "තන්න": ["ත", "න", "න"],
-  };
-  return compoundCells[clean] ?? [clean];
+  const compound = COMPOUND_BOL_CELLS.get(clean);
+  return compound ? [...compound] : [clean];
 }
 
 export function classifyTablaBol(bolName: string): TablaStrokeKind {

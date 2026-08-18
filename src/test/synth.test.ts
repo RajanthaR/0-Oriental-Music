@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { SWARA_SEMITONES, SwaraSynthEngine, swaraSynth, getSwaraFrequency } from "@/lib/audio/synth";
 import { ROOT_PITCHES } from "@/lib/audio/tanpura";
-import { TablaSynthEngine, tablaSynth, planTablaBol, scheduleTablaPlan } from "@/lib/audio/tabla";
+import { TablaSynthEngine, tablaSynth, planTablaBol, expandTablaBol, scheduleTablaPlan } from "@/lib/audio/tabla";
 import { normalizePracticeBpm } from "@/lib/audio/tempo";
 
 describe("Audio Synthesis Engine & Tuning Suite", () => {
@@ -75,6 +75,73 @@ describe("Audio Synthesis Engine & Tuning Suite", () => {
     expect(normalizePracticeBpm(-1, 80)).toBe(80);
     expect(normalizePracticeBpm(Number.POSITIVE_INFINITY, 80)).toBe(80);
     expect(normalizePracticeBpm(9999, 80)).toBe(80);
+  });
+
+  it.each([
+    "__proto__",
+    "constructor",
+    "prototype",
+    "toString",
+    "valueOf",
+    "hasOwnProperty",
+    "propertyIsEnumerable",
+  ])("fails closed for the prototype-key Tabla bol %s without throwing", (hostileBol) => {
+    // A plain-object lookup resolved `__proto__` to Object.prototype and
+    // `constructor` to Object, so `?? [clean]` never fired and the planner threw
+    // while trying to map an inherited non-array value.
+    expect(() => expandTablaBol(hostileBol)).not.toThrow();
+    const expanded = expandTablaBol(hostileBol);
+    expect(Array.isArray(expanded)).toBe(true);
+    expect(expanded).toEqual([hostileBol.toLowerCase()]);
+
+    expect(() => planTablaBol(hostileBol, 500)).not.toThrow();
+    const plan = planTablaBol(hostileBol, 500);
+    expect(Array.isArray(plan)).toBe(true);
+    expect(plan).toEqual([{ bol: hostileBol.toLowerCase(), kind: "fallback", delayMs: 0 }]);
+  });
+
+  it("keeps unknown and compound Tabla bols on the closed compound lookup", () => {
+    expect(expandTablaBol("ධන්න")).toEqual(["ධ", "න", "න"]);
+    expect(expandTablaBol("නොදන්නා")).toEqual(["නොදන්නා"]);
+    expect(expandTablaBol("-")).toEqual([]);
+    expect(expandTablaBol("s")).toEqual([]);
+    // The returned cells must be a fresh array so a caller cannot mutate the registry.
+    const first = expandTablaBol("ධන්න");
+    first[0] = "mutated";
+    expect(expandTablaBol("ධන්න")).toEqual(["ධ", "න", "න"]);
+  });
+
+  it("cannot strand Tabla playback ownership when a timer callback registers synchronously", () => {
+    // A timer API that fires its callback during registration must not leave the
+    // settled entry inside the active timer list, and cancelling afterwards must
+    // stay safe and idempotent.
+    const cleared: number[] = [];
+    let nextTimer = 1;
+    const strokes: string[] = [];
+    const timerApi = {
+      set: (callback: () => void) => {
+        const timer = nextTimer++;
+        callback();
+        return timer;
+      },
+      clear: (timer: number) => { cleared.push(timer); },
+    };
+
+    const cancel = scheduleTablaPlan(
+      [
+        { bol: "පළමු", kind: "open", delayMs: 100 },
+        { bol: "දෙවන", kind: "open", delayMs: 200 },
+      ],
+      (stroke) => { strokes.push(stroke.bol); },
+      timerApi,
+    );
+
+    expect(strokes).toEqual(["පළමු", "දෙවන"]);
+    expect(() => cancel()).not.toThrow();
+    expect(() => cancel()).not.toThrow();
+    // Every synchronously-settled timer was released at registration time, so
+    // cancellation has no surviving ownership left to clear.
+    expect(cleared).toEqual([1, 2]);
   });
 
   it("rolls back a Tabla schedule when registration fails after earlier timers", () => {

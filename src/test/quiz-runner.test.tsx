@@ -18,6 +18,15 @@ type RenderableAnswerOmitsCorrectness = Assert<
 const renderableQuestionHasNoForensicFields: RenderableQuestionOmitsForensicFields = true;
 const renderableAnswerHasNoCorrectness: RenderableAnswerOmitsCorrectness = true;
 
+// Built with String.fromCharCode so no raw control character ever enters this
+// source file. NFD_QUESTION_ID and NFC_QUESTION_ID are the same canonical ID in
+// two Unicode normalization forms.
+const ZERO_WIDTH_SPACE = String.fromCharCode(0x200b);
+const BIDI_ISOLATE = String.fromCharCode(0x2066);
+const NUL_CONTROL = String.fromCharCode(0);
+const NFD_QUESTION_ID = "q-e" + String.fromCharCode(0x0301);
+const NFC_QUESTION_ID = "q-" + String.fromCharCode(0x00e9);
+
 function validQuestion(): Question {
   return {
     id: "q-1",
@@ -210,6 +219,72 @@ describe("QuizRunner runtime boundary", () => {
 
     expect(screen.getByRole("alert")).toHaveTextContent("මෙම ප්‍රශ්නාවලිය දැනට ලබා ගත නොහැක.");
     expect(screen.queryByRole("button", { name: "පිළිතුර පරීක්ෂා කරන්න" })).not.toBeInTheDocument();
+    expect(recordQuizAttempt).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["surrounding whitespace", " q-1 ", "q-1"],
+    ["a leading tab", "\tq-1", "q-1"],
+    ["NFD before NFC composition", "q-é", "q-é"],
+    ["NFC before NFD composition", "q-é", "q-é"],
+  ])(
+    "renders a safe unavailable state for question IDs that differ only by %s",
+    (_label, firstId, secondId) => {
+      const recordQuizAttempt = vi.spyOn(ProgressStorage, "recordQuizAttempt");
+      // Both IDs satisfy the question contract, so only canonical comparison can
+      // reject them. Before canonicalization they survived as distinct questions
+      // and then aliased each other's answer, ordering, and matching state.
+      const first = { ...validQuestion(), id: firstId };
+      const second = { ...validQuestion(), id: secondId, prompt_si: "දෙවන ප්‍රශ්නය" };
+
+      render(<QuizRunner quiz={quizWithQuestions([first, second])} />);
+
+      expect(screen.getByRole("alert")).toHaveTextContent("මෙම ප්‍රශ්නාවලිය දැනට ලබා ගත නොහැක.");
+      expect(screen.queryByText("දෙවන ප්‍රශ්නය")).not.toBeInTheDocument();
+      expect(recordQuizAttempt).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    ["a zero-width space", "q" + ZERO_WIDTH_SPACE + "-1"],
+    ["a bidi isolate", "q" + BIDI_ISOLATE + "-1"],
+    ["a NUL control", "q" + NUL_CONTROL + "-1"],
+    ["a newline", "q\n-1"],
+    ["only whitespace", "   "],
+    ["a non-string value", 7],
+  ])("renders a safe unavailable state for a question ID containing %s", (_label, hostileId) => {
+    const recordQuizAttempt = vi.spyOn(ProgressStorage, "recordQuizAttempt");
+
+    render(<QuizRunner quiz={quizWithQuestions([{ ...validQuestion(), id: hostileId }])} />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("මෙම ප්‍රශ්නාවලිය දැනට ලබා ගත නොහැක.");
+    expect(recordQuizAttempt).not.toHaveBeenCalled();
+  });
+
+  it("records a completed attempt under the canonical quiz and question identity", () => {
+    const recordQuizAttempt = vi.spyOn(ProgressStorage, "recordQuizAttempt");
+    const quiz = {
+      ...quizWithQuestions([{ ...validQuestion(), id: " q-1\t" }]),
+      id: "  quiz-runtime-boundary \t",
+    };
+
+    render(<QuizRunner quiz={quiz} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "ස" }));
+    fireEvent.click(screen.getByRole("button", { name: "පිළිතුර පරීක්ෂා කරන්න" }));
+    fireEvent.click(screen.getByRole("button", { name: "ප්‍රතිඵලය බලන්න" }));
+
+    // The padded raw identity never reaches progress storage.
+    expect(recordQuizAttempt).toHaveBeenCalledWith("quiz-runtime-boundary", 1, 1, true);
+  });
+
+  it("renders a safe unavailable state for a padded-blank quiz identity", () => {
+    const recordQuizAttempt = vi.spyOn(ProgressStorage, "recordQuizAttempt");
+    const quiz = { ...quizWithQuestions([validQuestion()]), id: "  \t " };
+
+    render(<QuizRunner quiz={quiz} />);
+
+    expect(screen.getByRole("alert")).toHaveTextContent("මෙම ප්‍රශ්නාවලිය දැනට ලබා ගත නොහැක.");
     expect(recordQuizAttempt).not.toHaveBeenCalled();
   });
 

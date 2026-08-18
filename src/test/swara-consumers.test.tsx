@@ -6,12 +6,17 @@ import { NotationArranger } from "@/components/audio/NotationArranger";
 import { EarTrainingModule } from "@/components/audio/EarTrainingModule";
 import LessonDetailPage from "@/app/lessons/[id]/page";
 import RagaDetailPage from "@/app/ragas/[id]/page";
+import InstrumentDetailPage from "@/app/instruments/[id]/page";
+import { repository } from "@/lib/data/repository";
+import instrumentsData from "@/data/instruments.json";
+import type { Instrument } from "@/types/content";
 
 const routeParams = vi.hoisted(() => ({ id: "les-intro-01" }));
 
 const audioMocks = vi.hoisted(() => ({
   playSwaraToneHandle: vi.fn(),
   playSequenceHandle: vi.fn(),
+  playBol: vi.fn(),
 }));
 
 vi.mock("@/lib/audio/synth", async (importOriginal) => {
@@ -25,6 +30,14 @@ vi.mock("@/lib/audio/synth", async (importOriginal) => {
   };
 });
 
+vi.mock("@/lib/audio/tabla", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@/lib/audio/tabla")>();
+  return {
+    ...original,
+    tablaSynth: { playBol: audioMocks.playBol },
+  };
+});
+
 vi.mock("next/navigation", () => ({
   useParams: () => routeParams,
 }));
@@ -33,6 +46,29 @@ const resolvedPlayback = () => Object.assign(vi.fn(), {
   ready: Promise.resolve(true),
   finished: Promise.resolve(),
 });
+
+/**
+ * A handle whose cancellation throws and whose `finished` promise never settles,
+ * so the consumer keeps owning it until cleanup explicitly releases it. This is
+ * the exact shape that used to strand ownership and abort later cleanup steps.
+ */
+const throwingPlayback = () => {
+  const cancel = vi.fn(() => { throw new Error("cancellation failed"); });
+  return Object.assign(cancel, {
+    ready: Promise.resolve(true),
+    finished: new Promise<void>(() => undefined),
+  });
+};
+
+const throwingPlaybackFactory = () => {
+  const cancels: Array<ReturnType<typeof vi.fn>> = [];
+  const create = () => {
+    const handle = throwingPlayback();
+    cancels.push(handle);
+    return handle;
+  };
+  return { cancels, create };
+};
 
 const rejectingPlayback = () => {
   let rejectReady!: (reason?: unknown) => void;
@@ -57,9 +93,11 @@ const rejectPlayback = async (playback: ReturnType<typeof rejectingPlayback>) =>
 };
 
 afterEach(() => {
+  vi.useRealTimers();
   routeParams.id = "les-intro-01";
   audioMocks.playSwaraToneHandle.mockReset().mockImplementation(resolvedPlayback);
   audioMocks.playSequenceHandle.mockReset().mockImplementation(resolvedPlayback);
+  audioMocks.playBol.mockReset().mockImplementation(resolvedPlayback);
 });
 
 describe("Swara playback rejection consumers", () => {
@@ -198,5 +236,98 @@ describe("Swara playback rejection consumers", () => {
     expect(await screen.findByRole("status")).toHaveTextContent("රාග නාදය ආරම්භ කළ නොහැක");
     await waitFor(() => expect(screen.getAllByRole("button", { name: "ආරෝහණය අසන්න" })[0]).not.toBeDisabled());
     view.unmount();
+  });
+});
+
+describe("failure-atomic consumer audio cleanup", () => {
+  it("continues EarTraining cleanup after Next, replacement, and unmount cancellations throw", () => {
+    const playback = throwingPlaybackFactory();
+    audioMocks.playSwaraToneHandle.mockImplementation(playback.create);
+    const view = render(<EarTrainingModule />);
+    const listen = screen.getByRole("button", { name: /නාදය අසන්න/ });
+
+    fireEvent.click(listen);
+    expect(playback.cancels).toHaveLength(1);
+
+    // Replacement releases the first session; its throwing cancellation must not
+    // prevent the replacement from being installed.
+    expect(() => fireEvent.click(listen)).not.toThrow();
+    expect(playback.cancels).toHaveLength(2);
+    expect(playback.cancels[0]).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "ග (ගාන්ධාර)" }));
+    // Next releases the second session; the throwing cancellation must not stop
+    // the challenge from advancing.
+    expect(() => fireEvent.click(screen.getByRole("button", { name: /මීළඟ අභ්‍යාසය/ }))).not.toThrow();
+    expect(playback.cancels[1]).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: "ම (මධ්‍යම)" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /නාදය අසන්න/ }));
+    expect(playback.cancels).toHaveLength(3);
+    // Unmount releases the third session; a throwing cancel must not escape the
+    // effect cleanup.
+    expect(() => view.unmount()).not.toThrow();
+    expect(playback.cancels[2]).toHaveBeenCalledTimes(1);
+  });
+
+  it("contains a throwing lesson sequence cancellation on replacement and unmount", () => {
+    const playback = throwingPlaybackFactory();
+    audioMocks.playSequenceHandle.mockImplementation(playback.create);
+    routeParams.id = "les-intro-01";
+    const view = render(<LessonDetailPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: "ආදර්ශනයට සවන් දෙන්න" }));
+    expect(playback.cancels).toHaveLength(1);
+    expect(() => view.unmount()).not.toThrow();
+    expect(playback.cancels[0]).toHaveBeenCalledTimes(1);
+  });
+
+  it("contains a throwing Raga sequence cancellation on unmount", () => {
+    const playback = throwingPlaybackFactory();
+    audioMocks.playSequenceHandle.mockImplementation(playback.create);
+    routeParams.id = "raga-bilawal";
+    const view = render(<RagaDetailPage />);
+
+    fireEvent.click(screen.getAllByRole("button", { name: "ආරෝහණය අසන්න" })[0]);
+    expect(playback.cancels).toHaveLength(1);
+    expect(() => view.unmount()).not.toThrow();
+    expect(playback.cancels[0]).toHaveBeenCalledTimes(1);
+  });
+
+  it("clears every remaining instrument timer when an owned Tabla cancellation throws", () => {
+    // Instruments are quarantined by the publication policy, so the route's audio
+    // lifecycle is reached through a stubbed public projection. This exercises the
+    // component's cleanup wiring, not the policy decision.
+    const rawTabla = (instrumentsData as unknown as Instrument[]).find((item) => item.id === "inst-tabla");
+    if (!rawTabla) throw new Error("Missing inst-tabla fixture");
+    const instrumentSpy = vi.spyOn(repository, "getInstrumentById").mockReturnValue(rawTabla);
+    const sourceSpy = vi.spyOn(repository, "getSourceById").mockReturnValue(undefined);
+    const playback = throwingPlaybackFactory();
+    audioMocks.playBol.mockImplementation(playback.create);
+
+    try {
+      vi.useFakeTimers();
+      routeParams.id = "inst-tabla";
+      const view = render(<InstrumentDetailPage />);
+      fireEvent.click(screen.getByRole("button", { name: "ආදර්ශ නාද රටාව අසන්න" }));
+
+      // Four stroke timers at 0/400/800/1200ms plus a completion timer at 2000ms.
+      // Advance far enough to own two Tabla handles and leave three timers pending.
+      act(() => { vi.advanceTimersByTime(400); });
+      expect(playback.cancels).toHaveLength(2);
+
+      const clearTimeoutSpy = vi.spyOn(window, "clearTimeout");
+      expect(() => view.unmount()).not.toThrow();
+
+      // Both throwing handle cancellations ran, and neither prevented the two
+      // pending stroke timers or the completion timer from being cleared.
+      expect(playback.cancels[0]).toHaveBeenCalledTimes(1);
+      expect(playback.cancels[1]).toHaveBeenCalledTimes(1);
+      expect(clearTimeoutSpy).toHaveBeenCalledTimes(3);
+      clearTimeoutSpy.mockRestore();
+    } finally {
+      instrumentSpy.mockRestore();
+      sourceSpy.mockRestore();
+    }
   });
 });

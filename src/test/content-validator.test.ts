@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { validateCatalogIdentityContracts, validateContent, validatePublicCollection } from "@/lib/validation/content-validator";
 import { repository } from "@/lib/data/repository";
 import talasData from "@/data/talas.json";
+import quizzesData from "@/data/quizzes.json";
 import type { Raga, Tala } from "@/types/content";
 
 describe("Content Validation Suite", () => {
@@ -353,5 +354,102 @@ describe("Content Validation Suite", () => {
       theatreTraditions
     );
     expect(report.issues.some((issue) => issue.entityId === talas[0].id && issue.field === "aliases_si")).toBe(true);
+  });
+});
+
+describe("public Quiz aggregate evidence", () => {
+  const PUBLIC_QUIZ_ID = "quiz-les-intro-01";
+
+  function rawQuiz(): Record<string, unknown> {
+    const quiz = (quizzesData as unknown as Record<string, unknown>[])
+      .find((candidate) => candidate.id === PUBLIC_QUIZ_ID);
+    if (!quiz) throw new Error(`Missing quiz fixture: ${PUBLIC_QUIZ_ID}`);
+    return structuredClone(quiz);
+  }
+
+  it("accepts a valid aggregate Quiz that carries no direct source reference", () => {
+    const quiz = rawQuiz();
+    // A Quiz container never declares its own sourceReference; the aggregate
+    // chain is the public parent lesson plus every directly-sourced question.
+    expect(quiz.sourceReference).toBeUndefined();
+    expect(repository.getQuizById(PUBLIC_QUIZ_ID)?.id).toBe(PUBLIC_QUIZ_ID);
+
+    // Requiring decision.sourceEvidence.supportable failed this valid Quiz.
+    expect(validatePublicCollection("Quiz", [quiz])).toEqual({ isValid: true, issues: [] });
+    expect(validatePublicCollection("quizzes", [quiz])).toEqual({ isValid: true, issues: [] });
+  });
+
+  it("rejects a Quiz whose parent lesson is not public", () => {
+    const quiz = rawQuiz();
+    quiz.lessonId = "les-raga-bhairav";
+    const result = validatePublicCollection("Quiz", [quiz]);
+    expect(result.isValid).toBe(false);
+    expect(result.issues.some((issue) => issue.field === "lessonId")).toBe(true);
+  });
+
+  it("rejects a Quiz whose parent lesson is missing entirely", () => {
+    const quiz = rawQuiz();
+    quiz.lessonId = "les-does-not-exist";
+    const result = validatePublicCollection("Quiz", [quiz]);
+    expect(result.isValid).toBe(false);
+    expect(result.issues.some((issue) => issue.field === "lessonId")).toBe(true);
+  });
+
+  it("rejects a Quiz with an empty question set", () => {
+    const quiz = rawQuiz();
+    quiz.questions = [];
+    const result = validatePublicCollection("Quiz", [quiz]);
+    expect(result.isValid).toBe(false);
+    // The record contract rejects an empty question set before the aggregate rule
+    // runs. What must never happen is a spurious direct-evidence issue.
+    expect(result.issues.some((issue) => issue.field === "record" || issue.field === "questions")).toBe(true);
+    expect(result.issues.some((issue) => issue.field === "sourceReference")).toBe(false);
+  });
+
+  it("rejects a Quiz whose question set is malformed rather than an array", () => {
+    const quiz = rawQuiz();
+    quiz.questions = { length: 1 };
+    const result = validatePublicCollection("Quiz", [quiz]);
+    expect(result.isValid).toBe(false);
+    expect(result.issues.some((issue) => issue.field === "questions" || issue.field === "record")).toBe(true);
+  });
+
+  it("rejects a Quiz question that lacks supportable direct page evidence", () => {
+    const quiz = rawQuiz();
+    const questions = quiz.questions as Record<string, unknown>[];
+    questions[0] = {
+      ...questions[0],
+      sourceReference: {
+        sourceId: "SRC-G10-NADA",
+        pageOrSection: "sg10_emus_chap8_nadaya.pdf පිටු 9999",
+      },
+    };
+    const result = validatePublicCollection("Quiz", [quiz]);
+    expect(result.isValid).toBe(false);
+    expect(result.issues.some((issue) => issue.field === "questions[0].sourceReference")).toBe(true);
+  });
+
+  it("rejects a Quiz question that declares no explicit grade scope", () => {
+    const quiz = rawQuiz();
+    const questions = quiz.questions as Record<string, unknown>[];
+    const withoutGrades = { ...questions[0] };
+    delete withoutGrades.gradeBands;
+    questions[0] = withoutGrades;
+    const result = validatePublicCollection("Quiz", [quiz]);
+    expect(result.isValid).toBe(false);
+    // The nested question contract rejects a missing grade scope first; the
+    // aggregate rule is the second line of defence, never a bypass.
+    expect(result.issues.some((issue) =>
+      issue.field === "record" || issue.field === "questions[0].gradeBands")).toBe(true);
+    expect(result.issues.some((issue) => issue.field === "sourceReference")).toBe(false);
+  });
+
+  it("rejects a Quiz question whose type is not renderable", () => {
+    const quiz = rawQuiz();
+    const questions = quiz.questions as Record<string, unknown>[];
+    questions[0] = { ...questions[0], type: "audio-id", audioNotes: ["S"] };
+    const result = validatePublicCollection("Quiz", [quiz]);
+    expect(result.isValid).toBe(false);
+    expect(result.issues.some((issue) => issue.field === "record" || issue.field === "publication")).toBe(true);
   });
 });

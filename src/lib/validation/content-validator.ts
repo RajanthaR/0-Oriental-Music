@@ -24,8 +24,11 @@ import {
   getRecordPublicationDecision,
   UNKNOWN_PROVENANCE,
   type PublicationCatalogInputs,
+  type PublicationDecision,
+  type PublicationEvaluationContext,
 } from "@/lib/data/publication-policy";
 import { repository } from "@/lib/data/repository";
+import { inspectDispositionRegistry } from "@/lib/validation/disposition-registry";
 import { normalizeSinhalaText } from "@/lib/search/normalize-sinhala";
 import { planTablaBol } from "@/lib/audio/tabla";
 import { isSafePracticeBpm } from "@/lib/audio/tempo";
@@ -33,6 +36,7 @@ import {
   cloneBoundedRecord,
   isMappedTalaBolToken,
   isRecord,
+  normalizeEntityId,
   isValidSwaraToken,
   projectPublicRecord,
   readOwnDataField,
@@ -342,65 +346,36 @@ export function validateMusicalCoreFieldDispositions(
   const rawTalaSnapshot = cloneBoundedRecord(rawTalas);
   const safeRawTalas = Array.isArray(rawTalaSnapshot) ? rawTalaSnapshot : [];
   const evaluationContext = createPublicationEvaluationContext();
-  const ledgerIssueIds = new Set(
-    Array.isArray(forensicLedgerData.issues)
-      ? forensicLedgerData.issues.filter(isRecord).map((issue) => issue.id).filter((id): id is string => typeof id === "string")
-      : []
-  );
-  const rawIssueCatalog = asUnknownArray(readOwnDataField(registry, "issueCatalog"));
-  const issueCatalog = rawIssueCatalog.filter(isRecord);
-  const issueCatalogIds = new Set<string>();
-  rawIssueCatalog.forEach((candidate, index) => {
-    if (!isRecord(candidate)) {
-      issues.push({ entityType: "TalaFieldDisposition", entityId: String(index), field: "issueCatalog", message: "Disposition issue catalog entries must be objects", severity: "error" });
-      return;
-    }
-    if (typeof candidate.id === "string") {
-      if (issueCatalogIds.has(candidate.id)) {
-        issues.push({ entityType: "TalaFieldDisposition", entityId: candidate.id, field: "issueCatalog", message: "Disposition issue catalog IDs must be unique", severity: "error" });
-      }
-      issueCatalogIds.add(candidate.id);
-    }
+
+  // Every structural rule lives in the shared registry contract, so publication
+  // gating and this forensic validator cannot drift apart. Only the raw-catalog
+  // parity and source-evidence rules below are unique to forensic validation.
+  const inspection = inspectDispositionRegistry(registryInput);
+  inspection.issues.forEach((issue) => {
+    issues.push({
+      entityType: "TalaFieldDisposition",
+      entityId: issue.entityId,
+      field: issue.field,
+      message: issue.message,
+      severity: "error",
+    });
   });
-  issueCatalog.forEach((issue, index) => {
-    if (typeof issue.id !== "string" || typeof issue.ledgerIssueId !== "string" || !ledgerIssueIds.has(issue.ledgerIssueId)) {
-      issues.push({ entityType: "TalaFieldDisposition", entityId: typeof issue.id === "string" ? issue.id : String(index), field: "issueCatalog", message: "Disposition issue catalog entries must resolve to a forensic-ledger issue", severity: "error" });
-    }
-  });
-  const rawEntries = asUnknownArray(readOwnDataField(registry, "talas"));
-  rawEntries.forEach((candidate, index) => {
-    if (!isRecord(candidate)) {
-      issues.push({ entityType: "TalaFieldDisposition", entityId: String(index), field: "talas", message: "Disposition tala rows must be objects", severity: "error" });
-    }
-  });
-  const entries = rawEntries.filter(isRecord) as Array<{
+  const issueCatalogIds = inspection.issueCatalogIds;
+
+  // The shared contract accepts any unique subset of requiredFields. The current
+  // forensic state is narrower: `structure` is the one field still unclosed, and
+  // a registry that silently drops it would promote all eight quarantined Talas.
+  if (JSON.stringify(readOwnDataField(registry, "unclosedRequiredFields")) !== JSON.stringify(["structure"])) {
+    issues.push({ entityType: "TalaFieldDisposition", entityId: "registry", field: "policy", message: "Registry must explicitly record the unclosed structure field under whole-entity quarantine", severity: "error" });
+  }
+
+  type DispositionEntry = {
     talaId: string;
     context: { status: string; scope?: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string };
     theka: { status: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string };
     bols: Array<{ matra: number; status: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string }>;
-  }>;
-  if (
-    readOwnDataField(registry, "policy") !== "whole-entity-quarantine" ||
-    JSON.stringify(readOwnDataField(registry, "requiredFields")) !== JSON.stringify(["context", "structure", "theka", "bols"]) ||
-    JSON.stringify(readOwnDataField(registry, "unclosedRequiredFields")) !== JSON.stringify(["structure"])
-  ) {
-    issues.push({ entityType: "TalaFieldDisposition", entityId: "registry", field: "policy", message: "Registry must explicitly record the unclosed structure field under whole-entity quarantine", severity: "error" });
-  }
-  const entryById = new Map<string, (typeof entries)[number]>();
-  entries.forEach((entry, index) => {
-    const normalizedId = typeof entry.talaId === "string" ? entry.talaId.trim() : "";
-    if (!normalizedId || normalizedId !== entry.talaId || entryById.has(normalizedId)) {
-      issues.push({
-        entityType: "TalaFieldDisposition",
-        entityId: normalizedId || String(index),
-        field: "talaId",
-        message: "Registry tala IDs must be non-blank, normalized, and unique",
-        severity: "error",
-      });
-      return;
-    }
-    entryById.set(normalizedId, entry);
-  });
+  };
+  const entryById = inspection.entryById as unknown as Map<string, DispositionEntry>;
   const hasExactEvidence = (reference: unknown, status: string): boolean => {
     if (!isRecord(reference) || typeof reference.sourceId !== "string" || typeof reference.pageOrSection !== "string") return false;
     const decision = evaluateSourceReference(reference as unknown as SourceReference, evaluationContext);
@@ -491,9 +466,11 @@ export function validateMusicalCoreFieldDispositions(
       }
     });
   });
-  entries.forEach((entry) => {
-    if (!seen.has(entry.talaId)) {
-      issues.push({ entityType: "TalaFieldDisposition", entityId: entry.talaId, field: "record", message: "Disposition contains an entity absent from the raw tala catalog", severity: "error" });
+  // Closed world in the registry -> raw direction: a disposition row for an
+  // entity that is not in the raw catalog is an orphan.
+  entryById.forEach((entry, talaId) => {
+    if (!seen.has(talaId)) {
+      issues.push({ entityType: "TalaFieldDisposition", entityId: talaId, field: "record", message: "Disposition contains an entity absent from the raw tala catalog", severity: "error" });
     }
   });
   return { isValid: issues.length === 0, issues };
@@ -606,6 +583,84 @@ function sourceValuesMatch(left: unknown, right: unknown): boolean {
 }
 
 /**
+ * Validate a public Quiz's aggregate source evidence.
+ *
+ * A Quiz declares no `sourceReference` of its own: `getQuizContainerPublicationDecision`
+ * deliberately evaluates an absent reference, so `decision.sourceEvidence.supportable`
+ * is always false for a Quiz. Requiring it directly failed every valid Quiz.
+ *
+ * The real contract is aggregate, and this function re-derives it independently of
+ * the publication decision so a policy regression cannot silently pass validation:
+ *
+ * 1. the parent lesson must be public;
+ * 2. the question set must be non-empty; and
+ * 3. every question must carry its own explicit grade scope and its own
+ *    supportable direct page evidence.
+ *
+ * None of those gates is weakened here.
+ */
+function quizAggregateEvidenceIssues(
+  entityType: string,
+  id: string,
+  record: unknown,
+  decision: PublicationDecision,
+  evaluationContext: PublicationEvaluationContext,
+): ValidationIssue[] {
+  const issues: ValidationIssue[] = [];
+
+  const parentDisposition = decision.nestedDispositions.find(
+    (disposition) => disposition.path === "lessonId",
+  );
+  if (!parentDisposition) {
+    issues.push(baselineIssue(entityType, id, "lessonId", "A public Quiz must resolve a parent-lesson disposition."));
+  } else if (!parentDisposition.isPublic) {
+    issues.push(baselineIssue(
+      entityType,
+      id,
+      "lessonId",
+      `A public Quiz requires a public parent lesson (${parentDisposition.reasonCodes.join(", ") || "no eligibility reason"}).`,
+    ));
+  }
+
+  const questions = readOwnDataField(record, "questions");
+  if (!Array.isArray(questions) || questions.length === 0) {
+    issues.push(baselineIssue(entityType, id, "questions", "A public Quiz must contain at least one question."));
+    return issues;
+  }
+
+  questions.forEach((question, index) => {
+    const field = `questions[${index}]`;
+    if (!isRecord(question)) {
+      issues.push(baselineIssue(entityType, id, field, "Quiz questions must be bounded plain-data records."));
+      return;
+    }
+    const gradeBands = readOwnDataField(question, "gradeBands");
+    if (!Array.isArray(gradeBands) || gradeBands.length === 0) {
+      issues.push(baselineIssue(
+        entityType,
+        id,
+        `${field}.gradeBands`,
+        "Every public Quiz question must declare its own explicit grade scope.",
+      ));
+    }
+    const evidence = evaluateSourceReference(
+      readOwnDataField(question, "sourceReference") as SourceReference | undefined,
+      evaluationContext,
+    );
+    if (!evidence.supportable) {
+      issues.push(baselineIssue(
+        entityType,
+        id,
+        `${field}.sourceReference`,
+        `Public Quiz question lacks supportable page evidence: ${evidence.reason}`,
+      ));
+    }
+  });
+
+  return issues;
+}
+
+/**
  * Sources are a public transparency catalog, not curricular records.  The
  * repository validates raw source shape, then exposes an allowlisted,
  * unknown/unverified projection with evidence summary fields.  Keep this
@@ -629,14 +684,16 @@ function validateSourceTransparencyCollection(
     const repositorySources = repository.getSources();
     const repositoryById = new Map<string, Record<string, unknown>>();
     repositorySources.forEach((source) => {
-      const id = typeof source.id === "string" ? source.id.trim() : "";
+      // Canonical identity so the transparency rows, repository projection, and
+      // publication decisions all key on the same value.
+      const id = normalizeEntityId(source.id) ?? "";
       if (id) repositoryById.set(id, source as unknown as Record<string, unknown>);
     });
 
     const seenIds = new Set<string>();
     snapshot.forEach((candidate, index) => {
       const rawId = readOwnDataField(candidate, "id");
-      const normalizedId = typeof rawId === "string" ? rawId.trim() : "";
+      const normalizedId = normalizeEntityId(rawId) ?? "";
       const id = normalizedId || `${entityType}-${index}`;
       if (!normalizedId || seenIds.has(normalizedId)) {
         issues.push(baselineIssue(entityType, id, "id", "Source transparency IDs must be unique, non-empty normalized strings."));
@@ -861,7 +918,7 @@ export function validatePublicCollection(
     const value = record;
     const idValue = readOwnDataField(value, "id");
     const id = typeof idValue === "string" ? idValue : `${entityType}-${index}`;
-    const normalizedId = typeof idValue === "string" ? idValue.trim() : "";
+    const normalizedId = normalizeEntityId(idValue) ?? "";
     if (!normalizedId || seenIds.has(normalizedId)) {
       issues.push(baselineIssue(entityType, id, "id", "Public collection IDs must be unique, non-empty normalized strings."));
     } else {
@@ -887,7 +944,9 @@ export function validatePublicCollection(
     if (gradeBands.includes("12-13")) {
       issues.push(baselineIssue(entityType, id, "gradeBands", "Unsupported Grade 12-13 content crossed the public boundary."));
     }
-    if (!decision.sourceEvidence.supportable) {
+    if (expectedKind === "quiz") {
+      issues.push(...quizAggregateEvidenceIssues(entityType, id, value, decision, evaluationContext));
+    } else if (!decision.sourceEvidence.supportable) {
       issues.push(
         baselineIssue(
           entityType,
