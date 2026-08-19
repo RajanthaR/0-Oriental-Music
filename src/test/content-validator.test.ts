@@ -400,9 +400,9 @@ describe("public Quiz aggregate evidence", () => {
     quiz.questions = [];
     const result = validatePublicCollection("Quiz", [quiz]);
     expect(result.isValid).toBe(false);
-    // The record contract rejects an empty question set before the aggregate rule
-    // runs. What must never happen is a spurious direct-evidence issue.
-    expect(result.issues.some((issue) => issue.field === "record" || issue.field === "questions")).toBe(true);
+    // Empty questions are rejected by the canonical record contract; the
+    // aggregate rule no longer duplicates that check.
+    expect(result.issues.some((issue) => issue.field === "record")).toBe(true);
     expect(result.issues.some((issue) => issue.field === "sourceReference")).toBe(false);
   });
 
@@ -411,7 +411,7 @@ describe("public Quiz aggregate evidence", () => {
     quiz.questions = { length: 1 };
     const result = validatePublicCollection("Quiz", [quiz]);
     expect(result.isValid).toBe(false);
-    expect(result.issues.some((issue) => issue.field === "questions" || issue.field === "record")).toBe(true);
+    expect(result.issues.some((issue) => issue.field === "record")).toBe(true);
   });
 
   it("rejects a Quiz question that lacks supportable direct page evidence", () => {
@@ -437,10 +437,8 @@ describe("public Quiz aggregate evidence", () => {
     questions[0] = withoutGrades;
     const result = validatePublicCollection("Quiz", [quiz]);
     expect(result.isValid).toBe(false);
-    // The nested question contract rejects a missing grade scope first; the
-    // aggregate rule is the second line of defence, never a bypass.
-    expect(result.issues.some((issue) =>
-      issue.field === "record" || issue.field === "questions[0].gradeBands")).toBe(true);
+    // Missing grade scope is rejected by the canonical record contract.
+    expect(result.issues.some((issue) => issue.field === "record")).toBe(true);
     expect(result.issues.some((issue) => issue.field === "sourceReference")).toBe(false);
   });
 

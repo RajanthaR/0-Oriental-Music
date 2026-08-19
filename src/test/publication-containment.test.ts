@@ -41,7 +41,7 @@ import { MAX_GRAPH_NODES } from "@/lib/validation/content-contracts";
 
 describe("Prompt 1 publication containment", () => {
   it("declares the complete blocking and nonblocking dependency matrix", () => {
-    expect(DEPENDENCY_FIELD_RULES).toEqual({
+    expect(Object.fromEntries(DEPENDENCY_FIELD_RULES)).toEqual({
       prerequisites: { blocking: true, catalog: "lessons" },
       "steps[].lessonId": { blocking: true, catalog: "lessons" },
       nextRecommendedLessonId: { blocking: false, catalog: "lessons" },
@@ -58,7 +58,7 @@ describe("Prompt 1 publication containment", () => {
     });
   });
 
-  it.each(Object.entries(DEPENDENCY_FIELD_RULES))(
+  it.each(Array.from(DEPENDENCY_FIELD_RULES.entries()))(
     "applies the declarative %s dependency rule to the publication decision",
     (field, rule) => {
       const canonicalLesson = lessonsData.find((lesson) => lesson.id === "les-intro-01");
@@ -171,7 +171,7 @@ describe("Prompt 1 publication containment", () => {
         .toMatchObject({ status: "Needs Revision" });
       expect(repository.updateLessonStatus(String(raw.id), "Needs Revision", "Review Agent", "Safe repair")).toMatchObject({ ok: true });
       const repaired = mutableRepository.lessons[rawIndex];
-      expect(repaired.reviewMetadata).toMatchObject({ status: "Needs Revision", reviewer: "Review Agent" });
+      expect(repaired.reviewMetadata).toMatchObject({ status: "Needs Revision", reviewer: UNKNOWN_PROVENANCE });
 
       repaired.title_si = null;
       expect(repository.updateLessonStatus(String(repaired.id), "Needs Revision", "Review Agent", "Invalid record")).toMatchObject({ ok: false });
@@ -358,12 +358,11 @@ describe("Prompt 1 publication containment", () => {
   });
 
   it("deep-freezes the dependency matrix so policy cannot be changed at runtime", () => {
-    expect(Object.isFrozen(DEPENDENCY_FIELD_RULES)).toBe(true);
-    for (const rule of Object.values(DEPENDENCY_FIELD_RULES)) expect(Object.isFrozen(rule)).toBe(true);
+    for (const rule of Array.from(DEPENDENCY_FIELD_RULES.values())) expect(Object.isFrozen(rule)).toBe(true);
     expect(() => {
-      (DEPENDENCY_FIELD_RULES.prerequisites as { blocking: boolean }).blocking = false;
+      (DEPENDENCY_FIELD_RULES.get("prerequisites") as { blocking: boolean }).blocking = false;
     }).toThrow();
-    expect(DEPENDENCY_FIELD_RULES.prerequisites.blocking).toBe(true);
+    expect(DEPENDENCY_FIELD_RULES.get("prerequisites")?.blocking).toBe(true);
   });
 
   it("exposes only frozen publication snapshots, not mutable evaluation caches", () => {

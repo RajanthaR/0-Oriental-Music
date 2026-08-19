@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
+import { releaseHandleRef, releaseTimerRef } from "@/lib/audio/cleanup";
 import { Volume2, Play, Sparkles } from "lucide-react";
 
 export interface SwaraKeyboardProps {
@@ -52,17 +53,8 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
 
   const cancelPlayback = useCallback(() => {
     generationRef.current += 1;
-    const playback = playbackRef.current;
-    playbackRef.current = null;
-    try {
-      playback?.();
-    } catch {
-      // Cancellation is best-effort; the UI ownership must still be released.
-    }
-    if (highlightTimerRef.current !== null) {
-      window.clearTimeout(highlightTimerRef.current);
-      highlightTimerRef.current = null;
-    }
+    releaseHandleRef(playbackRef);
+    releaseTimerRef(highlightTimerRef, (id) => window.clearTimeout(id));
     if (mountedRef.current) {
       setPlayingKey(null);
       setIsPlayingScale(false);
@@ -127,10 +119,7 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
       () => {
         if (mountedRef.current && generationRef.current === generation && playbackRef.current === handle) {
           setAudioUnavailable(true);
-          if (highlightTimerRef.current !== null) {
-            window.clearTimeout(highlightTimerRef.current);
-            highlightTimerRef.current = null;
-          }
+          releaseTimerRef(highlightTimerRef, (id) => window.clearTimeout(id));
           setPlayingKey(null);
         }
       },
@@ -143,10 +132,7 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
         const isCurrentHandle = playbackRef.current === handle;
         if (isCurrentHandle) playbackRef.current = null;
         if (!mountedRef.current || generationRef.current !== generation || !isCurrentHandle) return;
-        if (highlightTimerRef.current !== null) {
-          window.clearTimeout(highlightTimerRef.current);
-          highlightTimerRef.current = null;
-        }
+        releaseTimerRef(highlightTimerRef, (id) => window.clearTimeout(id));
         setAudioUnavailable(true);
         setPlayingKey(null);
       },
@@ -163,16 +149,18 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
     if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) {
       return;
     }
+    releaseTimerRef(highlightTimerRef, (id) => window.clearTimeout(id));
     highlightTimerRef.current = window.setTimeout(() => {
       highlightTimerRef.current = null;
       if (!mountedRef.current || generationRef.current !== generation) return;
       setPlayingKey((curr) => (curr === baseKey ? null : curr));
-    }, 400);
+    }, 400) as unknown as number;
   }, [cancelPlayback, getFullNoteSymbol, onNotePlay, timbre]);
 
   // Keyboard shortcut listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       const match = KEYS_CONFIG.find((k) => k.hotkey.toLowerCase() === e.key.toLowerCase());
       if (match) {

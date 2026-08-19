@@ -43,7 +43,6 @@ import {
   getSourceDocumentSummary,
   UNKNOWN_PROVENANCE,
   PUBLIC_GRADE_BANDS,
-  sanitizePublicRecord,
   sanitizeReviewRecord,
   createUnverifiedReviewMetadata,
   type PublicationEvaluationContext,
@@ -53,10 +52,12 @@ import {
   type SourceDocumentSummary,
 } from "@/lib/data/publication-policy";
 import {
+  isDenseArray,
   isRecord,
   isReviewMetadata,
   cloneBoundedRecord,
   normalizeEntityId,
+  normalizeRecordId,
   readOwnDataField,
   projectPublicRecord,
   validateContentRecord,
@@ -108,10 +109,6 @@ function hasKnownReviewEvidence(value: unknown): value is ReviewMetadata {
 
 function readRawReviewMetadata(lesson: Record<string, unknown>): unknown {
   return readOwnDataField(lesson, "reviewMetadata");
-}
-
-function normalizeRecordId(value: unknown): string {
-  return normalizeEntityId(value) ?? "";
 }
 
 // Every direct-ID lookup must resolve the same canonical identity the listing,
@@ -325,14 +322,14 @@ class ContentRepository {
         id: source.id,
         title: source.title,
         originalFilename: source.originalFilename,
-        publisher: source.publisher,
+        publisher: UNKNOWN_PROVENANCE,
         grades: [...source.grades],
-        year: source.year,
+        year: UNKNOWN_PROVENANCE,
         language: source.language,
-        tier: source.tier,
-        location: source.location,
-        status: source.status,
-        license: source.license,
+        tier: "මූලාශ්‍ර වාර්තාව (සනාථ නොකළ)",
+        location: UNKNOWN_PROVENANCE,
+        status: "Unverified / source review pending",
+        license: UNKNOWN_PROVENANCE,
         url: source.url,
         evidenceState: document.reviewStatus,
         evidenceQuality: document.evidenceQuality,
@@ -603,7 +600,7 @@ class ContentRepository {
         ? metadataSnapshot as unknown as ReviewMetadata
         : createUnverifiedReviewMetadata();
       nextMetadata.status = newStatus;
-      if (!requestsPublication) nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
+      if (!requestsPublication) nextMetadata.lastVerifiedDate = UNKNOWN_PROVENANCE;
       if (!isReviewMetadata(nextMetadata)) return cmsFailure("malformed-review-metadata");
       const replacement = cloneBoundedRecord(lesson);
       if (!isRecord(replacement)) return cmsFailure("malformed-record");
@@ -660,8 +657,8 @@ class ContentRepository {
         : createUnverifiedReviewMetadata();
       nextMetadata.status = newStatus;
       if (newStatus !== "Published") {
-        nextMetadata.reviewer = reviewer;
-        nextMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
+        nextMetadata.reviewer = hasKnownReviewEvidence(rawMetadata) ? reviewer : UNKNOWN_PROVENANCE;
+        nextMetadata.lastVerifiedDate = UNKNOWN_PROVENANCE;
         nextMetadata.changeNotes = notes;
       }
       if (!isReviewMetadata(nextMetadata)) return cmsFailure("malformed-review-metadata");

@@ -21,6 +21,7 @@
 import forensicLedgerData from "../../../data/forensic-ledger.json";
 import {
   cloneBoundedRecord,
+  isDenseArray,
   isRecord,
   normalizeEntityId,
   readOwnDataField,
@@ -59,18 +60,6 @@ export interface DispositionRegistryInspection {
   entryById: Map<string, Record<string, unknown>>;
   /** Every `issueCatalog[].id`, present even when other rules fail. */
   issueCatalogIds: Set<string>;
-}
-
-function isDenseArray(value: unknown): value is unknown[] {
-  if (!Array.isArray(value)) return false;
-  try {
-    for (let index = 0; index < value.length; index += 1) {
-      if (!Object.prototype.hasOwnProperty.call(value, index)) return false;
-    }
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 function isNonBlank(value: unknown): value is string {

@@ -6,6 +6,7 @@ import manifest from "../../data/source-manifest.json";
 import sourceDocuments from "../../data/source-documents.json";
 import { repository } from "@/lib/data/repository";
 import { projectPublicRecord } from "@/lib/validation/content-contracts";
+import { UNKNOWN_PROVENANCE } from "@/lib/validation/content-contracts";
 import {
   SELECTED_PHASE_2_SOURCE_IDS,
   validateMusicalCoreFieldDispositions,
@@ -314,6 +315,28 @@ describe("selected Phase 2 source metadata", () => {
         // raw string equality.
         expect(validatePublicCollection("sources", projected)).toEqual({ isValid: true, issues: [] });
       });
+    });
+
+    it("exposes only unknown/unverified provenance on public source rows (non-circular)", () => {
+      const publicSources = repository.getSources();
+      expect(publicSources.length).toBeGreaterThan(0);
+      for (const source of publicSources) {
+        expect(source.publisher).toBe(UNKNOWN_PROVENANCE);
+        expect(source.year).toBe(UNKNOWN_PROVENANCE);
+        expect(source.location).toBe(UNKNOWN_PROVENANCE);
+        expect(source.license).toBe(UNKNOWN_PROVENANCE);
+        expect(source.tier).toBe("මූලාශ්‍ර වාර්තාව (සනාථ නොකළ)");
+        expect(source.status).toBe("Unverified / source review pending");
+        expect(String(source.tier)).not.toMatch(/Tier 1/);
+        expect(String(source.status)).not.toBe("Verified");
+        expect(String(source.year)).not.toMatch(/^\d{4}$/);
+        expect(String(source.publisher)).not.toMatch(/NIE Sri Lanka/);
+      }
+      // Prove the test is not vacuous: raw sources do contain fabricated values.
+      const rawHasFabricated = (runtimeSources as unknown as Array<Record<string, unknown>>).some(
+        (row) => String(row.tier).includes("Tier 1") || String(row.status) === "Verified"
+      );
+      expect(rawHasFabricated).toBe(true);
     });
   });
 });

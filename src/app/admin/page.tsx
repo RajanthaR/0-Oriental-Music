@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   ShieldAlert,
@@ -16,10 +16,12 @@ import { repository } from "@/lib/data/repository";
 import {
   validateContent,
   validateForensicInventory,
+  validateMusicalCoreFieldDispositions,
   validatePublicBoundary,
   ValidationIssue,
 } from "@/lib/validation/content-validator";
 import { ReviewStatus, Lesson } from "@/types/content";
+import { releaseTimerRef } from "@/lib/audio/cleanup";
 
 export default function AdminReviewDashboardPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -29,6 +31,13 @@ export default function AdminReviewDashboardPage() {
   }>({ isValid: true, issues: [] });
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>("all");
   const [updateNotice, setUpdateNotice] = useState<{ kind: "success" | "error"; message: string } | null>(null);
+  const noticeTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      releaseTimerRef(noticeTimerRef, (id) => window.clearTimeout(id));
+    };
+  }, []);
 
   useEffect(() => {
     const all = repository.getLessons({ visibility: "review" });
@@ -42,6 +51,7 @@ export default function AdminReviewDashboardPage() {
       repository.getTheatreTraditions()
     );
     const baselineReport = validateForensicInventory();
+    const dispositionReport = validateMusicalCoreFieldDispositions();
     const boundaryReport = validatePublicBoundary({
       lessons: repository.getLessons(),
       ragas: repository.getRagas(),
@@ -51,9 +61,11 @@ export default function AdminReviewDashboardPage() {
       theatreTraditions: repository.getTheatreTraditions(),
       learningPaths: repository.getLearningPaths(),
       exams: repository.getExamPapers(),
+      quizzes: repository.getQuizzes(),
+      glossary: repository.getGlossary(),
     });
     setValidationReport({
-      isValid: contentReport.isValid && baselineReport.isValid && boundaryReport.isValid,
+      isValid: contentReport.isValid && baselineReport.isValid && dispositionReport.isValid && boundaryReport.isValid,
       issues: [
         {
           entityType: "Publication",
@@ -64,6 +76,7 @@ export default function AdminReviewDashboardPage() {
         },
         ...contentReport.issues,
         ...baselineReport.issues,
+        ...dispositionReport.issues,
         ...boundaryReport.issues,
       ],
     });
@@ -82,7 +95,8 @@ export default function AdminReviewDashboardPage() {
           kind: "error",
           message: `පාඩම් අංක ${lessonId} සඳහා '${newStatus}' තත්ත්වය සටහන් කළ නොහැකි විය (${updated.reasonCode}). මූලාශ්‍ර හා සමාලෝචන සාක්ෂි පරීක්ෂා කරන්න.`,
         });
-    setTimeout(() => setUpdateNotice(null), 3000);
+    releaseTimerRef(noticeTimerRef, (id) => window.clearTimeout(id));
+    noticeTimerRef.current = window.setTimeout(() => setUpdateNotice(null), 3000) as unknown as number;
   };
 
   const statuses: ReviewStatus[] = [

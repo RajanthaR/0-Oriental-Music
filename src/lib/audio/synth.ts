@@ -35,6 +35,8 @@ export const SWARA_SEMITONES: Record<string, SwaraPitchInfo> = {
 };
 
 // Root Sa standard frequency: Middle C (C4 = 261.63Hz) or C#4 (277.18Hz)
+import { resumeAudioContext } from "./context";
+
 export const DEFAULT_ROOT_FREQ = 261.63; // C4
 
 export type SwaraTimbre = "harmonium" | "flute" | "sitar" | "pure";
@@ -176,7 +178,10 @@ export class SwaraSynthEngine {
         this.masterGain = masterGain;
       }
 
-      if (attemptedContext.state === "suspended") await attemptedContext.resume();
+      if (attemptedContext.state === "suspended") {
+        const resumed = await resumeAudioContext(attemptedContext);
+        if (!resumed) throw new Error("audio-resume-timeout");
+      }
       return attemptedContext.state !== "closed" && this.ctx === attemptedContext;
     } catch {
       // A rejected attempt must only clear the context it actually attempted.

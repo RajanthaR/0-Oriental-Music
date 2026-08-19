@@ -59,7 +59,7 @@ Run at most three fresh `rajantha-skills-library:ce-code-review` cycles against 
 rajantha-skills-library:ce-code-review base:beba1479f473b3413b3f2de48a27c558e1937c6f plan:docs/plans/2026-08-16-002-fix-phase-2-final-contract-closeout-plan.md grouping:auto
 ```
 
-Every reviewer and validator must run with GPT-5.6 Luna at MAX. Require correctness, testing, maintainability, project-standards, agent-native, learnings, security, API-contract, adversarial, reliability, and frontend-races coverage. Independently validate all surviving findings. Each accepted fix cycle gets one tested local `fix(review): ...` commit.
+No specific model, provider, or named reasoning level is required. Use models supported by the active agent environment and the review skill, record the actual model/provider coverage, and require correctness, testing, maintainability, project-standards, agent-native, learnings, security, API-contract, adversarial, reliability, and frontend-races coverage. Independently validate all surviving findings. Each accepted fix cycle gets one tested local `fix(review): ...` commit.
 
 Acceptance requires `status: complete`, full original-base scope, complete artifacts, `Ready to merge`, zero actionable findings, no degraded P0/P1 validation, and no unmet requirement. Then run full local gates and `rajantha-skills-library:browser-qa` at 1440x900 and 360x568 on the immutable reviewed HEAD. Only after all gates pass may the branch be pushed normally, existing PR #2 updated, hosted checks verified on the same SHA, and the PR marked ready. Never merge or deploy.
 

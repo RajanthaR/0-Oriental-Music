@@ -34,9 +34,11 @@ import { planTablaBol } from "@/lib/audio/tabla";
 import { isSafePracticeBpm } from "@/lib/audio/tempo";
 import {
   cloneBoundedRecord,
+  isDenseArray,
   isMappedTalaBolToken,
   isRecord,
   normalizeEntityId,
+  normalizeRecordId,
   isValidSwaraToken,
   projectPublicRecord,
   readOwnDataField,
@@ -375,8 +377,8 @@ export function validateMusicalCoreFieldDispositions(
     theka: { status: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string };
     bols: Array<{ matra: number; status: string; value?: string; sourceReference?: unknown; quality?: string; issueId?: string }>;
   };
-  const entryById = inspection.entryById as unknown as Map<string, DispositionEntry>;
-  const hasExactEvidence = (reference: unknown, status: string): boolean => {
+  const entryById = inspection.entryById as Map<string, Record<string, unknown>> as unknown as Map<string, DispositionEntry>;
+  const hasLedgerConsistentEvidence = (reference: unknown, status: string): boolean => { // ledger self-consistency; see hasPublishableFieldEvidence in publication-policy for quality-gated publish
     if (!isRecord(reference) || typeof reference.sourceId !== "string" || typeof reference.pageOrSection !== "string") return false;
     const decision = evaluateSourceReference(reference as unknown as SourceReference, evaluationContext);
     if (status === "verified") return decision.supportable;
@@ -425,7 +427,7 @@ export function validateMusicalCoreFieldDispositions(
       }
       const contextScope = field === "context" ? entry.context.scope : undefined;
       const evidenceRequired = value.quality !== "missing" && !(field === "context" && contextScope === "not-claimed");
-      if (evidenceRequired && !hasExactEvidence(value.sourceReference, value.status)) {
+      if (evidenceRequired && !hasLedgerConsistentEvidence(value.sourceReference, value.status)) {
         issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `${field}.sourceReference`, message: "Readable disposition fields require exact supportable source evidence", severity: "error" });
       }
     });
@@ -461,7 +463,7 @@ export function validateMusicalCoreFieldDispositions(
       } else if (typeof bolIssueId !== "string" || !issueCatalogIds.has(bolIssueId)) {
         issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}].issueId`, message: "Bol issue ID must resolve through the structured issue catalog", severity: "error" });
       }
-      if (bolQuality !== "missing" && !hasExactEvidence(readOwnDataField(bol, "sourceReference"), typeof bolStatus === "string" ? bolStatus : "")) {
+      if (bolQuality !== "missing" && !hasLedgerConsistentEvidence(readOwnDataField(bol, "sourceReference"), typeof bolStatus === "string" ? bolStatus : "")) {
         issues.push({ entityType: "TalaFieldDisposition", entityId: id, field: `bols[${bolIndex}].sourceReference`, message: "Readable bol fields require exact supportable source evidence", severity: "error" });
       }
     });
@@ -608,41 +610,41 @@ function quizAggregateEvidenceIssues(
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
 
-  const parentDisposition = decision.nestedDispositions.find(
-    (disposition) => disposition.path === "lessonId",
-  );
-  if (!parentDisposition) {
+  const lessonId = readOwnDataField(record, "lessonId");
+  const normalizedLessonId = normalizeRecordId(lessonId);
+  if (!normalizedLessonId) {
     issues.push(baselineIssue(entityType, id, "lessonId", "A public Quiz must resolve a parent-lesson disposition."));
-  } else if (!parentDisposition.isPublic) {
-    issues.push(baselineIssue(
-      entityType,
-      id,
-      "lessonId",
-      `A public Quiz requires a public parent lesson (${parentDisposition.reasonCodes.join(", ") || "no eligibility reason"}).`,
-    ));
+  } else {
+    const parent = evaluationContext.catalogs.lessons.find(
+      (lesson) => normalizeRecordId(readOwnDataField(lesson, "id")) === normalizedLessonId
+    );
+    if (!parent) {
+      issues.push(baselineIssue(entityType, id, "lessonId", "A public Quiz must resolve a parent-lesson disposition."));
+    } else {
+      const parentDecision = getRecordPublicationDecision(parent, evaluationContext);
+      if (!parentDecision.isPublic) {
+        issues.push(baselineIssue(
+          entityType,
+          id,
+          "lessonId",
+          `A public Quiz requires a public parent lesson (${parentDecision.reasonCodes.join(", ") || "no eligibility reason"}).`,
+        ));
+      }
+    }
   }
 
   const questions = readOwnDataField(record, "questions");
   if (!Array.isArray(questions) || questions.length === 0) {
-    issues.push(baselineIssue(entityType, id, "questions", "A public Quiz must contain at least one question."));
     return issues;
   }
 
   questions.forEach((question, index) => {
     const field = `questions[${index}]`;
     if (!isRecord(question)) {
-      issues.push(baselineIssue(entityType, id, field, "Quiz questions must be bounded plain-data records."));
       return;
     }
-    const gradeBands = readOwnDataField(question, "gradeBands");
-    if (!Array.isArray(gradeBands) || gradeBands.length === 0) {
-      issues.push(baselineIssue(
-        entityType,
-        id,
-        `${field}.gradeBands`,
-        "Every public Quiz question must declare its own explicit grade scope.",
-      ));
-    }
+    // gradeBands presence is enforced by the canonical record contract; the
+    // aggregate rule only checks evidence that the contract does not cover.
     const evidence = evaluateSourceReference(
       readOwnDataField(question, "sourceReference") as SourceReference | undefined,
       evaluationContext,

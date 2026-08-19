@@ -275,10 +275,10 @@ const dependencyFixtures: DependencyFixture[] = [
 describe("cycle-two publication parity and freshness", () => {
   it("keeps the declarative dependency table exhaustive", () => {
     expect(dependencyFixtures.map((fixture) => fixture.field).sort()).toEqual(
-      Object.keys(DEPENDENCY_FIELD_RULES).sort(),
+      Array.from(DEPENDENCY_FIELD_RULES.keys()).sort(),
     );
     for (const fixture of dependencyFixtures) {
-      expect(DEPENDENCY_FIELD_RULES[fixture.field]).toMatchObject({
+      expect(DEPENDENCY_FIELD_RULES.get(fixture.field)).toMatchObject({
         blocking: fixture.blocking,
         catalog: fixture.catalog,
       });

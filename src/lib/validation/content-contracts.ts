@@ -338,6 +338,22 @@ export function normalizeEntityId(value: unknown): string | undefined {
   return normalized;
 }
 
+export function normalizeRecordId(value: unknown): string {
+  return normalizeEntityId(value) ?? "";
+}
+
+export function isDenseArray(value: unknown): value is unknown[] {
+  if (!Array.isArray(value)) return false;
+  try {
+    for (let index = 0; index < value.length; index += 1) {
+      if (!Object.prototype.hasOwnProperty.call(value, index)) return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function isCurriculumStrandId(value: unknown): value is CurriculumStrandId {
   return isOneOf(CURRICULUM_STRAND_IDS, value);
 }

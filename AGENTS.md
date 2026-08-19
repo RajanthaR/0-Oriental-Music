@@ -236,6 +236,8 @@ Every implementation phase is an independently reviewable slice.
 
 Use the `rajantha-skills-library:ce-code-review` skill for every phase review. This is the required multi-agent code-review system; do not substitute an ad hoc self-review, the harness's quick built-in review, or an unstructured set of agents.
 
+There is no repository-wide requirement to use a particular model, provider, or named reasoning level for reviewers or validators. Use models supported by the active agent environment and the review skill, record the actual model/provider coverage in the artifacts, and preserve every required reviewer, validator, scope, and acceptance gate. Model unavailability must never be misreported as successful review coverage.
+
 The canonical checklist also lives in `docs/forensic-remediation/SKILL_MULTI_AGENT_REVIEW.md`. The rules below remain mandatory even when a phase prompt is older or less specific.
 
 ### A. Pre-review checkpoint and invocation

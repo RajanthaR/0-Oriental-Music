@@ -13,6 +13,8 @@ export interface TanpuraSettings {
   volume: number; // 0.0 to 1.0
 }
 
+import { resumeAudioContext } from "./context";
+
 export const ROOT_PITCHES: { name: string; freq: number }[] = [
   { name: "C (ස)", freq: 130.81 },
   { name: "C# (ස - සුලබ)", freq: 138.59 },
@@ -39,16 +41,23 @@ class TanpuraEngine {
   };
   private onPluckCallback?: (stringIndex: number, stringName: string) => void;
 
-  private initContext() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.ctx = new AudioCtx();
-      this.masterGain = this.ctx.createGain();
-      this.masterGain.gain.setValueAtTime(this.settings.volume, this.ctx.currentTime);
-      this.masterGain.connect(this.ctx.destination);
-    }
-    if (this.ctx.state === "suspended") {
-      this.ctx.resume();
+  private async initContext(): Promise<boolean> {
+    try {
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        if (!AudioCtx) return false;
+        this.ctx = new AudioCtx();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.setValueAtTime(this.settings.volume, this.ctx.currentTime);
+        this.masterGain.connect(this.ctx.destination);
+      }
+      if (this.ctx.state === "suspended") {
+        const resumed = await resumeAudioContext(this.ctx);
+        if (!resumed) return false;
+      }
+      return this.ctx.state !== "closed";
+    } catch {
+      return false;
     }
   }
 
@@ -153,9 +162,10 @@ class TanpuraEngine {
     }, this.settings.tempoSec * 1000);
   }
 
-  public start() {
+  public async start(): Promise<void> {
     if (typeof window === "undefined") return;
-    this.initContext();
+    const ok = await this.initContext();
+    if (!ok) return;
     if (this.isRunning) return;
     this.isRunning = true;
     this.currentStringIndex = 0;

@@ -24,6 +24,8 @@ export interface TablaTimerApi<TTimer = number> {
   clear: (timer: TTimer) => void;
 }
 
+import { resumeAudioContext } from "./context";
+
 export type TablaPlaybackHandle = (() => void) & {
   ready: Promise<boolean>;
   /** Resolves only after scheduled strokes and their nodes are cleaned up. */
@@ -201,7 +203,10 @@ export class TablaSynthEngine {
         this.ctx = attemptedContext;
         this.masterGain = masterGain;
       }
-      if (attemptedContext.state === "suspended") await attemptedContext.resume();
+      if (attemptedContext.state === "suspended") {
+        const resumed = await resumeAudioContext(attemptedContext);
+        if (!resumed) throw new Error("audio-resume-timeout");
+      }
       return attemptedContext.state !== "closed" && this.ctx === attemptedContext;
     } catch {
       // Never clear or close a replacement installed after this attempt began.

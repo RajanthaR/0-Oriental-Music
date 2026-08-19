@@ -25,10 +25,12 @@ export type MutableRef<T> = { current: T };
 export function runIsolatedCleanup(work: () => void): void {
   try {
     work();
-  } catch {
-    // A caller-supplied cancellation or timer clear is outside this module's
-    // control. One failure must never prevent the remaining owned work from
-    // being released.
+  } catch (error) {
+    try {
+      console.error("Audio cleanup step failed:", error);
+    } catch {
+      // Diagnostics must not prevent remaining cleanup.
+    }
   }
 }
 

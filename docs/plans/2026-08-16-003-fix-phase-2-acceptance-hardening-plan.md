@@ -178,7 +178,7 @@ The earlier rejected Deepchandi finding remains rejected and historical.
 
 1. Confirm branch, worktree, original base, and remote PR head before implementation and again before any push.
 2. Create one local implementation commit after U1-U8 and full local verification.
-3. Invoke `rajantha-skills-library:ce-code-review base:beba1479f473b3413b3f2de48a27c558e1937c6f plan:docs/plans/2026-08-16-003-fix-phase-2-acceptance-hardening-plan.md grouping:auto` with GPT-5.6 Luna at MAX for all eleven required reviewers and every validator.
+3. Invoke `rajantha-skills-library:ce-code-review base:beba1479f473b3413b3f2de48a27c558e1937c6f plan:docs/plans/2026-08-16-003-fix-phase-2-acceptance-hardening-plan.md grouping:auto`. No specific model, provider, or named reasoning level is required; use models supported by the active agent environment and the review skill, and record the actual model/provider coverage for all eleven required reviewers and every validator.
 4. Permit at most three finding/fix cycles, each with one tested `fix(review): ...` commit, then one full acceptance-only review. Findings in the acceptance review block delivery.
 5. Acceptance requires `status: complete`, full original-base scope, complete artifacts, `Ready to merge`, zero actionable findings, and no degraded P0/P1 or unmet requirement.
 6. On the immutable accepted SHA, run `npm run test`, `npm run type-check`, `npm run lint`, `npm run build`, `git diff --check`, JSON/forensic/source/publication consistency, and `rajantha-skills-library:browser-qa` at 1440x900 and 360x568.

@@ -26,7 +26,7 @@ export default function InstrumentsDirectoryPage() {
           වාද්‍ය භාණ්ඩ නාමාවලිය
         </h1>
         <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-          තත (තත්), අවනද්ධ (බෙර), සුශිර (සුළං) සහ ඝන භාණ්ඩවල ව්‍යුහය, නාද උත්පාදන විලාසය සහ වාදන ඉරියව් සවිස්තරව ගවේෂණය කරන්න.
+          තත (තත්), අවනද්ධ (බෙර), සුෂිර (සුළං) සහ ඝන භාණ්ඩවල ව්‍යුහය, නාද උත්පාදන විලාසය සහ වාදන ඉරියව් සවිස්තරව ගවේෂණය කරන්න.
         </p>
       </div>
 
@@ -49,7 +49,7 @@ export default function InstrumentsDirectoryPage() {
             { id: "all", label: "සියලු භාණ්ඩ" },
             { id: "තත් භාණ්ඩ", label: "තත් භාණ්ඩ (Chordophones)" },
             { id: "අවනද්ධ භාණ්ඩ", label: "අවනද්ධ භාණ්ඩ (Membranophones)" },
-            { id: "සුශිර භාණ්ඩ", label: "සුශිර භාණ්ඩ (Aerophones)" },
+            { id: "සුෂිර භාණ්ඩ", label: "සුෂිර භාණ්ඩ (Aerophones)" },
           ].map((cat) => (
             <button
               key={cat.id}

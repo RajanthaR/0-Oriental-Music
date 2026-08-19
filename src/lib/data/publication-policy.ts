@@ -11,9 +11,11 @@ import {
   isQuestion,
   isSourceReference as isContractSourceReference,
   normalizeEntityId,
+  normalizeRecordId,
   readOwnDataField,
   projectPublicRecord,
   validateContentRecord,
+  UNKNOWN_PROVENANCE,
   type ContentEntityKind,
 } from "@/lib/validation/content-contracts";
 import sourcesData from "@/data/sources.json";
@@ -32,7 +34,7 @@ import sourcePageQualityData from "../../../data/source-page-quality.json";
 import musicalCoreFieldDispositionsData from "../../../data/musical-core-field-dispositions.json";
 import { inspectDispositionRegistry } from "@/lib/validation/disposition-registry";
 
-export const UNKNOWN_PROVENANCE = "නොදනී / සනාථ වී නැත";
+export { UNKNOWN_PROVENANCE } from "@/lib/validation/content-contracts";
 
 export const PUBLIC_GRADE_BANDS = ["6-7", "8-9", "10-11"] as const;
 export type PublicGradeBand = (typeof PUBLIC_GRADE_BANDS)[number];
@@ -133,7 +135,8 @@ const KNOWN_QUARANTINED_ENTITY_IDS = new Set([
 ]);
 
 export function isKnownQuarantinedEntityId(value: unknown): boolean {
-  return typeof value === "string" && KNOWN_QUARANTINED_ENTITY_IDS.has(value.trim());
+  const id = normalizeRecordId(value);
+  return !!id && KNOWN_QUARANTINED_ENTITY_IDS.has(id);
 }
 
 type SourceDocumentRecord = {
@@ -227,21 +230,21 @@ function freezeDependencyRules<T extends Record<string, DependencyRule>>(rules: 
 }
 
 /** One dependency policy for every recognized nested reference. */
-export const DEPENDENCY_FIELD_RULES: Readonly<Record<string, DependencyRule>> = freezeDependencyRules({
-  prerequisites: { blocking: true, catalog: "lessons" },
-  "steps[].lessonId": { blocking: true, catalog: "lessons" },
-  nextRecommendedLessonId: { blocking: false, catalog: "lessons" },
-  quizId: { blocking: false, catalog: "quizzes" },
-  masteryQuizId: { blocking: true, catalog: "quizzes" },
-  nextRecommendedPathId: { blocking: false, catalog: "learningPaths" },
-  lessonId: { blocking: true, catalog: "lessons" },
-  talaId: { blocking: true, catalog: "talas" },
-  targetTalaId: { blocking: true, catalog: "talas" },
-  audioTalaId: { blocking: true, catalog: "talas" },
-  ragaId: { blocking: true, catalog: "ragas" },
-  targetRagaId: { blocking: true, catalog: "ragas" },
-  selectedRagaId: { blocking: true, catalog: "ragas" },
-});
+export const DEPENDENCY_FIELD_RULES: ReadonlyMap<string, DependencyRule> = new Map<string, DependencyRule>([
+  ["prerequisites", Object.freeze({ blocking: true, catalog: "lessons" } as const)],
+  ["steps[].lessonId", Object.freeze({ blocking: true, catalog: "lessons" } as const)],
+  ["nextRecommendedLessonId", Object.freeze({ blocking: false, catalog: "lessons" } as const)],
+  ["quizId", Object.freeze({ blocking: false, catalog: "quizzes" } as const)],
+  ["masteryQuizId", Object.freeze({ blocking: true, catalog: "quizzes" } as const)],
+  ["nextRecommendedPathId", Object.freeze({ blocking: false, catalog: "learningPaths" } as const)],
+  ["lessonId", Object.freeze({ blocking: true, catalog: "lessons" } as const)],
+  ["talaId", Object.freeze({ blocking: true, catalog: "talas" } as const)],
+  ["targetTalaId", Object.freeze({ blocking: true, catalog: "talas" } as const)],
+  ["audioTalaId", Object.freeze({ blocking: true, catalog: "talas" } as const)],
+  ["ragaId", Object.freeze({ blocking: true, catalog: "ragas" } as const)],
+  ["targetRagaId", Object.freeze({ blocking: true, catalog: "ragas" } as const)],
+  ["selectedRagaId", Object.freeze({ blocking: true, catalog: "ragas" } as const)],
+]);
 
 type SourceRecord = {
   id: string;
@@ -383,10 +386,6 @@ function registerKnownKinds(
     const previous = knownKinds.get(normalizedId);
     knownKinds.set(normalizedId, previous ? "ambiguous" : kind);
   });
-}
-
-function normalizeRecordId(value: unknown): string {
-  return normalizeEntityId(value) ?? "";
 }
 
 type CatalogInputRead = { present: boolean; safe: boolean; value?: unknown };
@@ -1043,10 +1042,10 @@ export function getTalaFieldDisposition(
     theka_si?: unknown;
     bols?: unknown;
   } | undefined;
-  const hasExactEvidence = (field: TalaFieldDispositionField): boolean =>
+  const hasPublishableFieldEvidence = (field: TalaFieldDispositionField): boolean =>
     field.quality === "A" || field.quality === "B"
       ? evaluateSourceReference(field.sourceReference, context).supportable
-      : false;
+      : false; // quality-gated publish decision; see hasLedgerConsistentEvidence in content-validator for ledger self-consistency
   const contextVerified = entry.context.status === "verified" && (
     entry.context.scope === "not-claimed"
       ? !tala?.context_si && !tala?.contextSourceReference && entry.context.quality === "N/A"
@@ -1056,7 +1055,7 @@ export function getTalaFieldDisposition(
           isSourceReference(tala.contextSourceReference) &&
           entry.context.sourceReference?.sourceId === tala.contextSourceReference.sourceId &&
           entry.context.sourceReference.pageOrSection === tala.contextSourceReference.pageOrSection &&
-          hasExactEvidence(entry.context)
+          hasPublishableFieldEvidence(entry.context)
         )
   );
   const allRequiredFieldsVerified =
@@ -1069,7 +1068,7 @@ export function getTalaFieldDisposition(
     contextVerified &&
     entry.theka.status === "verified" &&
     entry.theka.value === tala?.theka_si &&
-    hasExactEvidence(entry.theka) &&
+    hasPublishableFieldEvidence(entry.theka) &&
     entry.bols.length > 0 &&
     entry.bols.every((bol, index) =>
       bol.status === "verified" &&
@@ -1077,7 +1076,7 @@ export function getTalaFieldDisposition(
       Array.isArray(tala?.bols) &&
       bol.matra === (tala.bols[index] as { matra?: unknown } | undefined)?.matra &&
       bol.value === (tala.bols[index] as { bol_si?: unknown } | undefined)?.bol_si &&
-      hasExactEvidence(bol)
+      hasPublishableFieldEvidence(bol)
     ) &&
     Array.isArray(tala?.bols) && tala.bols.length === entry.bols.length;
     return { ...entry, allRequiredFieldsVerified };
@@ -1140,8 +1139,8 @@ function collectDependencyDispositions(
     const record = current.value as Record<string, unknown>;
     const prefix = current.path ? `${current.path}.` : "";
     const prerequisites = readOwnDataField(record, "prerequisites");
-    const prerequisiteRule = DEPENDENCY_FIELD_RULES.prerequisites;
-    if (Array.isArray(prerequisites)) {
+    const prerequisiteRule = DEPENDENCY_FIELD_RULES.get("prerequisites");
+    if (prerequisiteRule && Array.isArray(prerequisites)) {
       prerequisites.forEach((dependencyId, index) => addDependency(
         dependencyId,
         `${prefix}prerequisites[${index}]`,
@@ -1150,8 +1149,8 @@ function collectDependencyDispositions(
       ));
     }
     const steps = readOwnDataField(record, "steps");
-    const stepRule = DEPENDENCY_FIELD_RULES["steps[].lessonId"];
-    if (Array.isArray(steps)) {
+    const stepRule = DEPENDENCY_FIELD_RULES.get("steps[].lessonId");
+    if (stepRule && Array.isArray(steps)) {
       steps.forEach((step, index) => {
         const lessonId = step && typeof step === "object" && !Array.isArray(step)
           ? readOwnDataField(step, "lessonId")
@@ -1169,7 +1168,7 @@ function collectDependencyDispositions(
       if (key === "prerequisites" || key === "steps" || key === "lessonId") continue;
       const child = readOwnDataField(record, key);
       const childPath = `${prefix}${key}`;
-      const dependencyRule = DEPENDENCY_FIELD_RULES[key];
+      const dependencyRule = DEPENDENCY_FIELD_RULES.get(key);
       if (dependencyRule) {
         addDependency(child, childPath, dependencyRule.blocking, decisionContext.catalogs[dependencyRule.catalog]);
       }
@@ -1313,8 +1312,8 @@ function getRecordPublicationDecisionInternal(
   const hasValidRuntimeShape = hasCanonicalRuntimeShape(safeRecord, knownKind, decisionContext);
   const value = getRecordShape(safeRecord);
   const rawRecordId = readOwnDataField(value, "id");
-  const recordId = typeof rawRecordId === "string" ? rawRecordId : "";
-  const isQuiz = decisionContext.catalogs.quizzes.some((quiz) => normalizeRecordId(readOwnDataField(quiz, "id")) === normalizeRecordId(recordId));
+  const recordId = normalizeRecordId(rawRecordId);
+  const isQuiz = decisionContext.catalogs.quizzes.some((quiz) => normalizeRecordId(readOwnDataField(quiz, "id")) === recordId);
   const baseDecision = isQuiz
     ? getQuizContainerPublicationDecision(safeRecord, decisionContext)
     : getBasePublicationDecision(toPublicationInput(safeRecord), decisionContext);
@@ -1338,7 +1337,7 @@ function getRecordPublicationDecisionInternal(
     });
   }
   if (recordId) state.stack.add(recordId);
-
+  try {
   if (!hasValidRuntimeShape) reasonCodes.add("malformed-record");
   if (Array.isArray(value.gradeBands) && !isCanonicalGradeBandArray(value.gradeBands)) {
     reasonCodes.add("unsupported-grade");
@@ -1374,7 +1373,7 @@ function getRecordPublicationDecisionInternal(
     reasonCodes.add("dependency-cycle");
   }
 
-  const isExam = decisionContext.catalogs.examPapers.some((paper) => normalizeRecordId(readOwnDataField(paper, "id")) === normalizeRecordId(recordId));
+  const isExam = decisionContext.catalogs.examPapers.some((paper) => normalizeRecordId(readOwnDataField(paper, "id")) === recordId);
   if (!isQuiz && !isExam) {
     const quarantined = baseDecision.state === "quarantined";
     const contextIsPublic = !contextDecision.present || contextDecision.isPublic;
@@ -1389,20 +1388,21 @@ function getRecordPublicationDecisionInternal(
       nestedDispositions,
       withheldFields: Array.from(new Set(withheldFields)),
     };
-    if (recordId) state.stack.delete(recordId);
     return finish(decision);
   }
 
   const lessonId = readOwnDataField(value, "lessonId");
-  const parent = isQuiz && typeof lessonId === "string"
-    ? decisionContext.catalogs.lessons.find((lesson) => normalizeRecordId(readOwnDataField(lesson, "id")) === normalizeRecordId(lessonId))
+  const normalizedLessonId = normalizeRecordId(lessonId);
+  const parent = isQuiz && normalizedLessonId
+    ? decisionContext.catalogs.lessons.find((lesson) => normalizeRecordId(readOwnDataField(lesson, "id")) === normalizedLessonId)
     : undefined;
-  const parentIsActiveBacklink = isQuiz && typeof lessonId === "string" && state.stack.has(lessonId);
+  const parentIsActiveBacklink = isQuiz && !!normalizedLessonId && state.stack.has(normalizedLessonId);
   const parentIsPublic = !isQuiz || (!!parent && (
     parentIsActiveBacklink || getRecordPublicationDecisionInternal(parent, decisionContext, parent).isPublic
   ));
   if (isQuiz) {
-    const parentRule = DEPENDENCY_FIELD_RULES.lessonId;
+    const parentRule = DEPENDENCY_FIELD_RULES.get("lessonId");
+    if (!parentRule) throw new Error("Missing dependency rule for lessonId");
     nestedDispositions.push({
       path: "lessonId",
       isPublic: parentIsPublic,
@@ -1448,11 +1448,13 @@ function getRecordPublicationDecisionInternal(
     nestedDispositions,
     withheldFields: Array.from(new Set(withheldFields)),
   };
-  if (recordId) state.stack.delete(recordId);
   const dependsOnActiveBacklink = parentIsActiveBacklink || nestedDispositions.some(
     (disposition) => disposition.reasonCodes.includes("dependency-cycle")
   );
   return finish(decision, !dependsOnActiveBacklink);
+  } finally {
+    if (recordId) state.stack.delete(recordId);
+  }
 }
 
 export function getRecordPublicationDecision(

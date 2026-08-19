@@ -7,6 +7,7 @@ import { ProgressStorage } from "@/lib/storage/progress-storage";
 import {
   MAX_ARRAY_ITEMS,
   cloneBoundedRecord,
+  isDenseArray,
   isNonBlankString,
   isRecord,
   normalizeEntityId,
@@ -21,18 +22,6 @@ export type QuizRunnerQuiz = Omit<Pick<Quiz, "id" | "title_si" | "questions" | "
 export interface QuizRunnerProps {
   quiz: QuizRunnerQuiz;
   onComplete?: (score: number, maxScore: number, passed: boolean) => void;
-}
-
-function isDenseArray(value: unknown): value is unknown[] {
-  if (!Array.isArray(value)) return false;
-  try {
-    for (let index = 0; index < value.length; index += 1) {
-      if (!Object.prototype.hasOwnProperty.call(value, index)) return false;
-    }
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 function getUsableQuiz(quiz: unknown): QuizRunnerQuiz | null {
@@ -61,7 +50,7 @@ function getUsableQuiz(quiz: unknown): QuizRunnerQuiz | null {
       // control-bearing IDs must not survive as distinct questions, because the
       // renderer keys every answer, ordering, and matching selection on this value.
       const canonicalId = normalizeEntityId(projected.id);
-      if (!canonicalId || canonicalQuestionIds.has(canonicalId)) return null;
+      if (!canonicalId || canonicalId in Object.prototype || canonicalQuestionIds.has(canonicalId)) return null;
       canonicalQuestionIds.add(canonicalId);
       questions.push({ ...(projected as unknown as Question), id: canonicalId });
     }
@@ -88,9 +77,9 @@ function QuizUnavailable() {
 
 export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string | string[]>>({});
-  const [matchingSelections, setMatchingSelections] = useState<Record<string, string>>({});
-  const [orderedItems, setOrderedItems] = useState<Record<string, string[]>>({});
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string | string[]>>(() => Object.create(null));
+  const [matchingSelections, setMatchingSelections] = useState<Record<string, string>>(() => Object.create(null));
+  const [orderedItems, setOrderedItems] = useState<Record<string, string[]>>(() => Object.create(null));
   const [shortAnswerInput, setShortAnswerInput] = useState<string>("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
@@ -181,7 +170,8 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
     } else {
       setIsQuizCompleted(true);
       const finalScore = scoreCount;
-      const passed = (finalScore / totalQuestions) * 100 >= usableQuiz.passingScorePercent;
+      const percent = Math.round((finalScore / totalQuestions) * 100);
+      const passed = percent >= usableQuiz.passingScorePercent;
       ProgressStorage.recordQuizAttempt(usableQuiz.id, finalScore, totalQuestions, passed);
       if (onComplete) onComplete(finalScore, totalQuestions, passed);
     }
@@ -189,9 +179,9 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
 
   const handleRestart = () => {
     setCurrentIdx(0);
-    setSelectedAnswers({});
-    setMatchingSelections({});
-    setOrderedItems({});
+    setSelectedAnswers(Object.create(null));
+    setMatchingSelections(Object.create(null));
+    setOrderedItems(Object.create(null));
     setShortAnswerInput("");
     setIsSubmitted(false);
     setIsQuizCompleted(false);
