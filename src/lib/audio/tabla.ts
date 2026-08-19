@@ -203,10 +203,7 @@ export class TablaSynthEngine {
         this.ctx = attemptedContext;
         this.masterGain = masterGain;
       }
-      if (attemptedContext.state === "suspended") {
-        const resumed = await resumeAudioContext(attemptedContext);
-        if (!resumed) throw new Error("audio-resume-timeout");
-      }
+      if (attemptedContext.state === "suspended") await resumeAudioContext(attemptedContext);
       return attemptedContext.state !== "closed" && this.ctx === attemptedContext;
     } catch {
       // Never clear or close a replacement installed after this attempt began.

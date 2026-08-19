@@ -311,8 +311,9 @@ describe("failure-atomic consumer audio cleanup", () => {
       const view = render(<InstrumentDetailPage />);
       fireEvent.click(screen.getByRole("button", { name: "ආදර්ශ නාද රටාව අසන්න" }));
 
-      // Four stroke timers at 0/400/800/1200ms plus a completion timer at 2000ms.
-      // Advance far enough to own two Tabla handles and leave three timers pending.
+      // Four stroke timers at 0/400/800/1200ms. Completion is now driven by
+      // handle settlement, not a wall-clock timer. Advance far enough to own
+      // two Tabla handles and leave two timers pending.
       act(() => { vi.advanceTimersByTime(400); });
       expect(playback.cancels).toHaveLength(2);
 
@@ -320,10 +321,10 @@ describe("failure-atomic consumer audio cleanup", () => {
       expect(() => view.unmount()).not.toThrow();
 
       // Both throwing handle cancellations ran, and neither prevented the two
-      // pending stroke timers or the completion timer from being cleared.
+      // pending stroke timers from being cleared.
       expect(playback.cancels[0]).toHaveBeenCalledTimes(1);
       expect(playback.cancels[1]).toHaveBeenCalledTimes(1);
-      expect(clearTimeoutSpy).toHaveBeenCalledTimes(3);
+      expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
       clearTimeoutSpy.mockRestore();
     } finally {
       instrumentSpy.mockRestore();

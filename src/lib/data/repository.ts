@@ -655,7 +655,7 @@ class ContentRepository {
         : createUnverifiedReviewMetadata();
       nextMetadata.status = newStatus;
       if (newStatus !== "Published") {
-        nextMetadata.reviewer = hasKnownReviewEvidence(rawMetadata) ? reviewer : UNKNOWN_PROVENANCE;
+        nextMetadata.reviewer = hasKnownReviewEvidence(rawMetadata) && typeof reviewer === "string" && reviewer.trim() ? reviewer : UNKNOWN_PROVENANCE;
         nextMetadata.lastVerifiedDate = UNKNOWN_PROVENANCE;
         nextMetadata.changeNotes = notes;
       }

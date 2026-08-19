@@ -178,10 +178,7 @@ export class SwaraSynthEngine {
         this.masterGain = masterGain;
       }
 
-      if (attemptedContext.state === "suspended") {
-        const resumed = await resumeAudioContext(attemptedContext);
-        if (!resumed) throw new Error("audio-resume-timeout");
-      }
+      if (attemptedContext.state === "suspended") await resumeAudioContext(attemptedContext);
       return attemptedContext.state !== "closed" && this.ctx === attemptedContext;
     } catch {
       // A rejected attempt must only clear the context it actually attempted.

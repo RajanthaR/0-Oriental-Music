@@ -38,7 +38,7 @@ export default function SourcesCatalogPage() {
               className="col-span-2 sm:col-span-4 rounded-xl bg-amber-50 border border-amber-200 p-3 text-amber-950"
             >
               <span className="font-bold block text-text">මූලාශ්‍ර ගණන් ලබා ගත නොහැක</span>
-              මූලාශ්‍ර ලේඛන හෝ පිටු-ගුණාත්මක වාර්තා සනාථ කළ නොහැකි බැවින් ගණන් පෙන්වීම වළක්වා ඇත. සමාලෝචනය අවසන් වන තුරු පහත මූලාශ්‍ර ලැයිස්තුව පමණක් භාවිත කරන්න.
+              මූලාශ්‍ර ලේඛන හෝ පිටු-ගුණාත්මක වාර්තා සනාථ කළ නොහැකි බැවින් ගණන් පෙන්වීම වළක්වා ඇත.
             </div>
           )}
         </div>
@@ -46,6 +46,12 @@ export default function SourcesCatalogPage() {
 
       {/* Sources List */}
       <div className="space-y-4">
+        {sources.length === 0 ? (
+          <div role="status" className="rounded-3xl border border-amber-200 bg-amber-50 p-8 text-center text-sm text-amber-950">
+            <p className="font-bold">මූලාශ්‍ර තොරතුරු දැනට ලබා ගත නොහැක.</p>
+            <p className="mt-2 text-xs">මූලාශ්‍ර ලේඛන සනාථ කළ නොහැකි බැවින් ලැයිස්තුව временно වසා ඇත.</p>
+          </div>
+        ) : null}
         {sources.map((src) => (
           <div
             key={src.id}

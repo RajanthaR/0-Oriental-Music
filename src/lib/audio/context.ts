@@ -1,34 +1,36 @@
 /**
- * Bounded AudioContext resume helper.
- * Races `context.resume()` against a timeout and clears its timer on all paths.
- * A non-settling or rejected resume fails safely without wedging future attempts;
- * the caller's cached initPromise is cleared via its own finally handler.
+ * Shared AudioContext resume helper with bounded timeout.
+ *
+ * A non-settling or rejected `AudioContext.resume()` must fail safely without
+ * permanently wedging future audio attempts. The helper races `resume()` against
+ * a bounded timeout and clears its timer on all paths.
  */
 
 export async function resumeAudioContext(
   context: AudioContext,
   timeoutMs: number = 3000
-): Promise<boolean> {
-  if (context.state !== "suspended") return true;
+): Promise<void> {
+  if (context.state !== "suspended") return;
   let timeoutId: number | undefined;
   try {
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      timeoutId = window.setTimeout(
-        () => reject(new Error("audio-resume-timeout")),
-        timeoutMs
-      ) as unknown as number;
-    });
-    await Promise.race([context.resume(), timeoutPromise]);
-    return true;
-  } catch {
-    return false;
+    await Promise.race([
+      context.resume(),
+      new Promise<never>((_, reject) => {
+        timeoutId = window.setTimeout(
+          () => reject(new Error("audio-resume-timeout")),
+          timeoutMs
+        ) as unknown as number;
+      }),
+    ]);
   } finally {
     if (timeoutId !== undefined) {
       try {
         window.clearTimeout(timeoutId);
       } catch {
-        // Timer cancellation is best-effort.
+        // Timer cleanup is best-effort.
       }
     }
   }
 }
+
+export const resumeWithTimeout = resumeAudioContext;

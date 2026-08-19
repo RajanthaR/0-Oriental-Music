@@ -52,10 +52,7 @@ class TanpuraEngine {
         this.masterGain.gain.setValueAtTime(this.settings.volume, this.ctx.currentTime);
         this.masterGain.connect(this.ctx.destination);
       }
-      if (this.ctx.state === "suspended") {
-        const resumed = await resumeAudioContext(this.ctx);
-        if (!resumed) throw new Error("audio-resume-timeout");
-      }
+      if (this.ctx.state === "suspended") await resumeAudioContext(this.ctx);
       return this.ctx.state !== "closed";
     } catch {
       return false;

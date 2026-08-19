@@ -66,45 +66,62 @@ export default function InstrumentDetailPage() {
     setAudioError(false);
 
     if (instrument.id === "inst-tabla" || instrument.category_si.includes("අවනද්ධ")) {
+      const pendingHandles = new Set<TablaPlaybackHandle>();
+      let scheduledCount = 0;
+      const tryComplete = () => {
+        if (!mountedRef.current || audioGenerationRef.current !== generation) return;
+        if (scheduledCount === 4 && audioTimersRef.current.size === 0 && pendingHandles.size === 0) {
+          setIsPlayingAudio(false);
+        }
+      };
       ["ධා", "ධින්", "ධින්", "ධා"].forEach((bol, i) => {
         const timerId = window.setTimeout(() => {
           audioTimersRef.current.delete(timerId);
-          if (!mountedRef.current || audioGenerationRef.current !== generation) return;
+          if (!mountedRef.current || audioGenerationRef.current !== generation) {
+            tryComplete();
+            return;
+          }
           let handle: TablaPlaybackHandle;
           handle = tablaSynth.playBol(bol, 400, () => {
-            if (mountedRef.current && audioGenerationRef.current === generation && tablaHandlesRef.current.has(handle)) {
+            if (mountedRef.current && audioGenerationRef.current === generation && pendingHandles.has(handle)) {
               setAudioError(true);
             }
           });
+          pendingHandles.add(handle);
           tablaHandlesRef.current.add(handle);
+          scheduledCount += 1;
           void handle.ready.then(
             (played) => {
-              if (!mountedRef.current || audioGenerationRef.current !== generation || !tablaHandlesRef.current.has(handle)) return;
+              if (!mountedRef.current || audioGenerationRef.current !== generation || !pendingHandles.has(handle)) return;
               if (!played) setAudioError(true);
             },
             () => {
-              if (mountedRef.current && audioGenerationRef.current === generation && tablaHandlesRef.current.has(handle)) {
+              if (mountedRef.current && audioGenerationRef.current === generation && pendingHandles.has(handle)) {
                 setAudioError(true);
               }
             },
           );
           void handle.finished.then(
-            () => tablaHandlesRef.current.delete(handle),
             () => {
-              const isCurrent = tablaHandlesRef.current.delete(handle);
-              if (isCurrent && mountedRef.current && audioGenerationRef.current === generation) setAudioError(true);
+              pendingHandles.delete(handle);
+              tablaHandlesRef.current.delete(handle);
+              tryComplete();
+            },
+            () => {
+              const wasPending = pendingHandles.delete(handle);
+              tablaHandlesRef.current.delete(handle);
+              if (wasPending && mountedRef.current && audioGenerationRef.current === generation) setAudioError(true);
+              tryComplete();
             },
           );
+          // In case this was the last scheduled bol, check completion after scheduling.
+          if (scheduledCount === 4 && audioTimersRef.current.size === 0) {
+            // If all handles already finished synchronously, complete now; otherwise finished handlers will complete.
+            if (pendingHandles.size === 0) tryComplete();
+          }
         }, i * 400);
         audioTimersRef.current.add(timerId);
       });
-      completionTimerRef.current = window.setTimeout(() => {
-        completionTimerRef.current = null;
-        if (!mountedRef.current || audioGenerationRef.current !== generation) return;
-        audioGenerationRef.current += 1;
-        releaseHandleSet(tablaHandlesRef);
-        setIsPlayingAudio(false);
-      }, 2000);
     } else if (instrument.id === "inst-flute") {
       const handle = swaraSynth.playSequenceHandle(["S", "G", "M", "P", "N", "S'"], 0.5, undefined, 261.63, "flute");
       sequenceHandleRef.current = handle;

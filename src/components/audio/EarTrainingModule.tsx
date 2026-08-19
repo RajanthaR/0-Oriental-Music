@@ -150,6 +150,7 @@ export const EarTrainingModule: React.FC = () => {
 
   const handleNext = () => {
     cancelPlayback();
+    setAudioUnavailable(false);
     if (currentIndex < DEFAULT_CHALLENGES.length - 1) {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
