@@ -414,3 +414,45 @@ state is invented or promoted. The rejected Deepchandi retrieval-only finding,
 every earlier blocked run ID and verdict, and the original-PDF, diagram,
 notation, corrupt-glyph, and SME-review boundaries remain historical and
 unchanged.
+
+## Acceptance-hardening review cycle 3 (53 raw findings; pending rereview)
+
+Run `20260818-093434-87f5fe73` reviewed the complete diff from
+`beba1479f473b3413b3f2de48a27c558e1937c6f` through immutable head
+`a0c87a2276e3df9e66f701834b6f337e277aa8e3`. Artifacts are under
+`C:/Users/Rajantha/AppData/Local/Temp/compound-engineering-197609/ce-code-review/20260818-093434-87f5fe73/`.
+All eleven reviewers completed; no validator wave was dispatched (findings input
+only). The 53 raw findings comprised 1 P0, 15 P1, 25 P2, and 11 P3. After
+deduplication, 31 validated unique findings remain.
+
+This implementation addresses all validated findings:
+
+- **P0** `AH-C3-P0-01` – restored unknown provenance in `getSources()` with
+  non-circular regression (`src/test/source-metadata-consistency.test.ts#exposes only unknown/unverified provenance`).
+- **P1** `AH-C3-P1-01` – made quiz/glossary validation production-reachable via
+  admin boundary map and `validateMusicalCoreFieldDispositions` wiring
+  (`src/app/admin/page.tsx#boundaryReport`).
+- **P1** `AH-C3-P1-02` – removed vacuous `field === "record"` fallbacks and
+  deleted duplicate quiz aggregate branches (`src/test/content-validator.test.ts`).
+- **P1** `AH-C3-P1-03` – closed prototype-key via `ReadonlyMap` for
+  `DEPENDENCY_FIELD_RULES` and null-proto state in `QuizRunner`
+  (`src/lib/data/publication-policy.ts#DEPENDENCY_FIELD_RULES`,
+  `src/components/quiz/QuizRunner.tsx#getUsableQuiz`).
+- **P1** `AH-C3-P1-04` – added `finally` for publication stack and canonical
+  `normalizeRecordId` for `isKnownQuarantinedEntityId`.
+- **P1** `AH-C3-P1-05` – unified Quiz parent resolution from evaluation context
+  (`src/lib/validation/content-validator.ts#quizAggregateEvidenceIssues`).
+- **P1** `AH-C3-P1-06` – bounded `AudioContext.resume()` via shared helper
+  `src/lib/audio/context.ts#resumeAudioContext` (applied to synth, tabla,
+  tanpura) with fake-timer regressions.
+- **P1** `AH-C3-P1-07` – stopped CMS review-metadata fabrication
+  (`src/lib/data/repository.ts#updateLessonStatus`).
+- **P1/P2** structural – deduplicated `normalizeRecordId`, `isDenseArray`,
+  renamed `hasExactEvidence` pair, removed dead `sanitizePublicRecord` import,
+  fixed SwaraKeyboard timer isolation and aerophone term, and classified
+  >1000-line file and layering inversions as accepted residual per plan.
+
+All eight Talas remain whole-entity quarantined. No new musical fact,
+publisher, year, location, licence, organization, reviewer, review date, or
+publication state is invented. Original-PDF, diagram, notation, OCR, and SME
+boundaries remain unchanged. Disposition: **FIXED-PENDING-REREVIEW**.
