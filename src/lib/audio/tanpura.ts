@@ -29,6 +29,7 @@ export const ROOT_PITCHES: { name: string; freq: number }[] = [
 class TanpuraEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
+  private initPromise: Promise<boolean> | null = null;
   private isRunning: boolean = false;
   private timerId: NodeJS.Timeout | number | null = null;
   private currentStringIndex: number = 0;
@@ -41,7 +42,7 @@ class TanpuraEngine {
   };
   private onPluckCallback?: (stringIndex: number, stringName: string) => void;
 
-  private async initContext(): Promise<boolean> {
+  private async runContextInit(): Promise<boolean> {
     try {
       if (!this.ctx) {
         const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -53,12 +54,22 @@ class TanpuraEngine {
       }
       if (this.ctx.state === "suspended") {
         const resumed = await resumeAudioContext(this.ctx);
-        if (!resumed) return false;
+        if (!resumed) throw new Error("audio-resume-timeout");
       }
       return this.ctx.state !== "closed";
     } catch {
       return false;
     }
+  }
+
+  private async initContext(): Promise<boolean> {
+    if (this.initPromise) return this.initPromise;
+    const attempt = this.runContextInit();
+    this.initPromise = attempt;
+    void attempt.finally(() => {
+      if (this.initPromise === attempt) this.initPromise = null;
+    });
+    return attempt;
   }
 
   public getSettings(): TanpuraSettings {

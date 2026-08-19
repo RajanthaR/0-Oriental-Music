@@ -94,7 +94,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
 
   const handleSelectMCQ = (optId: string) => {
     if (isSubmitted) return;
-    setSelectedAnswers((prev) => ({ ...prev, [question.id]: optId }));
+    setSelectedAnswers((prev) => Object.assign(Object.create(null), prev, { [question.id]: optId }));
   };
 
   const handleToggleMultiSelect = (optId: string) => {
@@ -103,12 +103,12 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
     const updated = current.includes(optId)
       ? current.filter((id) => id !== optId)
       : [...current, optId];
-    setSelectedAnswers((prev) => ({ ...prev, [question.id]: updated }));
+    setSelectedAnswers((prev) => Object.assign(Object.create(null), prev, { [question.id]: updated }));
   };
 
   const handleMatchSelect = (left: string, right: string) => {
     if (isSubmitted) return;
-    setMatchingSelections((prev) => ({ ...prev, [left]: right }));
+    setMatchingSelections((prev) => Object.assign(Object.create(null), prev, { [left]: right }));
   };
 
   const getOrderingIds = (target: Question): string[] =>
@@ -124,7 +124,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
     if (index < 0 || target < 0 || target >= current.length) return;
     const next = [...current];
     [next[index], next[target]] = [next[target], next[index]];
-    setOrderedItems((previous) => ({ ...previous, [question.id]: next }));
+    setOrderedItems((previous) => Object.assign(Object.create(null), previous, { [question.id]: next }));
   };
 
   const handleCheckCurrentAnswer = () => {
