@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { Quiz, Question } from "@/types/content";
 import { CheckCircle2, XCircle, Award, RotateCcw, ArrowRight, ArrowUp, ArrowDown, Sparkles } from "lucide-react";
 import { ProgressStorage } from "@/lib/storage/progress-storage";
@@ -84,6 +84,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
   const [scoreCount, setScoreCount] = useState(0);
+  const scoreRef = useRef(0);
 
   const usableQuiz = useMemo(() => getUsableQuiz(quiz), [quiz]);
   if (!usableQuiz) return <QuizUnavailable />;
@@ -158,7 +159,11 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
     }
 
     if (isCorrect) {
-      setScoreCount((prev) => prev + 1);
+      setScoreCount((prev) => {
+        const next = prev + 1;
+        scoreRef.current = next;
+        return next;
+      });
     }
   };
 
@@ -169,7 +174,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
       setCurrentIdx((prev) => prev + 1);
     } else {
       setIsQuizCompleted(true);
-      const finalScore = scoreCount;
+      const finalScore = scoreRef.current;
       const percent = Math.round((finalScore / totalQuestions) * 100);
       const passed = percent >= usableQuiz.passingScorePercent;
       ProgressStorage.recordQuizAttempt(usableQuiz.id, finalScore, totalQuestions, passed);
@@ -186,6 +191,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
     setIsSubmitted(false);
     setIsQuizCompleted(false);
     setScoreCount(0);
+    scoreRef.current = 0;
   };
 
   if (isQuizCompleted) {
