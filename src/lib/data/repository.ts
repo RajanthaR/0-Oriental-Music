@@ -52,11 +52,9 @@ import {
   type SourceDocumentSummary,
 } from "@/lib/data/publication-policy";
 import {
-  isDenseArray,
   isRecord,
   isReviewMetadata,
   cloneBoundedRecord,
-  normalizeEntityId,
   normalizeRecordId,
   readOwnDataField,
   projectPublicRecord,
