@@ -49,7 +49,7 @@ export default function SourcesCatalogPage() {
         {sources.length === 0 ? (
           <div role="status" className="rounded-3xl border border-amber-200 bg-amber-50 p-8 text-center text-sm text-amber-950">
             <p className="font-bold">මූලාශ්‍ර තොරතුරු දැනට ලබා ගත නොහැක.</p>
-            <p className="mt-2 text-xs">මූලාශ්‍ර ලේඛන සනාථ කළ නොහැකි බැවින් ලැයිස්තුව временно වසා ඇත.</p>
+            <p className="mt-2 text-xs">මූලාශ්‍ර ලේඛන සනාථ කළ නොහැකි බැවින් ලැයිස්තුව තාවකාලිකව වසා ඇත.</p>
           </div>
         ) : null}
         {sources.map((src) => (

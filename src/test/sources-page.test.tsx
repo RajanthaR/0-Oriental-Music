@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import SourcesCatalogPage from "@/app/sources/page";
+import { repository } from "@/lib/data/repository";
 import sourceDocumentsData from "../../data/source-documents.json";
 import sourcePageQualityData from "../../data/source-page-quality.json";
 
@@ -62,6 +63,27 @@ describe("Sources transparency inventory rendering", () => {
     } finally {
       restoreCatalog(sourceDocuments, documentSnapshot);
       restoreCatalog(sourcePageQuality, pageSnapshot);
+    }
+  });
+});
+
+describe("Sources empty-catalog state", () => {
+  it("renders the pinned Sinhala unavailable copy when no sources are public", () => {
+    const mutableRepository = repository as unknown as { sources: unknown[] };
+    const original = [...mutableRepository.sources];
+    mutableRepository.sources = [];
+    try {
+      const view = render(<SourcesCatalogPage />);
+
+      // The empty state is pinned verbatim so copy regressions (including
+      // foreign-script leakage like a stray non-Sinhala word) fail loudly.
+      expect(screen.getByRole("status")).toHaveTextContent("මූලාශ්‍ර තොරතුරු දැනට ලබා ගත නොහැක.");
+      expect(screen.getByRole("status")).toHaveTextContent("මූලාශ්‍ර ලේඛන සනාථ කළ නොහැකි බැවින් ලැයිස්තුව තාවකාලිකව වසා ඇත.");
+      // No source rows render alongside the empty state.
+      expect(screen.queryByText("සාක්ෂි තත්ත්වය:")).not.toBeInTheDocument();
+      view.unmount();
+    } finally {
+      mutableRepository.sources.splice(0, mutableRepository.sources.length, ...original);
     }
   });
 });

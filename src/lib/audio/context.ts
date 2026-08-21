@@ -32,5 +32,3 @@ export async function resumeAudioContext(
     }
   }
 }
-
-export const resumeWithTimeout = resumeAudioContext;
