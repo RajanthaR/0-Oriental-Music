@@ -33,21 +33,105 @@ export const SWARA_STEPS: { si: string; en: string; semitones: number }[] = [
 export class PitchDetector {
   private audioCtx: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
+  private source: MediaStreamAudioSourceNode | null = null;
   private mediaStream: MediaStream | null = null;
   private isListening: boolean = false;
   private animFrameId: number | null = null;
+  private generation = 0;
   private buffer: Float32Array = new Float32Array(2048);
+
+  private stopStream(stream: MediaStream | null): void {
+    if (!stream) return;
+    try {
+      stream.getTracks().forEach((track) => {
+        try {
+          track.stop();
+        } catch {
+          // A track may already be stopped during browser teardown.
+        }
+      });
+    } catch {
+      // The stream can become unavailable while permissions are being revoked.
+    }
+  }
+
+  private closeContext(context: AudioContext | null): void {
+    if (!context) return;
+    try {
+      void Promise.resolve(context.close()).catch(() => {
+        // Closing an already-closed context is harmless for ownership cleanup.
+      });
+    } catch {
+      // Context construction can fail before close is available.
+    }
+  }
+
+  private releaseResources(
+    stream: MediaStream | null,
+    source: MediaStreamAudioSourceNode | null,
+    context: AudioContext | null,
+  ): void {
+    try {
+      source?.disconnect();
+    } catch {
+      // A partially constructed graph may already be disconnected.
+    }
+    this.stopStream(stream);
+    this.closeContext(context);
+  }
+
+  private disposeCurrentResources(): void {
+    this.isListening = false;
+
+    const frameId = this.animFrameId;
+    this.animFrameId = null;
+    if (frameId !== null && typeof cancelAnimationFrame === "function") {
+      try {
+        cancelAnimationFrame(frameId);
+      } catch {
+        // The frame may already have fired or the document may be tearing down.
+      }
+    }
+
+    const source = this.source;
+    this.source = null;
+    const stream = this.mediaStream;
+    this.mediaStream = null;
+    const context = this.audioCtx;
+    this.audioCtx = null;
+    this.analyser = null;
+    this.releaseResources(stream, source, context);
+  }
+
+  private cleanupAttempt(
+    stream: MediaStream | null,
+    source: MediaStreamAudioSourceNode | null,
+    context: AudioContext | null,
+  ): void {
+    this.releaseResources(stream, source, context);
+  }
 
   public async startListening(
     onPitchDetected: (result: PitchMatchResult | null) => void,
     rootFreq: number = 261.63
   ): Promise<boolean> {
+    const generation = ++this.generation;
+    // A new start owns the detector. It invalidates and releases any previous
+    // active attempt while a previous pending getUserMedia call is guarded by
+    // its older generation and will stop its late stream when it resolves.
+    this.disposeCurrentResources();
+
     if (typeof window === "undefined" || !navigator.mediaDevices?.getUserMedia) {
       return false;
     }
 
+    let stream: MediaStream | null = null;
+    let context: AudioContext | null = null;
+    let source: MediaStreamAudioSourceNode | null = null;
+    let transferred = false;
+
     try {
-      this.mediaStream = await navigator.mediaDevices.getUserMedia({
+      stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
@@ -55,54 +139,109 @@ export class PitchDetector {
         },
       });
 
+      if (this.generation !== generation) {
+        this.stopStream(stream);
+        return false;
+      }
+
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.audioCtx = new AudioCtx();
-      const source = this.audioCtx.createMediaStreamSource(this.mediaStream);
+      if (!AudioCtx) throw new Error("AudioContext is unavailable");
+      context = new AudioCtx();
+      const activeContext = context;
+      if (this.generation !== generation) {
+        this.cleanupAttempt(stream, source, activeContext);
+        return false;
+      }
+      source = activeContext.createMediaStreamSource(stream);
 
-      this.analyser = this.audioCtx.createAnalyser();
-      this.analyser.fftSize = 2048;
-      source.connect(this.analyser);
+      const analyser = activeContext.createAnalyser();
+      analyser.fftSize = 2048;
+      source.connect(analyser);
 
+      if (this.generation !== generation) {
+        this.cleanupAttempt(stream, source, activeContext);
+        return false;
+      }
+
+      this.audioCtx = activeContext;
+      this.source = source;
+      this.mediaStream = stream;
+      this.analyser = analyser;
       this.isListening = true;
+      transferred = true;
 
       const detect = () => {
-        if (!this.isListening || !this.analyser || !this.audioCtx) return;
+        const ownsResources = () => (
+          this.generation === generation &&
+          this.isListening &&
+          this.analyser === analyser &&
+          this.audioCtx === activeContext
+        );
+        if (!ownsResources()) return true;
 
-        this.analyser.getFloatTimeDomainData(this.buffer as any);
-        const { freq, clarity } = this.autoCorrelate(this.buffer, this.audioCtx.sampleRate);
+        try {
+          analyser.getFloatTimeDomainData(this.buffer as any);
+          // Browser analyser methods and test doubles can synchronously stop or
+          // replace a session. Do not emit a result from an operation that no
+          // longer owns the detector.
+          if (!ownsResources()) return false;
+          const { freq, clarity } = this.autoCorrelate(this.buffer, activeContext.sampleRate);
 
-        if (freq > 60 && freq < 1200 && clarity > 0.82) {
-          const match = this.mapFrequencyToSwara(freq, rootFreq, clarity);
-          onPitchDetected(match);
-        } else {
-          onPitchDetected(null);
+          if (freq > 60 && freq < 1200 && clarity > 0.82) {
+            const match = this.mapFrequencyToSwara(freq, rootFreq, clarity);
+            onPitchDetected(match);
+          } else {
+            onPitchDetected(null);
+          }
+
+          if (!ownsResources()) return false;
+
+          const nextFrame = requestAnimationFrame(detect);
+          if (!ownsResources()) {
+            // A re-entrant stop can happen while requestAnimationFrame is
+            // registering the callback, before its id can be stored. Avoid
+            // cancelling a replacement session's frame.
+            if (!this.isListening || (this.analyser === analyser && this.audioCtx === activeContext)) {
+              try {
+                cancelAnimationFrame(nextFrame);
+              } catch {
+                // The frame may already have fired during teardown.
+              }
+            }
+            return false;
+          }
+          this.animFrameId = nextFrame;
+          return true;
+        } catch (error) {
+          try {
+            console.error("Pitch detection error:", error);
+          } catch {
+            // Diagnostics must not prevent ownership cleanup.
+          }
+          if (ownsResources()) this.stopListening();
+          return false;
         }
-
-        this.animFrameId = requestAnimationFrame(detect);
       };
 
-      detect();
-      return true;
+      return detect();
     } catch (err) {
-      console.error("Microphone access error:", err);
+      try {
+        console.error("Microphone access error:", err);
+      } catch {
+        // Diagnostics must not prevent ownership cleanup.
+      }
+      if (transferred && this.generation === generation) {
+        this.disposeCurrentResources();
+      } else {
+        this.cleanupAttempt(stream, source, context);
+      }
       return false;
     }
   }
 
   public stopListening() {
-    this.isListening = false;
-    if (this.animFrameId) {
-      cancelAnimationFrame(this.animFrameId);
-      this.animFrameId = null;
-    }
-    if (this.mediaStream) {
-      this.mediaStream.getTracks().forEach((t) => t.stop());
-      this.mediaStream = null;
-    }
-    if (this.audioCtx) {
-      this.audioCtx.close();
-      this.audioCtx = null;
-    }
+    this.generation += 1;
+    this.disposeCurrentResources();
   }
 
   /**

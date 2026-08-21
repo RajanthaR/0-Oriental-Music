@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   ShieldAlert,
@@ -16,10 +16,12 @@ import { repository } from "@/lib/data/repository";
 import {
   validateContent,
   validateForensicInventory,
+  validateMusicalCoreFieldDispositions,
   validatePublicBoundary,
   ValidationIssue,
 } from "@/lib/validation/content-validator";
 import { ReviewStatus, Lesson } from "@/types/content";
+import { releaseTimerRef } from "@/lib/audio/cleanup";
 
 export default function AdminReviewDashboardPage() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -28,7 +30,14 @@ export default function AdminReviewDashboardPage() {
     issues: ValidationIssue[];
   }>({ isValid: true, issues: [] });
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>("all");
-  const [updatedSuccessMsg, setUpdatedSuccessMsg] = useState<string | null>(null);
+  const [updateNotice, setUpdateNotice] = useState<{ kind: "success" | "error"; message: string } | null>(null);
+  const noticeTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      releaseTimerRef(noticeTimerRef, (id) => window.clearTimeout(id));
+    };
+  }, []);
 
   useEffect(() => {
     const all = repository.getLessons({ visibility: "review" });
@@ -42,6 +51,7 @@ export default function AdminReviewDashboardPage() {
       repository.getTheatreTraditions()
     );
     const baselineReport = validateForensicInventory();
+    const dispositionReport = validateMusicalCoreFieldDispositions();
     const boundaryReport = validatePublicBoundary({
       lessons: repository.getLessons(),
       ragas: repository.getRagas(),
@@ -51,9 +61,11 @@ export default function AdminReviewDashboardPage() {
       theatreTraditions: repository.getTheatreTraditions(),
       learningPaths: repository.getLearningPaths(),
       exams: repository.getExamPapers(),
+      quizzes: repository.getQuizzes(),
+      glossary: repository.getGlossary(),
     });
     setValidationReport({
-      isValid: contentReport.isValid && baselineReport.isValid && boundaryReport.isValid,
+      isValid: contentReport.isValid && baselineReport.isValid && dispositionReport.isValid && boundaryReport.isValid,
       issues: [
         {
           entityType: "Publication",
@@ -64,6 +76,7 @@ export default function AdminReviewDashboardPage() {
         },
         ...contentReport.issues,
         ...baselineReport.issues,
+        ...dispositionReport.issues,
         ...boundaryReport.issues,
       ],
     });
@@ -71,12 +84,19 @@ export default function AdminReviewDashboardPage() {
 
   const handleUpdateStatus = (lessonId: string, newStatus: ReviewStatus) => {
     const isPublished = newStatus === "Published";
-    repository.updateLessonReviewStatus(lessonId, newStatus, isPublished);
+    const updated = repository.updateLessonReviewStatus(lessonId, newStatus, isPublished);
     setLessons(repository.getLessons({ visibility: "review" }));
-    setUpdatedSuccessMsg(
-      `පාඩම් අංක ${lessonId} සමාලෝචන පාරදත්ත '${newStatus}' ලෙස සටහන් විය. ප්‍රකාශන සීමා ප්‍රතිපත්තිය තවදුරටත් බලපැවැත්වේ.`
-    );
-    setTimeout(() => setUpdatedSuccessMsg(null), 3000);
+    setUpdateNotice(updated.ok
+      ? {
+          kind: "success",
+          message: `පාඩම් අංක ${lessonId} සමාලෝචන පාරදත්ත '${newStatus}' ලෙස සටහන් විය. ප්‍රකාශන සීමා ප්‍රතිපත්තිය තවදුරටත් බලපැවැත්වේ.`,
+        }
+      : {
+          kind: "error",
+          message: `පාඩම් අංක ${lessonId} සඳහා '${newStatus}' තත්ත්වය සටහන් කළ නොහැකි විය (${updated.reasonCode}). මූලාශ්‍ර හා සමාලෝචන සාක්ෂි පරීක්ෂා කරන්න.`,
+        });
+    releaseTimerRef(noticeTimerRef, (id) => window.clearTimeout(id));
+    noticeTimerRef.current = window.setTimeout(() => setUpdateNotice(null), 3000) as unknown as number;
   };
 
   const statuses: ReviewStatus[] = [
@@ -112,10 +132,15 @@ export default function AdminReviewDashboardPage() {
         </p>
       </div>
 
-      {updatedSuccessMsg && (
-        <div className="bg-green-50 border border-green-200 text-green-900 text-xs font-bold p-4 rounded-2xl flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-forest-green" />
-          <span>{updatedSuccessMsg}</span>
+      {updateNotice && (
+        <div
+          className={`${updateNotice.kind === "success" ? "bg-green-50 border-green-200 text-green-900" : "bg-red-50 border-red-200 text-red-900"} border text-xs font-bold p-4 rounded-2xl flex items-center gap-2`}
+          role="status"
+        >
+          {updateNotice.kind === "success"
+            ? <CheckCircle2 className="w-4 h-4 text-forest-green" />
+            : <AlertTriangle className="w-4 h-4 text-red-700" />}
+          <span>{updateNotice.message}</span>
         </div>
       )}
 

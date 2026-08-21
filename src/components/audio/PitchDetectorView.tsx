@@ -21,10 +21,15 @@ export const PitchDetectorView: React.FC<PitchDetectorViewProps> = ({
   const [matchedNotes, setMatchedNotes] = useState<string[]>([]);
 
   const detectorRef = useRef<PitchDetector | null>(null);
+  const mountedRef = useRef(false);
+  const operationRef = useRef(0);
 
   useEffect(() => {
+    mountedRef.current = true;
     detectorRef.current = new PitchDetector();
     return () => {
+      mountedRef.current = false;
+      operationRef.current += 1;
       if (detectorRef.current) {
         detectorRef.current.stopListening();
       }
@@ -32,10 +37,12 @@ export const PitchDetectorView: React.FC<PitchDetectorViewProps> = ({
   }, []);
 
   const handleStartMic = async () => {
+    const operation = ++operationRef.current;
     setErrorMsg(null);
     if (!detectorRef.current) return;
 
     const success = await detectorRef.current.startListening((result) => {
+      if (!mountedRef.current || operationRef.current !== operation) return;
       setPitchResult(result);
       if (result && result.isInTune) {
         // Check if matches target note
@@ -47,6 +54,10 @@ export const PitchDetectorView: React.FC<PitchDetectorViewProps> = ({
       }
     });
 
+    if (!mountedRef.current || operationRef.current !== operation) {
+      return;
+    }
+
     if (success) {
       setIsMicActive(true);
     } else {
@@ -57,6 +68,7 @@ export const PitchDetectorView: React.FC<PitchDetectorViewProps> = ({
   };
 
   const handleStopMic = () => {
+    operationRef.current += 1;
     if (detectorRef.current) {
       detectorRef.current.stopListening();
     }

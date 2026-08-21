@@ -1,31 +1,101 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { Quiz, Question } from "@/types/content";
-import { CheckCircle2, XCircle, Award, RotateCcw, ArrowRight, Sparkles } from "lucide-react";
+import { CheckCircle2, XCircle, Award, RotateCcw, ArrowRight, ArrowUp, ArrowDown, Sparkles } from "lucide-react";
 import { ProgressStorage } from "@/lib/storage/progress-storage";
+import {
+  MAX_ARRAY_ITEMS,
+  cloneBoundedRecord,
+  isDenseArray,
+  isNonBlankString,
+  isRecord,
+  normalizeEntityId,
+  projectPublicRecord,
+  validateContentRecord,
+} from "@/lib/validation/content-contracts";
+
+export type QuizRunnerQuiz = Omit<Pick<Quiz, "id" | "title_si" | "questions" | "passingScorePercent">, "questions"> & {
+  questions: Question[];
+};
 
 export interface QuizRunnerProps {
-  quiz: Quiz;
+  quiz: QuizRunnerQuiz;
   onComplete?: (score: number, maxScore: number, passed: boolean) => void;
+}
+
+function getUsableQuiz(quiz: unknown): QuizRunnerQuiz | null {
+  try {
+    const snapshot = cloneBoundedRecord(quiz);
+    if (!isRecord(snapshot) || !isNonBlankString(snapshot.title_si) ||
+      typeof snapshot.passingScorePercent !== "number" || !Number.isFinite(snapshot.passingScorePercent) ||
+      snapshot.passingScorePercent < 1 || snapshot.passingScorePercent > 100) {
+      return null;
+    }
+    // The quiz ID becomes a progress-storage key, so it must be canonical too.
+    const canonicalQuizId = normalizeEntityId(snapshot.id);
+    if (!canonicalQuizId) return null;
+
+    const rawQuestions = snapshot.questions;
+    if (!isDenseArray(rawQuestions) || rawQuestions.length === 0 || rawQuestions.length > MAX_ARRAY_ITEMS) return null;
+
+    const questions: Question[] = [];
+    const canonicalQuestionIds = new Set<string>();
+    for (let index = 0; index < rawQuestions.length; index += 1) {
+      const candidate = rawQuestions[index];
+      if (!validateContentRecord(candidate, "question").isValid) return null;
+      const projected = projectPublicRecord(candidate, "question");
+      if (!isRecord(projected)) return null;
+      // Compare and store the canonical identity. Padded, NFD-decomposed, or
+      // control-bearing IDs must not survive as distinct questions, because the
+      // renderer keys every answer, ordering, and matching selection on this value.
+      const canonicalId = normalizeEntityId(projected.id);
+      if (!canonicalId || canonicalId in Object.prototype || canonicalQuestionIds.has(canonicalId)) return null;
+      canonicalQuestionIds.add(canonicalId);
+      questions.push({ ...(projected as unknown as Question), id: canonicalId });
+    }
+
+    return {
+      id: canonicalQuizId,
+      title_si: snapshot.title_si,
+      passingScorePercent: snapshot.passingScorePercent,
+      questions,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function QuizUnavailable() {
+  return (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center text-sm text-amber-950" role="alert">
+      <p className="font-bold">මෙම ප්‍රශ්නාවලිය දැනට ලබා ගත නොහැක.</p>
+      <p className="mt-2 text-xs">හොඳ උත්සාහයක්! අන්තර්ගත සමාලෝචනය අවසන් වූ පසු නැවත උත්සාහ කරන්න.</p>
+    </div>
+  );
 }
 
 export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string | string[]>>({});
-  const [matchingSelections, setMatchingSelections] = useState<Record<string, string>>({});
-  const [orderedItems, setOrderedItems] = useState<Record<string, string[]>>({});
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string | string[]>>(() => Object.create(null));
+  const [matchingSelections, setMatchingSelections] = useState<Record<string, string>>(() => Object.create(null));
+  const [orderedItems, setOrderedItems] = useState<Record<string, string[]>>(() => Object.create(null));
   const [shortAnswerInput, setShortAnswerInput] = useState<string>("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
   const [scoreCount, setScoreCount] = useState(0);
+  const scoreRef = useRef(0);
 
-  const question: Question = quiz.questions[currentIdx];
-  const totalQuestions = quiz.questions.length;
+  const usableQuiz = useMemo(() => getUsableQuiz(quiz), [quiz]);
+  if (!usableQuiz) return <QuizUnavailable />;
+
+  const question = usableQuiz.questions[currentIdx];
+  const totalQuestions = usableQuiz.questions.length;
+  if (!question) return <QuizUnavailable />;
 
   const handleSelectMCQ = (optId: string) => {
     if (isSubmitted) return;
-    setSelectedAnswers((prev) => ({ ...prev, [question.id]: optId }));
+    setSelectedAnswers((prev) => Object.assign(Object.create(null), prev, { [question.id]: optId }));
   };
 
   const handleToggleMultiSelect = (optId: string) => {
@@ -34,12 +104,28 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
     const updated = current.includes(optId)
       ? current.filter((id) => id !== optId)
       : [...current, optId];
-    setSelectedAnswers((prev) => ({ ...prev, [question.id]: updated }));
+    setSelectedAnswers((prev) => Object.assign(Object.create(null), prev, { [question.id]: updated }));
   };
 
   const handleMatchSelect = (left: string, right: string) => {
     if (isSubmitted) return;
-    setMatchingSelections((prev) => ({ ...prev, [left]: right }));
+    setMatchingSelections((prev) => Object.assign(Object.create(null), prev, { [left]: right }));
+  };
+
+  const getOrderingIds = (target: Question): string[] =>
+    target.type === "ordering"
+      ? orderedItems[target.id] ?? [...target.orderingItems].reverse().map((item) => item.id)
+      : [];
+
+  const moveOrderingItem = (itemId: string, direction: -1 | 1) => {
+    if (isSubmitted) return;
+    const current = getOrderingIds(question);
+    const index = current.indexOf(itemId);
+    const target = index + direction;
+    if (index < 0 || target < 0 || target >= current.length) return;
+    const next = [...current];
+    [next[index], next[target]] = [next[target], next[index]];
+    setOrderedItems((previous) => Object.assign(Object.create(null), previous, { [question.id]: next }));
   };
 
   const handleCheckCurrentAnswer = () => {
@@ -58,16 +144,26 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
     } else if (question.type === "matching") {
       const pairs = question.matchingPairs || [];
       isCorrect = pairs.every((p) => matchingSelections[p.left_si] === p.right_si);
+    } else if (question.type === "ordering") {
+      const expected = [...(question.orderingItems ?? [])]
+        .sort((a, b) => a.correctIndex - b.correctIndex)
+        .map((item) => item.id);
+      const selected = getOrderingIds(question);
+      isCorrect = selected.length === expected.length && selected.every((id, index) => id === expected[index]);
     } else if (question.type === "short-answer") {
       const input = shortAnswerInput.trim().toLowerCase();
       const valid = question.correctShortAnswer_si || [];
       isCorrect = valid.some((v) => input.includes(v.toLowerCase()));
     } else {
-      isCorrect = true;
+      isCorrect = false;
     }
 
     if (isCorrect) {
-      setScoreCount((prev) => prev + 1);
+      setScoreCount((prev) => {
+        const next = prev + 1;
+        scoreRef.current = next;
+        return next;
+      });
     }
   };
 
@@ -78,27 +174,29 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
       setCurrentIdx((prev) => prev + 1);
     } else {
       setIsQuizCompleted(true);
-      const finalScore = scoreCount;
-      const passed = (finalScore / totalQuestions) * 100 >= (quiz.passingScorePercent || 70);
-      ProgressStorage.recordQuizAttempt(quiz.id, finalScore, totalQuestions, passed);
+      const finalScore = scoreRef.current;
+      const percent = Math.round((finalScore / totalQuestions) * 100);
+      const passed = percent >= usableQuiz.passingScorePercent;
+      ProgressStorage.recordQuizAttempt(usableQuiz.id, finalScore, totalQuestions, passed);
       if (onComplete) onComplete(finalScore, totalQuestions, passed);
     }
   };
 
   const handleRestart = () => {
     setCurrentIdx(0);
-    setSelectedAnswers({});
-    setMatchingSelections({});
-    setOrderedItems({});
+    setSelectedAnswers(Object.create(null));
+    setMatchingSelections(Object.create(null));
+    setOrderedItems(Object.create(null));
     setShortAnswerInput("");
     setIsSubmitted(false);
     setIsQuizCompleted(false);
     setScoreCount(0);
+    scoreRef.current = 0;
   };
 
   if (isQuizCompleted) {
     const percent = Math.round((scoreCount / totalQuestions) * 100);
-    const passed = percent >= (quiz.passingScorePercent || 70);
+    const passed = percent >= usableQuiz.passingScorePercent;
 
     return (
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-border shadow-warm-lg text-center max-w-lg mx-auto">
@@ -136,7 +234,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
       <div className="flex items-center justify-between border-b border-border-light pb-3 mb-4">
         <div>
           <span className="text-xs font-bold text-accent uppercase tracking-wider block mb-0.5">
-            ප්‍රශ්නාවලිය ({quiz.title_si})
+            ප්‍රශ්නාවලිය ({usableQuiz.title_si})
           </span>
           <span className="text-xs text-text-muted">
             ප්‍රශ්න {currentIdx + 1} / {totalQuestions}
@@ -267,6 +365,40 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Short Answer */}
+        {question.type === "ordering" && question.orderingItems && (
+          <div className="space-y-2" aria-label="අයිතම නිවැරදි පිළිවෙළට සකසන්න">
+            {getOrderingIds(question).map((itemId, index, current) => {
+              const item = question.orderingItems?.find((candidate) => candidate.id === itemId);
+              if (!item) return null;
+              return (
+                <div key={item.id} className="flex min-h-[44px] items-center gap-2 rounded-xl border border-border bg-surface-warm p-2">
+                  <span className="w-7 text-center text-xs font-bold text-primary">{index + 1}</span>
+                  <span className="flex-1 text-xs sm:text-sm">{item.text_si}</span>
+                  <button
+                    type="button"
+                    onClick={() => moveOrderingItem(item.id, -1)}
+                    disabled={isSubmitted || index === 0}
+                    className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-border bg-white disabled:opacity-40"
+                    aria-label={`${item.text_si} ඉහළට ගෙනයන්න`}
+                  >
+                    <ArrowUp className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveOrderingItem(item.id, 1)}
+                    disabled={isSubmitted || index === current.length - 1}
+                    className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-border bg-white disabled:opacity-40"
+                    aria-label={`${item.text_si} පහළට ගෙනයන්න`}
+                  >
+                    <ArrowDown className="h-4 w-4" />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
 

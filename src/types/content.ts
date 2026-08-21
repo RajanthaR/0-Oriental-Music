@@ -95,6 +95,7 @@ export interface DiagnosticQuestion {
 
 export interface Lesson {
   id: string;
+  /** Runtime validation narrows this to the canonical curriculum-strand set. */
   strandId: string;
   title_si: string;
   title_en?: string;
@@ -159,17 +160,20 @@ export interface Tala {
   id: string;
   name_si: string;
   name_en: string;
+  aliases_si: string[];
   matras: number;
   vibhagCount: number;
   vibhagStructure: number[];
   taliKhali_si: string[];
   theka_si: string;
   bols: TalaBol[];
-  layaVariants: {
+  practiceTempoBpm: {
     thah_bpm: number;
     dugun_bpm: number;
     chaugun_bpm: number;
   };
+  context_si?: string;
+  contextSourceReference?: SourceReference;
   gradeBands: GradeBandType[];
   sourceReference: SourceReference;
   reviewMetadata: ReviewMetadata;
@@ -179,7 +183,7 @@ export interface Instrument {
   id: string;
   name_si: string;
   name_en: string;
-  category_si: "තත් භාණ්ඩ (Chordophone)" | "අවනද්ධ භාණ්ඩ (Membranophone)" | "සුශිර භාණ්ඩ (Aerophone)" | "ඝන භාණ්ඩ (Idiophone)";
+  category_si: "තත් භාණ්ඩ (Chordophone)" | "අවනද්ධ භාණ්ඩ (Membranophone)" | "සුෂිර භාණ්ඩ (Aerophone)" | "ඝන භාණ්ඩ (Idiophone)";
   origin_si: "දේශීය / ශ්‍රී ලාංකීය" | "උත්තර භාරතීය" | "බටහිර / පෙරදිග ආභාසය";
   construction_si: string;
   soundProduction_si: string;
@@ -241,6 +245,7 @@ export interface GlossaryTerm {
   term_en: string;
   transliteration: string;
   category_si: "ස්වර හා ශ්‍රැති" | "ලය හා තාල" | "රාග ශාස්ත්‍රය" | "වාද්‍ය භාණ්ඩ" | "දේශීය සංගීතය" | "නාට්‍ය සංගීතය" | "ශබ්දය හා ධ්වනි විද්‍යාව" | "සාමාන්‍ය දැනුම";
+  gradeBands: GradeBandType[];
   definition_si: string;
   detailedNotes_si?: string;
   relatedTermIds?: string[];
@@ -286,20 +291,31 @@ export type QuestionType =
   | "audio-id"
   | "notation-id";
 
+/** Question discriminators that have a learner-facing QuizRunner renderer. */
+export type RenderableQuestionType = Exclude<QuestionType, "audio-id" | "notation-id">;
+
 export interface AnswerOption {
   id: string;
   text_si: string;
+}
+
+export interface RawAnswerOption extends AnswerOption {
   isCorrect?: boolean;
 }
 
-export interface Question {
+/**
+ * Raw/forensic question shape. The source corpus may retain question types
+ * whose public renderer is not implemented yet.
+ */
+export interface RawQuestion {
   id: string;
   type: QuestionType;
   gradeBands: GradeBandType[];
   difficulty: DifficultyLevel;
+  /** Runtime validation narrows this to the canonical curriculum-strand set. */
   strandId: string;
   prompt_si: string;
-  options_si?: AnswerOption[];
+  options_si?: RawAnswerOption[];
   correctAnswerIds?: string[]; // for mcq & multi-select
   matchingPairs?: { left_si: string; right_si: string }[];
   orderingItems?: { id: string; text_si: string; correctIndex: number }[];
@@ -312,13 +328,80 @@ export interface Question {
   sourceReference: SourceReference;
 }
 
+/**
+ * Fields that are safe for a learner-facing question projection.
+ *
+ * `RawQuestion` intentionally retains audio/notation evidence for forensic
+ * review, but those fields must not become part of the public QuizRunner
+ * contract by structural inheritance.
+ */
+export type RenderableQuestionFields = Omit<
+  RawQuestion,
+  | "type"
+  | "options_si"
+  | "correctAnswerIds"
+  | "matchingPairs"
+  | "orderingItems"
+  | "correctShortAnswer_si"
+  | "audioNotes"
+  | "audioTalaId"
+  | "diagramSvg"
+>;
+
+export interface McqQuestion extends RenderableQuestionFields {
+  type: "mcq";
+  options_si: AnswerOption[];
+  correctAnswerIds: string[];
+}
+
+export interface MultiSelectQuestion extends RenderableQuestionFields {
+  type: "multi-select";
+  options_si: AnswerOption[];
+  correctAnswerIds: string[];
+}
+
+export interface MatchingQuestion extends RenderableQuestionFields {
+  type: "matching";
+  matchingPairs: { left_si: string; right_si: string }[];
+}
+
+export interface OrderingQuestion extends RenderableQuestionFields {
+  type: "ordering";
+  orderingItems: { id: string; text_si: string; correctIndex: number }[];
+}
+
+export interface TrueFalseQuestion extends RenderableQuestionFields {
+  type: "true-false";
+  options_si: AnswerOption[];
+  correctAnswerIds: string[];
+}
+
+export interface ShortAnswerQuestion extends RenderableQuestionFields {
+  type: "short-answer";
+  correctShortAnswer_si: string[];
+}
+
+/** Public/UI question union. Unsupported forensic-only variants are excluded. */
+export type Question =
+  | McqQuestion
+  | MultiSelectQuestion
+  | MatchingQuestion
+  | OrderingQuestion
+  | TrueFalseQuestion
+  | ShortAnswerQuestion;
+
+export type ForensicQuestion = RawQuestion;
+
 export interface Quiz {
   id: string;
   title_si: string;
-  lessonId?: string;
+  lessonId: string;
+  gradeBands: GradeBandType[];
   questions: Question[];
   passingScorePercent: number;
 }
+
+export type RawQuiz = Omit<Quiz, "questions"> & { questions: RawQuestion[] };
 
 export interface ExamPaper {
   id: string;
@@ -331,6 +414,11 @@ export interface ExamPaper {
   sourceReference: SourceReference;
   reviewMetadata: ReviewMetadata;
 }
+
+export type RawExamPaper = Omit<ExamPaper, "partA_MCQ" | "partB_Structured"> & {
+  partA_MCQ: RawQuestion[];
+  partB_Structured: RawQuestion[];
+};
 
 export interface TeacherAssignment {
   id: string;

@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { BookOpen, Search, Sparkles, Volume2 } from "lucide-react";
+import { BookOpen, Search } from "lucide-react";
 import { repository } from "@/lib/data/repository";
-import { swaraSynth } from "@/lib/audio/synth";
 
 export default function GlossaryPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,14 +22,6 @@ export default function GlossaryPage() {
     { id: "දේශීය සංගීතය", label: "දේශීය සංගීතය" },
     { id: "නාට්‍ය සංගීතය", label: "නාට්‍ය සංගීතය" },
   ];
-
-  const handlePlayAudio = (term: string) => {
-    if (term === "ස" || term.includes("ස්වර")) {
-      swaraSynth.playSwaraTone("S");
-    } else {
-      swaraSynth.playSequence(["S", "R", "G", "M", "P"], 0.4);
-    }
-  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-8">

@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-import { swaraSynth } from "@/lib/audio/synth";
-import { tablaSynth } from "@/lib/audio/tabla";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
+import { tablaSynth, type TablaPlaybackHandle } from "@/lib/audio/tabla";
+import { releaseHandleRef } from "@/lib/audio/cleanup";
 import { Play, CheckCircle2, XCircle, RotateCcw, Sparkles, Volume2 } from "lucide-react";
 
 export interface EarTrainingChallenge {
@@ -30,15 +31,16 @@ const DEFAULT_CHALLENGES: EarTrainingChallenge[] = [
   },
   {
     id: "ear-02",
-    title_si: "තාල රිද්ම හඳුනාගැනීම (Tala Identification)",
-    type: "tala",
-    targetItem: "tala-dadra",
+    title_si: "ස්වර හඳුනාගැනීම (Swara Identification)",
+    type: "swara",
+    targetItem: "P",
     options_si: [
-      { id: "o1", text_si: "දාද්‍රා තාලය (මාත්‍රා 6)", value: "tala-dadra" },
-      { id: "o2", text_si: "කෙහර්වා තාලය (මාත්‍රා 8)", value: "tala-keherwa" },
-      { id: "o3", text_si: "රූපක් තාලය (මාත්‍රා 7)", value: "tala-roopak" },
+      { id: "o1", text_si: "ස (ෂඩ්ජ)", value: "S" },
+      { id: "o2", text_si: "ග (ගාන්ධාර)", value: "G" },
+      { id: "o3", text_si: "ම (මධ්‍යම)", value: "M" },
+      { id: "o4", text_si: "ප (පඤ්චම)", value: "P" },
     ],
-    explanation_si: "මාත්‍රා 3 බැගින් වූ විභාග 2 කින් සමන්විත දාද්‍රා තාලයේ ථේකාවයි.",
+    explanation_si: "වාදනය වූයේ පඤ්චම (ප) ස්වරයයි.",
   },
 ];
 
@@ -47,19 +49,92 @@ export const EarTrainingModule: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
+  const [audioUnavailable, setAudioUnavailable] = useState(false);
+  const mountedRef = useRef(false);
+  const generationRef = useRef(0);
+  const playbackRef = useRef<SwaraPlaybackHandle | TablaPlaybackHandle | null>(null);
+
+  const cancelPlayback = useCallback(() => {
+    // Invalidate the generation and surrender ownership before cancelling, so a
+    // throwing cancel can neither strand this handle nor abort Next, replacement,
+    // reset, or unmount cleanup that still has to run after it.
+    generationRef.current += 1;
+    releaseHandleRef(playbackRef);
+  }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      cancelPlayback();
+    };
+  }, [cancelPlayback]);
 
   const challenge = DEFAULT_CHALLENGES[currentIndex];
 
   const handlePlayMystery = () => {
+    cancelPlayback();
+    const generation = generationRef.current;
+    setAudioUnavailable(false);
     if (challenge.type === "swara") {
-      swaraSynth.playSwaraTone(challenge.targetItem, 0.9, 261.63, "harmonium");
+      const handle = swaraSynth.playSwaraToneHandle(challenge.targetItem, 0.9, 261.63, "harmonium");
+      playbackRef.current = handle;
+      void handle.ready.then(
+        (played) => {
+          if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
+          if (!played) setAudioUnavailable(true);
+        },
+        () => {
+          if (mountedRef.current && generationRef.current === generation && playbackRef.current === handle) {
+            setAudioUnavailable(true);
+          }
+        },
+      );
+      void (handle.finished ?? handle.ready.then(() => undefined, () => undefined)).then(
+        () => {
+          const isCurrentHandle = playbackRef.current === handle;
+          if (isCurrentHandle) playbackRef.current = null;
+        },
+        () => {
+          const isCurrentHandle = playbackRef.current === handle;
+          if (isCurrentHandle) playbackRef.current = null;
+          if (mountedRef.current && generationRef.current === generation && isCurrentHandle) {
+            setAudioUnavailable(true);
+          }
+        },
+      );
     } else if (challenge.type === "tala") {
-      // Play 1 cycle of dadra
-      ["ධා", "ධී", "නා", "ධා", "තී", "නා"].forEach((bol, i) => {
-        setTimeout(() => {
-          tablaSynth.playBol(bol);
-        }, i * 450);
+      let handle: TablaPlaybackHandle;
+      handle = tablaSynth.playBol(challenge.targetItem, 500, () => {
+        if (mountedRef.current && generationRef.current === generation && playbackRef.current === handle) {
+          setAudioUnavailable(true);
+        }
       });
+      playbackRef.current = handle;
+      void handle.ready.then(
+        (played) => {
+          if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
+          if (!played) setAudioUnavailable(true);
+        },
+        () => {
+          if (mountedRef.current && generationRef.current === generation && playbackRef.current === handle) {
+            setAudioUnavailable(true);
+          }
+        },
+      );
+      void (handle.finished ?? handle.ready.then(() => undefined, () => undefined)).then(
+        () => {
+          const isCurrentHandle = playbackRef.current === handle;
+          if (isCurrentHandle) playbackRef.current = null;
+        },
+        () => {
+          const isCurrentHandle = playbackRef.current === handle;
+          if (isCurrentHandle) playbackRef.current = null;
+          if (mountedRef.current && generationRef.current === generation && isCurrentHandle) {
+            setAudioUnavailable(true);
+          }
+        },
+      );
     }
   };
 
@@ -74,6 +149,8 @@ export const EarTrainingModule: React.FC = () => {
   };
 
   const handleNext = () => {
+    cancelPlayback();
+    setAudioUnavailable(false);
     if (currentIndex < DEFAULT_CHALLENGES.length - 1) {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
@@ -101,6 +178,12 @@ export const EarTrainingModule: React.FC = () => {
           ලකුණු: {score}
         </span>
       </div>
+
+      {audioUnavailable && (
+        <p role="alert" className="mb-3 text-xs font-semibold text-primary">
+          මෙම උපාංගයේ නාදය ආරම්භ කළ නොහැක. පසුව නැවත උත්සාහ කරන්න.
+        </p>
+      )}
 
       {/* Mystery Sound Play Button Box */}
       <div className="bg-surface-warm rounded-2xl p-6 mb-5 border border-border-light flex flex-col items-center justify-center">

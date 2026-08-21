@@ -3,6 +3,7 @@
     "id": "tala-dadra",
     "name_si": "දාදරා තාලය",
     "name_en": "Dadra Tala",
+    "aliases_si": [],
     "matras": 6,
     "vibhagCount": 2,
     "vibhagStructure": [
@@ -70,34 +71,33 @@
         "action_si": "ඇඟිලි (3)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 80,
       "dugun_bpm": 160,
-      "chaugun_bpm": 320
+      "chaugun_bpm": 240
     },
     "gradeBands": [
-      "6-7",
-      "8-9",
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G07-TG",
-      "pageOrSection": "පිටුව 34; sg10_emus_chap1_mulikanga.pdf පිටුව 6"
+      "sourceId": "SRC-EPD-TB-G10",
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "මාත්‍රා 6, විභාග 2 (3/3), තාළි 1, ඛාලි 1 තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
     "id": "tala-keherwa",
-    "name_si": "කෙහර්වා තාලය (කහර්වා)",
+    "name_si": "කෙහෙර්වා තාලය",
     "name_en": "Keherwa Tala",
+    "aliases_si": ["කෙහර්වා තාලය", "කහර්වා තාලය"],
     "matras": 8,
     "vibhagCount": 2,
     "vibhagStructure": [
@@ -108,7 +108,7 @@
       "1 වන මාත්‍රාව: තාළි (සම)",
       "5 වන මාත්‍රාව: ඛාලි"
     ],
-    "theka_si": "ධා ගේ නා තින් | නා කේ ධින් නා",
+    "theka_si": "ධා ගේ න ත | න ක ධ න",
     "bols": [
       {
         "matra": 1,
@@ -130,7 +130,7 @@
       },
       {
         "matra": 3,
-        "bol_si": "නා",
+        "bol_si": "න",
         "vibhagIndex": 0,
         "isSam": false,
         "isTali": false,
@@ -139,7 +139,7 @@
       },
       {
         "matra": 4,
-        "bol_si": "තින්",
+        "bol_si": "ත",
         "vibhagIndex": 0,
         "isSam": false,
         "isTali": false,
@@ -148,7 +148,7 @@
       },
       {
         "matra": 5,
-        "bol_si": "නා",
+        "bol_si": "න",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": false,
@@ -157,7 +157,7 @@
       },
       {
         "matra": 6,
-        "bol_si": "කේ",
+        "bol_si": "ක",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": false,
@@ -166,7 +166,7 @@
       },
       {
         "matra": 7,
-        "bol_si": "ධින්",
+        "bol_si": "ධ",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": false,
@@ -175,7 +175,7 @@
       },
       {
         "matra": 8,
-        "bol_si": "නා",
+        "bol_si": "න",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": false,
@@ -183,34 +183,33 @@
         "action_si": "ඇඟිලි (4)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 90,
       "dugun_bpm": 180,
-      "chaugun_bpm": 360
+      "chaugun_bpm": 240
     },
     "gradeBands": [
-      "6-7",
-      "8-9",
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G07-TG",
-      "pageOrSection": "පිටුව 36; sg10_emus_chap1_mulikanga.pdf පිටුව 6"
+      "sourceId": "SRC-EPD-TB-G10",
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "මාත්‍රා 8, විභාග 2 (4/4), තාළි 1, ඛාලි 1 තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
     "id": "tala-teental",
-    "name_si": "ත්‍රීතාලය (තීන්තාල්)",
+    "name_si": "ත්‍රිතාල් තාලය",
     "name_en": "Teental (Tritala)",
+    "aliases_si": ["ත්‍රීතාල් තාලය", "ත්‍රීතාලය", "තීන්තාල් තාලය"],
     "matras": 16,
     "vibhagCount": 4,
     "vibhagStructure": [
@@ -372,33 +371,33 @@
         "action_si": "ඇඟිලි (4)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 60,
       "dugun_bpm": 120,
       "chaugun_bpm": 240
     },
     "gradeBands": [
-      "8-9",
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G08-TG",
-      "pageOrSection": "පිටුව 45; sg10_emus_chap1_mulikanga.pdf පිටු 4-5"
+      "sourceId": "SRC-EPD-TB-G10",
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 4, 5"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "මාත්‍රා 16, විභාග 4 (4/4/4/4), තාළි 3, ඛාලි 1 තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
     "id": "tala-jhaptal",
-    "name_si": "ජප්තාලය",
+    "name_si": "ජප් තාලය",
     "name_en": "Jhaptal",
+    "aliases_si": ["ජප්තාල් තාලය"],
     "matras": 10,
     "vibhagCount": 4,
     "vibhagStructure": [
@@ -506,32 +505,33 @@
         "action_si": "ඇඟිලි (3)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 65,
       "dugun_bpm": 130,
-      "chaugun_bpm": 260
+      "chaugun_bpm": 240
     },
     "gradeBands": [
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 2 සහ 6"
+      "sourceId": "SRC-EPD-TB-G10",
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 6"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "මාත්‍රා 10, විභාග 4 (2/3/2/3), තාළි 3, ඛාලි 1 තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
     "id": "tala-deepchandi",
-    "name_si": "දීප්චන්දි තාලය",
+    "name_si": "දීප්චන්ද් තාලය",
     "name_en": "Deepchandi Tala",
+    "aliases_si": [],
     "matras": 14,
     "vibhagCount": 4,
     "vibhagStructure": [
@@ -675,7 +675,7 @@
         "action_si": "විවේකය (4)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 60,
       "dugun_bpm": 120,
       "chaugun_bpm": 240
@@ -684,23 +684,24 @@
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2 සහ 4"
+      "sourceId": "SRC-EPD-TB-G10",
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 2, 4, 5"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "මාත්‍රා 14, විභාග 4 (3/4/3/4), තාළි 3, ඛාලි 1 සහ සෑම විභාගයකම නිහඬ මාත්‍රාව තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
     "id": "tala-roopak",
     "name_si": "රූපක් තාලය",
     "name_en": "Roopak Tala",
+    "aliases_si": [],
     "matras": 7,
     "vibhagCount": 3,
     "vibhagStructure": [
@@ -779,10 +780,10 @@
         "action_si": "ඇඟිලි (2)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 70,
       "dugun_bpm": 140,
-      "chaugun_bpm": 280
+      "chaugun_bpm": 240
     },
     "gradeBands": [
       "10-11"
@@ -792,19 +793,20 @@
       "pageOrSection": "පිටුව 65 (රූපක් තාලය)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "සම ස්ථානය ඛාලියෙන් ආරම්භ වන සුවිශේෂී මාත්‍රා 7 ව්‍යුහය තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
     "id": "tala-lawani",
     "name_si": "ලාවනී තාලය",
     "name_en": "Lawani Tala",
+    "aliases_si": [],
     "matras": 8,
     "vibhagCount": 4,
     "vibhagStructure": [
@@ -819,7 +821,7 @@
       "5 වන මාත්‍රාව: ඛාලි (0)",
       "7 වන මාත්‍රාව: තාළි 3"
     ],
-    "theka_si": "ධා ගේ | නා තින් | නා කේ | ධින් නා",
+    "theka_si": "ධා ගේ | න ත | න ක | ධ න",
     "bols": [
       {
         "matra": 1,
@@ -841,7 +843,7 @@
       },
       {
         "matra": 3,
-        "bol_si": "නා",
+        "bol_si": "න",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": true,
@@ -850,7 +852,7 @@
       },
       {
         "matra": 4,
-        "bol_si": "තින්",
+        "bol_si": "ත",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": false,
@@ -859,7 +861,7 @@
       },
       {
         "matra": 5,
-        "bol_si": "නා",
+        "bol_si": "න",
         "vibhagIndex": 2,
         "isSam": false,
         "isTali": false,
@@ -868,7 +870,7 @@
       },
       {
         "matra": 6,
-        "bol_si": "කේ",
+        "bol_si": "ක",
         "vibhagIndex": 2,
         "isSam": false,
         "isTali": false,
@@ -877,7 +879,7 @@
       },
       {
         "matra": 7,
-        "bol_si": "ධින්",
+        "bol_si": "ධ",
         "vibhagIndex": 3,
         "isSam": false,
         "isTali": true,
@@ -886,7 +888,7 @@
       },
       {
         "matra": 8,
-        "bol_si": "නා",
+        "bol_si": "න",
         "vibhagIndex": 3,
         "isSam": false,
         "isTali": false,
@@ -894,41 +896,52 @@
         "action_si": "ඇඟිලි (2)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 85,
       "dugun_bpm": 170,
-      "chaugun_bpm": 340
+      "chaugun_bpm": 240
+    },
+    "context_si": "ලාවනී යනු හින්දුස්ථානි තාල පද්ධතියේ දක්නට ලැබෙන තාලයක් නොවේ. මාත්‍රා දෙක බැගින් වූ විභාග සහිත ගීත පාසල් පද්ධතියේ භාවිත වන නිසාත්, දේශීය තිත් රූප හා බටහිර තාලවල එවැනි කොටස් ඇති නිසාත් එය පාසල් පද්ධතියට නිර්දේශ කර ඇත.",
+    "contextSourceReference": {
+      "sourceId": "SRC-EPD-TB-G11",
+      "pageOrSection": "s11tim173.pdf පිටුව 24"
     },
     "gradeBands": [
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-EPD-TB-G11",
-      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 3; grade_11_music_textbook.md පිටුව 47"
+      "sourceId": "SRC-EPD-TB-G10",
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටු 3, 6"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "කෙහර්වා ඨේකාවම මාත්‍රා 2 බැගින් විභාග 4 කට බෙදෙන පාසල් ලාවනී තාලය තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
     "id": "tala-khemta",
-    "name_si": "ඛෙම්ටෝ තාලය (ඛෙම්ටා)",
+    "name_si": "ඛෙම්ටෝ තාලය",
     "name_en": "Khemta Tala",
-    "matras": 6,
+    "aliases_si": ["ඛෙම්ටා තාලය"],
+    "context_si": "එක් මාත්‍රාවකට අක්ෂර තුන බැගින් යෙදෙන මාත්‍රා හතරක තාලයකි; මූලාශ්‍රය මෙහි ලය වේගවත් බව සඳහන් කරයි.",
+    "contextSourceReference": {
+      "sourceId": "SRC-EPD-TB-G10",
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 7"
+    },
+    "matras": 4,
     "vibhagCount": 2,
     "vibhagStructure": [
-      3,
-      3
+      2,
+      2
     ],
     "taliKhali_si": [
       "1 වන මාත්‍රාව: තාළි (සම)",
-      "4 වන මාත්‍රාව: ඛාලි (0)"
+      "3 වන මාත්‍රාව: ඛාලි (0)"
     ],
     "theka_si": "ධන්න ධනක | තන්න ධනක",
     "bols": [
@@ -943,7 +956,7 @@
       },
       {
         "matra": 2,
-        "bol_si": "ධ",
+        "bol_si": "ධනක",
         "vibhagIndex": 0,
         "isSam": false,
         "isTali": false,
@@ -952,15 +965,6 @@
       },
       {
         "matra": 3,
-        "bol_si": "නක",
-        "vibhagIndex": 0,
-        "isSam": false,
-        "isTali": false,
-        "isKhali": false,
-        "action_si": "ඇඟිලි (3)"
-      },
-      {
-        "matra": 4,
         "bol_si": "තන්න",
         "vibhagIndex": 1,
         "isSam": false,
@@ -969,44 +973,35 @@
         "action_si": "වැනීම (0)"
       },
       {
-        "matra": 5,
-        "bol_si": "ධ",
+        "matra": 4,
+        "bol_si": "ධනක",
         "vibhagIndex": 1,
         "isSam": false,
         "isTali": false,
         "isKhali": false,
         "action_si": "ඇඟිලි (2)"
-      },
-      {
-        "matra": 6,
-        "bol_si": "නක",
-        "vibhagIndex": 1,
-        "isSam": false,
-        "isTali": false,
-        "isKhali": false,
-        "action_si": "ඇඟිලි (3)"
       }
     ],
-    "layaVariants": {
+    "practiceTempoBpm": {
       "thah_bpm": 100,
       "dugun_bpm": 200,
-      "chaugun_bpm": 400
+      "chaugun_bpm": 240
     },
     "gradeBands": [
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
+      "sourceId": "SRC-EPD-TB-G10",
       "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 7"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "නාට්‍ය හා චංචල ගීත සඳහා යොදන ඛෙම්ටෝ තාල ඨේකාව තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   }
 ]

@@ -2,15 +2,14 @@
   {
     "id": "les-intro-01",
     "strandId": "strand-fundamentals",
-    "title_si": "නාදය සහ සංගීත නාදය හැඳින්වීම",
-    "title_en": "Introduction to Sound and Musical Sound",
+    "title_si": "නාදයේ ත්‍රිවිධ ගුණ",
+    "title_en": "The Three Properties of Musical Sound",
     "slug": "intro-to-sound-and-music",
-    "summary_si": "ශබ්දය සහ සංගීත නාදය අතර වෙනස, නාදයේ ප්‍රධාන ලක්ෂණ 3 (උස්-මිටි බව, තීව්‍රතාව, නාද ගුණය) සරලව අවබෝධ කරගනිමු.",
-    "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට ශබ්දය සහ සංගීත නාදය අතර වෙනස පැහැදිලි කිරීමටත්, නාදයක උස්-මිටි බව (Pitch), තීව්‍රතාව (Intensity), සහ නාද ගුණය (Timbre) නිවැරදිව හඳුනාගැනීමටත් හැකිවනු ඇත.",
-    "estimatedMinutes": 12,
+    "summary_si": "නාදයේ ප්‍රධාන ත්‍රිවිධ ගුණ වන තාරතාවය / උච්චනීච ප්‍රභේදය, විපුලතාවය / රූප භේදය සහ ධ්වනි ගුණය / ජාති භේදය විද්‍යාත්මකව හා සංගීතමය වශයෙන් හඳුනාගනිමු.",
+    "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට නාදයේ ත්‍රිවිධ ගුණ වන තාරතාවය, විපුලතාවය සහ ධ්වනි ගුණය හඳුනාගෙන ඒවා කෙරෙහි බලපාන සාධක නිවැරදිව පැහැදිලි කිරීමට හැකිවනු ඇත.",
+    "estimatedMinutes": 15,
     "gradeBands": [
-      "6-7",
-      "8-9"
+      "10-11"
     ],
     "difficulty": "පහසු",
     "prerequisites": [],
@@ -18,36 +17,31 @@
       "COMP-01-NADA"
     ],
     "diagnosticQuestion": {
-      "question_si": "කනට ප්‍රියජනක, ක්‍රමවත් කම්පන සහිත ශබ්දයක් හඳුන්වන්නේ කුමන නමකින්ද?",
+      "question_si": "නවීන සංගීතඥයන්ගේ මතය අනුව නාදයේ ප්‍රධාන ගුණ කීයක් ද?",
       "options_si": [
-        "ඝෝෂාව",
-        "නාදය",
-        "ප්‍රතිරාවය",
-        "අනුනාදය"
+        "දෙකකි",
+        "තුනකි",
+        "හතරකි",
+        "පහකි"
       ],
       "correctIndex": 1,
-      "explanation_si": "ක්‍රමවත් කම්පන සහිත කනට ප්‍රියජනක ශබ්ද 'නාදය' (Musical sound) ලෙස හැඳින්වේ."
+      "explanation_si": "නවීන සංගීතඥයන්ගේ මතය අනුව නාදයේ ප්‍රධාන ගුණ තුනකි: තාරතාවය, විපුලතාවය සහ ධ්වනි ගුණය."
     },
     "contentSections": [
       {
-        "heading_si": "1. ශබ්දය සහ නාදය යනු කුමක්ද?",
-        "content_si": "අප අවට පරිසරයේ විවිධ ශබ්ද ඇසේ. සුළඟ හමන හඬ, රථවාහන ශබ්ද, කුරුල්ලන්ගේ නාද ඒ අතර වේ. නමුත් සංගීතයේදී අප සලකන්නේ ක්‍රමවත් සංඛ්‍යාත සහිත, කනට ප්‍රිය උපදවන නාද (Musical Sound) පමණි.",
+        "heading_si": "1. නාදයේ ස්වභාවය",
+        "content_si": "ස්වර යනු එකිනෙකට වෙනස් වූ නාද වේ. ස්වර සප්තකය ගොඩනැගී ඇත්තේ එම නාද අනුපිළිවෙළට සංවිධානය කිරීමෙනි. කටහඬක් හෝ සංගීත භාණ්ඩයක හඬක් තවත් හඬකින් වෙන්කර හඳුනාගැනීමට උපකාරී වන වෙනස්කම් නාදයේ ගුණාංග වේ.",
         "keyTerms": [
           {
             "term_si": "නාදය",
-            "meaning_si": "ක්‍රමවත් කම්පන සහිත කනට ප්‍රිය උපදවන ශබ්දය",
+            "meaning_si": "ස්වර සහ ස්වර සප්තක ගොඩනැගීමට පදනම් වන සංගීත නාදය",
             "term_en": "Nada"
-          },
-          {
-            "term_si": "ආහත නාදය",
-            "meaning_si": "භෞතික වස්තු ගැටීමෙන් උපදින නාදය",
-            "term_en": "Ahata Nada"
           }
         ]
       },
       {
-        "heading_si": "2. නාදයේ ප්‍රධාන ලක්ෂණ 3",
-        "content_si": "ඕනෑම සංගීත නාදයකට ප්‍රධාන ලක්ෂණ තුනක් ඇත:\n1. නාදයේ උස්-මිටි බව (Pitch / තාරතාව): නාදය කොතරම් සිහින්ද හෝ ගොරෝසුද යන්නයි.\n2. නාදයේ මහත්-කුඩා බව (Intensity / තීව්‍රතාව): ශබ්දයේ හයිය හෝ මෘදු බවයි.\n3. නාදයේ ජාතිය හෙවත් ගුණය (Timbre): එකම ස්වරය ගැයුවද වයලීනයෙන්ද බටනලාවෙන්ද කියා වෙන්කොට හඳුනාගත හැකි ලක්ෂණයයි."
+        "heading_si": "2. නාදයේ ත්‍රිවිධ ගුණ",
+        "content_si": "නාදයක පහත දැක්වෙන ප්‍රධාන ත්‍රිවිධ ගුණ අන්තර්ගත වේ:\n\n1. තාරතාවය හෙවත් උච්චනීච ප්‍රභේදය (Pitch): නාදයක සංඛ්‍යාත වෙනස නිසා එය තවත් නාදයකින් වෙන්කර හඳුනාගැනීමට ලැබෙන ගුණයයි. සංඛ්‍යාතය යනු තත්පරයක් තුළ සිදුවන සම්පූර්ණ කම්පන වාර ගණනයි. තාරතාවයට බලපාන සාධක ලෙස ඇදි තතක ආතතිය, දිග හා ඝනකමත්, ඇදි පටලයක ආතතිය, වර්ගඵලය හා ඝනකමත් මූලාශ්‍රය දක්වයි.\n\n2. විපුලතාවය හෙවත් රූප භේදය (Magnitude): නාදයේ අඩු වැඩි බව හෙවත් හඬේ සැරයි. නාදය නිපදවීමට යොදන බලය හා ශක්ති ප්‍රමාණය අනුව තරංගයේ විස්තාරය සහ හඬ අඩු වැඩි වේ.\n\n3. ධ්වනි ගුණය හෙවත් ජාති භේදය (Timbre / Quality): පුද්ගල කටහඬක් හෝ සංගීත භාණ්ඩයක නාදයක් තවත් එකකින් වෙන්කර හඳුනාගැනීමට උපකාරී වන සුවිශේෂී ගුණයයි. හඬ වෙන්කර හඳුනාගැනීමට තරංග රටාවේ වෙනස හේතු වේ."
       }
     ],
     "listenActivity": {
@@ -89,25 +83,25 @@
     },
     "quizId": "quiz-les-intro-01",
     "recap_si": [
-      "ක්‍රමවත් කම්පන සහිත ප්‍රියජනක ශබ්දය නාදයයි.",
-      "නාදයේ ලක්ෂණ 3 කි: උස්-මිටි බව, මහත්-කුඩා බව, සහ නාද ගුණය.",
+      "ස්වර යනු එකිනෙකට වෙනස් වූ නාද වන අතර ඒවා අනුපිළිවෙළට සංවිධානය කිරීමෙන් ස්වර සප්තකය ගොඩනැගේ.",
+      "නාදයේ ත්‍රිවිධ ගුණ: තාරතාවය (සංඛ්‍යාතය මත), විපුලතාවය (විස්තාරය මත), සහ ධ්වනි ගුණය (තරංග රටාව මත).",
       "සංගීතයේ සියලුම ස්වර බිහිවන්නේ නාදය පදනම් කරගෙනයි."
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "1 වන ඒකකය: නාදය හා සංගීතය (පිටු 10-15)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 2-12"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "NIE 6 ශ්‍රේණියේ 1 වන ඒකකයට අනුකූලව සම්පාදනය විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-swara-01",
-    "published": true
+    "published": false
   },
   {
     "id": "les-swara-01",
@@ -250,16 +244,16 @@
       "pageOrSection": "2 වන ඒකකය: සප්ත ස්වර (පිටු 18-25)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "සප්ත ස්වර ශාස්ත්‍රීය නාම සහ ආරෝහණ/අවරෝහණ අභ්‍යාස තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-swara-02",
-    "published": true
+    "published": false
   },
   {
     "id": "les-swara-02",
@@ -371,16 +365,16 @@
       "pageOrSection": "පිටු 14-17 (ස්වර ප්‍රභේද)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "කෝමල/තීව්‍ර ස්වර විවරණ සහ අභ්‍යාස නිවැරදිව තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-saptaka-01",
-    "published": true
+    "published": false
   },
   {
     "id": "les-saptaka-01",
@@ -464,16 +458,16 @@
       "pageOrSection": "පිටුව 20 (සප්තක අධ්‍යයනය)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "සප්තක 3 ප්‍රස්තාර නීති හා සංඛ්‍යාත වෙනස්කම් සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-alankara-01",
-    "published": true
+    "published": false
   },
   {
     "id": "les-alankara-01",
@@ -582,16 +576,16 @@
       "pageOrSection": "පිටුව 30 (අලංකාර ඒකකය)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "අලංකාර රටා 5 සහ ශ්‍රව්‍ය ආදර්ශන තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-tala-basics",
-    "published": true
+    "published": false
   },
   {
     "id": "les-tala-basics",
@@ -642,7 +636,7 @@
     },
     "guidedPractice": {
       "title_si": "තාල දෘශ්‍යකාරකය නිරීක්ෂණය කරමු",
-      "instruction_si": "දාද්‍රා තාලය තෝරා සම සහ ඛාලි සලකුණු වන ආකාරය බලන්න.",
+      "instruction_si": "දාදරා තාලය තෝරා සම සහ ඛාලි සලකුණු වන ආකාරය බලන්න.",
       "interactiveTool": "tala-visualizer",
       "targetTalaId": "tala-dadra"
     },
@@ -663,29 +657,27 @@
       "pageOrSection": "පිටු 35-38 (තාල මූලධර්ම)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "තාල මූලධර්ම සහ ලය ප්‍රභේද සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-tala-dadra",
-    "published": true
+    "published": false
   },
   {
     "id": "les-tala-dadra",
     "strandId": "strand-laya-tala",
-    "title_si": "දාද්‍රා තාලය සහ අත්පුඩි ගැසීමේ ක්‍රමය",
+    "title_si": "දාදරා තාලය සහ අත්පුඩි ගැසීමේ ක්‍රමය",
     "title_en": "Dadra Tala: 6-Matra Rhythm Cycle and Hand Actions",
     "slug": "dadra-tala-hand-actions",
-    "summary_si": "මාත්‍රා 6ක්, විභාග 2ක් (3+3), තාළි 1ක් සහ ඛාලි 1ක් සහිත දාද්‍රා තාලයේ ථේකාව සහ අත්පුඩි ගැසීමේ නියම ක්‍රමය පුහුණු වෙමු.",
-    "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට දාද්‍රා තාලයේ මාත්‍රා, විභාග, තාළි, ඛාලි විස්තර කිරීමටත්, 'ධා ධී නා | ධා තී නා' ථේකාව නිවැරදිව අත්පුඩි ගසමින් උච්චාරණය කිරීමටත් හැකිවනු ඇත.",
+    "summary_si": "මාත්‍රා 6ක්, විභාග 2ක් (3+3), තාළි 1ක් සහ ඛාලි 1ක් සහිත දාදරා තාලයේ ථේකාව සහ අත්පුඩි ගැසීමේ නියම ක්‍රමය පුහුණු වෙමු.",
+    "learningGoal_si": "මෙම පාඩම අවසානයේ ඔබට දාදරා තාලයේ මාත්‍රා, විභාග, තාළි, ඛාලි විස්තර කිරීමටත්, 'ධා ධී නා | ධා තී නා' ථේකාව නිවැරදිව අත්පුඩි ගසමින් උච්චාරණය කිරීමටත් හැකිවනු ඇත.",
     "estimatedMinutes": 15,
     "gradeBands": [
-      "6-7",
-      "8-9",
       "10-11"
     ],
     "difficulty": "පහසු",
@@ -696,7 +688,7 @@
       "COMP-02-DADRA"
     ],
     "diagnosticQuestion": {
-      "question_si": "දාද්‍රා තාලයේ මුළු මාත්‍රා ගණන කීයද?",
+      "question_si": "දාදරා තාලයේ මුළු මාත්‍රා ගණන කීයද?",
       "options_si": [
         "4",
         "6",
@@ -704,11 +696,11 @@
         "16"
       ],
       "correctIndex": 1,
-      "explanation_si": "දාද්‍රා තාලයේ මුළු මාත්‍රා 6 කි. (3 බැගින් වූ විභාග 2 කි)."
+      "explanation_si": "දාදරා තාලයේ මුළු මාත්‍රා 6 කි. (3 බැගින් වූ විභාග 2 කි)."
     },
     "contentSections": [
       {
-        "heading_si": "1. දාද්‍රා තාලයේ ව්‍යුහය",
+        "heading_si": "1. දාදරා තාලයේ ව්‍යුහය",
         "content_si": "• මුළු මාත්‍රා: 6 කි.\n• විභාග: 2 කි (මාත්‍රා 3 බැගින්).\n• තාළි: 1 වන මාත්‍රාවේ (සම).\n• ඛාලි: 4 වන මාත්‍රාවේ.\n• ථේකාව: ධා ධී නා | ධා තී නා",
         "notationTable": [
           {
@@ -749,45 +741,45 @@
     ],
     "listenActivity": {
       "type": "rhythm-loop",
-      "title_si": "දාද්‍රා තාලයේ ථේකාව අසමු",
-      "instruction_si": "තබ්ලාවෙන් දාද්‍රා තාලයේ බෝල් වාදනය වන ආකාරය අසන්න.",
+      "title_si": "දාදරා තාලයේ ථේකාව අසමු",
+      "instruction_si": "තබ්ලාවෙන් දාදරා තාලයේ බෝල් වාදනය වන ආකාරය අසන්න.",
       "speedBpm": 80,
       "talaId": "tala-dadra"
     },
     "guidedPractice": {
-      "title_si": "දාද්‍රා තාලයට අත්පුඩි ගසමු",
+      "title_si": "දාදරා තාලයට අත්පුඩි ගසමු",
       "instruction_si": "1 වන මාත්‍රාවේ අත්පුඩියක් ගසා, 2-3 ඇඟිලි ගණන් කර, 4 වන මාත්‍රාවේ අත පසෙකට වනන්න.",
       "interactiveTool": "tala-visualizer",
       "targetTalaId": "tala-dadra"
     },
     "independentPractice": {
-      "title_si": "දාද්‍රා තාල රිද්ම ක්‍රීඩාව",
-      "instruction_si": "දාද්‍රා තාලයේ මාත්‍රා 6 ක ස්පන්දනයට අනුකූලව තට්ටු කරන්න.",
+      "title_si": "දාදරා තාල රිද්ම ක්‍රීඩාව",
+      "instruction_si": "දාදරා තාලයේ මාත්‍රා 6 ක ස්පන්දනයට අනුකූලව තට්ටු කරන්න.",
       "interactiveTool": "rhythm-tap",
       "targetTalaId": "tala-dadra",
       "targetBpm": 80
     },
     "quizId": "quiz-les-tala-dadra",
     "recap_si": [
-      "දාද්‍රා තාලයට මාත්‍රා 6 කි, විභාග 2 කි (3/3).",
+      "දාදරා තාලයට මාත්‍රා 6 කි, විභාග 2 කි (3/3).",
       "1 වන මාත්‍රාව සම (තාළි) වන අතර 4 වන මාත්‍රාව ඛාලියයි.",
       "ථේකාව: ධා ධී නා | ධා තී නා."
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G07-TG",
-      "pageOrSection": "පිටුව 34 (දාද්‍රා තාලය)"
+      "sourceId": "SRC-EPD-TB-G10",
+      "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "දාද්‍රා තාල ථේකාව හා අත් ක්‍රියාකාරකම් තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-tala-keherwa",
-    "published": true
+    "published": false
   },
   {
     "id": "les-tala-keherwa",
@@ -899,16 +891,16 @@
       "pageOrSection": "පිටුව 36 (කෙහර්වා තාලය)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "මාත්‍රා 8 කෙහර්වා තාල ව්‍යුහය සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-tala-teental",
-    "published": true
+    "published": false
   },
   {
     "id": "les-tala-teental",
@@ -978,16 +970,16 @@
       "pageOrSection": "පිටුව 45 (ත්‍රීතාලය)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "මාත්‍රා 16 ත්‍රීතාල ලක්ෂණ තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-thata-basics",
-    "published": true
+    "published": false
   },
   {
     "id": "les-thata-basics",
@@ -1085,16 +1077,16 @@
       "pageOrSection": "පිටුව 45 (ථාට 10 ඒකකය)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "ථාට 10 නාම සහ ස්වර සංයුති සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-raga-bhairav",
-    "published": true
+    "published": false
   },
   {
     "id": "les-raga-bhairav",
@@ -1188,16 +1180,16 @@
       "pageOrSection": "පිටුව 56 (භෛරව් රාග ඒකකය)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "භෛරව් රාග ලක්ෂණ හා ප්‍රායෝගික අභ්‍යාස තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-raga-yaman",
-    "published": true
+    "published": false
   },
   {
     "id": "les-raga-yaman",
@@ -1289,16 +1281,16 @@
       "pageOrSection": "පිටුව 58 (යමන් රාගය)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "තීව්‍ර මධ්‍යම සංඛ්‍යාතය සහ වාදී-සංවාදී සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-vocal-posture",
-    "published": true
+    "published": false
   },
   {
     "id": "les-vocal-posture",
@@ -1381,16 +1373,16 @@
       "pageOrSection": "පිටුව 28 (හඬ පුහුණුව)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "හඬ පුහුණු මූලධර්ම සහ දේශීය ශ්‍රැති අභ්‍යාස සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-inst-overview",
-    "published": true
+    "published": false
   },
   {
     "id": "les-inst-overview",
@@ -1467,16 +1459,16 @@
       "pageOrSection": "පිටු 74-76 (වාද්‍ය භාණ්ඩ වර්ගීකරණය)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "නාට්‍ය ශාස්ත්‍ර චතුර්විධ වර්ගීකරණය සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-inst-desi-drums",
-    "published": true
+    "published": false
   },
   {
     "id": "les-inst-desi-drums",
@@ -1561,16 +1553,16 @@
       "pageOrSection": "පිටු 88-93 (දේශීය අවනද්ධ භාණ්ඩ)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "දේශීය බෙර වර්ගීකරණය සහ ව්‍යුහාත්මක කරුණු සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-folk-work",
-    "published": true
+    "published": false
   },
   {
     "id": "les-folk-work",
@@ -1667,16 +1659,16 @@
       "pageOrSection": "ගැමි ගී අධ්‍යයන පරිච්ඡේදය"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "ජන ගී සාහිත්‍ය හා නාද ලක්ෂණ සනාථ විය.",
-      "license": "Academic Heritage Reference",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-theatre-nadagam",
-    "published": true
+    "published": false
   },
   {
     "id": "les-theatre-nadagam",
@@ -1769,16 +1761,16 @@
       "pageOrSection": "පිටුව 110 (නාඩගම් ඒකකය)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "නාඩගම් ඉතිහාසය හා සංගීත අංග තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-theatre-nurthi",
-    "published": true
+    "published": false
   },
   {
     "id": "les-theatre-nurthi",
@@ -1881,16 +1873,16 @@
       "pageOrSection": "පිටුව 114 (නූර්ති ඒකකය)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "ජෝන් ද සිල්වා යුගය හා නූර්ති සංගීත ලක්ෂණ සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-apprec-elements",
-    "published": true
+    "published": false
   },
   {
     "id": "les-apprec-elements",
@@ -1982,16 +1974,16 @@
       "pageOrSection": "පිටු 120-125 (ගී රසවින්දනය)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "ගීත විචාර නිර්ණායක සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-creative-rhythm",
-    "published": true
+    "published": false
   },
   {
     "id": "les-creative-rhythm",
@@ -2028,7 +2020,7 @@
     "contentSections": [
       {
         "heading_si": "1. තනු නිර්මාණයේ මූලික පියවර",
-        "content_si": "1. මූලික ස්වර මාලාව තෝරාගැනීම (උදා: ස රි ග ප ධ).\n2. ස්වර අතර විරාම හා නාද දිගු කිරීම් සැලසුම් කිරීම.\n3. නියමිත තාලයකට (දාද්‍රා හෝ කෙහර්වා) ගළපා ගැනීම."
+        "content_si": "1. මූලික ස්වර මාලාව තෝරාගැනීම (උදා: ස රි ග ප ධ).\n2. ස්වර අතර විරාම හා නාද දිගු කිරීම් සැලසුම් කිරීම.\n3. නියමිත තාලයකට (දාදරා හෝ කෙහෙර්වා) ගළපා ගැනීම."
       }
     ],
     "listenActivity": {
@@ -2090,16 +2082,16 @@
       "pageOrSection": "පිටු 130-135 (නිර්මාණ ඒකකය)"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "නිර්මාණාත්මක සංගීත අභ්‍යාස තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
     "nextRecommendedLessonId": "les-exam-skills",
-    "published": true
+    "published": false
   },
   {
     "id": "les-exam-skills",
@@ -2184,14 +2176,14 @@
       "pageOrSection": "සාමාන්‍ය පෙළ හා උසස් පෙළ ඇගයීම් වාර්තා"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "විභාග නිර්ණායක හා ප්‍රශ්න රටා තහවුරු විය.",
-      "license": "Educational Assessment Reference",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     },
-    "published": true
+    "published": false
   }
 ]

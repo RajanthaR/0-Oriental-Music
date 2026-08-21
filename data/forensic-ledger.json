@@ -1,15 +1,434 @@
 {
-  "schemaVersion": "p01.1",
-  "generatedDate": "2026-08-15",
-  "phase": "Prompt 1 / publication containment and source baseline",
-  "authority": "Current checkout at base 6e62a3ad2d9621b8790d35af3358b08fafceaa57",
+  "schemaVersion": "p02.1",
+  "generatedDate": "2026-08-16",
+  "phase": "Phase 2 closeout / canonical musical-core containment",
+  "authority": "Historical baseline and audited-through evidence only; no stored SHA claims to identify the live checkout.",
+  "historicalBaseline": {
+    "phase": "Prompt 1 / publication containment and source baseline",
+    "baseSha": "6e62a3ad2d9621b8790d35af3358b08fafceaa57"
+  },
+  "auditedThrough": {
+    "phase": "Phase 2 p02r4 findings input",
+    "baseSha": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "reviewedHead": "97c0c138b2b90ac27516a3c8c3716361ac537981",
+    "reviewRunId": "20260815-235819-p02r4",
+    "status": "Findings input only; not acceptance evidence"
+  },
+  "followupReviewInput": {
+    "phase": "Phase 2 final-contract findings input",
+    "baseSha": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "reviewedHead": "c1785ae31f153168d362f3b1f294e68726aa819b",
+    "reviewRunId": "20260816-063000-p02-final-acceptance",
+    "artifactDirectory": "C:/tmp/compound-engineering/ce-code-review/20260816-063000-p02-final-acceptance/",
+    "reviewersCompleted": 11,
+    "validatorsCompleted": 6,
+    "validatedFindings": {
+      "P1": 1,
+      "P2": 4,
+      "P3": 1
+    },
+    "status": "Historical validated findings input only; the fresh closeout review is separate acceptance evidence"
+  },
+  "acceptanceHardeningInput": {
+    "phase": "Phase 2 acceptance hardening and PR #2 readiness",
+    "plan": "docs/plans/2026-08-16-003-fix-phase-2-acceptance-hardening-plan.md",
+    "baseSha": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "startingHead": "4c8ab9755d20d4d23cc8081fe831f448b15f3a2e",
+    "reviewRunId": "20260816-191000-p02-final-contract-c3",
+    "artifactDirectory": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/",
+    "reviewersCompleted": 11,
+    "validatorsCompleted": 20,
+    "validatedFindingIds": [
+      "C3-01",
+      "C3-02",
+      "C3-03",
+      "C3-04",
+      "C3-05",
+      "C3-06",
+      "C3-07",
+      "C3-08",
+      "C3-09",
+      "C3-10",
+      "C3-11",
+      "C3-12",
+      "C3-13",
+      "C3-14",
+      "C3-15",
+      "C3-16",
+      "C3-17",
+      "C3-18",
+      "C3-19",
+      "C3-20"
+    ],
+    "authorizedAdditionalFindings": [
+      "P02-PITCH-OWNERSHIP-001",
+      "P02-PROJECT-SCOPE-001"
+    ],
+    "traceability": {
+      "C3-01": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-01.json",
+        "test": {
+          "path": "src/test/review-closeout.test.ts",
+          "symbol": "rejects every CMS status/published mismatch"
+        },
+        "fix": {
+          "path": "src/lib/data/repository.ts",
+          "symbol": "updateLessonReviewStatus"
+        },
+        "anchor": {
+          "path": "src/lib/data/repository.ts",
+          "symbol": "updateLessonReviewStatus"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-02": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-02.json",
+        "test": {
+          "path": "src/test/review-closeout.test.ts",
+          "symbol": "recomputes publication summaries"
+        },
+        "fix": {
+          "path": "src/lib/data/repository.ts",
+          "symbol": "getPublicationSummary"
+        },
+        "anchor": {
+          "path": "src/lib/data/repository.ts",
+          "symbol": "getPublicationSummary"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-03": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-03.json",
+        "test": {
+          "path": "src/test/source-metadata-consistency.test.ts",
+          "symbol": "unknown provenance representation"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-contracts.ts",
+          "symbol": "projectPublicRecord"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-contracts.ts",
+          "symbol": "projectPublicRecord"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-04": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-04.json",
+        "test": {
+          "path": "src/test/publication-containment.test.ts",
+          "symbol": "duplicate IDs"
+        },
+        "fix": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "evaluatePublicationBatch"
+        },
+        "anchor": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "evaluatePublicationBatch"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-05": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-05.json",
+        "test": {
+          "path": "src/test/content-contracts.test.ts",
+          "symbol": "detached snapshot"
+        },
+        "fix": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "captureEvaluationValue"
+        },
+        "anchor": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "captureEvaluationValue"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-06": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-06.json",
+        "test": {
+          "path": "src/test/review-closeout.test.ts",
+          "symbol": "fails closed for duplicate top-level IDs"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validatePublicCollection"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validatePublicCollection"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-07": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-07.json",
+        "test": {
+          "path": "src/test/content-contracts.test.ts",
+          "symbol": "unknown or ambiguous kinds"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-contracts.ts",
+          "symbol": "projectPublicRecord"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-contracts.ts",
+          "symbol": "projectPublicRecord"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-08": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-08.json",
+        "test": {
+          "path": "src/test/publication-containment.test.ts",
+          "symbol": "identity containment"
+        },
+        "fix": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "createPublicationEvaluationContext"
+        },
+        "anchor": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "createPublicationEvaluationContext"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-09": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-09.json",
+        "test": {
+          "path": "src/test/content-validator.test.ts",
+          "symbol": "malformed tala fields"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validateMusicalCoreFieldDispositions"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validateMusicalCoreFieldDispositions"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-10": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-10.json",
+        "test": {
+          "path": "src/test/source-metadata-consistency.test.ts",
+          "symbol": "ambiguous extracted-document mappings"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validateSelectedSourceMetadata"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validateSelectedSourceMetadata"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-11": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-11.json",
+        "test": {
+          "path": "src/test/publication-containment.test.ts",
+          "symbol": "declarative %s dependency rule"
+        },
+        "fix": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "DEPENDENCY_FIELD_RULES"
+        },
+        "anchor": {
+          "path": "src/lib/data/publication-policy.ts",
+          "symbol": "DEPENDENCY_FIELD_RULES"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-12": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-12.json",
+        "test": {
+          "path": "src/test/source-metadata-consistency.test.ts",
+          "symbol": "ambiguous extracted-document mappings"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validateSelectedSourceMetadata"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-validator.ts",
+          "symbol": "validateSelectedSourceMetadata"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-13": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-13.json",
+        "test": {
+          "path": "src/test/review-closeout.test.ts",
+          "symbol": "resolves current musical-core anchors"
+        },
+        "fix": {
+          "path": "docs/FORENSIC_CORRECTION_LOG.md",
+          "symbol": "P02-FINAL-06"
+        },
+        "anchor": {
+          "path": "docs/FORENSIC_CORRECTION_LOG.md",
+          "symbol": "P02-FINAL-06"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-14": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-14.json",
+        "test": {
+          "path": "src/test/content-contracts.test.ts",
+          "symbol": "discriminator-compatible fields"
+        },
+        "fix": {
+          "path": "src/lib/validation/content-contracts.ts",
+          "symbol": "projectPublicRecord"
+        },
+        "anchor": {
+          "path": "src/lib/validation/content-contracts.ts",
+          "symbol": "projectPublicRecord"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-15": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-15.json",
+        "test": {
+          "path": "src/test/quiz-runner.test.tsx",
+          "symbol": "duplicate question IDs"
+        },
+        "fix": {
+          "path": "src/components/quiz/QuizRunner.tsx",
+          "symbol": "getUsableQuiz"
+        },
+        "anchor": {
+          "path": "src/components/quiz/QuizRunner.tsx",
+          "symbol": "getUsableQuiz"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-16": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-16.json",
+        "test": {
+          "path": "src/test/search-engine.test.ts",
+          "symbol": "normalized-empty controls"
+        },
+        "fix": {
+          "path": "src/lib/search/search-engine.ts",
+          "symbol": "classifySearchQuery"
+        },
+        "anchor": {
+          "path": "src/lib/search/search-engine.ts",
+          "symbol": "classifySearchQuery"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-17": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-17.json",
+        "test": {
+          "path": "src/test/components.test.tsx",
+          "symbol": "rhythm session"
+        },
+        "fix": {
+          "path": "src/components/audio/RhythmTapGame.tsx",
+          "symbol": "RhythmTapGame"
+        },
+        "anchor": {
+          "path": "src/components/audio/RhythmTapGame.tsx",
+          "symbol": "RhythmTapGame"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-18": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-18.json",
+        "test": {
+          "path": "src/test/components.test.tsx",
+          "symbol": "completed rhythm playback handles"
+        },
+        "fix": {
+          "path": "src/components/audio/TalaVisualizer.tsx",
+          "symbol": "TalaVisualizer"
+        },
+        "anchor": {
+          "path": "src/components/audio/TalaVisualizer.tsx",
+          "symbol": "TalaVisualizer"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-19": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-19.json",
+        "test": {
+          "path": "src/test/components.test.tsx",
+          "symbol": "stale Tala unavailable callbacks"
+        },
+        "fix": {
+          "path": "src/components/audio/TalaVisualizer.tsx",
+          "symbol": "TalaVisualizer"
+        },
+        "anchor": {
+          "path": "src/components/audio/TalaVisualizer.tsx",
+          "symbol": "TalaVisualizer"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "C3-20": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-20.json",
+        "test": {
+          "path": "src/test/components.test.tsx",
+          "symbol": "Tabla promises reject"
+        },
+        "fix": {
+          "path": "src/lib/audio/tabla.ts",
+          "symbol": "scheduleTablaPlan"
+        },
+        "anchor": {
+          "path": "src/lib/audio/tabla.ts",
+          "symbol": "scheduleTablaPlan"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "P02-PITCH-OWNERSHIP-001": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/metadata.json authorizedAdditionalFindings",
+        "test": {
+          "path": "src/test/pitch.test.ts",
+          "symbol": "late stream"
+        },
+        "fix": {
+          "path": "src/lib/audio/pitch.ts",
+          "symbol": "startListening"
+        },
+        "anchor": {
+          "path": "src/lib/audio/pitch.ts",
+          "symbol": "startListening"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      },
+      "P02-PROJECT-SCOPE-001": {
+        "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/metadata.json authorizedAdditionalFindings",
+        "test": {
+          "path": "src/test/review-closeout.test.ts",
+          "symbol": "records the acceptance-hardening scope"
+        },
+        "fix": {
+          "path": "AGENTS.md",
+          "symbol": "current verified public curriculum boundary"
+        },
+        "anchor": {
+          "path": "AGENTS.md",
+          "symbol": "current verified public curriculum boundary"
+        },
+        "disposition": "FIXED-PENDING-REREVIEW"
+      }
+    },
+    "implementationDisposition": "Bounded runtime containment and lifecycle hardening only; no musical claim is promoted. All eight Talas remain whole-entity quarantined.",
+    "status": "Historical findings input with implementation pending fresh review acceptance; not acceptance evidence"
+  },
+  "issueCountBaseline": 35,
   "evidencePolicy": {
     "publicGradeBands": [
       "6-7",
       "8-9",
       "10-11"
     ],
-    "publicEligibility": "A claim is discoverable only when its grade scope is within 6-11, its source ID maps to exactly one supplied extracted document, its exact page evidence is in range, and at least one cited page is an A/B readable Sinhala page.",
+    "publicEligibility": "A claim is discoverable only when the record declares its own Grades 6-11 scope, its source ID maps to exactly one supplied extracted document, its named PDF exactly matches that document when present, its exact page evidence is in range, every cited page is an A/B readable Sinhala page, every required field disposition is verified, and every required public dependency is available.",
     "reviewBoundary": "Markdown extraction is evidence with limits. C/D, image-only, corrupt-font, visual, ambiguous, and missing-PDF cases remain needs-review until original-PDF/manual review.",
     "metadataBoundary": "Publisher, year, place, licence, reviewer, review date, and Published state are not accepted as evidence unless a real source or review event establishes them."
   },
@@ -36,12 +455,14 @@
     ],
     "optionalEvidenceFields": [
       "exactSection",
-      "exactPageOrSection"
+      "exactPageOrSection",
+      "semanticReferences"
     ],
     "severityValues": [
       "P0",
       "P1",
-      "P2"
+      "P2",
+      "P3"
     ],
     "publicVisibilityValues": [
       "contained",
@@ -73,6 +494,7 @@
     ]
   },
   "inventory": {
+    "boundary": "Observed extracted-Markdown inventory at the audited snapshot only; these counts do not establish curriculum completeness, official coverage, or publication readiness.",
     "sourceMarkdownFilesInBySource": 30,
     "sourceMarkdownFilesAllArtifacts": 66,
     "originalPdfFilesInCheckout": 0,
@@ -104,9 +526,9 @@
       "exams": 2
     },
     "rawCompletedReviewMetadata": {
-      "recordsClaimingPublished": 69,
-      "recordsUsingSwaraMagaReviewer": 69,
-      "recordsWith2026ReviewDates": 69
+      "recordsClaimingPublished": 0,
+      "recordsUsingSwaraMagaReviewer": 0,
+      "recordsWith2026ReviewDates": 0
     },
     "rawGradeScope": {
       "recordsContainingGrades12To13Claims": 34,
@@ -154,7 +576,7 @@
         },
         {
           "path": "data/source-documents.json",
-          "locator": "all 30 extracted documents",
+          "locator": "the extracted-document inventory recorded under inventory.sourceMarkdownFilesInBySource",
           "exactSection": "no supplied Grade 12-13 source document"
         }
       ],
@@ -168,7 +590,7 @@
       "id": "P01-RAGA-BHAIRAV-001",
       "severity": "P1",
       "entityOrPath": "src/data/ragas.json:raga-bhairav and src/data/lessons.json:les-raga-bhairav",
-      "currentClaim": "Bhairav is presented as a published Grade 10-11 raga with a page 56 citation.",
+      "currentClaim": "Bhairav is not established in the supplied prescribed Grade 6-11 raga list evidence (grade_11_raga_identification.md). Remains quarantined.",
       "evidence": [
         {
           "path": "src/data/ragas.json",
@@ -186,10 +608,10 @@
           "exactSection": "Review Required; cross-grade mapping is not verified"
         }
       ],
-      "disposition": "quarantine until raga facts and source mapping are corrected against the original PDF",
+      "disposition": "quarantine retained: not established in the supplied prescribed school raga syllabus evidence",
       "publicVisibility": "quarantined",
       "confidence": "confirmed",
-      "confidenceScope": "current claim only; musical correction needs SME review",
+      "confidenceScope": "bounded corpus audit; not established in supplied prescribed raga evidence",
       "status": "contained",
       "evidenceBasis": "review-required"
     },
@@ -197,7 +619,7 @@
       "id": "P01-TALA-ROOPAK-001",
       "severity": "P1",
       "entityOrPath": "src/data/talas.json:tala-roopak",
-      "currentClaim": "Roopak is presented as a published Grade 10-11 seven-matra tala with a page 65 citation.",
+      "currentClaim": "Roopak is not established in the supplied prescribed school tala list evidence (grade_10_musical_fundamentals.md / grade_11_music_textbook.md). Remains quarantined.",
       "evidence": [
         {
           "path": "src/data/talas.json",
@@ -210,10 +632,10 @@
           "exactSection": "Music sd.pdf, Review Required, 15 pages"
         }
       ],
-      "disposition": "quarantine until the tala structure and source page are verified",
+      "disposition": "quarantine retained: not established in the supplied prescribed school tala list evidence",
       "publicVisibility": "quarantined",
       "confidence": "confirmed",
-      "confidenceScope": "current claim only; tala correction needs SME review",
+      "confidenceScope": "bounded corpus audit; not established in supplied prescribed tala evidence",
       "status": "contained",
       "evidenceBasis": "review-required"
     },
@@ -221,123 +643,390 @@
       "id": "P01-RAGA-BILAWAL-001",
       "severity": "P1",
       "entityOrPath": "src/data/ragas.json:raga-bilawal",
-      "currentClaim": "Bilawal is presented as a published Grade 6-11 raga, including an Alhaiya Bilawal label and an incomplete arohana.",
+      "currentClaim": "Bilawal was previously presented with an Alhaiya Bilawal label, incomplete arohana lacking M, and Shadav-Sampurna jati. Remediated in Phase 2 against official Grade 11 source evidence with all 7 Shuddha notes, Sampurna-Sampurna jati, vadi Dha, samvadi Ga, thata Bilawal, and pakad.",
       "evidence": [
         {
           "path": "src/data/ragas.json",
           "locator": "raga-bilawal fields",
-          "exactPageOrSection": "පිටුව 38; sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
+          "exactPageOrSection": "SRC-G11-RAGA-ID (sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2)"
         },
         {
-          "path": "data/source-page-quality.json",
-          "locator": "grade_11_raga_identification pages 1-2",
-          "exactSection": "A-quality extracted pages still require claim-level comparison"
+          "path": "data/source-documents.json",
+          "locator": "DOC-GRADE_11_RAGA_ID",
+          "exactSection": "A-quality native extraction, 2 pages"
+        },
+        {
+          "path": "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
+          "locator": "raga-bilawal row",
+          "exactSection": "full field-level audit matrix"
         }
       ],
-      "disposition": "quarantine until the name, swara sequence, and page evidence are manually reconciled",
-      "publicVisibility": "quarantined",
+      "disposition": "remediated against official Grade 11 raga identification document (PDF Pages 1-2); unquarantined in public scope",
+      "publicVisibility": "contained",
       "confidence": "confirmed",
-      "confidenceScope": "current claim only; correction not independently verified",
+      "confidenceScope": "remediated and verified against DOC-GRADE_11_RAGA_ID pages 1-2",
       "status": "contained",
-      "evidenceBasis": "claim-comparison-missing"
+      "evidenceBasis": "canonical-inspection"
     },
     {
       "id": "P01-TALA-LAWANI-001",
       "severity": "P1",
       "entityOrPath": "src/data/talas.json:tala-lawani",
-      "currentClaim": "Lawani is presented as a published Grade 10-11 eight-matra tala using a mixed Grade 10 and Grade 11 citation.",
+      "currentClaim": "Lawani has mixed cross-document evidence. Its required Grade 11 school context remains Review Required and the extracted Grade 10 bol cells cannot establish a learner-visible playable entity without original-PDF review.",
       "evidence": [
         {
           "path": "src/data/talas.json",
           "locator": "tala-lawani.sourceReference",
-          "exactPageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 3; grade_11_music_textbook.md පිටුව 47"
+          "exactPageOrSection": "SRC-EPD-TB-G10 (sg10_emus_chap1_mulikanga.pdf පිටු 3, 6)"
         },
         {
-          "path": "data/source-documents.json",
-          "locator": "SRC-EPD-TB-G11",
-          "exactSection": "source filename maps to s11tim173.pdf; cited Grade 10 page is a different document"
+          "path": "src/data/talas.json",
+          "locator": "tala-lawani.context_si and contextSourceReference",
+          "exactPageOrSection": "SRC-EPD-TB-G11 (s11tim173.pdf පිටුව 24), stored separately from the structural sourceReference"
+        },
+        {
+          "path": "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
+          "locator": "tala-lawani row",
+          "exactSection": "full field-level audit matrix"
         }
       ],
-      "disposition": "quarantine until the framing and cross-document citation are verified",
+      "disposition": "quarantine the whole Lawani entity from directories, routes, search, quizzes, learning paths, audio, and summaries; retain the raw Grade 10 structure and Grade 11 context only for audit and later original-PDF/SME review",
       "publicVisibility": "quarantined",
-      "confidence": "confirmed",
-      "confidenceScope": "citation contradiction",
-      "status": "contained",
-      "evidenceBasis": "citation-contradiction"
+      "confidence": "needs-review",
+      "confidenceScope": "Grade 10 pages 3 and 6 are readable extraction, but normalized bol cells and the required Grade 11 school context remain unresolved",
+      "status": "needs-review",
+      "evidenceBasis": "review-required"
     },
     {
       "id": "P01-SOUND-TERMINOLOGY-001",
       "severity": "P1",
-      "entityOrPath": "src/data/lessons.json:les-intro-01 and src/data/glossary.json:term-nada, term-sound, term-ahata-nada, term-anahata-nada",
-      "currentClaim": "Sound, nada, ahata-nada, and anahata-nada claims are published with Grade 6 or cross-grade citations.",
+      "entityOrPath": "src/data/lessons.json:les-intro-01 and src/data/glossary.json acoustics records",
+      "currentClaim": "Sound properties and acoustics terminology previously claimed Grade 6 scope and unverified citations. The lesson and five evidenced glossary records are remediated to Grade 10 Unit 8; term-sound, term-ahata-nada, and term-anahata-nada remain quarantined because the supplied corpus does not establish their definitions.",
       "evidence": [
         {
           "path": "src/data/lessons.json",
           "locator": "les-intro-01.sourceReference",
-          "exactPageOrSection": "1 වන ඒකකය: නාදය හා සංගීතය (පිටු 10-15)"
+          "exactPageOrSection": "SRC-G10-NADA (8 වන ඒකකය: නාදයේ ගුණ, පිටු 2-12)"
         },
         {
           "path": "src/data/glossary.json",
-          "locator": "term-nada through term-anahata-nada",
-          "exactSection": "pages 10-14 and 12"
+          "locator": "term-nada, term-pitch, term-intensity, term-timbre, term-frequency",
+          "exactPageOrSection": "SRC-G10-NADA (sg10_emus_chap8_nadaya.pdf පිටු 2-12); term-sound, term-ahata-nada, and term-anahata-nada explicitly withheld"
         },
         {
-          "path": "data/source-documents.json",
-          "locator": "SG06_emus_tim.pdf and Music sd.pdf",
-          "exactSection": "Review Required"
+          "path": "data/terminology-si.json",
+          "locator": "all terminology records",
+          "exactPageOrSection": "review labels are Unverified / Needs Review; this dataset does not represent an SME approval event"
         }
       ],
-      "disposition": "quarantine until terminology and exact page evidence pass language and SME review",
-      "publicVisibility": "quarantined",
+      "disposition": "publish only the Grade 10 lesson and five source-grounded acoustics records; quarantine three unsupported glossary definitions and retain all terminology audit labels as unverified",
+      "publicVisibility": "contained",
       "confidence": "confirmed",
-      "confidenceScope": "current claim only; semantic correction needs review",
+      "confidenceScope": "bounded to DOC-GRADE_10_NADAYA pages 2-12 and an exact-term search of the supplied by-source corpus",
       "status": "contained",
-      "evidenceBasis": "review-required"
+      "evidenceBasis": "canonical-inspection"
     },
     {
       "id": "P01-TALA-DADRA-CITE-001",
       "severity": "P1",
       "entityOrPath": "src/data/talas.json:tala-dadra and src/data/lessons.json:les-tala-dadra",
-      "currentClaim": "Dadra is presented as published with a Grade 7 page 34 citation and a second unrelated filename/page.",
+      "currentClaim": "Dadra tala and lesson previously cited unverified Grade 7 pages. Grade 10 page 6 establishes a source location, but the extracted bol glyph cells are not accepted as a learner-visible playable entity without original-PDF review.",
       "evidence": [
         {
           "path": "src/data/talas.json",
           "locator": "tala-dadra.sourceReference",
-          "exactPageOrSection": "පිටුව 34; sg10_emus_chap1_mulikanga.pdf පිටුව 6"
+          "exactPageOrSection": "SRC-EPD-TB-G10 (sg10_emus_chap1_mulikanga.pdf පිටුව 6)"
         },
         {
-          "path": "data/source-documents.json",
-          "locator": "SRC-NIE-G07-TG",
-          "exactSection": "Music sd.pdf is Review Required and does not establish the second filename"
+          "path": "src/data/lessons.json",
+          "locator": "les-tala-dadra.sourceReference",
+          "exactPageOrSection": "SRC-EPD-TB-G10 (sg10_emus_chap1_mulikanga.pdf පිටුව 6)"
+        },
+        {
+          "path": "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
+          "locator": "tala-dadra row",
+          "exactSection": "full field-level audit matrix"
         }
       ],
-      "disposition": "quarantine until source-document and page-level citation are reconciled",
+      "disposition": "retain the raw Dadra record and exact Grade 10 locator for audit, but quarantine the whole tala and every dependent lesson or quiz until the original bol cells are manually verified",
       "publicVisibility": "quarantined",
+      "confidence": "needs-review",
+      "confidenceScope": "bounded to DOC-GRADE_10_MUSICAL_FUNDAMENTALS page 6; normalized bol cells remain unaccepted",
+      "status": "needs-review",
+      "evidenceBasis": "review-required"
+    },
+    {
+      "id": "P02-QUIZ-SYNC-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/quizzes.json:quiz-les-intro-01 and quiz-les-tala-dadra",
+      "currentClaim": "Public quizzes retained stale Grade 6/7 questions and unsupported citations after their parent lessons were remediated.",
+      "evidence": [
+        {
+          "path": "src/data/quizzes.json",
+          "locator": "quiz-les-intro-01 questions",
+          "exactPageOrSection": "SRC-G10-NADA (sg10_emus_chap8_nadaya.pdf පිටු 3, 4, 10-11)"
+        },
+        {
+          "path": "src/data/quizzes.json",
+          "locator": "quiz-les-tala-dadra questions",
+          "exactPageOrSection": "SRC-EPD-TB-G10 (sg10_emus_chap1_mulikanga.pdf පිටුව 6)"
+        }
+      ],
+      "disposition": "replace stale questions and citations with source-grounded Grade 10 acoustics and Dadra evidence",
+      "publicVisibility": "contained",
       "confidence": "confirmed",
-      "confidenceScope": "citation contradiction",
+      "confidenceScope": "quiz claims compared with DOC-GRADE_10_NADAYA pages 3, 4, 10-11 and DOC-GRADE_10_MULIKANGA page 6",
       "status": "contained",
-      "evidenceBasis": "citation-contradiction"
+      "evidenceBasis": "canonical-inspection"
+    },
+    {
+      "id": "P02-LOCATOR-POLICY-001",
+      "severity": "P1",
+      "entityOrPath": "src/lib/data/publication-policy.ts:evaluateSourceReference",
+      "currentClaim": "Digits in filenames, partial in-range locators, prefixed counterfeit filenames, mixed readable/corrupt page sets, and second PDF names separated by whitespace, comma, slash, parentheses, or newline could previously satisfy parts of the publication gate.",
+      "evidence": [
+        {
+          "path": "src/lib/data/publication-policy.ts",
+          "locator": "explicitPageReferences and hasMismatchedPdfReference",
+          "exactSection": "explicit page-clause parsing, exact single-filename agreement, full range validation, and all-cited-pages A/B Sinhala readability"
+        },
+        {
+          "path": "src/test/publication-containment.test.ts",
+          "locator": "adversarial source locator test",
+          "exactSection": "filename-only, page 2-999, counterfeit-prefix, mixed-quality pages, and whitespace/comma/slash/parenthesis/newline second-PDF cases"
+        }
+      ],
+      "disposition": "fail closed unless explicit pages all fall in range, every cited page is A/B Sinhala-readable, and the sole named PDF exactly agrees with the source ID",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "runtime policy and adversarial regression cases",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-GRADE-EVIDENCE-001",
+      "severity": "P1",
+      "entityOrPath": "public Phase 2 raga, tala, lesson, and quiz grade bands",
+      "currentClaim": "Core records previously advertised lower grades not established by the document selected in their source reference.",
+      "evidence": [
+        {
+          "path": "src/data/ragas.json",
+          "locator": "seven public raga gradeBands",
+          "exactPageOrSection": "SRC-G11-RAGA-ID Grade 11, PDF Pages 1-2"
+        },
+        {
+          "path": "src/data/talas.json",
+          "locator": "eight raw quarantined tala gradeBands",
+          "exactPageOrSection": "SRC-EPD-TB-G10 Grade 10, PDF Page 7 supports readable raw Khemta cells; no Tala is public until every required structure/action field is dispositioned"
+        },
+        {
+          "path": "src/data/lessons.json and src/data/quizzes.json",
+          "locator": "les-tala-dadra and quiz-les-tala-dadra",
+          "exactPageOrSection": "SRC-EPD-TB-G10 Grade 10, PDF Page 6, quality A"
+        },
+        {
+          "path": "src/data/lessons.json, src/data/quizzes.json, and src/data/glossary.json",
+          "locator": "les-intro-01, quiz-les-intro-01, and five public acoustics terms",
+          "exactPageOrSection": "SRC-G10-NADA Grade 10, PDF Pages 2-12 (question pages 3, 4, 10-11), quality A"
+        }
+      ],
+      "disposition": "use only the 10-11 browse bucket containing the exact source grade and require every public band to intersect the selected source's grade metadata",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "selected source-document grades; earlier grades are not inferred",
+      "status": "contained",
+      "evidenceBasis": "cross-entity"
+    },
+    {
+      "id": "P02-TALA-STRUCTURE-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/talas.json:tala-deepchandi, tala-keherwa, tala-lawani, tala-khemta",
+      "currentClaim": "Keherwa and Lawani used bols absent from the cited table, Khemta was modeled as six rather than four compound matras, and Deepchandi used a spelling not established by the accepted Grade 10 source.",
+      "evidence": [
+        {
+          "path": "oriental_music_markdown/by-source/grade_10_musical_fundamentals.md",
+          "locator": "PDF Pages 3, 6-7",
+          "exactPageOrSection": "Keherwa/Lawani eight-cell table and Khemta four-matra, three-akshara explanation"
+        },
+        {
+          "path": "src/test/musical-core.test.ts",
+          "locator": "expectedTalas fixture",
+          "exactSection": "exact matra, vibhag, bol, and hand-mark assertions"
+        },
+        {
+          "path": "src/data/talas.json",
+          "locator": "tala-deepchandi.name_si",
+          "exactPageOrSection": "SRC-EPD-TB-G10 PDF Pages 2, 4-5 establish දීප්චන්ද්; Grade 11 දීප්චන්දි remains retrieval-only and needs-review"
+        }
+      ],
+      "disposition": "retain Khemta's readable four-matra compound cells and all other Tala structures as raw audit data; quarantine all eight Talas until every learner-visible/playable structure field is closed; keep Grade 11 දීප්චන්දි retrieval-only",
+      "publicVisibility": "contained",
+      "confidence": "needs-review",
+      "confidenceScope": "Khemta's readable cells are bounded to Grade 10 page 7, but remaining structure/action fields and all other normalized bol glyphs require explicit disposition plus original-PDF/manual review",
+      "status": "needs-review",
+      "evidenceBasis": "review-required"
+    },
+    {
+      "id": "P02-STATIC-QUARANTINE-001",
+      "severity": "P1",
+      "entityOrPath": "src/components/audio/EarTrainingModule.tsx and src/app/search/page.tsx",
+      "currentClaim": "Static public practice/search copy exposed quarantined Roopak, Bhairav, Dadra, and Lawani even though repository and direct-route gates contained those records.",
+      "evidence": [
+        {
+          "path": "src/components/audio/EarTrainingModule.tsx",
+          "locator": "DEFAULT_CHALLENGES tala options",
+          "exactSection": "the unsupported Tala challenge was removed; the module now uses only source-supported swara exercises"
+        },
+        {
+          "path": "src/app/search/page.tsx",
+          "locator": "placeholder and quick samples",
+          "exactSection": "Bhairav, Dadra, and Lawani are absent from static discovery suggestions"
+        },
+        {
+          "path": "src/test/components.test.tsx",
+          "locator": "static quarantine regression",
+          "exactSection": "public EarTraining and Search UI contain no Roopak, Bhairav, Dadra, or Lawani claims; components.test.tsx:971 static quarantine regression; search-engine.test.ts:20 quarantined query regression"
+        }
+      ],
+      "disposition": "remove quarantined static claims and regression-lock public UI copy independently of repository filtering",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "application containment invariant; source evidence N/A",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-TALA-VALIDATION-001",
+      "severity": "P1",
+      "entityOrPath": "src/lib/validation/content-validator.ts:Tala validation",
+      "currentClaim": "Malformed Tala fields, in-range but incorrect vibhag indexes, blank or fallback bols, and search-equivalent identities could pass structural validation or throw instead of returning issues.",
+      "evidence": [
+        {
+          "path": "src/lib/validation/content-validator.ts",
+          "locator": "Tala structural and identity validation",
+          "exactSection": "runtime type guards, cumulative vibhag membership, intentional bol plans, and shared search normalization"
+        },
+        {
+          "path": "src/test/content-validator.test.ts",
+          "locator": "negative Tala and catalog identity mutations",
+          "exactSection": "null fields, string booleans, blank bols, wrong vibhag membership, duplicate IDs, and search-equivalent variants fail closed"
+        }
+      ],
+      "disposition": "return structured errors for malformed records and reject any public Tala or searchable catalog identity that violates the canonical runtime contract",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "application validation invariant; source evidence N/A",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-AUDIO-OWNERSHIP-001",
+      "severity": "P1",
+      "entityOrPath": "src/lib/audio/tabla.ts and src/components/audio/TalaVisualizer.tsx",
+      "currentClaim": "Playback previously mixed singleton scheduling with a visualizer effect cleanup that could immediately cancel Start and allowed lifecycle changes to affect pending compound strokes.",
+      "evidence": [
+        {
+          "path": "src/lib/audio/tabla.ts",
+          "locator": "scheduleTablaPlan and playBol",
+          "exactSection": "each play call owns and returns its cancellation handle"
+        },
+        {
+          "path": "src/components/audio/TalaVisualizer.tsx",
+          "locator": "playbackCancelRef",
+          "exactSection": "Start retains its handle; tick replacement, Stop, Reset, audio-off, tala change, BPM change, and unmount cancel only the visualizer's own session"
+        },
+        {
+          "path": "src/test/musical-core.test.ts",
+          "locator": "scheduled tabla playback ownership regression",
+          "exactSection": "interleaved owner cancellation leaves the other owner's delayed strokes executable"
+        },
+        {
+          "path": "src/test/components.test.tsx",
+          "locator": "TalaVisualizer lifecycle and hydration regressions",
+          "exactSection": "Start/tick/Stop/Reset/audio-off/tala-change/unmount and co-mounted isolation are interaction-tested at components.test.tsx:182,261,286"
+        }
+      ],
+      "disposition": "replace global cancellation with caller-owned scheduling handles and regression-lock independent playback sessions",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "application audio invariant; source evidence N/A",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-RAGA-FIELDS-001",
+      "severity": "P1",
+      "entityOrPath": "src/data/ragas.json and public raga UI",
+      "currentClaim": "Public raga records included unsupported rasa, usage/history, extra phrases, and lower-grade claims; Yaman ascent and Bhimpalasi time also contradicted the cited Grade 11 table.",
+      "evidence": [
+        {
+          "path": "oriental_music_markdown/by-source/grade_11_raga_identification.md",
+          "locator": "PDF Pages 1-2",
+          "exactPageOrSection": "seven raga scales, fields, times, and mukhyanga table"
+        },
+        {
+          "path": "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
+          "locator": "Raga evidence sections 1.1-1.3",
+          "exactSection": "independent verified, editorial, withheld, and quarantined field dispositions"
+        }
+      ],
+      "disposition": "remove or explicitly withhold absent claims; correct Yaman and Bhimpalasi; retain one source mukhyanga per public raga",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "Grade 11 pages 1-2; rasa and other absent details withheld",
+      "status": "contained",
+      "evidenceBasis": "canonical-inspection"
+    },
+    {
+      "id": "P02-QUIZ-POLICY-001",
+      "severity": "P1",
+      "entityOrPath": "src/lib/data/publication-policy.ts:getQuizPublicationDecision and src/lib/data/repository.ts:getQuizzes",
+      "currentClaim": "A quiz could remain public under a public parent even if a nested question had unsupported or missing explicit grades, and repository-only filtering did not expose structured failure reasons or summary counts.",
+      "evidence": [
+        {
+          "path": "src/lib/data/publication-policy.ts",
+          "locator": "getQuizPublicationDecision",
+          "exactSection": "structured public-parent, non-empty question-set, explicit question-grade/source, and nested-question decisions"
+        },
+        {
+          "path": "src/test/publication-containment.test.ts",
+          "locator": "unsupported nested question mutation",
+          "exactSection": "12-13 question causes quiz lookup to fail closed"
+        }
+      ],
+      "disposition": "centralize aggregate quiz decisions, require every nested question to carry explicit grades and direct evidence, expose reason codes, and include quiz counts in the repository summary",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "repository getter and mutation regression test",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
     },
     {
       "id": "P01-SOURCE-METADATA-001",
       "severity": "P1",
       "entityOrPath": "src/data/sources.json and data/source-manifest.json",
-      "currentClaim": "Source records display verified publishers, years, locations, licences, tiers, and statuses.",
+      "currentClaim": "Phase 2 source records displayed verified publishers, years, locations, licences, tiers, and statuses that are not established by the supplied extraction metadata.",
       "evidence": [
         {
           "path": "src/data/sources.json",
-          "locator": "all 21 source records",
-          "exactSection": "status Verified and populated publisher/year/location/license fields"
+          "locator": "SRC-EPD-TB-G10, SRC-EPD-TB-G11, SRC-G10-NADA, SRC-G11-RAGA-ID",
+          "exactSection": "Phase 2 selected source identities retain stable IDs and filenames; publisher/year/place/licence/tier are explicit unknown/unverified values"
         },
         {
           "path": "data/source-documents.json",
-          "locator": "30 extracted documents",
+          "locator": "the extracted-document inventory and per-document reviewStatus values",
           "exactSection": "reviewStatus is Source Triaged, Review Required, or Image Only / Gaps; it does not establish all metadata"
+        },
+        {
+          "path": "data/source-manifest.json and SOURCES.md",
+          "locator": "four selected Phase 2 source rows",
+          "exactSection": "exact filenames and grades retained; publisher/year/place/licence/tier/URL are unknown or omitted and unsupported topics are absent"
         }
       ],
-      "disposition": "sanitize public source views and retain raw metadata only as untrusted audit input",
+      "disposition": "replace unsupported raw metadata on the four Phase 2 selected source records with explicit unknown/unverified values; retain stable IDs and filenames only for link/progress compatibility",
       "publicVisibility": "contained",
       "confidence": "confirmed",
+      "confidenceScope": "Phase 2 selected source records only; remaining catalog metadata is deferred to later source-specific phases",
       "status": "contained",
       "evidenceBasis": "metadata-comparison"
     },
@@ -554,8 +1243,1021 @@
       "confidenceScope": "implementation defect",
       "status": "contained",
       "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-PUBLIC-PROJECTION-001",
+      "severity": "P1",
+      "entityOrPath": "src/lib/data/publication-policy.ts and src/lib/data/repository.ts",
+      "currentClaim": "Canonical grades, dependencies, field withholding, repository reads, search inputs, and summary counts could make separate publication decisions.",
+      "evidence": [
+        {
+          "path": "src/lib/data/publication-policy.ts",
+          "locator": "getRecordPublicationDecision / collectDependencyDispositions / sanitizePublicRecord",
+          "exactSection": "canonical browse bands, blocking and optional dependencies, and publicProjection"
+        },
+        {
+          "path": "src/test/publication-containment.test.ts",
+          "locator": "individual/mixed grade and dependency projection regressions",
+          "exactSection": "missing or malformed canonical scope fails closed; optional unavailable successors are stripped; summaries equal public getters"
+        }
+      ],
+      "disposition": "make one fail-closed decision return the exact sanitized public projection consumed by repository lists, direct lookups, search, and counts",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "runtime publication contract",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-QUESTION-CONTRACT-001",
+      "severity": "P1",
+      "entityOrPath": "nested quiz and exam questions plus src/components/quiz/QuizRunner.tsx",
+      "currentClaim": "A question with a missing answer shape or unsupported discriminator could be published and the runner's fallback treated it as correct.",
+      "evidence": [
+        {
+          "path": "src/lib/data/publication-policy.ts",
+          "locator": "hasCanonicalQuestionShape",
+          "exactSection": "closed discriminator and per-type answer contracts"
+        },
+        {
+          "path": "src/components/quiz/QuizRunner.tsx",
+          "locator": "ordering branch and fail-closed fallback",
+          "exactSection": "ordering requires learner interaction; unsupported types never auto-pass"
+        }
+      ],
+      "disposition": "reject malformed or unsupported nested questions before public projection and implement the supported ordering interaction explicitly",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "runtime question and assessment contract",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-AUDIO-RESILIENCE-001",
+      "severity": "P1",
+      "entityOrPath": "TalaVisualizer, RhythmTapGame, tablaSynth, and swaraSynth",
+      "currentClaim": "Unsafe BPM values could create hot timers and missing or throwing Web Audio APIs could escape while controls remained stuck in a playing state.",
+      "evidence": [
+        {
+          "path": "src/lib/audio/tempo.ts",
+          "locator": "isSafePracticeBpm / normalizePracticeBpm",
+          "exactSection": "finite 40-240 BPM application boundary"
+        },
+        {
+          "path": "src/test/components.test.tsx and src/test/synth.test.ts",
+          "locator": "StrictMode lifecycle, unavailable-audio, and hostile-BPM regressions",
+          "exactSection": "caller-owned cancellation, deterministic hydration, localized fallback, and nonthrowing initialization"
+        }
+      ],
+      "disposition": "bound application tempo, make rhythm completion single-shot, return caller-owned readiness handles, and keep text/visual tools usable with localized feedback when Web Audio is unavailable",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "application timing and browser capability contract; curriculum evidence N/A",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-FINAL-01",
+      "severity": "P1",
+      "entityOrPath": "Lesson runtime contract, review metadata, and public detail projection",
+      "currentClaim": "A Lesson missing required raw reviewMetadata could pass the public boundary and reach a route that dereferenced the missing value.",
+      "evidence": [
+        {
+          "path": "src/lib/validation/content-contracts.ts",
+          "locator": "isReviewMetadata / isLesson / projectPublicRecord",
+          "exactSection": "isReviewMetadata, validateContentRecord, and projectPublicRecord",
+          "semanticReferences": [
+            {
+              "path": "src/lib/validation/content-contracts.ts",
+              "symbol": "isReviewMetadata, validateContentRecord, and projectPublicRecord"
+            }
+          ]
+        },
+        {
+          "path": "src/test/content-contracts.test.ts",
+          "locator": "lesson review metadata mutation",
+          "exactSection": "tests: rejects both CMS publication entry points when raw metadata is synthesized or incomplete; rejects every required route-rendered Raga and Lesson shape",
+          "semanticReferences": [
+            {
+              "path": "src/test/content-contracts.test.ts",
+              "symbol": "tests: rejects both CMS publication entry points when raw metadata is synthesized or incomplete; rejects every required route-rendered Raga and Lesson shape"
+            }
+          ]
+        }
+      ],
+      "disposition": "require valid raw review metadata before publication, report malformed forensic input, and synthesize explicit unverified metadata only in bounded review/public projections",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "runtime content and route-safety contract; curriculum evidence N/A",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-FINAL-02",
+      "severity": "P2",
+      "entityOrPath": "Finite-domain fields in content records and nested activities/questions/checkpoints",
+      "currentClaim": "Arbitrary nonblank difficulty, strand, review, reuse, activity, tool, category, and checkpoint values could pass partial runtime guards.",
+      "evidence": [
+        {
+          "path": "src/lib/validation/content-contracts.ts",
+          "locator": "finite union constants and entity-specific validators",
+          "exactSection": "DIFFICULTY_LEVELS, REVIEW_STATUSES, REUSE_STATUSES, AUDIO_ACTIVITY_TYPES, PRACTICE_TOOLS, and CHECKPOINT_TYPES",
+          "semanticReferences": [
+            {
+              "path": "src/lib/validation/content-contracts.ts",
+              "symbol": "DIFFICULTY_LEVELS, REVIEW_STATUSES, REUSE_STATUSES, AUDIO_ACTIVITY_TYPES, PRACTICE_TOOLS, and CHECKPOINT_TYPES"
+            }
+          ]
+        },
+        {
+          "path": "src/test/content-contracts.test.ts",
+          "locator": "invalid finite-domain mutation matrix",
+          "exactSection": "tests: rejects unsupported finite-domain values across every known entity contract",
+          "semanticReferences": [
+            {
+              "path": "src/test/content-contracts.test.ts",
+              "symbol": "tests: rejects unsupported finite-domain values across every known entity contract"
+            }
+          ]
+        }
+      ],
+      "disposition": "centralize finite domains in dependency-free contracts and fail every unsupported literal closed before source or dependency evaluation",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "runtime domain contract; curriculum evidence N/A",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-FINAL-03",
+      "severity": "P2",
+      "entityOrPath": "Instrument, CulturalTradition, TheatreTradition, LearningPath, Glossary, Quiz, Exam, and nested runtime contracts",
+      "currentClaim": "Dormant or currently nonpublic entity guards omitted required interface fields and nested shapes, allowing later source remediation to expose malformed records.",
+      "evidence": [
+        {
+          "path": "src/lib/validation/content-contracts.ts",
+          "locator": "identifyContentKind / validateContentRecord",
+          "exactSection": "KIND_SIGNATURES, identifyContentKind, and validateContentRecord",
+          "semanticReferences": [
+            {
+              "path": "src/lib/validation/content-contracts.ts",
+              "symbol": "KIND_SIGNATURES, identifyContentKind, and validateContentRecord"
+            }
+          ]
+        },
+        {
+          "path": "src/test/content-contracts.test.ts",
+          "locator": "canonical entity and malformed-field tables",
+          "exactSection": "tests: validates every imported catalog record, nested question, and allowlisted projection",
+          "semanticReferences": [
+            {
+              "path": "src/test/content-contracts.test.ts",
+              "symbol": "tests: validates every imported catalog record, nested question, and allowlisted projection"
+            }
+          ]
+        }
+      ],
+      "disposition": "treat all imported catalogs as unknown arrays, reject unknown or ambiguous kinds, and use the same complete contract for validation, publication, repository reads, and allowlisted projections",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "closed-world application contract; no new publication promotion",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-FINAL-04",
+      "severity": "P2",
+      "entityOrPath": "Runtime graph inspection, dependency processing, review sanitization, and public projection",
+      "currentClaim": "Recursive inspection or cloning could overflow on deep acyclic data and did not share one bounded cycle/node/depth policy.",
+      "evidence": [
+        {
+          "path": "src/lib/validation/content-contracts.ts",
+          "locator": "inspectGraph / projectPublicRecord / cloneBoundedJson",
+          "exactSection": "inspectGraph and projectPublicRecord",
+          "semanticReferences": [
+            {
+              "path": "src/lib/validation/content-contracts.ts",
+              "symbol": "inspectGraph and projectPublicRecord"
+            }
+          ]
+        },
+        {
+          "path": "src/test/content-contracts.test.ts",
+          "locator": "shared DAG, cycle, depth, width, sparse-array, and oversized-collection cases",
+          "exactSection": "tests: accepts shared DAGs but rejects cycles and graph budget overruns",
+          "semanticReferences": [
+            {
+              "path": "src/test/content-contracts.test.ts",
+              "symbol": "tests: accepts shared DAGs but rejects cycles and graph budget overruns"
+            }
+          ]
+        }
+      ],
+      "disposition": "replace recursive JSON walking with bounded iterative traversal; count shared DAG nodes once and reject cycles, sparse arrays, depth overflow, node overflow, and oversized containers as malformed-record",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "runtime denial-of-service and projection safety contract",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-FINAL-05",
+      "severity": "P3",
+      "entityOrPath": "Sinhala public search normalization",
+      "currentClaim": "A nonblank bidi or zero-width query that normalized to an empty string matched every public field through includes-empty behavior.",
+      "evidence": [
+        {
+          "path": "src/lib/search/search-engine.ts",
+          "locator": "SearchIndex.search normalized-query guard",
+          "exactSection": "classifySearchQuery, searchFilter, and SearchIndex.search",
+          "semanticReferences": [
+            {
+              "path": "src/lib/search/search-engine.ts",
+              "symbol": "classifySearchQuery, searchFilter, and SearchIndex.search"
+            }
+          ]
+        },
+        {
+          "path": "src/test/search-engine.test.ts",
+          "locator": "raw-empty and normalized-empty control regression",
+          "exactSection": "tests: treats raw-empty and normalized-empty queries as different states",
+          "semanticReferences": [
+            {
+              "path": "src/test/search-engine.test.ts",
+              "symbol": "tests: treats raw-empty and normalized-empty queries as different states"
+            }
+          ]
+        }
+      ],
+      "disposition": "preserve featured results only for genuinely empty or whitespace input and return no results when a nonblank query has no normalized or transliterated search text",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "public search correctness and catalog-enumeration boundary",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
+    },
+    {
+      "id": "P02-FINAL-06",
+      "severity": "P2",
+      "entityOrPath": "Swara synthesis handles and all current sequence/tone consumers",
+      "currentClaim": "Delayed Swara sequence work could continue after replacement or unmount, causing later audio and React callbacks without caller ownership.",
+      "evidence": [
+        {
+          "path": "src/lib/audio/synth.ts",
+          "locator": "SwaraPlaybackHandle / playSwaraToneHandle / playSequenceHandle",
+          "exactSection": "SwaraPlaybackHandle, playSwaraToneHandle, and playSequenceHandle",
+          "semanticReferences": [
+            {
+              "path": "src/lib/audio/synth.ts",
+              "symbol": "SwaraPlaybackHandle, playSwaraToneHandle, and playSequenceHandle"
+            }
+          ]
+        },
+        {
+          "path": "src/test/synth.test.ts and src/test/components.test.tsx",
+          "locator": "initialization, active-node, delay, StrictMode, replacement, unmount, and co-mounted ownership regressions",
+          "exactSection": "tests: cancels owned Swara tone and scale work; retains ready Swara ownership until finished",
+          "semanticReferences": [
+            {
+              "path": "src/test/synth.test.ts and src/test/components.test.tsx",
+              "symbol": "tests: cancels owned Swara tone and scale work; retains ready Swara ownership until finished"
+            }
+          ]
+        }
+      ],
+      "disposition": "introduce caller-owned Swara handles, keep Promise wrappers for compatibility, and migrate every current page/component consumer to replacement and unmount cleanup without autoplay",
+      "publicVisibility": "contained",
+      "confidence": "confirmed",
+      "confidenceScope": "local Web Audio lifecycle and privacy boundary; curriculum evidence N/A",
+      "status": "contained",
+      "evidenceBasis": "runtime-inspection"
     }
   ],
+  "acceptanceHardeningCycle1": {
+    "phase": "Phase 2 acceptance hardening cycle 1",
+    "plan": "docs/plans/2026-08-16-003-fix-phase-2-acceptance-hardening-plan.md",
+    "baseSha": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "reviewedHead": "b1b2f5ea949d274fa5e260f39f0554465f704072",
+    "reviewRunId": "20260816-161455-p02-acceptance-c1-4e350894",
+    "artifactDirectory": "C:/tmp/compound-engineering/ce-code-review/20260816-161455-p02-acceptance-c1-4e350894/",
+    "reviewersCompleted": 11,
+    "validatorWave": {
+      "validatorsCompleted": 24,
+      "validated": 23,
+      "rejected": 1,
+      "infrastructureFailures": 0,
+      "degradedP0P1": 0
+    },
+    "rejectedValidator": {
+      "artifact": "validator-05-closeout-plan-reference.json",
+      "status": "rejected",
+      "reason": "Historical dual-plan reference: the earlier final-contract section legitimately points to docs/plans/2026-08-16-002-fix-phase-2-final-contract-closeout-plan.md, while this acceptance-hardening input is governed by docs/plans/2026-08-16-003-fix-phase-2-acceptance-hardening-plan.md. Historical pointers and verdicts remain unchanged."
+    },
+    "status": "Blocked historical acceptance input; 23 validated findings require pending fixes or rerereview; not final acceptance evidence",
+    "dispositionStatuses": [
+      "FIXED-PENDING-REREVIEW"
+    ],
+    "validatedFindings": [
+      {
+        "validatorArtifact": "validator-01-hostile-validator-arrays.json",
+        "severity": "P1",
+        "finding": "Exported validators can iterate hostile or sparse outer collections before a safe snapshot.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Add one bounded dense-array snapshot/guard for validatePublicCollection, validateCatalogIdentityContracts, and validateContent; return structured failure instead of throwing or false-green validation.",
+        "paths": [
+          "src/lib/validation/content-validator.ts"
+        ],
+        "symbols": [
+          "validatePublicCollection",
+          "validateCatalogIdentityContracts",
+          "validateContent"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-02-batch-normalized-duplicate-ids.json",
+        "severity": "P1",
+        "finding": "evaluatePublicationBatch misses duplicate IDs that differ only by surrounding whitespace.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Canonicalize trimmed identity once, reject blank or colliding IDs, and fail closed using the same identity rule as hasUniqueRecordIds.",
+        "paths": [
+          "src/lib/data/publication-policy.ts",
+          "src/lib/data/repository.ts"
+        ],
+        "symbols": [
+          "evaluatePublicationBatch",
+          "hasUniqueRecordIds"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-03-cms-metadata-proxy.json",
+        "severity": "P1",
+        "finding": "CMS review-status mutations can spread or read a hostile reviewMetadata proxy.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Detach metadata with a bounded clone, read only the detached record, and make updateLessonReviewStatus and updateLessonStatus return false on hostile input without throwing.",
+        "paths": [
+          "src/lib/data/repository.ts"
+        ],
+        "symbols": [
+          "hasKnownReviewEvidence",
+          "updateLessonReviewStatus",
+          "updateLessonStatus"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-04-cms-hostile-lookup.json",
+        "severity": "P1",
+        "finding": "CMS lookup can throw when a candidate lesson ID accessor is hostile.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Use safe own-field reads for lookup and a fail-closed mutation boundary; no catalog mutation may occur after a rejected lookup.",
+        "paths": [
+          "src/lib/data/repository.ts"
+        ],
+        "symbols": [
+          "updateLessonReviewStatus",
+          "updateLessonStatus",
+          "findRecordById"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-06-admin-rejected-success.json",
+        "severity": "P1",
+        "finding": "Admin displays success after the repository rejects a Published transition.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Honor the boolean or result from updateLessonReviewStatus, refresh only after success, and show localized rejection feedback.",
+        "paths": [
+          "src/app/admin/page.tsx",
+          "src/lib/data/repository.ts"
+        ],
+        "symbols": [
+          "handleUpdateStatus",
+          "updateLessonReviewStatus"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-07-batch-failure-reasons.json",
+        "severity": "P1",
+        "finding": "Batch wrappers and summaries discard stable malformed or incomplete failure reasons.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Preserve a structured failure union through batch reporting and count incomplete snapshots as needs-review without erasing raw counts.",
+        "paths": [
+          "src/lib/data/publication-policy.ts",
+          "src/lib/data/repository.ts"
+        ],
+        "symbols": [
+          "evaluatePublicationBatch",
+          "getRecordPublicationDecisions",
+          "getPublicationSummary"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-08-quizrunner-duplicate-ids.json",
+        "severity": "P1",
+        "finding": "QuizRunner accepts duplicate question IDs and aliases answer state.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Reject duplicate question IDs during getUsableQuiz projection and render the unavailable state without controls or an attempt.",
+        "paths": [
+          "src/components/quiz/QuizRunner.tsx"
+        ],
+        "symbols": [
+          "getUsableQuiz"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-09-failed-catalog-raw-counts.json",
+        "severity": "P1",
+        "finding": "Failed catalog capture can replace a nonempty catalog with an empty snapshot and erase raw counts.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Retain a bounded raw-count and failure marker and report captured records as needs-review in summaries.",
+        "paths": [
+          "src/lib/data/publication-policy.ts",
+          "src/lib/data/repository.ts"
+        ],
+        "symbols": [
+          "createPublicationEvaluationContext",
+          "getPublicationCatalogRawCount",
+          "getPublicationSummary"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-10-pitch-replacement-race.json",
+        "severity": "P1",
+        "finding": "A stale microphone start can stop the newer replacement session.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Return from the stale or unmounted completion branch without stopping the current detector and add newest-first deferred-start regression coverage.",
+        "paths": [
+          "src/components/audio/PitchDetectorView.tsx",
+          "src/lib/audio/pitch.ts"
+        ],
+        "symbols": [
+          "handleStartMic",
+          "operationRef",
+          "startListening"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-11-known-snapshot-mismatch.json",
+        "severity": "P1",
+        "finding": "Exported validateContentRecord can trust an unrelated caller-supplied known snapshot.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Remove or constrain the public knownSnapshot path and capture the value's own safe snapshot before runtime-shape checks.",
+        "paths": [
+          "src/lib/validation/content-contracts.ts"
+        ],
+        "symbols": [
+          "validateContentRecord",
+          "hasCanonicalRuntimeShape"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-12-curriculum-fixed-count.json",
+        "severity": "P1",
+        "finding": "The legacy curriculum map contradicted its warning by asserting fixed 30-document, complete Grades 6-11 coverage.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "The fixed count and completeness assertion are replaced with bounded extracted-inventory wording; source-backed public scope remains 6-11 and does not imply curriculum completeness.",
+        "paths": [
+          "docs/CURRICULUM_MAP.md"
+        ],
+        "symbols": [
+          "12-13/උසස් පෙළ boundary note"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-13-quiz-format-coverage.json",
+        "severity": "P1",
+        "finding": "Supported quiz formats lack interaction-to-results regression coverage.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Add parameterized controls, submission, scoring, and localized-feedback coverage for every supported renderer format.",
+        "paths": [
+          "src/test/quiz-runner.test.tsx"
+        ],
+        "symbols": [
+          "quiz format scenarios"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-14-dependency-matrix-coverage.json",
+        "severity": "P1",
+        "finding": "The dependency matrix is declared but not behaviorally proved across all recognized keys and public surfaces.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Add matrix-driven available and unavailable cases, optional-link stripping, and direct, list, search, and summary parity checks.",
+        "paths": [
+          "src/lib/data/publication-policy.ts",
+          "src/test/publication-containment.test.ts"
+        ],
+        "symbols": [
+          "DEPENDENCY_FIELD_RULES",
+          "collectDependencyDispositions"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-15-forensic-question-projection.json",
+        "severity": "P2",
+        "finding": "Nested quiz and exam projection can retain forensic audio or notation question types.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Require isPublicQuestionType for every nested child and quarantine the parent when any child is forensic-only or malformed.",
+        "paths": [
+          "src/lib/validation/content-contracts.ts"
+        ],
+        "symbols": [
+          "projectPublicRecord",
+          "isPublicQuestionType",
+          "nested question projection"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-16-evidence-helper-toctou.json",
+        "severity": "P2",
+        "finding": "Evidence helpers reread caller objects after shape checks, allowing stateful proxies to change the evidence decision.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Detach the supplied Tala or context record once at the exported helper boundary and read only that snapshot.",
+        "paths": [
+          "src/lib/data/publication-policy.ts"
+        ],
+        "symbols": [
+          "getTalaFieldDisposition",
+          "getContextClaimPublicationDecision"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-17-quiz-parent-matrix.json",
+        "severity": "P2",
+        "finding": "Quiz-parent lessonId is handled outside the declarative dependency matrix and lacks a nested disposition.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Add the blocking lessonId rule, emit the parent disposition, and extend matrix and public-surface parity tests.",
+        "paths": [
+          "src/lib/data/publication-policy.ts"
+        ],
+        "symbols": [
+          "DEPENDENCY_FIELD_RULES",
+          "collectDependencyDispositions",
+          "quiz-parent decision"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-18-evaluation-context-mutability.json",
+        "severity": "P2",
+        "finding": "PublicationEvaluationContext exposes mutable snapshots, indexes, and memo state.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Hide or freeze evaluation internals and keep mutable memo and stack state private to the context implementation.",
+        "paths": [
+          "src/lib/data/publication-policy.ts"
+        ],
+        "symbols": [
+          "PublicationEvaluationContext",
+          "createPublicationEvaluationContext",
+          "PUBLICATION_CONTEXT_STATE"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-19-stale-search-anchor.json",
+        "severity": "P2",
+        "finding": "Numeric search guard and test anchors in the correction log, field matrix, closeout, and ledger are stale.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Use symbol and heading references now and refresh numeric lines only after code and tests stabilize; no stale line is presented as final acceptance evidence.",
+        "paths": [
+          "src/lib/search/search-engine.ts",
+          "src/test/search-engine.test.ts",
+          "docs/FORENSIC_CORRECTION_LOG.md",
+          "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
+          "docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md",
+          "data/forensic-ledger.json"
+        ],
+        "symbols": [
+          "normalized-empty search guard",
+          "normalized-empty search regression"
+        ],
+        "anchorStatus": "Numeric line anchors intentionally deferred"
+      },
+      {
+        "validatorArtifact": "validator-20-quizrunner-array-limit.json",
+        "severity": "P2",
+        "finding": "QuizRunner accepts a dense question array above the shared MAX_ARRAY_ITEMS bound.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Reject oversized question arrays before iteration or apply the complete bounded graph check and render the unavailable state.",
+        "paths": [
+          "src/components/quiz/QuizRunner.tsx",
+          "src/lib/validation/content-contracts.ts"
+        ],
+        "symbols": [
+          "getUsableQuiz",
+          "MAX_ARRAY_ITEMS"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-21-quizrunner-zero-score.json",
+        "severity": "P2",
+        "finding": "QuizRunner admits passingScorePercent 0 despite the shared contract and then applies a fallback threshold.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Align the renderer with isQuiz for nonpositive thresholds and add the zero-score regression without changing the curriculum contract by inference.",
+        "paths": [
+          "src/components/quiz/QuizRunner.tsx",
+          "src/lib/validation/content-contracts.ts"
+        ],
+        "symbols": [
+          "getUsableQuiz",
+          "isQuiz"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-22-sanitizer-return-type.json",
+        "severity": "P2",
+        "finding": "sanitizePublicRecord<T> promises T but returns an empty object for a rejected record.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Return T | undefined or a discriminated result and require callers to branch on rejection rather than cast an empty object.",
+        "paths": [
+          "src/lib/data/publication-policy.ts"
+        ],
+        "symbols": [
+          "sanitizePublicRecord"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-23-rejected-settled-handles.json",
+        "severity": "P2",
+        "finding": "Rejected finished or ready playback handles lack cleanup regression coverage.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Exercise rejection after a beat, reset or replacement, and unmount; verify settled handles and stale unavailable callbacks are cleaned exactly once.",
+        "paths": [
+          "src/test/components.test.tsx",
+          "src/components/audio/RhythmTapGame.tsx",
+          "src/components/audio/TalaVisualizer.tsx"
+        ],
+        "symbols": [
+          "playback handle rejection and lifecycle scenarios"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      },
+      {
+        "validatorArtifact": "validator-24-public-collection-duplicate-ids.json",
+        "severity": "P1",
+        "finding": "Exported public-collection validators can return valid for exact duplicate records even when batch evaluation detects the collision.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Route validatePublicCollection and validatePublicBoundary through the shared duplicate-aware batch decision and fail the complete collection closed.",
+        "paths": [
+          "src/lib/validation/content-validator.ts",
+          "src/lib/data/publication-policy.ts"
+        ],
+        "symbols": [
+          "validatePublicCollection",
+          "validatePublicBoundary",
+          "evaluatePublicationBatch"
+        ],
+        "anchorStatus": "Refresh line anchor after code stabilizes if needed"
+      }
+    ],
+    "historicalPreservation": [
+      "The rejected Deepchandi retrieval finding remains rejected and retrieval-only.",
+      "Earlier p02r4, final-contract, and other blocked review runs remain historical findings input and are not relabeled as acceptance.",
+      "No new musical fact, Tala, raga, grade, metadata, publication, push, ready PR, merge, or deployment is claimed by this record."
+    ]
+  },
+  "acceptanceHardeningCycle2": {
+    "phase": "Phase 2 acceptance hardening cycle 2 traceability repair",
+    "plan": "docs/plans/2026-08-16-003-fix-phase-2-acceptance-hardening-plan.md",
+    "baseSha": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "reviewedHead": "5b3d2fac41b6b53c3747cb60ec7cc7a316eacd86",
+    "reviewRunId": "20260816-200203-p02-acceptance-c2-8f89f6b1",
+    "artifactDirectory": "C:/tmp/compound-engineering/ce-code-review/20260816-200203-p02-acceptance-c2-8f89f6b1/",
+    "reviewersCompleted": 11,
+    "validatorWave": {
+      "validatorAttempts": 24,
+      "validated": 20,
+      "rejected": 4,
+      "infrastructureFailures": 0,
+      "degradedP0P1": 0
+    },
+    "selectedFindingIds": [
+      "V15",
+      "V23"
+    ],
+    "validatedFindings": [
+      {
+        "id": "V15",
+        "validatorArtifact": "validator-15-stale-anchors.json",
+        "finding": "Correction-log, closeout, field-matrix, and ledger rows retained blank or unrelated numeric anchors, while the closeout test asserted only nonblank lines.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Refresh affected Phase 2 rows to current symbols/headings and require semantic anchor resolution in the closeout test.",
+        "paths": [
+          "docs/FORENSIC_CORRECTION_LOG.md",
+          "docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md",
+          "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
+          "data/forensic-ledger.json",
+          "src/test/review-closeout.test.ts"
+        ],
+        "symbols": [
+          "gradeScopeMatchesSource",
+          "requires each public grade band to contain a grade established by its source",
+          "retains ready Swara ownership until finished",
+          "should not discover quarantined Bhairav or Roopak claims"
+        ],
+        "anchorStatus": "Current line-qualified anchors carry semantic symbols/headings; fresh rereview remains required"
+      },
+      {
+        "id": "V23",
+        "validatorArtifact": "validator-23-finding-traceability-tests.json",
+        "finding": "Acceptance-hardening coverage checked only ID sentinels and anchor counts instead of the exact scoped IDs and each finding's test/fix/anchor/disposition mapping.",
+        "status": "FIXED-PENDING-REREVIEW",
+        "disposition": "Require the exact C3-01 through C3-20 plus authorized P02 finding set and validate every structured semantic mapping against current files and historical evidence tables.",
+        "paths": [
+          "src/test/review-closeout.test.ts",
+          "docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md",
+          "docs/FORENSIC_CORRECTION_LOG.md",
+          "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
+          "data/forensic-ledger.json"
+        ],
+        "symbols": [
+          "Exact scoped finding traceability",
+          "acceptanceHardeningInput.traceability",
+          "FIXED-PENDING-REREVIEW"
+        ],
+        "anchorStatus": "Exact ID set and test/fix/anchor/disposition mapping are machine-checked; fresh rereview remains required"
+      }
+    ],
+    "currentSemanticAnchors": [
+      {
+        "path": "src/test/musical-core.test.ts",
+        "symbol": "verifies bounded quarantine status for out-of-scope entities"
+      },
+      {
+        "path": "src/lib/data/publication-policy.ts",
+        "symbol": "gradeScopeMatchesSource"
+      },
+      {
+        "path": "src/test/publication-containment.test.ts",
+        "symbol": "requires each public grade band to contain a grade established by its source"
+      },
+      {
+        "path": "src/test/components.test.tsx",
+        "symbol": "retains ready Swara ownership until finished"
+      },
+      {
+        "path": "src/test/search-engine.test.ts",
+        "symbol": "should not discover quarantined Bhairav or Roopak claims"
+      }
+    ],
+    "status": "Blocked historical acceptance input; V15 and V23 fixes remain pending fresh review; not acceptance evidence",
+    "otherCycle2FindingsUntouched": true,
+    "historicalPreservation": [
+      "The rejected Deepchandi retrieval finding remains rejected and retrieval-only.",
+      "Earlier p02r4, final-contract, cycle-1, and cycle-2 review runs remain historical findings input and are not relabeled as acceptance.",
+      "No new musical fact, Tala, raga, grade, metadata, publication, push, ready PR, merge, or deployment is claimed by this record."
+    ]
+  },
+  "acceptanceHardeningCycle3": {
+    "phase": "Phase 2 acceptance hardening cycle 3",
+    "plan": "docs/plans/2026-08-16-003-fix-phase-2-acceptance-hardening-plan.md",
+    "baseSha": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "reviewedHead": "1f67f50f919a63ec5ccb007ab563ce410b94621f",
+    "reviewRunId": "20260817-033648-p02-acceptance-c3-1ebef39b",
+    "artifactDirectory": "C:/tmp/compound-engineering/ce-code-review/20260817-033648-p02-acceptance-c3-1ebef39b/",
+    "reviewersCompleted": 11,
+    "reviewerModel": "gpt-5.6-luna",
+    "reviewerEffort": "max",
+    "validatorWave": {
+      "candidates": 14,
+      "validated": 14,
+      "rejected": 0,
+      "infrastructureFailures": 0,
+      "degradedP0P1": 0
+    },
+    "fixCommitSubject": "fix(review): close cycle-three acceptance findings",
+    "validatedFindings": [
+      {
+        "id": "C3-V01",
+        "artifact": "validator-01-whitespace-quarantine-id.json",
+        "test": "src/test/publication-containment.test.ts:130",
+        "fix": "src/lib/data/publication-policy.ts:130 (isKnownQuarantinedEntityId)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V02",
+        "artifact": "validator-02-page-metadata.json",
+        "test": "src/test/publication-parity.test.ts:541",
+        "fix": "src/lib/data/publication-policy.ts:316 (isSourceDocumentRecord)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V03",
+        "artifact": "validator-03-unsafe-tala-context.json",
+        "test": "src/test/publication-containment.test.ts:715",
+        "fix": "src/lib/data/publication-policy.ts:923 (getTalaFieldDisposition)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V04",
+        "artifact": "validator-04-mutable-quarantine-registry.json",
+        "test": "src/test/publication-containment.test.ts:130",
+        "fix": "src/lib/data/publication-policy.ts:130 (private registry predicate)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V05",
+        "artifact": "validator-05-quizrunner-snapshot.json",
+        "test": "src/test/quiz-runner.test.tsx:175",
+        "fix": "src/components/quiz/QuizRunner.tsx:37 (getUsableQuiz)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V06",
+        "artifact": "validator-06-public-collection-kind.json",
+        "test": "src/test/publication-containment.test.ts:699",
+        "fix": "src/lib/validation/content-validator.ts:615 (validatePublicCollection)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V07",
+        "artifact": "validator-07-source-id-normalization.json",
+        "test": "src/test/publication-containment.test.ts:706",
+        "fix": "src/lib/validation/content-contracts.ts:318 (isSourceReference)",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V08",
+        "artifact": "validator-08-search-controls.json",
+        "test": "src/test/search-engine.test.ts:12",
+        "fix": "src/lib/search/normalize-sinhala.ts:14",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V09",
+        "artifact": "validator-09-dependency-boundary-tests.json",
+        "test": "src/test/publication-parity.test.ts:332",
+        "fix": "repository/list/lookup/search/summary dependency parity regression",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V10",
+        "artifact": "validator-10-traceability-anchors.json",
+        "test": "src/test/review-closeout.test.ts:64,136",
+        "fix": "exact-line semantic anchors and six-column ledger parity",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V11",
+        "artifact": "validator-11-rhythm-rerender-test.json",
+        "test": "src/test/components.test.tsx:891",
+        "fix": "complete latest-callback rhythm session regression",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V12",
+        "artifact": "validator-12-microphone-privacy-test.json",
+        "test": "src/test/pitch.test.ts:389",
+        "fix": "fetch/XHR/WebSocket/beacon zero-upload guards",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V13",
+        "artifact": "validator-13-synth-mock-restoration.json",
+        "test": "src/test/synth.test.ts:57",
+        "fix": "failure-safe AudioContext restoration",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      },
+      {
+        "id": "C3-V14",
+        "artifact": "validator-14-cms-test-restoration.json",
+        "test": "src/test/publication-containment.test.ts:143",
+        "fix": "remove rejected-operation mutating reset",
+        "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
+      }
+    ],
+    "status": "Third fix cycle complete locally; mandatory read-only acceptance review pending; not acceptance evidence",
+    "historicalPreservation": [
+      "The rejected Deepchandi retrieval-only finding remains rejected.",
+      "All eight Talas remain whole-entity quarantined.",
+      "Earlier blocked and fix-cycle runs remain historical findings input.",
+      "No push, ready PR, merge, deployment, or musical-source promotion is authorized by this entry."
+    ]
+  },
+  "finalAcceptanceFollowup": {
+    "reviewRunId": "20260817-054012-p02-final-acceptance-a17068ff",
+    "reviewedHead": "b1fba4a2278a38501023488c9fd9e8c703b723fd",
+    "artifactRoot": "C:/tmp/compound-engineering/ce-code-review/20260817-054012-p02-final-acceptance-a17068ff/",
+    "validatedFindingIds": [
+      "FA-V01",
+      "FA-V03",
+      "FA-V04",
+      "FA-V05",
+      "FA-V06",
+      "FA-V07",
+      "FA-V08",
+      "FA-V09",
+      "FA-V10",
+      "FA-V11",
+      "FA-V14",
+      "FA-V15",
+      "FA-V16",
+      "FA-V17"
+    ],
+    "semanticTraceability": {
+      "FA-V01": "src/lib/validation/content-validator.ts#validatePublicCollection",
+      "FA-V03": "src/lib/validation/content-contracts.ts#safeOwnEntries",
+      "FA-V04": "src/lib/data/publication-policy.ts#createPublicationEvaluationContext",
+      "FA-V05": "src/lib/validation/content-validator.ts#validateMusicalCoreFieldDispositions",
+      "FA-V06": "src/lib/audio/synth.ts#snapshotValidSwaraSequence",
+      "FA-V07": "src/lib/audio/tabla.ts#planTablaBol",
+      "FA-V08": "src/lib/data/publication-policy.ts#getRecordPublicationDecision",
+      "FA-V09": "src/lib/data/publication-policy.ts#sanitizeReviewRecord",
+      "FA-V10": "src/lib/data/repository.ts#CmsMutationResult",
+      "FA-V11": "src/types/content.ts#AnswerOption",
+      "FA-V14": "src/test/review-closeout.test.ts#records the acceptance-hardening scope without rewriting blocked review history",
+      "FA-V15": "src/test/synth.test.ts#settles Swara cleanup when clearTimeout throws",
+      "FA-V16": "src/lib/data/repository.ts#updateLessonReviewStatus",
+      "FA-V17": "src/lib/data/publication-policy.ts#parseSourceLocator"
+    },
+    "status": "All validated blockers fixed locally; fresh mandatory rereview pending; not acceptance evidence",
+    "historicalPreservation": [
+      "The acceptance run remains blocked findings input.",
+      "All eight Talas remain whole-entity quarantined.",
+      "The rejected Deepchandi retrieval-only finding remains rejected.",
+      "No push, ready PR, merge, deployment, or musical-source promotion is authorized by this entry."
+    ]
+  },
+  "acceptanceHardeningReviewCycle1": {
+    "reviewRunId": "20260817-p02-hardening-c1-06568d6f",
+    "originalBase": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "reviewedHead": "06568d6f0d777771ef139e6fdd21d1bc73d8c5e7",
+    "artifactRoot": "C:/tmp/compound-engineering/ce-code-review/20260817-p02-hardening-c1-06568d6f/",
+    "reviewersRequired": 11,
+    "reviewersCompleted": 11,
+    "validatorsDispatched": 20,
+    "validatorsValidated": 20,
+    "validatorsRejected": 0,
+    "validatorsFailed": 0,
+    "degradedP0P1": 0,
+    "validatedFindingIds": [
+      "AH-C1-V01",
+      "AH-C1-V02",
+      "AH-C1-V03",
+      "AH-C1-V04",
+      "AH-C1-V05",
+      "AH-C1-V06",
+      "AH-C1-V07",
+      "AH-C1-V08",
+      "AH-C1-V09",
+      "AH-C1-V10",
+      "AH-C1-V11",
+      "AH-C1-V12",
+      "AH-C1-V13",
+      "AH-C1-V14",
+      "AH-C1-V15",
+      "AH-C1-V16",
+      "AH-C1-V17",
+      "AH-C1-V18",
+      "AH-C1-V19",
+      "AH-C1-V20"
+    ],
+    "semanticTraceability": {
+      "AH-C1-V01": "src/test/swara-consumers.test.tsx#cancels a NotationArranger tone when its arranged item is removed",
+      "AH-C1-V02": "src/test/synth.test.ts#rolls back earlier Tabla timers when an immediate stroke callback fails",
+      "AH-C1-V03": "src/test/components.test.tsx#releases a Tala handle only after ready and finished settle",
+      "AH-C1-V04": "src/test/pitch.test.ts#cleans the active graph when analyser sampling throws",
+      "AH-C1-V05": "src/test/pitch.test.ts#releases an active session before installing a replacement",
+      "AH-C1-V06": "src/lib/data/publication-policy.ts#toPublicationInput",
+      "AH-C1-V07": "src/lib/validation/content-contracts.ts#safeOwnEntries",
+      "AH-C1-V08": "src/lib/validation/content-validator.ts#validatePublicCollection",
+      "AH-C1-V09": "src/lib/validation/content-validator.ts#validateSourceTransparencyCollection",
+      "AH-C1-V10": "src/lib/validation/content-contracts.ts#isGradeBandArray",
+      "AH-C1-V11": "src/lib/validation/content-contracts.ts#canonicalQuestionIds",
+      "AH-C1-V12": "src/test/swara-consumers.test.tsx#releases a Swara tone when onNotePlay throws",
+      "AH-C1-V13": "src/components/audio/RhythmTapGame.tsx#clearPlayback",
+      "AH-C1-V14": "src/components/audio/TalaVisualizer.tsx#cancelPlayback",
+      "AH-C1-V15": "src/lib/data/publication-policy.ts#evaluatePublicationBatch",
+      "AH-C1-V16": "src/lib/data/publication-policy.ts#hasValidPageQualityRegistry",
+      "AH-C1-V17": "src/lib/data/publication-policy.ts#getTalaFieldDisposition",
+      "AH-C1-V18": "src/test/pitch.test.ts#rechecks ownership when stop is re-entered during frame registration",
+      "AH-C1-V19": "src/components/audio/TalaVisualizer.tsx#timerGenerationRef",
+      "AH-C1-V20": "src/lib/validation/content-contracts.ts#normalizeEntityId"
+    },
+    "status": "All 20 validated cycle-1 findings fixed locally; full original-base rereview pending; not acceptance evidence",
+    "historicalPreservation": [
+      "Earlier blocked runs and their verdicts remain unchanged.",
+      "The rejected Deepchandi retrieval-only finding remains rejected.",
+      "All eight Talas remain whole-entity quarantined.",
+      "Original-PDF, notation/layout, OCR/corrupt-glyph, and SME review remain deferred.",
+      "No push, ready PR, merge, deployment, or source promotion is authorized by this entry."
+    ]
+  },
   "publicBaseline": {
     "state": "source-backed but not fully reviewed",
     "publicGradeBands": [
@@ -571,5 +2273,158 @@
       "SME and Sinhala review records",
       "regression tests and final publication decision"
     ]
+  },
+  "acceptanceHardeningReviewCycle2": {
+    "findingsInputRunId": "20260817-p02-hardening-c2-2af0d18",
+    "findingsInputArtifactRoot": "C:/tmp/compound-engineering/ce-code-review/20260817-p02-hardening-c2-2af0d18/",
+    "findingsInputOriginalBase": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "findingsInputReviewedHead": "2af0d182ab0077338964432da5f75de9401f83ec",
+    "findingsInputReviewersRequired": 11,
+    "findingsInputReviewerArtifactsProduced": 10,
+    "findingsInputMissingReviewerArtifacts": [
+      "frontend-races"
+    ],
+    "findingsInputValidatorsDispatched": 0,
+    "findingsInputValidatorArtifactsProduced": 0,
+    "findingsInputTerminationCause": "402 Payment Required; code deactivated_workspace",
+    "findingsInputStatus": "INCOMPLETE run preserved as historical findings input; the missing frontend-races artifact and the zero validator artifacts are absent coverage, not a zero-findings result, and this run is not acceptance evidence",
+    "originalBase": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "implementationHead": "2af0d182ab0077338964432da5f75de9401f83ec",
+    "validatedFindingIds": [
+      "AH-C2-V01",
+      "AH-C2-V02",
+      "AH-C2-V03",
+      "AH-C2-V04",
+      "AH-C2-V05",
+      "AH-C2-V06",
+      "AH-C2-V07",
+      "AH-C2-V08",
+      "AH-C2-V09",
+      "AH-C2-V10"
+    ],
+    "authorizedAdditionalFindings": [
+      "AH-C2-R01",
+      "AH-C2-R02",
+      "AH-C2-R03",
+      "AH-C2-R04",
+      "AH-C2-R05",
+      "AH-C2-R06"
+    ],
+    "semanticTraceability": {
+      "AH-C2-V01": "src/test/quiz-runner.test.tsx#renders a safe unavailable state for question IDs that differ only by %s",
+      "AH-C2-V02": "src/test/sources-page.test.tsx#renders an honest unavailable state for %s",
+      "AH-C2-V03": "src/test/source-metadata-consistency.test.ts#canonical source identity parity",
+      "AH-C2-V04": "src/test/content-validator.test.ts#accepts a valid aggregate Quiz that carries no direct source reference",
+      "AH-C2-V05": "src/test/swara-consumers.test.tsx#continues EarTraining cleanup after Next, replacement, and unmount cancellations throw",
+      "AH-C2-V06": "src/test/swara-consumers.test.tsx#clears every remaining instrument timer when an owned Tabla cancellation throws",
+      "AH-C2-V07": "src/test/synth.test.ts#fails closed for the prototype-key Tabla bol %s without throwing",
+      "AH-C2-V08": "src/test/publication-parity.test.ts#makes the evaluation context unsafe for a verified-looking registry with %s",
+      "AH-C2-V09": "src/test/graph-boundary.test.ts#traverses %s alone but fails the combined catalog closed without throwing",
+      "AH-C2-V10": "src/test/publication-parity.test.ts#refreshes every consumer when only the source-document reviewStatus changes",
+      "AH-C2-R01": "src/test/pitch.test.ts#releases an active session when stream.getTracks() throws on stop",
+      "AH-C2-R02": "src/test/synth.test.ts#cannot strand Tabla playback ownership when a timer callback registers synchronously",
+      "AH-C2-R03": "src/test/graph-boundary.test.ts#withholds %s from every public surface",
+      "AH-C2-R04": "src/test/sources-page.test.tsx#renders the extracted-corpus counts while the corpus is certifiable",
+      "AH-C2-R05": "src/test/audio-cleanup.test.ts#cancels every owned handle even when an earlier cancellation throws",
+      "AH-C2-R06": "src/test/review-closeout.test.ts#recomputes publication summaries from current inputs without memoized identity"
+    },
+    "fixSymbols": {
+      "AH-C2-V01": "src/components/quiz/QuizRunner.tsx#canonicalQuestionIds",
+      "AH-C2-V02": "src/lib/data/publication-policy.ts#getSourceCorpusInventory",
+      "AH-C2-V03": "src/lib/data/repository.ts#matchesRecordId",
+      "AH-C2-V04": "src/lib/validation/content-validator.ts#quizAggregateEvidenceIssues",
+      "AH-C2-V05": "src/components/audio/EarTrainingModule.tsx#cancelPlayback",
+      "AH-C2-V06": "src/lib/audio/cleanup.ts#releaseHandleSet",
+      "AH-C2-V07": "src/lib/audio/tabla.ts#COMPOUND_BOL_CELLS",
+      "AH-C2-V08": "src/lib/validation/disposition-registry.ts#inspectDispositionRegistry",
+      "AH-C2-V09": "src/test/graph-boundary.test.ts#expectBoundedFailClosed",
+      "AH-C2-V10": "src/test/publication-parity.test.ts#readEveryConsumer",
+      "AH-C2-R01": "src/lib/audio/pitch.ts#stopStream",
+      "AH-C2-R02": "src/lib/audio/tabla.ts#scheduleTablaPlan",
+      "AH-C2-R03": "src/test/graph-boundary.test.ts#withholds %s from every public surface",
+      "AH-C2-R04": "src/app/sources/page.tsx#inventory.available",
+      "AH-C2-R05": "src/lib/audio/cleanup.ts#runIsolatedCleanup",
+      "AH-C2-R06": "src/test/review-closeout.test.ts#mutableRepository.lessons = originalCatalog"
+    },
+    "reviewModelPolicy": "The original gpt-5.6-luna/MAX reviewer specification is superseded: the deactivated external workspace cannot dispatch it. This cycle uses Claude Opus 5 at high effort for every reviewer and validator, and the adversarial lens uses the review skill's documented in-process fallback with the peer skip reason recorded in Coverage.",
+    "status": "All ten remaining cycle-2 candidate findings and six authorized additional regressions are fixed locally with focused regressions; a complete fresh original-base review is still pending; not acceptance evidence and no push, ready PR, merge, or deployment is authorized",
+    "historicalPreservation": [
+      "Earlier blocked runs and their verdicts remain unchanged.",
+      "The incomplete cycle-2 infrastructure run is preserved and is never described as zero findings.",
+      "The rejected Deepchandi retrieval-only finding remains rejected.",
+      "All eight Talas remain whole-entity quarantined.",
+      "Original-PDF, notation/layout, OCR/corrupt-glyph, and SME review remain deferred.",
+      "No musical fact, publisher, year, location, licence, organization, reviewer, review date, or publication state is invented or promoted.",
+      "The public curriculum boundary remains Grades 6-11; Grade 12-13 and A/L records stay quarantined in raw audit data."
+    ]
+  },
+  "acceptanceHardeningReviewCycle3": {
+    "findingsInputRunId": "20260818-093434-87f5fe73",
+    "findingsInputArtifactRoot": "C:/Users/Rajantha/AppData/Local/Temp/compound-engineering-197609/ce-code-review/20260818-093434-87f5fe73/",
+    "findingsInputOriginalBase": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "findingsInputReviewedHead": "a0c87a2276e3df9e66f701834b6f337e277aa8e3",
+    "findingsInputReviewersRequired": 11,
+    "findingsInputReviewerArtifactsProduced": 11,
+    "findingsInputValidatorsDispatched": 0,
+    "findingsInputValidatorArtifactsProduced": 0,
+    "findingsInputStatus": "BLOCKED findings input only; 53 raw findings (1 P0, 15 P1, 25 P2, 11 P3), no validator wave dispatched, not acceptance evidence",
+    "originalBase": "beba1479f473b3413b3f2de48a27c558e1937c6f",
+    "implementationHead": "a0c87a2276e3df9e66f701834b6f337e277aa8e3",
+    "validatedFindingIds": [
+      "AH-C3-P0-01",
+      "AH-C3-P1-01",
+      "AH-C3-P1-02",
+      "AH-C3-P1-03",
+      "AH-C3-P1-04",
+      "AH-C3-P1-05",
+      "AH-C3-P1-06",
+      "AH-C3-P1-07",
+      "AH-C3-P1-08",
+      "AH-C3-P1-09",
+      "AH-C3-P1-10",
+      "AH-C3-P1-11",
+      "AH-C3-P1-12",
+      "AH-C3-P1-13",
+      "AH-C3-P1-14",
+      "AH-C3-P1-15"
+    ],
+    "authorizedAdditionalFindings": [],
+    "semanticTraceability": {
+      "AH-C3-P0-01": "src/lib/data/repository.ts#getSources",
+      "AH-C3-P1-01": "src/app/admin/page.tsx#validatePublicBoundary",
+      "AH-C3-P1-02": "src/test/content-validator.test.ts#quiz aggregate vacuous branches",
+      "AH-C3-P1-03": "src/lib/data/publication-policy.ts#DEPENDENCY_FIELD_RULES",
+      "AH-C3-P1-04": "src/components/quiz/QuizRunner.tsx#prototype-safe keyed state",
+      "AH-C3-P1-05": "src/lib/validation/content-validator.ts#quizAggregateEvidenceIssues parent resolution",
+      "AH-C3-P1-06": "src/lib/audio/synth.ts#resumeAudioContext",
+      "AH-C3-P1-07": "src/lib/data/repository.ts#updateLessonStatus fabricated metadata",
+      "AH-C3-P1-08": "src/lib/validation/content-contracts.ts#hasExactEvidence duplicate",
+      "AH-C3-P1-09": "src/lib/audio/context.ts#shared AudioContext helper",
+      "AH-C3-P1-10": "src/components/audio/SwaraKeyboard.tsx#releaseTimerRef isolation",
+      "AH-C3-P1-11": "src/lib/data/publication-policy.ts#isKnownQuarantinedEntityId canonical",
+      "AH-C3-P1-12": "src/lib/validation/disposition-registry.ts#unclosedRequiredFields",
+      "AH-C3-P1-13": "src/lib/audio/cleanup.ts#runIsolatedCleanup diagnostics",
+      "AH-C3-P1-14": "src/app/instruments/page.tsx#Aerophone category term",
+      "AH-C3-P1-15": "src/test/publication-containment.test.ts#dependency matrix Map"
+    },
+    "fixSymbols": {
+      "AH-C3-P0-01": "src/lib/data/repository.ts#getSources",
+      "AH-C3-P1-01": "src/app/admin/page.tsx#boundaryReport",
+      "AH-C3-P1-02": "src/test/content-validator.test.ts#record contract",
+      "AH-C3-P1-03": "src/lib/data/publication-policy.ts#DEPENDENCY_FIELD_RULES",
+      "AH-C3-P1-04": "src/components/quiz/QuizRunner.tsx#getUsableQuiz",
+      "AH-C3-P1-05": "src/lib/validation/content-validator.ts#quizAggregateEvidenceIssues",
+      "AH-C3-P1-06": "src/lib/audio/context.ts#resumeAudioContext",
+      "AH-C3-P1-07": "src/lib/data/repository.ts#updateLessonStatus",
+      "AH-C3-P1-08": "src/lib/data/publication-policy.ts#hasPublishableFieldEvidence",
+      "AH-C3-P1-09": "src/lib/audio/context.ts",
+      "AH-C3-P1-10": "src/components/audio/SwaraKeyboard.tsx#cancelPlayback",
+      "AH-C3-P1-11": "src/lib/data/publication-policy.ts#isKnownQuarantinedEntityId",
+      "AH-C3-P1-12": "src/lib/validation/disposition-registry.ts#inspectDispositionRegistry",
+      "AH-C3-P1-13": "src/lib/audio/cleanup.ts#runIsolatedCleanup",
+      "AH-C3-P1-14": "src/app/instruments/page.tsx",
+      "AH-C3-P1-15": "src/test/publication-containment.test.ts"
+    },
+    "disposition": "FIXED-PENDING-REREVIEW"
   }
 }

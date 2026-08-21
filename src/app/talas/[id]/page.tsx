@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Activity, ArrowRight, FileText } from "lucide-react";
 import { repository } from "@/lib/data/repository";
+import { formatPublicSourceReference } from "@/lib/data/publication-policy";
 import { TalaVisualizer } from "@/components/audio/TalaVisualizer";
 import { RhythmTapGame } from "@/components/audio/RhythmTapGame";
 
@@ -18,7 +19,8 @@ export default function TalaDetailPage() {
   if (!tala) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-xl font-bold text-text mb-4">තාලය හමු නොවීය.</h2>
+        <h2 className="text-xl font-bold text-text mb-4">මෙම තාලය ප්‍රසිද්ධ භාවිතයට නොමැත හෝ හමු නොවීය.</h2>
+        <p className="mb-4 text-sm text-text-secondary">මූලාශ්‍ර සාක්ෂිය සම්පූර්ණ වන තෙක් අසනාථ තාල ප්‍රදර්ශනය නොකෙරේ.</p>
         <Link href="/talas" className="text-primary underline text-sm">
           සියලු තාල වෙත ආපසු යන්න
         </Link>
@@ -52,6 +54,18 @@ export default function TalaDetailPage() {
           {tala.name_si} ({tala.name_en})
         </h1>
 
+        {tala.context_si && (
+          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+            <span className="mb-1 block font-bold">විෂය නිර්දේශ සන්දර්භය:</span>
+            <p>{tala.context_si}</p>
+            {tala.contextSourceReference && (
+              <p className="mt-2 text-xs text-amber-800">
+                මූලාශ්‍රය: {formatPublicSourceReference(tala.contextSourceReference)}
+              </p>
+            )}
+          </div>
+        )}
+
         <div className="bg-surface-warm p-4 rounded-2xl border border-border-light text-xs sm:text-sm mb-6">
           <span className="font-bold text-text block mb-1">තාළි සහ ඛාලි ලකුණු:</span>
           <ul className="list-disc list-inside space-y-1 text-text-secondary">
@@ -74,7 +88,7 @@ export default function TalaDetailPage() {
           තාලයේ ස්පන්දනයට අනුව අත්පුඩි ගසමින් හෝ තිරය මත තට්ටු කරමින් නිරවද්‍යතාව මැන බලන්න.
         </p>
 
-        <RhythmTapGame bpm={tala.layaVariants?.thah_bpm || 80} totalBeats={tala.matras * 2} />
+        <RhythmTapGame bpm={tala.practiceTempoBpm?.thah_bpm || 80} totalBeats={tala.matras * 2} />
       </section>
 
       {/* Source Citation */}
@@ -83,7 +97,7 @@ export default function TalaDetailPage() {
         <div>
           <span className="font-bold text-text block">මූලාශ්‍ර සටහන:</span>
           <p>
-            {source?.title} ({source?.publisher}) — {tala.sourceReference.pageOrSection}
+            {source?.title} — {formatPublicSourceReference(tala.sourceReference)}
           </p>
         </div>
       </footer>

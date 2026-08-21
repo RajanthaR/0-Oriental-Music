@@ -3,52 +3,51 @@
     "id": "quiz-les-intro-01",
     "title_si": "නාදය සහ සංගීත නාදය කුඩා ප්‍රශ්නාවලිය",
     "lessonId": "les-intro-01",
+    "gradeBands": ["10-11"],
     "passingScorePercent": 75,
     "questions": [
       {
         "id": "q-intro-01",
         "type": "mcq",
         "gradeBands": [
-          "6-7",
-          "8-9"
+          "10-11"
         ],
         "difficulty": "පහසු",
         "strandId": "strand-fundamentals",
-        "prompt_si": "සංගීතයේදී භාවිතා වන ක්‍රමවත් කම්පන සහිත කනට ප්‍රිය උපදවන ශබ්ද හඳුන්වන්නේ කෙසේද?",
+        "prompt_si": "නාදයක සංඛ්‍යාතය වෙනස් වන විට අපට හඳුනාගත හැකි ප්‍රධාන ගුණය කුමක්ද?",
         "options_si": [
           {
             "id": "opt-1",
-            "text_si": "ඝෝෂාව"
+            "text_si": "විපුලතාවය"
           },
           {
             "id": "opt-2",
-            "text_si": "නාදය",
+            "text_si": "තාරතාවය",
             "isCorrect": true
           },
           {
             "id": "opt-3",
-            "text_si": "ප්‍රතිරාවය"
+            "text_si": "ධ්වනි ගුණය"
           },
           {
             "id": "opt-4",
-            "text_si": "සංඥාව"
+            "text_si": "ලය"
           }
         ],
         "correctAnswerIds": [
           "opt-2"
         ],
-        "explanation_si": "ක්‍රමවත් කම්පන සහිත ප්‍රියජනක ශබ්දය සංගීතයේදී 'නාදය' (Nada) නම් වේ.",
+        "explanation_si": "සංඛ්‍යාතය වෙනස් වීමෙන් නාදයක උස්-මිටි ස්වභාවය වෙනස් වේ. මෙම ගුණය තාරතාවය හෙවත් උච්චනීච ප්‍රභේදයයි.",
         "sourceReference": {
-          "sourceId": "SRC-NIE-G06-TG",
-          "pageOrSection": "පිටුව 12"
+          "sourceId": "SRC-G10-NADA",
+          "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටුව 4"
         }
       },
       {
         "id": "q-intro-02",
         "type": "multi-select",
         "gradeBands": [
-          "6-7",
-          "8-9"
+          "10-11"
         ],
         "difficulty": "පහසු",
         "strandId": "strand-fundamentals",
@@ -56,17 +55,17 @@
         "options_si": [
           {
             "id": "opt-1",
-            "text_si": "නාදයේ උස්-මිටි බව (Pitch)",
+            "text_si": "තාරතාවය (උච්චනීච ප්‍රභේදය)",
             "isCorrect": true
           },
           {
             "id": "opt-2",
-            "text_si": "නාදයේ මහත්-කුඩා බව (Intensity)",
+            "text_si": "විපුලතාවය (රූප භේදය)",
             "isCorrect": true
           },
           {
             "id": "opt-3",
-            "text_si": "නාදයේ ජාතිය හෙවත් ගුණය (Timbre)",
+            "text_si": "ධ්වනි ගුණය (ජාති භේදය)",
             "isCorrect": true
           },
           {
@@ -79,22 +78,21 @@
           "opt-2",
           "opt-3"
         ],
-        "explanation_si": "නාදයේ ලක්ෂණ 3 කි: උස්-මිටි බව, මහත්-කුඩා බව, සහ නාද ගුණය.",
+        "explanation_si": "නාදයේ ත්‍රිවිධ ගුණ වන්නේ තාරතාවය / උච්චනීච ප්‍රභේදය, විපුලතාවය / රූප භේදය සහ ධ්වනි ගුණය / ජාති භේදයයි.",
         "sourceReference": {
-          "sourceId": "SRC-NIE-G06-TG",
-          "pageOrSection": "පිටුව 14"
+          "sourceId": "SRC-G10-NADA",
+          "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටුව 3"
         }
       },
       {
         "id": "q-intro-03",
         "type": "true-false",
         "gradeBands": [
-          "6-7",
-          "8-9"
+          "10-11"
         ],
         "difficulty": "පහසු",
         "strandId": "strand-fundamentals",
-        "prompt_si": "වස්තූන් දෙකක් එකිනෙක ගැටීමෙන් උපදින නාදය 'ආහත නාදය' නම් වේ.",
+        "prompt_si": "ගීතයකට සවන් දෙන විට ගායකයා හෝ වාද්‍ය භාණ්ඩය වෙන්කර හඳුනාගැනීමට උපකාරී වන්නේ ධ්වනි ගුණයයි.",
         "options_si": [
           {
             "id": "opt-1",
@@ -109,10 +107,10 @@
         "correctAnswerIds": [
           "opt-1"
         ],
-        "explanation_si": "භෞතික වස්තු ගැටීමෙන් උපදින නාදය ආහත නාදයයි.",
+        "explanation_si": "වාද්‍ය භාණ්ඩයකින් භාණ්ඩයකට සහ කටහඬකින් කටහඬකට ඇති වෙනස හඳුනාගැනීමට උපකාරී වන ගුණය ධ්වනි ගුණය හෙවත් ජාති භේදයයි.",
         "sourceReference": {
-          "sourceId": "SRC-NIE-G06-TG",
-          "pageOrSection": "පිටුව 13"
+          "sourceId": "SRC-G10-NADA",
+          "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 10-11"
         }
       }
     ]
@@ -121,6 +119,7 @@
     "id": "quiz-les-swara-01",
     "title_si": "සප්ත ස්වර කුඩා ප්‍රශ්නාවලිය",
     "lessonId": "les-swara-01",
+    "gradeBands": ["6-7", "8-9"],
     "passingScorePercent": 75,
     "questions": [
       {
@@ -236,6 +235,7 @@
     "id": "quiz-les-swara-02",
     "title_si": "ස්වර ප්‍රභේද ප්‍රශ්නාවලිය",
     "lessonId": "les-swara-02",
+    "gradeBands": ["7", "8-9", "10-11"],
     "passingScorePercent": 75,
     "questions": [
       {
@@ -369,21 +369,20 @@
   },
   {
     "id": "quiz-les-tala-dadra",
-    "title_si": "දාද්‍රා තාල ප්‍රශ්නාවලිය",
+    "title_si": "දාදරා තාල ප්‍රශ්නාවලිය",
     "lessonId": "les-tala-dadra",
+    "gradeBands": ["10-11"],
     "passingScorePercent": 75,
     "questions": [
       {
         "id": "q-tala-dadra-01",
         "type": "mcq",
         "gradeBands": [
-          "6-7",
-          "8-9",
           "10-11"
         ],
         "difficulty": "පහසු",
         "strandId": "strand-laya-tala",
-        "prompt_si": "දාද්‍රා තාලයේ විභාග ව්‍යුහය කුමක්ද?",
+        "prompt_si": "දාදරා තාලයේ විභාග ව්‍යුහය කුමක්ද?",
         "options_si": [
           {
             "id": "opt-1",
@@ -406,23 +405,21 @@
         "correctAnswerIds": [
           "opt-2"
         ],
-        "explanation_si": "දාද්‍රා තාලය මාත්‍රා 3 බැගින් වූ විභාග 2 කින් (3+3) සමන්විතය.",
+        "explanation_si": "දාදරා තාලය මාත්‍රා 3 බැගින් වූ විභාග 2 කින් (3+3) සමන්විතය.",
         "sourceReference": {
-          "sourceId": "SRC-NIE-G07-TG",
-          "pageOrSection": "පිටුව 34"
+          "sourceId": "SRC-EPD-TB-G10",
+          "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
         }
       },
       {
         "id": "q-tala-dadra-02",
         "type": "ordering",
         "gradeBands": [
-          "6-7",
-          "8-9",
           "10-11"
         ],
         "difficulty": "පහසු",
         "strandId": "strand-laya-tala",
-        "prompt_si": "දාද්‍රා තාලයේ ථේකාවේ බෝල් නිවැරදි අනුපිළිවෙළට සකසන්න:",
+        "prompt_si": "දාදරා තාලයේ ථේකාවේ බෝල් නිවැරදි අනුපිළිවෙළට සකසන්න:",
         "orderingItems": [
           {
             "id": "bol-1",
@@ -455,23 +452,21 @@
             "correctIndex": 5
           }
         ],
-        "explanation_si": "දාද්‍රා ථේකාව: ධා ධී නා | ධා තී නා.",
+        "explanation_si": "දාදරා ථේකාව: ධා ධී නා | ධා තී නා.",
         "sourceReference": {
-          "sourceId": "SRC-NIE-G07-TG",
-          "pageOrSection": "පිටුව 34"
+          "sourceId": "SRC-EPD-TB-G10",
+          "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
         }
       },
       {
         "id": "q-tala-dadra-03",
         "type": "mcq",
         "gradeBands": [
-          "6-7",
-          "8-9",
           "10-11"
         ],
         "difficulty": "පහසු",
         "strandId": "strand-laya-tala",
-        "prompt_si": "දාද්‍රා තාලයේ ඛාලි ලකුණ යෙදෙන්නේ කීවන මාත්‍රාවේද?",
+        "prompt_si": "දාදරා තාලයේ ඛාලි ලකුණ යෙදෙන්නේ කීවන මාත්‍රාවේද?",
         "options_si": [
           {
             "id": "opt-1",
@@ -494,10 +489,10 @@
         "correctAnswerIds": [
           "opt-3"
         ],
-        "explanation_si": "දාද්‍රා තාලයේ 4 වන මාත්‍රාව ඛාලියයි ('0').",
+        "explanation_si": "දාදරා තාලයේ 4 වන මාත්‍රාව ඛාලියයි ('0').",
         "sourceReference": {
-          "sourceId": "SRC-NIE-G07-TG",
-          "pageOrSection": "පිටුව 34"
+          "sourceId": "SRC-EPD-TB-G10",
+          "pageOrSection": "sg10_emus_chap1_mulikanga.pdf පිටුව 6"
         }
       }
     ]
@@ -506,6 +501,7 @@
     "id": "quiz-les-raga-bhairav",
     "title_si": "භෛරව් රාග ප්‍රශ්නාවලිය",
     "lessonId": "les-raga-bhairav",
+    "gradeBands": ["10-11"],
     "passingScorePercent": 75,
     "questions": [
       {
@@ -611,6 +607,7 @@
     "id": "quiz-les-inst-desi-drums",
     "title_si": "දේශීය බෙර වර්ග ප්‍රශ්නාවලිය",
     "lessonId": "les-inst-desi-drums",
+    "gradeBands": ["8-9", "10-11"],
     "passingScorePercent": 75,
     "questions": [
       {
@@ -717,6 +714,7 @@
     "id": "quiz-les-theatre-nadagam",
     "title_si": "නාඩගම් නාට්‍ය සංගීත ප්‍රශ්නාවලිය",
     "lessonId": "les-theatre-nadagam",
+    "gradeBands": ["8-9", "10-11"],
     "passingScorePercent": 75,
     "questions": [
       {

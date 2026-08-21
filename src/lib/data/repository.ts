@@ -11,8 +11,17 @@ import {
   ExamPaper,
   GradeBandType,
   ReviewStatus,
-  ContentReviewStatus,
+  ReviewMetadata,
 } from "@/types/content";
+
+export {
+  CURRICULUM_STRANDS,
+  CURRICULUM_STRAND_IDS,
+  type CurriculumStrandId,
+  type StrandInfo,
+} from "@/lib/data/curriculum-strands";
+import { CURRICULUM_STRANDS } from "@/lib/data/curriculum-strands";
+import type { StrandInfo } from "@/lib/data/curriculum-strands";
 
 import sourcesData from "@/data/sources.json";
 import lessonsData from "@/data/lessons.json";
@@ -28,20 +37,97 @@ import examPapersData from "@/data/exam-papers.json";
 import { searchFilter } from "@/lib/search/search-engine";
 import {
   getRecordPublicationDecision,
+  evaluatePublicationBatch,
+  createPublicationEvaluationContext,
+  getPublicationCatalogRawCount,
   getSourceDocumentSummary,
   UNKNOWN_PROVENANCE,
   PUBLIC_GRADE_BANDS,
-  sanitizePublicRecord,
+  sanitizeReviewRecord,
+  createUnverifiedReviewMetadata,
+  type PublicationEvaluationContext,
+  type PublicationCatalogInputs,
+  type PublicationDecision,
+  type PublicationReasonCode,
   type SourceDocumentSummary,
 } from "@/lib/data/publication-policy";
+import {
+  isRecord,
+  isReviewMetadata,
+  cloneBoundedRecord,
+  normalizeRecordId,
+  readOwnDataField,
+  projectPublicRecord,
+  validateContentRecord,
+  type ContentEntityKind,
+} from "@/lib/validation/content-contracts";
 
-export interface StrandInfo {
-  id: string;
-  name_si: string;
-  name_en: string;
-  description_si: string;
-  iconName: string;
-  gradeBands: GradeBandType[];
+const COMPLETED_REVIEW_STATUSES = new Set<ReviewStatus>([
+  "Rights & Source Verification",
+  "Published",
+]);
+
+function hasUniqueRecordIds(items: readonly unknown[]): boolean {
+  const ids = new Set<string>();
+  for (const item of items) {
+    if (!isRecord(item)) return false;
+    // Canonical identity, not a bare trim: control-bearing and canonically
+    // equivalent IDs must collide here exactly as they do in publication policy,
+    // so listing, direct lookup, validation, and summaries agree.
+    const id = normalizeRecordId(readOwnDataField(item, "id"));
+    if (!id || ids.has(id)) return false;
+    ids.add(id);
+  }
+  return true;
+}
+
+function hasKnownReviewEvidence(value: unknown): value is ReviewMetadata {
+  try {
+    if (!isReviewMetadata(value) || !isRecord(value)) return false;
+    const metadata = value as unknown as ReviewMetadata;
+    if (!COMPLETED_REVIEW_STATUSES.has(metadata.status)) return false;
+    const isUnknown = (field: string): boolean => {
+      const normalized = field.trim().toLowerCase();
+      return normalized === UNKNOWN_PROVENANCE.toLowerCase() ||
+        normalized === "unknown / unverified" || normalized === "unknown";
+    };
+    if ([
+      metadata.reviewer,
+      metadata.reviewDate,
+      metadata.lastVerifiedDate,
+      metadata.changeNotes,
+      metadata.license,
+    ].some(isUnknown)) return false;
+    if (metadata.changeNotes.trim().startsWith("Publication containment baseline:")) return false;
+    return !isUnknown(metadata.reuseStatus);
+  } catch {
+    return false;
+  }
+}
+
+function readRawReviewMetadata(lesson: Record<string, unknown>): unknown {
+  return readOwnDataField(lesson, "reviewMetadata");
+}
+
+// Every direct-ID lookup must resolve the same canonical identity the listing,
+// validation, decision, and summary boundaries already use. A bare `===` let a
+// padded or canonically equivalent identifier be listed but never looked up.
+function matchesRecordId(candidateId: unknown, requestedId: unknown): boolean {
+  const requested = normalizeRecordId(requestedId);
+  return requested !== "" && normalizeRecordId(candidateId) === requested;
+}
+
+function findUniqueRecordIndex(items: readonly unknown[], id: string): number {
+  const normalizedId = normalizeRecordId(id);
+  if (!normalizedId) return -1;
+  let match = -1;
+  for (let index = 0; index < items.length; index += 1) {
+    const candidate = items[index];
+    if (!isRecord(candidate) || normalizeRecordId(readOwnDataField(candidate, "id")) !== normalizedId) continue;
+    if (match !== -1) return -1;
+    match = index;
+  }
+  return match;
 }
 
 export interface SourceCatalogView {
@@ -66,145 +152,176 @@ export interface PublicationCollectionSummary {
   public: number;
   quarantined: number;
   needsReview: number;
+  failureReasons: readonly string[];
+}
+
+export type CmsMutationReasonCode =
+  | "updated"
+  | "record-not-found"
+  | "invalid-request"
+  | "status-publication-mismatch"
+  | "missing-review-evidence"
+  | "publication-ineligible"
+  | "malformed-review-metadata"
+  | PublicationReasonCode;
+
+export interface CmsMutationResult {
+  ok: boolean;
+  reasonCode: CmsMutationReasonCode;
+  decision?: PublicationDecision;
+}
+
+function cmsFailure(reasonCode: CmsMutationReasonCode, decision?: PublicationDecision): CmsMutationResult {
+  return { ok: false, reasonCode, ...(decision ? { decision } : {}) };
+}
+
+function cmsSuccess(): CmsMutationResult {
+  return { ok: true, reasonCode: "updated" };
+}
+
+export interface PublicSearchCatalogs {
+  lessons: Lesson[];
+  ragas: Raga[];
+  talas: Tala[];
+  instruments: Instrument[];
+  glossary: GlossaryTerm[];
+  culturalTraditions: CulturalTradition[];
 }
 
 export type LessonVisibility = "public" | "review";
-
-export const CURRICULUM_STRANDS: StrandInfo[] = [
-  {
-    id: "strand-fundamentals",
-    name_si: "මූලික සංගීත දැනුම",
-    name_en: "Music Fundamentals",
-    description_si: "නාදය, ශබ්දයේ ලක්ෂණ සහ සංගීත මූලධර්ම",
-    iconName: "Volume2",
-    gradeBands: ["6-7", "8-9"],
-  },
-  {
-    id: "strand-swara-shruti",
-    name_si: "ස්වර හා ශ්‍රැති",
-    name_en: "Swara and Shruti",
-    description_si: "සප්ත ස්වර, ශුද්ධ/කෝමල/තීව්‍ර ස්වර, සප්තක සහ ශ්‍රැති වාදය",
-    iconName: "Music",
-    gradeBands: ["6-7", "8-9", "10-11"],
-  },
-  {
-    id: "strand-laya-tala",
-    name_si: "ලය හා තාල",
-    name_en: "Laya and Tala",
-    description_si: "මාත්‍රා, විභාග, තාළි, ඛාලි සහ උත්තර භාරතීය තාල",
-    iconName: "Activity",
-    gradeBands: ["6-7", "8-9", "10-11"],
-  },
-  {
-    id: "strand-ragas",
-    name_si: "රාග ලෝකය",
-    name_en: "World of Ragas",
-    description_si: "ථාට 10, රාග ලක්ෂණ, ආරෝහණ/අවරෝහණ සහ පකඩ්",
-    iconName: "Compass",
-    gradeBands: ["8-9", "10-11"],
-  },
-  {
-    id: "strand-vocal-instrumental",
-    name_si: "ගායන හා වාදන පුහුණුව",
-    name_en: "Vocal and Instrumental Practice",
-    description_si: "හඬ පුහුණුව, ආසන, තාන්පුර ශ්‍රැතිය හා අලංකාර",
-    iconName: "Mic",
-    gradeBands: ["6-7", "8-9", "10-11"],
-  },
-  {
-    id: "strand-instruments",
-    name_si: "වාද්‍ය භාණ්ඩ",
-    name_en: "Musical Instruments",
-    description_si: "චතුර්විධ වර්ගීකරණය, සිතාරය, තබ්ලාව සහ දේශීය බෙර",
-    iconName: "Radio",
-    gradeBands: ["6-7", "8-9", "10-11"],
-  },
-  {
-    id: "strand-folk-music",
-    name_si: "ජන හා දේශීය සංගීතය",
-    name_en: "Folk and Indigenous Music",
-    description_si: "ගොයම්, කරත්ත, පාරු කවි, රබන් පද සහ ශාන්තිකර්ම",
-    iconName: "Feather",
-    gradeBands: ["6-7", "8-9", "10-11"],
-  },
-  {
-    id: "strand-theatre-music",
-    name_si: "නාට්‍ය හා රංග සංගීතය",
-    name_en: "Theatre and Dramatic Music",
-    description_si: "නාඩගම්, නූර්ති, සොකරි සහ කෝලම් සංගීත සම්ප්‍රදාය",
-    iconName: "Drama",
-    gradeBands: ["8-9", "10-11"],
-  },
-  {
-    id: "strand-appreciation",
-    name_si: "ගී රසවිඳීම හා ඉතිහාසය",
-    name_en: "Music Appreciation and History",
-    description_si: "ගීත විචාරය, සංගීතමය අංග සහ පුරෝගාමීන්",
-    iconName: "Sparkles",
-    gradeBands: ["10-11"],
-  },
-  {
-    id: "strand-creativity-tech",
-    name_si: "නිර්මාණ හා සංගීත තාක්ෂණය",
-    name_en: "Creativity and Music Tech",
-    description_si: "තනු හා රිද්ම නිර්මාණ, ප්‍රස්තාරගත කිරීම සහ ඩිජිටල් මෙවලම්",
-    iconName: "Wand2",
-    gradeBands: ["8-9", "10-11"],
-  },
-  {
-    id: "strand-exam-practice",
-    name_si: "ප්‍රශ්න හා විභාග පුහුණුව",
-    name_en: "Exam Practice",
-    description_si: "10–11 ශ්‍රේණි විභාග අභ්‍යාස සහ මූලාශ්‍ර සමාලෝචන සටහන්",
-    iconName: "Award",
-    gradeBands: ["10-11"],
-  },
-];
+type PublicationCatalogKey = keyof PublicationEvaluationContext["catalogs"];
 
 class ContentRepository {
-  private sources = sourcesData;
-  private lessons: Lesson[] = lessonsData as Lesson[];
-  private ragas: Raga[] = ragasData as Raga[];
-  private talas: Tala[] = talasData as Tala[];
-  private instruments: Instrument[] = instrumentsData as Instrument[];
-  private culturalTraditions: CulturalTradition[] = culturalTraditionsData as unknown as CulturalTradition[];
-  private theatreTraditions: TheatreTradition[] = theatreTraditionsData as TheatreTradition[];
-  private glossary: GlossaryTerm[] = glossaryData as GlossaryTerm[];
-  private learningPaths: LearningPath[] = learningPathsData as LearningPath[];
-  private quizzes: Quiz[] = quizzesData as Quiz[];
-  private examPapers: ExamPaper[] = examPapersData as ExamPaper[];
+  private sources: unknown[] = sourcesData as unknown[];
+  private lessons: unknown[] = lessonsData as unknown[];
+  private ragas: unknown[] = ragasData as unknown[];
+  private talas: unknown[] = talasData as unknown[];
+  private instruments: unknown[] = instrumentsData as unknown[];
+  private culturalTraditions: unknown[] = culturalTraditionsData as unknown[];
+  private theatreTraditions: unknown[] = theatreTraditionsData as unknown[];
+  private glossary: unknown[] = glossaryData as unknown[];
+  private learningPaths: unknown[] = learningPathsData as unknown[];
+  private quizzes: unknown[] = quizzesData as unknown[];
+  private examPapers: unknown[] = examPapersData as unknown[];
 
-  private selectPublic<T extends { id: string }>(items: T[]): T[] {
-    return items
-      .filter((item) => getRecordPublicationDecision(item).isPublic)
-      .map((item) => sanitizePublicRecord(item));
+  private createEvaluationContext(overrides: PublicationCatalogInputs = {}): PublicationEvaluationContext {
+    return createPublicationEvaluationContext({
+      sources: this.sources,
+      lessons: this.lessons,
+      ragas: this.ragas,
+      talas: this.talas,
+      instruments: this.instruments,
+      culturalTraditions: this.culturalTraditions,
+      theatreTraditions: this.theatreTraditions,
+      glossary: this.glossary,
+      learningPaths: this.learningPaths,
+      quizzes: this.quizzes,
+      examPapers: this.examPapers,
+      ...overrides,
+    });
   }
 
-  private selectForReview<T extends { id: string }>(items: T[]): T[] {
-    return items.map((item) => sanitizePublicRecord(item));
+  private freezePublicationSummary(
+    summary: Record<string, PublicationCollectionSummary>,
+  ): Record<string, PublicationCollectionSummary> {
+    for (const value of Object.values(summary)) Object.freeze(value);
+    return Object.freeze(summary);
   }
 
-  private summarize<T extends { id: string }>(items: T[]): PublicationCollectionSummary {
-    const decisions = items.map((item) => getRecordPublicationDecision(item));
+  private selectPublic<T>(
+    catalog: PublicationCatalogKey,
+    context = this.createEvaluationContext(),
+  ): T[] {
+    const items = context.catalogs[catalog];
+    if (!context.safe) return [];
+    if (!hasUniqueRecordIds(items)) return [];
+    const batch = evaluatePublicationBatch(items, context);
+    if (!batch.isValid || batch.decisions.length !== items.length) return [];
+    const decisions = batch.decisions;
+    return items.flatMap((item, index) => {
+      const decision = decisions[index];
+      return decision.isPublic && decision.publicProjection
+        ? [decision.publicProjection as T]
+        : [];
+    });
+  }
+
+  private selectForReview<T>(
+    catalog: PublicationCatalogKey,
+    kind: ContentEntityKind,
+    context = this.createEvaluationContext(),
+  ): T[] {
+    if (!context.safe) return [];
+    const items = context.catalogs[catalog];
+    if (!hasUniqueRecordIds(items)) return [];
+    return items.flatMap((item) => {
+      const projection = sanitizeReviewRecord(item, context);
+      return validateContentRecord(projection, kind).isValid ? [projection as T] : [];
+    });
+  }
+
+  private summarize(
+    catalog: PublicationCatalogKey,
+    context: PublicationEvaluationContext,
+  ): PublicationCollectionSummary {
+    const items = context.catalogs[catalog];
+    const raw = getPublicationCatalogRawCount(context, catalog);
+    if (!context.safe) {
+      return { raw, public: 0, quarantined: 0, needsReview: raw, failureReasons: ["unsafe-container"] };
+    }
+    if (!hasUniqueRecordIds(items)) {
+      return { raw, public: 0, quarantined: 0, needsReview: raw, failureReasons: ["duplicate-record-id"] };
+    }
+    const batch = evaluatePublicationBatch(items, context);
+    if (!batch.isValid || batch.decisions.length !== items.length) {
+      return {
+        raw,
+        public: 0,
+        quarantined: 0,
+        needsReview: raw,
+        failureReasons: [batch.failureReason ?? "incomplete-decision-batch"],
+      };
+    }
+    const decisions = batch.decisions;
     return {
-      raw: items.length,
+      raw,
       public: decisions.filter((decision) => decision.state === "public").length,
       quarantined: decisions.filter((decision) => decision.state === "quarantined").length,
       needsReview: decisions.filter((decision) => decision.state === "needs-review").length,
+      failureReasons: [],
     };
   }
 
   // Sources: public transparency metadata is deliberately sanitized. The raw
   // publisher/year/location/license values are not provenance evidence.
   public getSources(): SourceCatalogView[] {
-    return this.sources.map((source) => {
-      const document = getSourceDocumentSummary(source.id);
-      return {
+    const context = this.createEvaluationContext();
+    if (!context.safe || !hasUniqueRecordIds(context.catalogs.sources)) return [];
+    return context.catalogs.sources.flatMap((candidate) => {
+      if (!validateContentRecord(candidate, "source").isValid || !isRecord(candidate)) return [];
+      const projected = projectPublicRecord(candidate, "source");
+      if (!isRecord(projected)) return [];
+      const source = projected as unknown as {
+        id: string;
+        title: string;
+        originalFilename: string;
+        grades: string[];
+        language: string;
+        url?: string;
+        publisher: string;
+        year: string;
+        tier: string;
+        location: string;
+        status: string;
+        license: string;
+      };
+      const document = getSourceDocumentSummary(source.id, context);
+      return [{
         id: source.id,
         title: source.title,
         originalFilename: source.originalFilename,
         publisher: UNKNOWN_PROVENANCE,
-        grades: source.grades,
+        grades: [...source.grades],
         year: UNKNOWN_PROVENANCE,
         language: source.language,
         tier: "මූලාශ්‍ර වාර්තාව (සනාථ නොකළ)",
@@ -214,12 +331,12 @@ class ContentRepository {
         url: source.url,
         evidenceState: document.reviewStatus,
         evidenceQuality: document.evidenceQuality,
-      };
+      }];
     });
   }
 
   public getSourceById(id: string): SourceCatalogView | undefined {
-    return this.getSources().find((source) => source.id === id);
+    return this.getSources().find((source) => matchesRecordId(source.id, id));
   }
 
   // Strands are derived from publicly discoverable lessons, not from the raw
@@ -237,7 +354,7 @@ class ContentRepository {
   }
 
   public getStrandById(id: string): StrandInfo | undefined {
-    return this.getStrands().find((strand) => strand.id === id);
+    return this.getStrands().find((strand) => matchesRecordId(strand.id, id));
   }
 
   // Lessons
@@ -247,142 +364,132 @@ class ContentRepository {
     visibility?: LessonVisibility;
     query?: string;
   }): Lesson[] {
-    let list = filters?.visibility === "review"
-      ? this.selectForReview(this.lessons)
-      : this.selectPublic(this.lessons);
-    if (filters?.gradeBand) {
-      list = list.filter((lesson) => lesson.gradeBands.includes(filters.gradeBand!));
+    let gradeBand: GradeBandType | undefined;
+    let strandId: string | undefined;
+    let visibility: LessonVisibility | undefined;
+    let query: unknown;
+    try {
+      if (filters !== undefined && (!filters || typeof filters !== "object")) return [];
+      gradeBand = filters?.gradeBand;
+      strandId = filters?.strandId;
+      visibility = filters?.visibility;
+      query = filters?.query;
+    } catch {
+      return [];
     }
-    if (filters?.strandId) {
-      list = list.filter((lesson) => lesson.strandId === filters.strandId);
+    const context = this.createEvaluationContext();
+    let list = visibility === "review"
+      ? this.selectForReview<Lesson>("lessons", "lesson", context)
+      : this.selectPublic<Lesson>("lessons", context);
+    if (gradeBand) {
+      list = list.filter((lesson) => lesson.gradeBands.includes(gradeBand));
     }
-    if (filters?.query) {
-      list = searchFilter(list, filters.query, (lesson) => [
-        lesson.title_si,
-        lesson.title_en || "",
-        lesson.summary_si,
-        lesson.learningGoal_si,
-      ]);
+    if (strandId) {
+      list = list.filter((lesson) => lesson.strandId === strandId);
     }
-    return list;
+    return searchFilter(list, query, (lesson) => [
+      lesson.title_si,
+      lesson.title_en || "",
+      lesson.summary_si,
+      lesson.learningGoal_si,
+    ]);
   }
 
   public getLessonById(id: string): Lesson | undefined {
-    return this.getLessons().find((lesson) => lesson.id === id || lesson.slug === id);
+    return this.getLessons().find((lesson) => matchesRecordId(lesson.id, id) || matchesRecordId(lesson.slug, id));
   }
 
   // Ragas
   public getRagas(query?: string): Raga[] {
-    let list = this.selectPublic(this.ragas);
-    if (query) {
-      list = searchFilter(list, query, (raga) => [
-        raga.name_si,
-        raga.name_en,
-        raga.thata_si,
-        raga.vadi_si,
-        raga.samvadi_si,
-        raga.time_si,
-      ]);
-    }
-    return list;
+    return searchFilter(this.selectPublic<Raga>("ragas"), query, (raga) => [
+      raga.name_si,
+      raga.name_en,
+      raga.thata_si,
+      raga.vadi_si,
+      raga.samvadi_si,
+      raga.time_si,
+    ]);
   }
 
   public getRagaById(id: string): Raga | undefined {
-    return this.getRagas().find((raga) => raga.id === id);
+    return this.getRagas().find((raga) => matchesRecordId(raga.id, id));
   }
 
   // Talas
   public getTalas(query?: string): Tala[] {
-    let list = this.selectPublic(this.talas);
-    if (query) {
-      list = searchFilter(list, query, (tala) => [tala.name_si, tala.name_en, tala.theka_si]);
-    }
-    return list;
+    return searchFilter(this.selectPublic<Tala>("talas"), query, (tala) => [
+      tala.name_si,
+      tala.name_en,
+      ...tala.aliases_si,
+      tala.theka_si,
+    ]);
   }
 
   public getTalaById(id: string): Tala | undefined {
-    return this.getTalas().find((tala) => tala.id === id);
+    return this.getTalas().find((tala) => matchesRecordId(tala.id, id));
   }
 
   // Instruments
   public getInstruments(query?: string): Instrument[] {
-    let list = this.selectPublic(this.instruments);
-    if (query) {
-      list = searchFilter(list, query, (instrument) => [
-        instrument.name_si,
-        instrument.name_en,
-        instrument.category_si,
-        instrument.origin_si,
-        instrument.construction_si,
-      ]);
-    }
-    return list;
+    return searchFilter(this.selectPublic<Instrument>("instruments"), query, (instrument) => [
+      instrument.name_si,
+      instrument.name_en,
+      instrument.category_si,
+      instrument.origin_si,
+      instrument.construction_si,
+    ]);
   }
 
   public getInstrumentById(id: string): Instrument | undefined {
-    return this.getInstruments().find((instrument) => instrument.id === id);
+    return this.getInstruments().find((instrument) => matchesRecordId(instrument.id, id));
   }
 
   // Traditions
   public getCulturalTraditions(query?: string): CulturalTradition[] {
-    let list = this.selectPublic(this.culturalTraditions);
-    if (query) {
-      list = searchFilter(list, query, (tradition) => [
-        tradition.title_si,
-        tradition.title_en,
-        tradition.category_si,
-        tradition.description_si,
-      ]);
-    }
-    return list;
+    return searchFilter(this.selectPublic<CulturalTradition>("culturalTraditions"), query, (tradition) => [
+      tradition.title_si,
+      tradition.title_en,
+      tradition.category_si,
+      tradition.description_si,
+    ]);
   }
 
   public getCulturalTraditionById(id: string): CulturalTradition | undefined {
-    return this.getCulturalTraditions().find((tradition) => tradition.id === id);
+    return this.getCulturalTraditions().find((tradition) => matchesRecordId(tradition.id, id));
   }
 
   public getTheatreTraditions(query?: string): TheatreTradition[] {
-    let list = this.selectPublic(this.theatreTraditions);
-    if (query) {
-      list = searchFilter(list, query, (tradition) => [
-        tradition.title_si,
-        tradition.title_en,
-        tradition.type_si,
-        tradition.historicalBackground_si,
-      ]);
-    }
-    return list;
+    return searchFilter(this.selectPublic<TheatreTradition>("theatreTraditions"), query, (tradition) => [
+      tradition.title_si,
+      tradition.title_en,
+      tradition.type_si,
+      tradition.historicalBackground_si,
+    ]);
   }
 
   public getTheatreTraditionById(id: string): TheatreTradition | undefined {
-    return this.getTheatreTraditions().find((tradition) => tradition.id === id);
+    return this.getTheatreTraditions().find((tradition) => matchesRecordId(tradition.id, id));
   }
 
   // Glossary
   public getGlossary(query?: string, category?: string): GlossaryTerm[] {
-    let list = this.selectPublic(this.glossary);
+    let list = this.selectPublic<GlossaryTerm>("glossary");
     if (category) {
       list = list.filter((term) => term.category_si === category);
     }
-    if (query) {
-      list = searchFilter(list, query, (term) => [
-        term.term_si,
-        term.term_en,
-        term.transliteration,
-        term.definition_si,
-        term.category_si,
-      ]);
-    }
-    return list;
+    return searchFilter(list, query, (term) => [
+      term.term_si,
+      term.term_en,
+      term.transliteration,
+      term.definition_si,
+      term.category_si,
+    ]);
   }
 
-  // Learning Paths. A path is not discoverable if any of its steps are
-  // quarantined or otherwise unavailable in the public lesson collection.
+  // Learning-path dependency closure is enforced by the central publication
+  // decision, so every public surface consumes the same result.
   public getLearningPaths(gradeBand?: GradeBandType): LearningPath[] {
-    const publicLessonIds = new Set(this.getLessons().map((lesson) => lesson.id));
-    let list = this.selectPublic(this.learningPaths).filter((path) =>
-      path.steps.every((step) => publicLessonIds.has(step.lessonId))
-    );
+    let list = this.selectPublic<LearningPath>("learningPaths");
     if (gradeBand) {
       list = list.filter((path) => path.gradeBands.includes(gradeBand));
     }
@@ -390,21 +497,20 @@ class ContentRepository {
   }
 
   public getLearningPathById(id: string): LearningPath | undefined {
-    return this.getLearningPaths().find((path) => path.id === id);
+    return this.getLearningPaths().find((path) => matchesRecordId(path.id, id));
   }
 
   // Quizzes & Exams
   public getQuizzes(): Quiz[] {
-    const publicLessonIds = new Set(this.getLessons().map((lesson) => lesson.id));
-    return this.quizzes.filter((quiz) => !quiz.lessonId || publicLessonIds.has(quiz.lessonId));
+    return this.selectPublic<Quiz>("quizzes");
   }
 
   public getQuizById(id: string): Quiz | undefined {
-    return this.getQuizzes().find((quiz) => quiz.id === id);
+    return this.getQuizzes().find((quiz) => matchesRecordId(quiz.id, id));
   }
 
   public getExamPapers(gradeBand?: GradeBandType): ExamPaper[] {
-    let list = this.selectPublic(this.examPapers);
+    let list = this.selectPublic<ExamPaper>("examPapers");
     if (gradeBand) {
       list = list.filter((paper) => paper.gradeBand === gradeBand);
     }
@@ -412,28 +518,42 @@ class ContentRepository {
   }
 
   public getExamPaperById(id: string): ExamPaper | undefined {
-    return this.getExamPapers().find((paper) => paper.id === id);
+    return this.getExamPapers().find((paper) => matchesRecordId(paper.id, id));
   }
 
   public getPublicationSummary(): Record<string, PublicationCollectionSummary> {
-    return {
-      lessons: this.summarize(this.lessons),
-      ragas: this.summarize(this.ragas),
-      talas: this.summarize(this.talas),
-      instruments: this.summarize(this.instruments),
-      culturalTraditions: this.summarize(this.culturalTraditions),
-      theatreTraditions: this.summarize(this.theatreTraditions),
-      glossary: this.summarize(this.glossary),
-      learningPaths: {
-        ...this.summarize(this.learningPaths),
-        public: this.getLearningPaths().length,
-      },
-      exams: this.summarize(this.examPapers),
+    const context = this.createEvaluationContext();
+    const learningPaths = this.summarize("learningPaths", context);
+    const summary = {
+      lessons: this.summarize("lessons", context),
+      ragas: this.summarize("ragas", context),
+      talas: this.summarize("talas", context),
+      instruments: this.summarize("instruments", context),
+      culturalTraditions: this.summarize("culturalTraditions", context),
+      theatreTraditions: this.summarize("theatreTraditions", context),
+      glossary: this.summarize("glossary", context),
+      learningPaths,
+      quizzes: this.summarize("quizzes", context),
+      exams: this.summarize("examPapers", context),
     };
+    return this.freezePublicationSummary(summary);
   }
 
   public getSourceDocumentSummary(sourceId: string): SourceDocumentSummary {
-    return getSourceDocumentSummary(sourceId);
+    return getSourceDocumentSummary(sourceId, this.createEvaluationContext());
+  }
+
+  /** One immutable evidence/catalog capture for a complete public search. */
+  public getPublicSearchCatalogs(): PublicSearchCatalogs {
+    const context = this.createEvaluationContext();
+    return {
+      lessons: this.selectPublic<Lesson>("lessons", context),
+      ragas: this.selectPublic<Raga>("ragas", context),
+      talas: this.selectPublic<Tala>("talas", context),
+      instruments: this.selectPublic<Instrument>("instruments", context),
+      glossary: this.selectPublic<GlossaryTerm>("glossary", context),
+      culturalTraditions: this.selectPublic<CulturalTradition>("culturalTraditions", context),
+    };
   }
 
   public getPublicGradeBands(): readonly string[] {
@@ -446,14 +566,53 @@ class ContentRepository {
     lessonId: string,
     newStatus: ReviewStatus,
     isPublished: boolean = false
-  ): boolean {
-    const lesson = this.lessons.find((candidate) => candidate.id === lessonId);
-    if (!lesson) return false;
+  ): CmsMutationResult {
+    try {
+      const context = this.createEvaluationContext();
+      if (!context.safe) return cmsFailure("unsafe-container");
+      if (!hasUniqueRecordIds(context.catalogs.lessons)) return cmsFailure("duplicate-record-id");
+      const snapshotIndex = findUniqueRecordIndex(context.catalogs.lessons, lessonId);
+      const lesson = snapshotIndex >= 0 && isRecord(context.catalogs.lessons[snapshotIndex])
+        ? context.catalogs.lessons[snapshotIndex]
+        : undefined;
+      if (!lesson || snapshotIndex < 0) return cmsFailure("record-not-found");
+      if (typeof isPublished !== "boolean") return cmsFailure("invalid-request");
 
-    lesson.reviewMetadata.status = newStatus;
-    lesson.published = isPublished;
-    lesson.reviewMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
-    return true;
+      if ((newStatus === "Published") !== isPublished) return cmsFailure("status-publication-mismatch");
+      const requestsPublication = newStatus === "Published" || isPublished;
+      const rawMetadata = readRawReviewMetadata(lesson);
+      if (requestsPublication && !hasKnownReviewEvidence(rawMetadata)) return cmsFailure("missing-review-evidence");
+      if (requestsPublication) {
+        const publication = getRecordPublicationDecision(lesson, context);
+        if (!publication.isPublic || !publication.sourceEvidence.supportable) {
+          return cmsFailure(publication.reasonCodes[0] ?? "publication-ineligible", publication);
+        }
+      }
+
+      const safeCandidate = sanitizeReviewRecord(lesson, context);
+      if (!safeCandidate || !validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) {
+        return cmsFailure("malformed-record");
+      }
+      const metadataSnapshot = cloneBoundedRecord(rawMetadata);
+      const nextMetadata: ReviewMetadata = isReviewMetadata(metadataSnapshot)
+        ? metadataSnapshot as unknown as ReviewMetadata
+        : createUnverifiedReviewMetadata();
+      nextMetadata.status = newStatus;
+      if (!requestsPublication) nextMetadata.lastVerifiedDate = UNKNOWN_PROVENANCE;
+      if (!isReviewMetadata(nextMetadata)) return cmsFailure("malformed-review-metadata");
+      const replacement = cloneBoundedRecord(lesson);
+      if (!isRecord(replacement)) return cmsFailure("malformed-record");
+      replacement.reviewMetadata = nextMetadata;
+      replacement.published = isPublished;
+      if (!validateContentRecord(replacement, "lesson").isValid) return cmsFailure("malformed-record");
+      const nextLessons = cloneBoundedRecord(context.catalogs.lessons);
+      if (!Array.isArray(nextLessons)) return cmsFailure("unsafe-container");
+      nextLessons[snapshotIndex] = replacement;
+      this.lessons = nextLessons;
+      return cmsSuccess();
+    } catch {
+      return cmsFailure("evaluation-failed");
+    }
   }
 
   public updateLessonStatus(
@@ -461,16 +620,59 @@ class ContentRepository {
     newStatus: ReviewStatus,
     reviewer: string,
     notes: string
-  ): boolean {
-    const lesson = this.lessons.find((candidate) => candidate.id === lessonId);
-    if (!lesson) return false;
+  ): CmsMutationResult {
+    try {
+      const context = this.createEvaluationContext();
+      if (!context.safe) return cmsFailure("unsafe-container");
+      if (!hasUniqueRecordIds(context.catalogs.lessons)) return cmsFailure("duplicate-record-id");
+      const snapshotIndex = findUniqueRecordIndex(context.catalogs.lessons, lessonId);
+      const lesson = snapshotIndex >= 0 && isRecord(context.catalogs.lessons[snapshotIndex])
+        ? context.catalogs.lessons[snapshotIndex]
+        : undefined;
+      if (!lesson || snapshotIndex < 0) return cmsFailure("record-not-found");
 
-    lesson.reviewMetadata.status = newStatus;
-    lesson.reviewMetadata.reviewer = reviewer;
-    lesson.reviewMetadata.lastVerifiedDate = new Date().toISOString().split("T")[0];
-    lesson.reviewMetadata.changeNotes = notes;
-    lesson.published = newStatus === "Published";
-    return true;
+      const rawMetadata = readRawReviewMetadata(lesson);
+      if (newStatus === "Published") {
+        if (!hasKnownReviewEvidence(rawMetadata) || !isRecord(rawMetadata)) return cmsFailure("missing-review-evidence");
+        if (typeof reviewer !== "string" || typeof notes !== "string" ||
+          !reviewer.trim() || !notes.trim() ||
+          [UNKNOWN_PROVENANCE, "Unknown / Unverified", "unknown"].includes(reviewer.trim())) return cmsFailure("invalid-request");
+        if (reviewer.trim() !== String(readOwnDataField(rawMetadata, "reviewer")).trim() ||
+          notes.trim() !== String(readOwnDataField(rawMetadata, "changeNotes")).trim()) return cmsFailure("missing-review-evidence");
+        const publication = getRecordPublicationDecision(lesson, context);
+        if (!publication.isPublic || !publication.sourceEvidence.supportable) {
+          return cmsFailure(publication.reasonCodes[0] ?? "publication-ineligible", publication);
+        }
+      }
+
+      const safeCandidate = sanitizeReviewRecord(lesson, context);
+      if (!safeCandidate || !validateContentRecord(safeCandidate, "lesson").isValid || !isRecord(safeCandidate)) {
+        return cmsFailure("malformed-record");
+      }
+      const metadataSnapshot = cloneBoundedRecord(rawMetadata);
+      const nextMetadata: ReviewMetadata = isReviewMetadata(metadataSnapshot)
+        ? metadataSnapshot as unknown as ReviewMetadata
+        : createUnverifiedReviewMetadata();
+      nextMetadata.status = newStatus;
+      if (newStatus !== "Published") {
+        nextMetadata.reviewer = hasKnownReviewEvidence(rawMetadata) && typeof reviewer === "string" && reviewer.trim() ? reviewer : UNKNOWN_PROVENANCE;
+        nextMetadata.lastVerifiedDate = UNKNOWN_PROVENANCE;
+        nextMetadata.changeNotes = notes;
+      }
+      if (!isReviewMetadata(nextMetadata)) return cmsFailure("malformed-review-metadata");
+      const replacement = cloneBoundedRecord(lesson);
+      if (!isRecord(replacement)) return cmsFailure("malformed-record");
+      replacement.reviewMetadata = nextMetadata;
+      replacement.published = newStatus === "Published";
+      if (!validateContentRecord(replacement, "lesson").isValid) return cmsFailure("malformed-record");
+      const nextLessons = cloneBoundedRecord(context.catalogs.lessons);
+      if (!Array.isArray(nextLessons)) return cmsFailure("unsafe-container");
+      nextLessons[snapshotIndex] = replacement;
+      this.lessons = nextLessons;
+      return cmsSuccess();
+    } catch {
+      return cmsFailure("evaluation-failed");
+    }
   }
 }
 

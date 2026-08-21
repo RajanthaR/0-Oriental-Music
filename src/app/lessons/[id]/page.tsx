@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -18,8 +18,10 @@ import {
   FileText,
 } from "lucide-react";
 import { repository } from "@/lib/data/repository";
+import { formatPublicSourceReference } from "@/lib/data/publication-policy";
 import { ProgressStorage } from "@/lib/storage/progress-storage";
-import { swaraSynth } from "@/lib/audio/synth";
+import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
+import { releaseHandleRef, releaseTimerRef } from "@/lib/audio/cleanup";
 import { SwaraKeyboard } from "@/components/audio/SwaraKeyboard";
 import { TalaVisualizer } from "@/components/audio/TalaVisualizer";
 import { RhythmTapGame } from "@/components/audio/RhythmTapGame";
@@ -41,6 +43,19 @@ export default function LessonDetailPage() {
   const [diagnosticSelected, setDiagnosticSelected] = useState<number | null>(null);
   const [showDiagnosticResult, setShowDiagnosticResult] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
+  const [audioError, setAudioError] = useState(false);
+  const mountedRef = useRef(false);
+  const audioGenerationRef = useRef(0);
+  const sequenceHandleRef = useRef<SwaraPlaybackHandle | null>(null);
+  const audioTimerRef = useRef<number | null>(null);
+
+  // Invalidate the generation and surrender ownership before cancelling, so a
+  // throwing sequence cancellation cannot leave the pending timer running.
+  const cancelOwnedAudio = useCallback(() => {
+    audioGenerationRef.current += 1;
+    releaseHandleRef(sequenceHandleRef);
+    releaseTimerRef(audioTimerRef, (timerId) => window.clearTimeout(timerId));
+  }, []);
 
   useEffect(() => {
     if (!lesson) return;
@@ -48,6 +63,16 @@ export default function LessonDetailPage() {
     setIsSaved(p.savedLessonIds.includes(lesson.id));
     setIsCompleted(p.completedLessonIds.includes(lesson.id));
   }, [lesson]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    setAudioPlaying(false);
+    setAudioError(false);
+    return () => {
+      mountedRef.current = false;
+      cancelOwnedAudio();
+    };
+  }, [cancelOwnedAudio, lessonId]);
 
   if (!lesson) {
     return (
@@ -65,14 +90,45 @@ export default function LessonDetailPage() {
     setIsSaved(saved);
   };
 
-  const handlePlayLessonAudio = () => {
+  const handlePlayLessonAudio = async () => {
     if (audioPlaying) return;
+    cancelOwnedAudio();
+    const generation = audioGenerationRef.current;
     setAudioPlaying(true);
+    setAudioError(false);
     if (lesson.listenActivity.notes) {
-      swaraSynth.playSequence(lesson.listenActivity.notes, 0.6, undefined, 261.63, "harmonium")
-        .then(() => setAudioPlaying(false));
+      const handle = swaraSynth.playSequenceHandle(lesson.listenActivity.notes, 0.6, undefined, 261.63, "harmonium");
+      sequenceHandleRef.current = handle;
+      void handle.ready.then(
+        (played) => {
+          if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
+          if (!played) setAudioError(true);
+        },
+        () => {
+          if (mountedRef.current && audioGenerationRef.current === generation && sequenceHandleRef.current === handle) {
+            setAudioError(true);
+            setAudioPlaying(false);
+          }
+        },
+      );
+      let finishedWithError = false;
+      try {
+        await (handle.finished ?? handle.ready.then(() => undefined, () => undefined));
+      } catch {
+        finishedWithError = true;
+      } finally {
+        const isCurrentHandle = sequenceHandleRef.current === handle;
+        if (isCurrentHandle) sequenceHandleRef.current = null;
+        if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
+        if (finishedWithError) setAudioError(true);
+        setAudioPlaying(false);
+      }
     } else {
-      setTimeout(() => setAudioPlaying(false), 2000);
+      audioTimerRef.current = window.setTimeout(() => {
+        audioTimerRef.current = null;
+        if (!mountedRef.current || audioGenerationRef.current !== generation) return;
+        setAudioPlaying(false);
+      }, 2000);
     }
   };
 
@@ -84,6 +140,9 @@ export default function LessonDetailPage() {
   };
 
   const strand = repository.getStrandById(lesson.strandId);
+  const practiceTala = lesson.guidedPractice.interactiveTool === "tala-visualizer" && lesson.guidedPractice.targetTalaId
+    ? repository.getTalaById(lesson.guidedPractice.targetTalaId)
+    : undefined;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
@@ -131,7 +190,7 @@ export default function LessonDetailPage() {
               {lesson.difficulty} මට්ටම
             </span>
             <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800">
-              ශ්‍රේණි: {lesson.gradeBands.join(", ")}
+              ශ්‍රේණි කාණ්ඩය: {lesson.gradeBands.join(", ")}
             </span>
             <span className="text-xs text-text-muted flex items-center gap-1 ml-auto">
               <Clock className="w-3.5 h-3.5" /> විනාඩි {lesson.estimatedMinutes}
@@ -296,6 +355,11 @@ export default function LessonDetailPage() {
             <Play className="w-4 h-4 fill-current" />
             {audioPlaying ? "ශ්‍රවණය වෙමින් පවතී..." : "ආදර්ශනයට සවන් දෙන්න"}
           </button>
+          {audioError && (
+            <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950">
+              මෙම උපාංගයේ නාදය ආරම්භ කළ නොහැක. පාඩමේ ලිඛිත සහ දෘශ්‍ය අන්තර්ගතය දිගටම භාවිත කළ හැක.
+            </p>
+          )}
         </section>
 
         {/* 11 & 12. Interactive Practice Activity */}
@@ -317,12 +381,13 @@ export default function LessonDetailPage() {
           )}
 
           {lesson.guidedPractice.interactiveTool === "tala-visualizer" && (
-            <TalaVisualizer
-              tala={
-                repository.getTalaById(lesson.guidedPractice.targetTalaId || "tala-dadra") ||
-                repository.getTalas()[0]
-              }
-            />
+            practiceTala ? (
+              <TalaVisualizer tala={practiceTala} />
+            ) : (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950">
+                මෙම අභ්‍යාසයට අවශ්‍ය තාලය මූලාශ්‍ර සමාලෝචනය අවසන් වන තෙක් ප්‍රසිද්ධ භාවිතයට නොමැත.
+              </div>
+            )
           )}
 
           {lesson.guidedPractice.interactiveTool === "rhythm-tap" && (
@@ -376,7 +441,7 @@ export default function LessonDetailPage() {
           <div className="space-y-0.5">
             <span className="font-bold text-text block">මූලාශ්‍ර සටහන (Source Reference):</span>
             <p>
-              {source?.title} ({source?.publisher}, {source?.year}) — {lesson.sourceReference.pageOrSection}
+              {source?.title} — {formatPublicSourceReference(lesson.sourceReference)}
             </p>
             <p className="text-[11px] text-text-muted">
               සමාලෝචනය: {lesson.reviewMetadata.reviewer} ({lesson.reviewMetadata.lastVerifiedDate}) | බලපත්‍රය: {lesson.reviewMetadata.license}

@@ -1,15 +1,16 @@
 [
   {
     "id": "raga-bilawal",
-    "name_si": "බිලාවල් රාගය (අල්හයියා බිලාවල්)",
-    "name_en": "Raga Bilawal (Alhaiya Bilawal)",
+    "name_si": "බිලාවල් රාගය",
+    "name_en": "Raga Bilawal",
     "thata_si": "බිලාවල් ථාටය (සියලු ශුද්ධ ස්වර)",
-    "arohana_si": "ස , රි , ග , ප , ධ , නි , ස̇",
+    "arohana_si": "ස , රි , ග , ම , ප , ධ , නි , ස̇",
     "avarohana_si": "ස̇ , නි , ධ , ප , ම , ග , රි , ස",
     "arohana_swaras": [
       "S",
       "R",
       "G",
+      "M",
       "P",
       "D",
       "N",
@@ -27,14 +28,13 @@
     ],
     "vadi_si": "ධෛවත (ධ)",
     "samvadi_si": "ගාන්ධාර (ග)",
-    "jati_si": "ෂාඩව - සම්පූර්ණ (ආරෝහණයේ 'ම' වර්ජිතය)",
-    "time_si": "දිවා ප්‍රථම ප්‍රහාරය (උදෑසන)",
-    "rasa_si": "ශාන්ත, භක්ති, ප්‍රසන්න",
-    "pakad_si": "ග රි , ග ප , ධ , නි ස̇",
+    "jati_si": "සම්පූර්ණ - සම්පූර්ණ (ස්වර 7 ම ශුද්ධ වේ)",
+    "time_si": "දිවා ප්‍රථම ප්‍රහරය",
+    "rasa_si": "නොදනී / සනාථ වී නැත",
+    "pakad_si": "ග රි , ග ප ධ නි ස̇",
     "characteristics_si": [
-      "සියලුම ස්වර ශුද්ධ ස්වර වන මූලික ථාට රාගයයි.",
-      "ආරෝහණයේදී මධ්‍යම (ම) ස්වරය වර්ජිත වන බැවින් ෂාඩව-සම්පූර්ණ ජාතියට අයත් වේ.",
-      "පාසල් 8 ශ්‍රේණියේදී ප්‍රථමයෙන් උගන්වන ප්‍රධාන ශාන්ත රාගයකි."
+      "ආරෝහණ හා අවරෝහණ දෙකෙහිම ස්වර 7 ම ශුද්ධව යෙදේ.",
+      "ආරෝහණ හා අවරෝහණ දෙකෙහිම ස්වර 7 ම ශුද්ධව යෙදෙන බැවින් සම්පූර්ණ-සම්පූර්ණ ජාතියට අයත් වේ."
     ],
     "samplePhrases": [
       {
@@ -48,45 +48,30 @@
           "N",
           "S'"
         ]
-      },
-      {
-        "name_si": "සරල ආලාප රටාව",
-        "swaras": [
-          "S",
-          "R",
-          "G",
-          "R",
-          "S",
-          "D",
-          "N",
-          "S"
-        ]
       }
     ],
     "gradeBands": [
-      "6-7",
-      "8-9",
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G08-TG",
-      "pageOrSection": "පිටුව 38; sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "NIE 8 ශ්‍රේණි ගුරු මාර්ගෝපදේශය සහ 11 ශ්‍රේණි රාග වගුව අනුව සම්පූර්ණ කෙරිණි.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
     "id": "raga-bhupali",
     "name_si": "භූපාලි රාගය",
     "name_en": "Raga Bhupali",
-    "thata_si": "කල්‍යාන් ථාටය (බිලාවල් ථාටාශ්‍රිතවද සැලකේ)",
+    "thata_si": "කල්‍යාන් ථාටය",
     "arohana_si": "ස , රි , ග , ප , ධ , ස̇",
     "avarohana_si": "ස̇ , ධ , ප , ග , රි , ස",
     "arohana_swaras": [
@@ -108,13 +93,12 @@
     "vadi_si": "ගාන්ධාර (ග)",
     "samvadi_si": "ධෛවත (ධ)",
     "jati_si": "ඖඩව - ඖඩව (ස්වර 5, ම සහ නි වර්ජිතය)",
-    "time_si": "රාත්‍රී ප්‍රථම ප්‍රහාරය (සන්ධ්‍යා කාලය)",
-    "rasa_si": "ශාන්ත, භක්ති, ප්‍රසන්න",
-    "pakad_si": "ග රි . ස ධ̣ , ස රි ග , ප ග , ධ ප , ග රි ස",
+    "time_si": "රාත්‍රී ප්‍රථම ප්‍රහරය",
+    "rasa_si": "නොදනී / සනාථ වී නැත",
+    "pakad_si": "ග රි , ස ධ̣ , ස රි ග , ප ග , ධ ප , ග රි ස",
     "characteristics_si": [
       "මධ්‍යම (ම) සහ නිෂාද (නි) ස්වර දෙකම ආරෝහණ හා අවරෝහණ දෙකෙහිම වර්ජිතය.",
-      "ස්වර 5 ක් පමණක් යෙදෙන ඖඩව-ඖඩව ජාතියේ මූලික රාගයකි.",
-      "8 ශ්‍රේණියේදී ප්‍රායෝගික ගායනයට හඳුන්වා දෙන ආරම්භක රාගයකි."
+      "ස්වර 5 ක් පමණක් යෙදෙන ඖඩව-ඖඩව ජාතියේ රාගයකි."
     ],
     "samplePhrases": [
       {
@@ -123,25 +107,12 @@
           "G",
           "R",
           "S",
-          "D",
+          ".D",
           "S",
           "R",
           "G",
           "P",
           "G",
-          "R",
-          "S"
-        ]
-      },
-      {
-        "name_si": "සරල තනු සංචාරය",
-        "swaras": [
-          "S",
-          "R",
-          "G",
-          "P",
-          "D",
-          "S'",
           "D",
           "P",
           "G",
@@ -151,21 +122,20 @@
       }
     ],
     "gradeBands": [
-      "8-9",
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G08-TG",
-      "pageOrSection": "පිටුව 40; sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "ම-නි වර්ජිත ඖඩව ජාතිය සහ වාදී ග / සංවාදී ධ සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
@@ -198,13 +168,11 @@
     "vadi_si": "පංචම (ප)",
     "samvadi_si": "ෂඩ්ජ (ස)",
     "jati_si": "සම්පූර්ණ - සම්පූර්ණ (ස්වර 7 ම යෙදේ)",
-    "time_si": "රාත්‍රී දෙවන ප්‍රහාරය",
-    "rasa_si": "ශෘංගාර, භක්ති, චංචල",
+    "time_si": "රාත්‍රී දෙවන ප්‍රහරය",
+    "rasa_si": "නොදනී / සනාථ වී නැත",
     "pakad_si": "ස ස , රි රි , ග(කෝ) ග(කෝ) , ම ම , ප",
     "characteristics_si": [
-      "ගාන්ධාර (ග) සහ නිෂාද (නි) ස්වර දෙක කෝමල වේ; අනෙක් ස්වර ශුද්ධ වේ.",
-      "හෝලි, ධමර් සහ තප්පා වැනි සැහැල්ලු ශාස්ත්‍රීය ගායන සඳහා බහුලව භාවිත වේ.",
-      "9 ශ්‍රේණියේදී හා 11 ශ්‍රේණියේදී මධ්‍යලය ගීත හා තානාලංකාර සඳහා නියමිත රාගයකි."
+      "ගාන්ධාර (ග) සහ නිෂාද (නි) ස්වර දෙක කෝමල වේ; අනෙක් ස්වර ශුද්ධ වේ."
     ],
     "samplePhrases": [
       {
@@ -220,43 +188,23 @@
           "M",
           "P"
         ]
-      },
-      {
-        "name_si": "සරල සංචාරය",
-        "swaras": [
-          "R",
-          "g",
-          "M",
-          "P",
-          "D",
-          "n",
-          "S'",
-          "n",
-          "D",
-          "P",
-          "M",
-          "g",
-          "R",
-          "S"
-        ]
       }
     ],
     "gradeBands": [
-      "8-9",
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G09-TG",
-      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2; grade_11_music_textbook.md පිටුව 12"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "කෝමල ග-නි ස්වර සහ වාදී ප / සංවාදී ස සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
@@ -288,13 +236,12 @@
     "vadi_si": "ගාන්ධාර (ග)",
     "samvadi_si": "නිෂාද (නි)",
     "jati_si": "ෂාඩව - සම්පූර්ණ (ආරෝහණයේ 'රි' වර්ජිතය)",
-    "time_si": "රාත්‍රී දෙවන ප්‍රහාරය",
-    "rasa_si": "ශෘංගාර, චංචල, ප්‍රේමණීය",
+    "time_si": "රාත්‍රී දෙවන ප්‍රහරය",
+    "rasa_si": "නොදනී / සනාථ වී නැත",
     "pakad_si": "නි(කෝ) ධ , ම ප ධ , ම ග",
     "characteristics_si": [
       "ආරෝහණයේදී ශුද්ධ නිෂාද (නි) ද, අවරෝහණයේදී කෝමල නිෂාද (නි) ද යෙදෙන බැවින් ද්වි නිෂාද රාගයකි.",
-      "ආරෝහණයේදී රිෂභ (රි) ස්වරය වර්ජිත වේ.",
-      "නූර්ති නාට්‍ය ගීත සහ සරල ගී නිර්මාණය සඳහා බහුලව යොදා ගැනේ."
+      "ආරෝහණයේදී රිෂභ (රි) ස්වරය වර්ජිත වේ."
     ],
     "samplePhrases": [
       {
@@ -308,43 +255,23 @@
           "M",
           "G"
         ]
-      },
-      {
-        "name_si": "තනු සංචාරය",
-        "swaras": [
-          "S",
-          "G",
-          "M",
-          "P",
-          "D",
-          "N",
-          "S'",
-          "n",
-          "D",
-          "P",
-          "M",
-          "G",
-          "R",
-          "S"
-        ]
       }
     ],
     "gradeBands": [
-      "8-9",
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G09-TG",
-      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "ද්වි නිෂාද සහ ආරෝහණයේ රි වර්ජිත බව තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
@@ -355,7 +282,7 @@
     "arohana_si": "නි̣(කෝ) . ස ග(කෝ) ම ප නි(කෝ) ස̇",
     "avarohana_si": "ස̇ නි(කෝ) ධ ප ම ග(කෝ) රි ස",
     "arohana_swaras": [
-      "n",
+      ".n",
       "S",
       "g",
       "M",
@@ -376,19 +303,18 @@
     "vadi_si": "මධ්‍යම (ම)",
     "samvadi_si": "ෂඩ්ජ (ස)",
     "jati_si": "ඖඩව - සම්පූර්ණ (ආරෝහණයේ 'රි' සහ 'ධ' වර්ජිතය)",
-    "time_si": "දිවා තෙවන ප්‍රහාරය (පස්වරුව)",
-    "rasa_si": "ශාන්ත, කරුණා, ශෘංගාර",
+    "time_si": "රාත්‍රී තෙවන ප්‍රහරය",
+    "rasa_si": "නොදනී / සනාථ වී නැත",
     "pakad_si": "නි̣(කෝ) ස ම , ම ප ග(කෝ) ම ග(කෝ) රි ස",
     "characteristics_si": [
       "ආරෝහණයේදී රිෂභ (රි) සහ ධෛවත (ධ) ස්වර වර්ජිත වන අතර අවරෝහණයේ සියලු ස්වර යෙදේ.",
-      "ගාන්ධාර (ග) සහ නිෂාද (නි) ස්වර කෝමල වේ.",
-      "සීගිරියේ සිතුවම් රමණී, සැඳෑ අඳුර ලොව ගලන වේලාවට ආදී ප්‍රකට සිංහල සරල ගී සඳහා පදනම් වූ රාගයකි."
+      "ගාන්ධාර (ග) සහ නිෂාද (නි) ස්වර කෝමල වේ."
     ],
     "samplePhrases": [
       {
         "name_si": "මුඛ්‍යාංගය (පකඩ්)",
         "swaras": [
-          "n",
+          ".n",
           "S",
           "M",
           "M",
@@ -402,35 +328,35 @@
       }
     ],
     "gradeBands": [
-      "8-9",
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-G09-RAGA",
-      "pageOrSection": "sg9_emus_raga.pdf පිටු 1-2; sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "9 ශ්‍රේණි නිල ප්‍රශ්නාවලි හා 11 ශ්‍රේණි වගුව අනුව වාදී ම / සංවාදී ස තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
     "id": "raga-yaman",
-    "name_si": "යමන් රාගය (කල්‍යාන්)",
-    "name_en": "Raga Yaman (Kalyan)",
+    "name_si": "යමන් රාගය",
+    "name_en": "Raga Yaman",
     "thata_si": "කල්‍යාන් ථාටය",
-    "arohana_si": "නි̣ , රි , ග , ම(තී) , ධ , නි , ස̇",
+    "arohana_si": "ස , රි , ග , ම(තී) , ප , ධ , නි , ස̇",
     "avarohana_si": "ස̇ , නි , ධ , ප , ම(තී) , ග , රි , ස",
     "arohana_swaras": [
-      "N",
+      "S",
       "R",
       "G",
       "m",
+      "P",
       "D",
       "N",
       "S'"
@@ -447,20 +373,18 @@
     ],
     "vadi_si": "ගාන්ධාර (ග)",
     "samvadi_si": "නිෂාද (නි)",
-    "jati_si": "සම්පූර්ණ - සම්පූර්ණ (ආරෝහණයේ 'ස' මඟහැර මන්ද්‍ර නි වෙතින් ඇරඹෙයි)",
-    "time_si": "රාත්‍රී ප්‍රථම ප්‍රහාරය (සන්ධ්‍යා කාලය)",
-    "rasa_si": "ශෘංගාර, භක්ති, ප්‍රීති",
+    "jati_si": "සම්පූර්ණ - සම්පූර්ණ",
+    "time_si": "රාත්‍රී ප්‍රථම ප්‍රහරය",
+    "rasa_si": "නොදනී / සනාථ වී නැත",
     "pakad_si": "නි̣ රි ග රි ස , ප ම(තී) ග රි ස",
     "characteristics_si": [
-      "මධ්‍යම (ම) ස්වරය තීව්‍ර වන අතර අනෙක් සියලු ස්වර ශුද්ධ වේ.",
-      "ආරෝහණයේදී සෘජුව 'ස' ස්වරය නොගෙන මන්ද්‍ර නිෂාදයෙන් (නි̣) ආරම්භ කිරීම සම්ප්‍රදායයි.",
-      "10 සහ 11 ශ්‍රේණිවල විෂය නිර්දේශයේ ප්‍රධානතම සන්ධ්‍යා රාගයකි."
+      "මධ්‍යම (ම) ස්වරය තීව්‍ර වන අතර අනෙක් සියලු ස්වර ශුද්ධ වේ."
     ],
     "samplePhrases": [
       {
         "name_si": "මුඛ්‍යාංගය (පකඩ්)",
         "swaras": [
-          "N",
+          ".N",
           "R",
           "G",
           "R",
@@ -474,21 +398,20 @@
       }
     ],
     "gradeBands": [
-      "8-9",
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2; sg9_emus_raga.pdf"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "තීව්‍ර මධ්‍යම සහ වාදී ග / සංවාදී නි සනාථ විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
@@ -552,13 +475,13 @@
       "pageOrSection": "පිටුව 56; sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "ආන්දෝලිත කෝමල රි-ධ ස්වර තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
@@ -591,13 +514,11 @@
     "vadi_si": "මධ්‍යම (ම)",
     "samvadi_si": "ෂඩ්ජ (ස)",
     "jati_si": "සම්පූර්ණ - සම්පූර්ණ (කෝමල ස්වර 4 ම යෙදේ)",
-    "time_si": "දිවා ප්‍රථම ප්‍රහාරය (සංගීත ප්‍රසංග අවසානයේ ඕනෑම වේලාවක ගයයි)",
-    "rasa_si": "භක්ති, ශාන්ත, ශෝක, කරුණා",
+    "time_si": "දිවා ප්‍රථම ප්‍රහරය",
+    "rasa_si": "නොදනී / සනාථ වී නැත",
     "pakad_si": "ම ග(කෝ) , ස රි(කෝ) ස , ධ̣(කෝ) නි̣(කෝ) ස",
     "characteristics_si": [
-      "රි, ග, ධ, නි යන ස්වර සතරම කෝමල වේ.",
-      "සම්භාව්‍ය සංගීත ප්‍රසංගයක අවසාන ගායනා අංගය ලෙස බහුලව භාවිත වේ.",
-      "11 ශ්‍රේණි විෂය නිර්දේශයේ එන ප්‍රමුඛතම සර්ව කෝමල රාගයයි."
+      "රි, ග, ධ, නි යන ස්වර සතරම කෝමල වේ."
     ],
     "samplePhrases": [
       {
@@ -608,8 +529,8 @@
           "S",
           "r",
           "S",
-          "d",
-          "n",
+          ".d",
+          ".n",
           "S"
         ]
       }
@@ -618,17 +539,17 @@
       "10-11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-EPD-TB-G11",
-      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටුව 2"
+      "sourceId": "SRC-G11-RAGA-ID",
+      "pageOrSection": "sg11_emus_ chap3_raga_handunaganimu.pdf පිටු 1-2"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-15",
-      "lastVerifiedDate": "2026-08-15",
-      "changeNotes": "ස්වර 4 කෝමල බව සහ වාදී ම / සංවාදී ස තහවුරු විය.",
-      "license": "Educational Open Access",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   }
 ]

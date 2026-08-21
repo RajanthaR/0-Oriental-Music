@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { swaraSynth } from "@/lib/audio/synth";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
 import { CheckCircle2, RotateCcw, Sparkles, Volume2 } from "lucide-react";
 
 export interface NotationArrangerProps {
@@ -21,14 +21,64 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
   const [arrangedItems, setArrangedItems] = useState<string[]>([]);
   const [isEvaluated, setIsEvaluated] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [audioUnavailable, setAudioUnavailable] = useState(false);
+  const mountedRef = useRef(false);
+  const generationRef = useRef(0);
+  const playbackRef = useRef<SwaraPlaybackHandle | null>(null);
+
+  const cancelPlayback = useCallback(() => {
+    generationRef.current += 1;
+    const playback = playbackRef.current;
+    playbackRef.current = null;
+    try {
+      playback?.();
+    } catch {
+      // Cancellation is best-effort; the UI ownership must still be released.
+    }
+  }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      cancelPlayback();
+    };
+  }, [cancelPlayback]);
 
   const handleSelectItem = (item: string, idx: number) => {
+    cancelPlayback();
     // Play tone if it's a swara
     const clean = item.trim();
     if (["ස", "රි", "ග", "ම", "ප", "ධ", "නි"].includes(clean)) {
       const swaraMap: Record<string, string> = { "ස": "S", "රි": "R", "ග": "G", "ම": "M", "ප": "P", "ධ": "D", "නි": "N" };
       if (swaraMap[clean]) {
-        swaraSynth.playSwaraTone(swaraMap[clean]);
+        const generation = generationRef.current;
+        setAudioUnavailable(false);
+        const handle = swaraSynth.playSwaraToneHandle(swaraMap[clean]);
+        playbackRef.current = handle;
+        void handle.ready.then(
+          (played) => {
+            if (!mountedRef.current || generationRef.current !== generation || playbackRef.current !== handle) return;
+            if (!played) setAudioUnavailable(true);
+          },
+          () => {
+            if (mountedRef.current && generationRef.current === generation && playbackRef.current === handle) {
+              setAudioUnavailable(true);
+            }
+          },
+        );
+        void (handle.finished ?? handle.ready.then(() => undefined, () => undefined)).then(
+          () => {
+            if (playbackRef.current === handle) playbackRef.current = null;
+          },
+          () => {
+            const isCurrentHandle = playbackRef.current === handle;
+            if (isCurrentHandle) playbackRef.current = null;
+            if (mountedRef.current && generationRef.current === generation && isCurrentHandle) {
+              setAudioUnavailable(true);
+            }
+          },
+        );
       }
     }
 
@@ -38,6 +88,7 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
   };
 
   const handleRemoveItem = (item: string, idx: number) => {
+    cancelPlayback();
     setAvailableItems((prev) => [...prev, item]);
     setArrangedItems((prev) => prev.filter((_, i) => i !== idx));
     setIsEvaluated(false);
@@ -56,6 +107,7 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
   };
 
   const handleReset = () => {
+    cancelPlayback();
     setAvailableItems(shuffledItems);
     setArrangedItems([]);
     setIsEvaluated(false);
@@ -82,6 +134,12 @@ export const NotationArranger: React.FC<NotationArrangerProps> = ({
           නැවත
         </button>
       </div>
+
+      {audioUnavailable && (
+        <p role="alert" className="mb-3 text-xs font-semibold text-primary">
+          මෙම උපාංගයේ නාදය ආරම්භ කළ නොහැක. සලකුණු අනුව අභ්‍යාසය දිගටම කරන්න.
+        </p>
+      )}
 
       {/* Drop / Arranged Sequence Area */}
       <div className="min-h-[70px] bg-surface-warm border-2 border-dashed border-border rounded-xl p-3 mb-4 flex flex-wrap items-center gap-2">

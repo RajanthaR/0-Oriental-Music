@@ -2,13 +2,22 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Tala } from "@/types/content";
-import { tablaSynth } from "@/lib/audio/tabla";
+import { tablaSynth, type TablaPlaybackHandle } from "@/lib/audio/tabla";
+import { normalizePracticeBpm } from "@/lib/audio/tempo";
 import { Play, Square, RotateCcw, Volume2, VolumeX, Hand, Waves } from "lucide-react";
 
 export interface TalaVisualizerProps {
   tala: Tala;
   initialBpm?: number;
   showTablaAudioToggle?: boolean;
+}
+
+export function getCircularBeatStyle(index: number, matras: number, radius = 80): { transform: string } {
+  const angle = (index / matras) * 2 * Math.PI - Math.PI / 2;
+  const round = (value: number) => Math.round(value * 1_000_000) / 1_000_000;
+  return {
+    transform: `translate(${round(Math.cos(angle) * radius)}px, ${round(Math.sin(angle) * radius)}px)`,
+  };
 }
 
 export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
@@ -18,54 +27,215 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentMatra, setCurrentMatra] = useState<number>(1);
-  const [bpm, setBpm] = useState<number>(initialBpm || tala.layaVariants?.thah_bpm || 75);
+  const [bpm, setBpm] = useState<number>(() => normalizePracticeBpm(initialBpm, tala.practiceTempoBpm?.thah_bpm));
   const [audioEnabled, setAudioEnabled] = useState(true);
+  const [audioError, setAudioError] = useState(false);
   const [visualMode, setVisualMode] = useState<"circular" | "linear">("circular");
 
-  const timerRef = useRef<NodeJS.Timeout | number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const playbackCancelRef = useRef<(() => void) | null>(null);
+  const currentMatraRef = useRef(1);
+  const audioEnabledRef = useRef(audioEnabled);
+  const mountedRef = useRef(true);
+  const playbackGenerationRef = useRef(0);
+  const timerGenerationRef = useRef(0);
+  const playbackSignature = JSON.stringify({
+    id: tala.id,
+    matras: tala.matras,
+    theka: tala.theka_si,
+    bols: tala.bols.map((bol) => [bol.matra, bol.bol_si]),
+    tempo: tala.practiceTempoBpm?.thah_bpm ?? null,
+  });
+  const activeTalaSignatureRef = useRef(playbackSignature);
+  const previousBpmRef = useRef(bpm);
 
   const currentBol = tala.bols.find((b) => b.matra === currentMatra) || tala.bols[0];
+  const matraDurationMs = (60 / bpm) * 1000;
+
+  const stopTimer = useCallback(() => {
+    timerGenerationRef.current += 1;
+    const timer = timerRef.current;
+    timerRef.current = null;
+    if (timer !== null) {
+      try {
+        clearInterval(timer);
+      } catch {
+        // Timer cancellation is best-effort during browser teardown.
+      }
+    }
+  }, []);
+
+  const cancelPlayback = useCallback(() => {
+    playbackGenerationRef.current += 1;
+    const cancel = playbackCancelRef.current;
+    playbackCancelRef.current = null;
+    try {
+      cancel?.();
+    } catch {
+      // A failed cancellation must not prevent state/timer cleanup.
+    }
+  }, []);
+
+  const selectMatra = useCallback((matra: number) => {
+    currentMatraRef.current = matra;
+    setCurrentMatra(matra);
+  }, []);
+
+  const playMatra = useCallback((matra: number) => {
+    cancelPlayback();
+    if (!audioEnabledRef.current) return;
+    const bol = tala.bols.find((candidate) => candidate.matra === matra);
+    if (bol) {
+      const generation = playbackGenerationRef.current;
+      let ownedHandle: TablaPlaybackHandle | undefined;
+      let unavailableReported = false;
+      const reportUnavailable = () => {
+        if (
+          unavailableReported ||
+          !mountedRef.current ||
+          playbackGenerationRef.current !== generation ||
+          (ownedHandle !== undefined && playbackCancelRef.current !== ownedHandle)
+        ) return;
+        unavailableReported = true;
+        setAudioError(true);
+      };
+      let handle: TablaPlaybackHandle;
+      try {
+        handle = tablaSynth.playBol(bol.bol_si, matraDurationMs, reportUnavailable);
+      } catch {
+        reportUnavailable();
+        return;
+      }
+      if (!mountedRef.current || playbackGenerationRef.current !== generation) {
+        try {
+          handle();
+        } catch {
+          // The operation may already be in browser teardown.
+        }
+        return;
+      }
+      ownedHandle = handle;
+      playbackCancelRef.current = handle;
+      const failMalformedHandle = () => {
+        reportUnavailable();
+        if (playbackCancelRef.current === handle) playbackCancelRef.current = null;
+        try {
+          handle();
+        } catch {
+          // The operation may already be in browser teardown.
+        }
+        reportUnavailable();
+      };
+      try {
+        void Promise.resolve(handle.ready).then(
+          (available) => {
+            if (!available) reportUnavailable();
+          },
+          reportUnavailable,
+        );
+      } catch {
+        failMalformedHandle();
+      }
+      try {
+        if (handle.finished) {
+          void Promise.resolve(handle.finished).then(
+            () => {
+              if (mountedRef.current && playbackGenerationRef.current === generation && playbackCancelRef.current === handle) {
+                playbackCancelRef.current = null;
+              }
+          },
+          () => {
+            reportUnavailable();
+            if (playbackCancelRef.current === handle) playbackCancelRef.current = null;
+          },
+          );
+        }
+      } catch {
+        failMalformedHandle();
+      }
+    }
+  }, [cancelPlayback, matraDurationMs, tala.bols]);
 
   const stepNextMatra = useCallback(() => {
-    setCurrentMatra((prev) => {
-      const next = prev >= tala.matras ? 1 : prev + 1;
-      const nextBol = tala.bols.find((b) => b.matra === next);
-      if (nextBol && audioEnabled) {
-        tablaSynth.playBol(nextBol.bol_si);
-      }
-      return next;
-    });
-  }, [tala.matras, tala.bols, audioEnabled]);
+    if (!mountedRef.current) return;
+    const next = currentMatraRef.current >= tala.matras ? 1 : currentMatraRef.current + 1;
+    selectMatra(next);
+    playMatra(next);
+  }, [playMatra, selectMatra, tala.matras]);
 
   useEffect(() => {
-    if (isPlaying) {
-      const intervalMs = (60 / bpm) * 1000;
-      timerRef.current = setInterval(() => {
-        stepNextMatra();
-      }, intervalMs);
-    } else {
-      if (timerRef.current) {
-        clearInterval(timerRef.current as number);
-        timerRef.current = null;
-      }
+    if (!isPlaying) {
+      stopTimer();
+      return;
     }
+    const timerGeneration = timerGenerationRef.current;
+    const timer = setInterval(() => {
+      if (!mountedRef.current || timerGenerationRef.current !== timerGeneration) return;
+      stepNextMatra();
+    }, matraDurationMs);
+    timerRef.current = timer;
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current as number);
+      timerGenerationRef.current += 1;
+      try {
+        clearInterval(timer);
+      } catch {
+        // Timer cancellation is best-effort during browser teardown.
       }
+      if (timerRef.current === timer) timerRef.current = null;
     };
-  }, [isPlaying, bpm, stepNextMatra]);
+  }, [isPlaying, matraDurationMs, stepNextMatra, stopTimer]);
+
+  useEffect(() => {
+    if (previousBpmRef.current !== bpm) {
+      if (isPlaying) cancelPlayback();
+      previousBpmRef.current = bpm;
+    }
+  }, [bpm, cancelPlayback, isPlaying]);
+
+  useEffect(() => {
+    if (activeTalaSignatureRef.current === playbackSignature) return;
+    activeTalaSignatureRef.current = playbackSignature;
+    setIsPlaying(false);
+    stopTimer();
+    cancelPlayback();
+    selectMatra(1);
+    setAudioError(false);
+    setBpm(normalizePracticeBpm(initialBpm, tala.practiceTempoBpm?.thah_bpm));
+  }, [cancelPlayback, initialBpm, playbackSignature, selectMatra, stopTimer, tala.practiceTempoBpm?.thah_bpm]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      stopTimer();
+      cancelPlayback();
+    };
+  }, [cancelPlayback, stopTimer]);
 
   const handleTogglePlay = () => {
-    if (!isPlaying && audioEnabled) {
-      tablaSynth.playBol(currentBol.bol_si);
+    if (isPlaying) {
+      setIsPlaying(false);
+      stopTimer();
+      cancelPlayback();
+      return;
     }
-    setIsPlaying(!isPlaying);
+    setAudioError(false);
+    playMatra(currentMatraRef.current);
+    setIsPlaying(true);
   };
 
   const handleReset = () => {
     setIsPlaying(false);
-    setCurrentMatra(1);
+    stopTimer();
+    cancelPlayback();
+    selectMatra(1);
+  };
+
+  const handleAudioToggle = () => {
+    if (audioEnabled) cancelPlayback();
+    const next = !audioEnabled;
+    audioEnabledRef.current = next;
+    setAudioEnabled(next);
   };
 
   return (
@@ -85,14 +255,15 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
           {showTablaAudioToggle && (
             <button
               type="button"
-              onClick={() => setAudioEnabled(!audioEnabled)}
-              className={`p-2 rounded-lg border transition-all ${
+              onClick={handleAudioToggle}
+              className={`min-h-[44px] min-w-[44px] p-2 rounded-lg border transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                 audioEnabled
                   ? "bg-primary-50 text-primary border-primary-200"
                   : "bg-surface-warm text-text-muted border-border"
               }`}
               title={audioEnabled ? "තබ්ලා නාදය නිහඬ කරන්න" : "තබ්ලා නාදය සක්‍රිය කරන්න"}
               aria-label="තබ්ලා නාදය පාලනය"
+              aria-pressed={audioEnabled}
             >
               {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </button>
@@ -101,7 +272,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
           <button
             type="button"
             onClick={handleReset}
-            className="p-2 rounded-lg border border-border bg-surface-warm text-text hover:bg-white transition-all"
+            className="min-h-[44px] min-w-[44px] p-2 rounded-lg border border-border bg-surface-warm text-text hover:bg-white transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             title="නැවත මුලට"
             aria-label="නැවත මුලට"
           >
@@ -111,7 +282,7 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
           <button
             type="button"
             onClick={handleTogglePlay}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm text-white shadow-sm transition-all ${
+            className={`flex min-h-[44px] items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm text-white shadow-sm transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
               isPlaying ? "bg-red-600 hover:bg-red-700" : "bg-primary hover:bg-primary-dark"
             }`}
           >
@@ -129,6 +300,12 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
           </button>
         </div>
       </div>
+
+      {audioError && (
+        <p role="status" className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950">
+          මෙම උපාංගයේ තබ්ලා නාදය ආරම්භ කළ නොහැක. දෘශ්‍ය තාල ගණනය දිගටම භාවිත කළ හැක.
+        </p>
+      )}
 
       {/* Main Beat Display: Circular or Linear */}
       <div className="bg-surface-warm rounded-2xl p-6 mb-4 border border-border-light flex flex-col items-center justify-center min-h-[220px]">
@@ -157,18 +334,12 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
 
             {/* Circular Beat Dots */}
             {tala.bols.map((bol, idx) => {
-              const angle = (idx / tala.matras) * 2 * Math.PI - Math.PI / 2;
-              const radius = 80; // px
-              const x = Math.cos(angle) * radius;
-              const y = Math.sin(angle) * radius;
               const isCurrent = bol.matra === currentMatra;
 
               return (
                 <div
                   key={bol.matra}
-                  style={{
-                    transform: `translate(${x}px, ${y}px)`,
-                  }}
+                  style={getCircularBeatStyle(idx, tala.matras)}
                   className={`
                     absolute w-8 h-8 rounded-full flex flex-col items-center justify-center text-[10px] font-bold transition-all
                     ${
@@ -246,10 +417,8 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
         {/* Tempo Slider */}
         <div className="bg-surface-warm p-3 rounded-xl border border-border-light">
           <div className="flex items-center justify-between mb-1.5 font-semibold text-text-secondary">
-            <span>ලය / වේගය (Tempo): {bpm} BPM</span>
-            <span className="text-[11px] text-primary">
-              {bpm < 70 ? "විලම්බිත" : bpm < 140 ? "මධ්‍ය" : "ද්‍රුත"}
-            </span>
+            <span>යෙදුමේ පුහුණු වේගය: {bpm} BPM</span>
+            <span className="text-[11px] text-primary">වෙනස් කළ හැකි අගයකි</span>
           </div>
           <input
             type="range"
@@ -261,16 +430,20 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
             className="w-full accent-primary h-2 bg-white rounded-lg cursor-pointer"
             aria-label="තාලයේ වේගය (BPM)"
           />
+          <p className="mt-1.5 text-[11px] text-text-muted">
+            මෙය අභ්‍යාසයට පමණක් යොදාගන්නා යෙදුම් පෙරනිමියකි; මූලාශ්‍රයෙන් සනාථ කළ ලය වර්ගීකරණයක් නොවේ.
+          </p>
         </div>
 
         {/* Visual Mode Toggle */}
         <div className="bg-surface-warm p-3 rounded-xl border border-border-light flex items-center justify-between">
           <span className="font-semibold text-text-secondary">දර්ශන මාදිලිය:</span>
-          <div className="flex bg-white rounded-lg p-1 border border-border">
+          <div className="flex bg-white rounded-lg p-1 border border-border" role="group" aria-label="තාල දර්ශන මාදිලිය">
             <button
               type="button"
               onClick={() => setVisualMode("circular")}
-              className={`px-3 py-1 rounded-md font-bold transition-all ${
+              aria-pressed={visualMode === "circular"}
+              className={`min-h-[44px] min-w-[44px] px-3 py-1 rounded-md font-bold transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                 visualMode === "circular" ? "bg-primary text-white" : "text-text-secondary"
               }`}
             >
@@ -279,7 +452,8 @@ export const TalaVisualizer: React.FC<TalaVisualizerProps> = ({
             <button
               type="button"
               onClick={() => setVisualMode("linear")}
-              className={`px-3 py-1 rounded-md font-bold transition-all ${
+              aria-pressed={visualMode === "linear"}
+              className={`min-h-[44px] min-w-[44px] px-3 py-1 rounded-md font-bold transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                 visualMode === "linear" ? "bg-primary text-white" : "text-text-secondary"
               }`}
             >

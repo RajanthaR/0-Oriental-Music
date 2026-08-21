@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Sparkles, Clock, Play, ArrowRight, Music, FileText, CheckCircle2 } from "lucide-react";
 import { repository } from "@/lib/data/repository";
-import { swaraSynth } from "@/lib/audio/synth";
+import { formatPublicSourceReference } from "@/lib/data/publication-policy";
+import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
+import { releaseHandleRef } from "@/lib/audio/cleanup";
 import { SwaraKeyboard } from "@/components/audio/SwaraKeyboard";
 
 export default function RagaDetailPage() {
@@ -15,6 +17,27 @@ export default function RagaDetailPage() {
   const raga = repository.getRagaById(ragaId);
   const source = raga ? repository.getSourceById(raga.sourceReference.sourceId) : undefined;
   const [playingPhraseIdx, setPlayingPhraseIdx] = useState<number | null>(null);
+  const [audioError, setAudioError] = useState(false);
+  const mountedRef = useRef(false);
+  const audioGenerationRef = useRef(0);
+  const sequenceHandleRef = useRef<SwaraPlaybackHandle | null>(null);
+
+  // Invalidate the generation and surrender ownership before cancelling, so a
+  // throwing sequence cancellation cannot leave a stale handle owned.
+  const cancelOwnedAudio = useCallback(() => {
+    audioGenerationRef.current += 1;
+    releaseHandleRef(sequenceHandleRef);
+  }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    setPlayingPhraseIdx(null);
+    setAudioError(false);
+    return () => {
+      mountedRef.current = false;
+      cancelOwnedAudio();
+    };
+  }, [cancelOwnedAudio, ragaId]);
 
   if (!raga) {
     return (
@@ -27,25 +50,48 @@ export default function RagaDetailPage() {
     );
   }
 
-  const handlePlayPhrase = async (phraseSwaras: string[], idx: number) => {
+  const playSequence = async (phraseSwaras: string[], idx: number) => {
     if (playingPhraseIdx !== null) return;
+    cancelOwnedAudio();
+    const generation = audioGenerationRef.current;
     setPlayingPhraseIdx(idx);
-    await swaraSynth.playSequence(phraseSwaras, 0.6, undefined, 261.63, "harmonium");
-    setPlayingPhraseIdx(null);
+    setAudioError(false);
+    const handle = swaraSynth.playSequenceHandle(phraseSwaras, 0.6, undefined, 261.63, "harmonium");
+    sequenceHandleRef.current = handle;
+    void handle.ready.then(
+      (played) => {
+        if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
+        if (!played) setAudioError(true);
+      },
+      () => {
+        if (mountedRef.current && audioGenerationRef.current === generation && sequenceHandleRef.current === handle) {
+          setAudioError(true);
+          setPlayingPhraseIdx(null);
+        }
+      },
+    );
+    let finishedWithError = false;
+    try {
+      await (handle.finished ?? handle.ready.then(() => undefined, () => undefined));
+    } catch {
+      finishedWithError = true;
+    } finally {
+      const isCurrentHandle = sequenceHandleRef.current === handle;
+      if (isCurrentHandle) sequenceHandleRef.current = null;
+      if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
+      if (finishedWithError) setAudioError(true);
+      setPlayingPhraseIdx(null);
+    }
   };
 
+  const handlePlayPhrase = (phraseSwaras: string[], idx: number) => playSequence(phraseSwaras, idx);
+
   const handlePlayArohana = async () => {
-    if (playingPhraseIdx !== null) return;
-    setPlayingPhraseIdx(99);
-    await swaraSynth.playSequence(raga.arohana_swaras, 0.6, undefined, 261.63, "harmonium");
-    setPlayingPhraseIdx(null);
+    await playSequence(raga.arohana_swaras, 99);
   };
 
   const handlePlayAvarohana = async () => {
-    if (playingPhraseIdx !== null) return;
-    setPlayingPhraseIdx(98);
-    await swaraSynth.playSequence(raga.avarohana_swaras, 0.6, undefined, 261.63, "harmonium");
-    setPlayingPhraseIdx(null);
+    await playSequence(raga.avarohana_swaras, 98);
   };
 
   return (
@@ -74,7 +120,7 @@ export default function RagaDetailPage() {
           {raga.name_si}
         </h1>
         <p className="text-xs sm:text-sm text-text-secondary leading-relaxed mb-6">
-          ප්‍රධාන රසය: <span className="font-bold text-text">{raga.rasa_si}</span> | ජාතිය:{" "}
+          ජාතිය:{" "}
           <span className="font-bold text-text">{raga.jati_si}</span>
         </p>
 
@@ -127,6 +173,11 @@ export default function RagaDetailPage() {
             {playingPhraseIdx === 98 ? "වාදනය වේ..." : "අවරෝහණය අසන්න"}
           </button>
         </div>
+        {audioError && (
+          <p role="status" className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950">
+            මෙම උපාංගයේ රාග නාදය ආරම්භ කළ නොහැක. ස්වර සටහන් සහ යතුරුපුවරුව දිගටම භාවිත කළ හැක.
+          </p>
+        )}
       </div>
 
       {/* Interactive Swara Keyboard for this Raga */}
@@ -199,7 +250,7 @@ export default function RagaDetailPage() {
         <div>
           <span className="font-bold text-text block">මූලාශ්‍ර සටහන:</span>
           <p>
-            {source?.title} ({source?.publisher}) — {raga.sourceReference.pageOrSection}
+            {source?.title} — {formatPublicSourceReference(raga.sourceReference)}
           </p>
         </div>
       </footer>

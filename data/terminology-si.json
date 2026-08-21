@@ -5,36 +5,27 @@
     "term_en": "Musical Sound (Nada)",
     "transliteration": "Nādaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "ක්‍රමවත් කම්පන සහිත, කනට ප්‍රිය උපදවන සුසර ශබ්දය නාදය නම් වේ. සංගීතයේ මූලික පදනම නාදයයි.",
+    "definition_si": "සංගීතයේ භාවිත වන ස්වර එකිනෙකට වෙනස් නාද ලෙස හඳුනාගත හැකි අතර, නාදයක ගුණ අනුව කටහඬ සහ වාද්‍ය භාණ්ඩ වෙන්කර හඳුනාගත හැක.",
     "knownVariants": [
-      "නාදය",
       "නාද",
       "Nada"
     ],
-    "prerequisites": [
-      "term-sound"
-    ],
+    "prerequisites": [],
     "relatedTerms": [
-      "term-ahata-nada",
-      "term-anahata-nada",
       "term-pitch",
       "term-intensity",
       "term-timbre"
     ],
     "relevantGrades": [
-      "6",
-      "7",
-      "8",
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටු 10-14 (නාදය සහ සංගීතය)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටුව 2"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-sound",
@@ -42,9 +33,8 @@
     "term_en": "Sound / Acoustic Noise",
     "transliteration": "Śabdaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "ඕනෑම වස්තුවක කම්පනයෙන් උපදින, කනට ඇසෙන සියලුම ශ්‍රව්‍ය සංවේදනයන් ශබ්දය නම් වේ. ක්‍රමවත් ශබ්ද නාද වන අතර අක්‍රමවත් ශබ්ද ඝෝෂා වේ.",
+    "definition_si": "මෙම නිර්වචනය සැපයූ Grades 6–11 මූලාශ්‍ර සංග්‍රහයෙන් සනාථ වී නැත. මූලාශ්‍රයක් සහ නිශ්චිත පිටුවක් සනාථ වන තෙක් ප්‍රසිද්ධ අන්තර්ගතයෙන් වළක්වා ඇත.",
     "knownVariants": [
-      "ශබ්දය",
       "ශබ්ද"
     ],
     "prerequisites": [],
@@ -52,19 +42,15 @@
       "term-nada"
     ],
     "relevantGrades": [
-      "6",
-      "7",
-      "8",
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 10"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "සැපයූ මූලාශ්‍ර සංග්‍රහයෙන් නිශ්චිත පිටු සාක්ෂියක් සනාථ වී නැත"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-ahata-nada",
@@ -72,9 +58,8 @@
     "term_en": "Ahata Nada (Struck Sound)",
     "transliteration": "Āhata Nādaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "භෞතික වස්තූන් දෙකක් එකිනෙක ගැටීමෙන්, පිරිමැදීමෙන් හෝ වාතය පිඹීමෙන් උපදින, මිනිස් කනට ඇසෙන ප්‍රායෝගික සංගීත නාදයයි.",
+    "definition_si": "‘ආහත නාදය’ යන නිර්වචනය සැපයූ Grades 6–11 මූලාශ්‍ර සංග්‍රහයෙන් සනාථ වී නැත. නිශ්චිත මූලාශ්‍ර සාක්ෂිය ලැබෙන තෙක් ප්‍රසිද්ධ අන්තර්ගතයෙන් වළක්වා ඇත.",
     "knownVariants": [
-      "ආහත නාදය",
       "ආහත"
     ],
     "prerequisites": [
@@ -84,17 +69,15 @@
       "term-anahata-nada"
     ],
     "relevantGrades": [
-      "8",
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "පිටුව 12 (නාද ප්‍රභේද)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "සැපයූ මූලාශ්‍ර සංග්‍රහයෙන් නිශ්චිත පිටු සාක්ෂියක් සනාථ වී නැත"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-anahata-nada",
@@ -102,10 +85,8 @@
     "term_en": "Anahata Nada (Unstruck / Cosmic Sound)",
     "transliteration": "Anāhata Nādaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "භෞතික ගැටීමකින් තොරව විශ්වයේ හෝ භාවනාවෙන් හදවත තුළ අත්විඳින අධ්‍යාත්මික නාදයයි. එය ප්‍රායෝගික ගායන වාදනයට යොදා නොගනී.",
-    "knownVariants": [
-      "අනාහත නාදය"
-    ],
+    "definition_si": "‘අනාහත නාදය’ යන නිර්වචනය සැපයූ Grades 6–11 මූලාශ්‍ර සංග්‍රහයෙන් සනාථ වී නැත. නිශ්චිත මූලාශ්‍ර සාක්ෂිය ලැබෙන තෙක් ප්‍රසිද්ධ අන්තර්ගතයෙන් වළක්වා ඇත.",
+    "knownVariants": [],
     "prerequisites": [
       "term-nada"
     ],
@@ -117,22 +98,23 @@
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "පිටුව 12"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "සැපයූ මූලාශ්‍ර සංග්‍රහයෙන් නිශ්චිත පිටු සාක්ෂියක් සනාථ වී නැත"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-pitch",
-    "term_si": "තාරතාවය (උස්-මිටි බව)",
+    "term_si": "තාරතාවය (උච්චනීච ප්‍රභේදය / උස්-මිටි බව)",
     "term_en": "Pitch",
     "transliteration": "Tāratāvaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "නාදයක සිහින් (උස්) හෝ ගොරෝසු (මිටි) ස්වභාවයයි. එය තීරණය වන්නේ කම්පන සංඛ්‍යාතය (Frequency) මතය.",
+    "definition_si": "නාදයක සංඛ්‍යාත වෙනස නිසා එය තවත් නාදයකින් වෙන්කර හඳුනාගැනීමට ලැබෙන ගුණයයි.",
     "knownVariants": [
       "තාරතාවය",
       "තාරතාව",
+      "උච්චනීච ප්‍රභේදය",
       "උස් මිටි බව"
     ],
     "prerequisites": [
@@ -144,29 +126,26 @@
       "term-frequency"
     ],
     "relevantGrades": [
-      "6",
-      "7",
-      "8",
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 12 (නාදයේ ලක්ෂණ)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 4"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-intensity",
-    "term_si": "විපුලතාවය (තීව්‍රතාවය / මහත්-කුඩා බව)",
-    "term_en": "Intensity / Volume",
+    "term_si": "විපුලතාවය (රූප භේදය / මහත්-කුඩා බව)",
+    "term_en": "Intensity / Magnitude / Volume",
     "transliteration": "Vipulatāvaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "නාදයක ප්‍රබල හඬ (හයිය) හෝ මෘදු බවයි. එය තීරණය වන්නේ කම්පන විස්තාරය (Amplitude) මතය.",
+    "definition_si": "නාදයක ප්‍රබල හඬ (හයිය) හෝ මෘදු බවයි. එය තීරණය වන්නේ කම්පන විස්තාරය (Amplitude) හා යෙදූ බලය/ශක්තිය මතය.",
     "knownVariants": [
       "විපුලතාවය",
+      "රූප භේදය",
       "තීව්‍රතාවය",
       "මහත් කුඩා බව"
     ],
@@ -178,29 +157,26 @@
       "term-timbre"
     ],
     "relevantGrades": [
-      "6",
-      "7",
-      "8",
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 13"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 7, 8"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-timbre",
-    "term_si": "ධ්වනි ගුණය (නාද ජාතිය)",
+    "term_si": "ධ්වනි ගුණය (ජාති භේදය / නාද ජාතිය)",
     "term_en": "Timbre / Quality",
     "transliteration": "Dhwani Guṇaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "එකම තාරතාවයෙන් හා තීව්‍රතාවයෙන් යුත් නාද දෙකක් වෙන්කොට හඳුනාගැනීමට උපකාරී වන නාදයේ සුවිශේෂී වර්ණය හෝ මාධ්‍ය ලක්ෂණයයි (උදා: වයලීන හා බටනලා හඬ වෙන්කර හඳුනාගැනීම).",
+    "definition_si": "පුද්ගල කටහඬක් හෝ සංගීත භාණ්ඩයක නාදයක් තවත් එකකින් වෙන්කර හඳුනාගැනීමට උපකාරී වන සුවිශේෂී ගුණයයි; තරංග රටාවේ වෙනස එම හඳුනාගැනීමට හේතු වේ.",
     "knownVariants": [
       "ධ්වනි ගුණය",
+      "ජාති භේදය",
       "නාද ගුණය",
       "නාද ජාතිය"
     ],
@@ -212,19 +188,15 @@
       "term-intensity"
     ],
     "relevantGrades": [
-      "6",
-      "7",
-      "8",
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 14"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 10, 11"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-frequency",
@@ -232,9 +204,8 @@
     "term_en": "Frequency",
     "transliteration": "Saṅkhyātaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "තත්පරයක් තුළ සිදුවන පූර්ණ කම්පන වාර ගණනයි. එය මනිනු ලබන්නේ හර්ට්ස් (Hz) ඒකක වලිනි.",
+    "definition_si": "තත්පරයක් තුළ සිදුවන සම්පූර්ණ කම්පන වාර ගණනයි.",
     "knownVariants": [
-      "සංඛ්‍යාතය",
       "Frequency"
     ],
     "prerequisites": [
@@ -245,16 +216,15 @@
       "term-nada"
     ],
     "relevantGrades": [
-      "9",
       "10",
       "11"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "පිටුව 88 (සංගීත භෞතික විද්‍යාව)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 4, 5"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-swara",
@@ -264,7 +234,6 @@
     "category_si": "ස්වර හා ශ්‍රැති",
     "definition_si": "ශ්‍රවණය කළ සැණින් සිත ප්‍රමෝදයට පත්කරන, නිශ්චිත තාරතාවක් සහිත සංගීත නාදය ස්වරය නම් වේ.",
     "knownVariants": [
-      "ස්වරය",
       "ස්වර",
       "Swara"
     ],
@@ -289,8 +258,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 20 (සප්ත ස්වර හැඳින්වීම)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-shuddha-swara",
@@ -300,7 +269,6 @@
     "category_si": "ස්වර හා ශ්‍රැති",
     "definition_si": "තමන්ට නියමිත ස්වභාවික ස්ථානයෙහි පිහිටි මූලික ස්වර 7 ශුද්ධ ස්වර වේ: ෂඩ්ජ (ස), රිෂභ (රි), ගාන්ධාර (ග), මධ්‍යම (ම), පංචම (ප), ධෛවත (ධ), නිෂාද (නි).",
     "knownVariants": [
-      "ශුද්ධ ස්වර",
       "ශුද්ධ"
     ],
     "prerequisites": [
@@ -322,8 +290,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටු 22-25"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-vikruta-swara",
@@ -333,7 +301,6 @@
     "category_si": "ස්වර හා ශ්‍රැති",
     "definition_si": "ශුද්ධ ස්ථානයෙන් මඳක් පහළට හෝ ඉහළට විතැන් වූ ස්වර විකෘති ස්වර නම් වේ. ඒවා කෝමල (පහත්) සහ තීව්‍ර (උස්) ලෙස කොටස් දෙකකි.",
     "knownVariants": [
-      "විකෘති ස්වර",
       "විකෘති"
     ],
     "prerequisites": [
@@ -354,8 +321,8 @@
       "sourceId": "SRC-NIE-G07-TG",
       "pageOrSection": "පිටුව 18 (විකෘති ස්වර හඳුනාගැනීම)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-komala-swara",
@@ -365,9 +332,7 @@
     "category_si": "ස්වර හා ශ්‍රැති",
     "definition_si": "ශුද්ධ ස්ථානයට වඩා අඩස්වරයක් (ශ්‍රැති 1-2 ක්) පහතින් ශබ්ද වන ස්වර 4 කි: කෝමල රි (r), කෝමල ග (g), කෝමල ධ (d), කෝමල නි (n).",
     "knownVariants": [
-      "කෝමල ස්වර",
-      "කෝමල",
-      "කෝමළ"
+      "කෝමල"
     ],
     "prerequisites": [
       "term-vikruta-swara"
@@ -387,8 +352,8 @@
       "sourceId": "SRC-NIE-G07-TG",
       "pageOrSection": "පිටුව 20"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-theevra-swara",
@@ -398,7 +363,6 @@
     "category_si": "ස්වර හා ශ්‍රැති",
     "definition_si": "ශුද්ධ ස්ථානයට වඩා අඩස්වරයක් ඉහළින් ශබ්ද වන මධ්‍යම (ම) ස්වරය තීව්‍ර මධ්‍යම (m) නම් වේ. හින්දුස්ථානි සංගීතයේ ඇති එකම තීව්‍ර ස්වරය මෙයයි.",
     "knownVariants": [
-      "තීව්‍ර ස්වර",
       "තීව්‍ර මධ්‍යම",
       "තීව්ර"
     ],
@@ -420,8 +384,8 @@
       "sourceId": "SRC-NIE-G07-TG",
       "pageOrSection": "පිටුව 21"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-saptaka",
@@ -431,7 +395,6 @@
     "category_si": "ස්වර හා ශ්‍රැති",
     "definition_si": "අනුපිළිවෙළින් පිහිටි ශුද්ධ ස්වර 7 ක සහ විකෘති ස්වර 5 ක (මුළු ස්වර 12 ක) සමූහය සප්තකයක් නම් වේ. ප්‍රධාන සප්තක 3 කි: මන්ද්‍ර (පහළ), මධ්‍ය (සාමාන්‍ය), තාර (ඉහළ).",
     "knownVariants": [
-      "සප්තකය",
       "සප්තක",
       "Saptaka"
     ],
@@ -455,8 +418,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටු 28-31 (සප්තක 3 හඳුනාගැනීම)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-mandra-saptaka",
@@ -466,7 +429,6 @@
     "category_si": "ස්වර හා ශ්‍රැති",
     "definition_si": "මධ්‍ය සප්තකයට වඩා අඩක් පහළ තාරතාවයකින් පිහිටි සප්තකයයි. ප්‍රස්තාරයේදී ස්වරයට යටින් තිතක් ( . ) තබා සටහන් කරයි (උදා: නි̣ , ධ̣).",
     "knownVariants": [
-      "මන්ද්‍ර සප්තකය",
       "මන්ද්‍ර"
     ],
     "prerequisites": [
@@ -488,8 +450,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 29"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-madhya-saptaka",
@@ -499,7 +461,6 @@
     "category_si": "ස්වර හා ශ්‍රැති",
     "definition_si": "සාමාන්‍ය කටහඬින් පහසුවෙන් ගායනා කළ හැකි මධ්‍යම තාරතා පරාසයයි. මෙහි ස්වර සඳහා ඉහළ හෝ පහළ තිත් නොයොදයි (උදා: ස , රි , ග).",
     "knownVariants": [
-      "මධ්‍ය සප්තකය",
       "මධ්‍ය"
     ],
     "prerequisites": [
@@ -521,8 +482,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 29"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-tara-saptaka",
@@ -532,7 +493,6 @@
     "category_si": "ස්වර හා ශ්‍රැති",
     "definition_si": "මධ්‍ය සප්තකයට වඩා දෙගුණයක තාරතාවයකින් පිහිටි ඉහළ සප්තකයයි. ප්‍රස්තාරයේදී ස්වරයට ඉහළින් තිතක් තබා සටහන් කරයි (උදා: ස̇ , රි̇).",
     "knownVariants": [
-      "තාර සප්තකය",
       "තාර"
     ],
     "prerequisites": [
@@ -554,8 +514,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 30"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-alankara",
@@ -588,8 +548,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටු 32-38 (සරල අලංකාර 7)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-thata",
@@ -626,8 +586,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 35 (ථාට පද්ධතිය)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-laya",
@@ -661,8 +621,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 40 (ලය සහ තාලය)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-matra",
@@ -672,7 +632,6 @@
     "category_si": "ලය හා තාල",
     "definition_si": "තාලයක කාලය මනින කුඩාම මූලික ඒකකය මාත්‍රාවයි. තාලයක මුළු කාලය සමාන මාත්‍රා ගණනාවකට බෙදා දක්වයි.",
     "knownVariants": [
-      "මාත්‍රාව",
       "මාත්‍රා",
       "Matra"
     ],
@@ -696,8 +655,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 42"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-vibhaga",
@@ -707,7 +666,6 @@
     "category_si": "ලය හා තාල",
     "definition_si": "තාලයක මාත්‍රා කිහිපයක් එක්වීමෙන් සෑදෙන කොටස හෙවත් ඛණ්ඩය විභාගයක් නම් වේ. ප්‍රස්තාරයේදී විභාග වෙන්කරන්නේ සිරස් ඉරක් ( | ) මඟිනි.",
     "knownVariants": [
-      "විභාගය",
       "විභාග"
     ],
     "prerequisites": [
@@ -729,8 +687,8 @@
       "sourceId": "SRC-NIE-G07-TG",
       "pageOrSection": "පිටුව 32 (තාල ලක්ෂණ)"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-tala",
@@ -740,7 +698,6 @@
     "category_si": "ලය හා තාල",
     "definition_si": "ගායන, වාදන හා නර්තන කටයුතු ක්‍රමවත්ව මැනීමට යොදාගන්නා චක්‍රීය කාල රාමුව තාලය නම් වේ.",
     "knownVariants": [
-      "තාලය",
       "තාල",
       "Tala"
     ],
@@ -767,8 +724,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 40"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-sam",
@@ -801,8 +758,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 43"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-tali",
@@ -813,7 +770,6 @@
     "definition_si": "තාලයක් අතින් නිරූපණය කිරීමේදී අත්පුඩි ගැසීමෙන් පෙන්වන ප්‍රබල මාත්‍රා ස්ථාන තාළි නම් වේ. ඒවා x, 2, 3, 4 ආදී අංක මඟින් දක්වයි.",
     "knownVariants": [
       "තාළි",
-      "තාලි",
       "තාළිය"
     ],
     "prerequisites": [
@@ -835,8 +791,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 43"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-khali",
@@ -869,8 +825,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටුව 44"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-theka",
@@ -902,8 +858,8 @@
       "sourceId": "SRC-NIE-G07-TG",
       "pageOrSection": "පිටුව 34"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-avarta",
@@ -935,8 +891,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 42"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-raga",
@@ -946,7 +902,6 @@
     "category_si": "රාග ශාස්ත්‍රය",
     "definition_si": "ස්වර, වර්ණ සහ ධ්වනි විලාසයන්ගෙන් සමන්විත වූ, රසික සිත් සතුටු කරන නීතිගත මධුර ස්වර රටාව රාගය නම් වේ.",
     "knownVariants": [
-      "රාගය",
       "රාග",
       "Raga"
     ],
@@ -972,8 +927,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටු 36-39"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-arohana",
@@ -983,7 +938,6 @@
     "category_si": "රාග ශාස්ත්‍රය",
     "definition_si": "රාගයක ස්වර පහළ සිට ඉහළ තාරතාවයට (ස සිට තාර ස̇ දක්වා) ක්‍රමයෙන් ගායනා හෝ වාදනය කිරීම ආරෝහණයයි.",
     "knownVariants": [
-      "ආරෝහණය",
       "ආරෝහණ"
     ],
     "prerequisites": [
@@ -1003,8 +957,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 37"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-avarohana",
@@ -1014,7 +968,6 @@
     "category_si": "රාග ශාස්ත්‍රය",
     "definition_si": "රාගයක ස්වර ඉහළ තාරතාවයේ සිට පහළට (තාර ස̇ සිට ස දක්වා) ක්‍රමයෙන් ගායනා හෝ වාදනය කිරීම අවරෝහණයයි.",
     "knownVariants": [
-      "අවරෝහණය",
       "අවරෝහණ"
     ],
     "prerequisites": [
@@ -1034,8 +987,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 37"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-vadi",
@@ -1045,7 +998,6 @@
     "category_si": "රාග ශාස්ත්‍රය",
     "definition_si": "රාගයක වඩාත්ම වැදගත්, වැඩිම වාර ගණනක් ප්‍රයෝග වන ප්‍රධානතම ස්වරයයි. එය රාගයේ 'රජු' බඳු ස්වරය ලෙස හැඳින්වේ.",
     "knownVariants": [
-      "වාදී ස්වරය",
       "වාදී"
     ],
     "prerequisites": [
@@ -1066,8 +1018,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 38"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-samvadi",
@@ -1077,7 +1029,6 @@
     "category_si": "රාග ශාස්ත්‍රය",
     "definition_si": "වාදී ස්වරයට පසුව රාගයක දෙවනුවට වැදගත්ම ස්වරයයි. සාමාන්‍යයෙන් වාදී ස්වරයේ සිට 4 වන හෝ 5 වන ස්වරය (ශ්‍රැති 9 හෝ 13 පරතරය) සංවාදී වේ. එය 'ඇමති' බඳු ස්වරයයි.",
     "knownVariants": [
-      "සංවාදී ස්වරය",
       "සංවාදී"
     ],
     "prerequisites": [
@@ -1097,8 +1048,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 38"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-jati",
@@ -1132,8 +1083,8 @@
       "sourceId": "SRC-NIE-G08-TG",
       "pageOrSection": "පිටුව 39"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-pakad",
@@ -1144,8 +1095,7 @@
     "definition_si": "රාගයක සුවිශේෂී අනන්‍යතාව හා ස්වරූපය ක්ෂණිකව ප්‍රකට කරවන කෙටි සුවිශේෂී ස්වර ඛණ්ඩය මුඛ්‍යාංගය හෙවත් පකඩ් නම් වේ.",
     "knownVariants": [
       "මුඛ්‍යාංගය",
-      "පකඩ්",
-      "මුඛ්යාංගය"
+      "පකඩ්"
     ],
     "prerequisites": [
       "term-raga"
@@ -1163,8 +1113,8 @@
       "sourceId": "SRC-NIE-G09-TG",
       "pageOrSection": "පිටුව 48"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-gana-samaya",
@@ -1193,8 +1143,8 @@
       "sourceId": "SRC-NIE-G1011-TG",
       "pageOrSection": "පිටුව 52"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-pancha-turya",
@@ -1229,8 +1179,8 @@
       "sourceId": "SRC-NIE-G06-TG",
       "pageOrSection": "පිටු 55-60; sg9_emus_music_instruments.pdf පිටු 1-5"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-athatha",
@@ -1240,8 +1190,7 @@
     "category_si": "වාද්‍ය භාණ්ඩ",
     "definition_si": "හම් ඇටවූ මුහුණත අතින් පමණක් තට්ටු කරමින් වාදනය කරන බෙර භාණ්ඩයි (උදා: අත් රබාන, බුම්මැඩිය, ගැටබෙරයේ වම් මුහුණත).",
     "knownVariants": [
-      "ආතත",
-      "ආතත භාණ්ඩ"
+      "ආතත"
     ],
     "prerequisites": [
       "term-pancha-turya"
@@ -1262,8 +1211,8 @@
       "sourceId": "SRC-NIE-G09-TG",
       "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-vithatha",
@@ -1273,8 +1222,7 @@
     "category_si": "වාද්‍ය භාණ්ඩ",
     "definition_si": "කඩිප්පුවක් හෙවත් කෝටුවක් භාවිතයෙන් පමණක් පහර දී වාදනය කරන අවනද්ධ භාණ්ඩයි (උදා: තම්මැට්ටම).",
     "knownVariants": [
-      "විතත",
-      "විතත භාණ්ඩ"
+      "විතත"
     ],
     "prerequisites": [
       "term-pancha-turya"
@@ -1295,8 +1243,8 @@
       "sourceId": "SRC-NIE-G09-TG",
       "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-vithathathatha",
@@ -1306,8 +1254,7 @@
     "category_si": "වාද්‍ය භාණ්ඩ",
     "definition_si": "එක් පසක් අතින්ද අනෙක් පස කඩිප්පුවකින්ද (කෝටුවකින්) පහර දී එකවර වාදනය කරන බෙර භාණ්ඩයි (උදා: දවුල, උඩැක්කිය).",
     "knownVariants": [
-      "විතතාතත",
-      "විතතාතත භාණ්ඩ"
+      "විතතාතත"
     ],
     "prerequisites": [
       "term-pancha-turya"
@@ -1328,8 +1275,8 @@
       "sourceId": "SRC-NIE-G09-TG",
       "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-ghana",
@@ -1339,8 +1286,7 @@
     "category_si": "වාද්‍ය භාණ්ඩ",
     "definition_si": "ලෝහ හෝ ලී වැනි ඝන ද්‍රව්‍ය එකිනෙක ගැටීමෙන් ස්වභාවික නාදය උපදවන භාණ්ඩයි (උදා: තාලම්පට, පන්තේරුව, තලිය, කයිතාලම, හක්ගෙඩිය).",
     "knownVariants": [
-      "ඝන",
-      "ඝන භාණ්ඩ"
+      "ඝන"
     ],
     "prerequisites": [
       "term-pancha-turya"
@@ -1360,8 +1306,8 @@
       "sourceId": "SRC-NIE-G09-TG",
       "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-sushira",
@@ -1371,9 +1317,7 @@
     "category_si": "වාද්‍ය භාණ්ඩ",
     "definition_si": "මුඛයෙන් වාතය පිඹීමෙන් වාත කඳ කම්පනය කර නාදය උපදවන සුළං වාද්‍ය භාණ්ඩයි (උදා: හොරණෑව, බටනලාව, කොම්බුව, නාදස්වරම්).",
     "knownVariants": [
-      "සුෂිර",
-      "සුෂිර භාණ්ඩ",
-      "සුසිර"
+      "සුෂිර"
     ],
     "prerequisites": [
       "term-pancha-turya"
@@ -1393,8 +1337,8 @@
       "sourceId": "SRC-NIE-G09-TG",
       "pageOrSection": "sg9_emus_music_instruments.pdf පිටුව 4"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   },
   {
     "id": "term-tabla",
@@ -1404,7 +1348,6 @@
     "category_si": "වාද්‍ය භාණ්ඩ",
     "definition_si": "හින්දුස්ථානි සංගීතයේ ප්‍රධානතම තාල වාද්‍ය භාණ්ඩය වන දායාන් (දකුණු ලී බෙරය) සහ බායාන් (වම් ලෝහ/මැටි බෙරය) යන යුගල බෙරයයි.",
     "knownVariants": [
-      "තබ්ලාව",
       "තබ්ලා",
       "Tabla"
     ],
@@ -1426,7 +1369,7 @@
       "sourceId": "SRC-NIE-G07-TG",
       "pageOrSection": "tabla.md පිටු 1-23"
     },
-    "confidence": "Verified",
-    "reviewStatus": "Published"
+    "confidence": "Unverified",
+    "reviewStatus": "Needs Review"
   }
 ]

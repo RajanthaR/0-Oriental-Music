@@ -5,18 +5,17 @@
     "term_en": "Musical Sound (Nada)",
     "transliteration": "Nādaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "ක්‍රමවත් කම්පන සහිත, කනට ප්‍රිය උපදවන සුසර ශබ්දය නාදය නම් වේ. සංගීතයේ මූලික පදනම නාදයයි.",
+    "gradeBands": ["10-11"],
+    "definition_si": "ස්වර යනු එකිනෙකට වෙනස් වූ නාද වන අතර ස්වර සප්තකය එම නාද අනුපිළිවෙළට සංවිධානය කිරීමෙන් ගොඩනැගේ.",
     "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: නාදය, නාද, Nada",
     "relatedTermIds": [
-      "term-ahata-nada",
-      "term-anahata-nada",
       "term-pitch",
       "term-intensity",
       "term-timbre"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටු 10-14 (නාදය සහ සංගීතය)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටුව 2"
     }
   },
   {
@@ -25,14 +24,14 @@
     "term_en": "Sound / Acoustic Noise",
     "transliteration": "Śabdaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "ඕනෑම වස්තුවක කම්පනයෙන් උපදින, කනට ඇසෙන සියලුම ශ්‍රව්‍ය සංවේදනයන් ශබ්දය නම් වේ. ක්‍රමවත් ශබ්ද නාද වන අතර අක්‍රමවත් ශබ්ද ඝෝෂා වේ.",
-    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: ශබ්දය, ශබ්ද",
+    "definition_si": "සැපයූ SRC-G10-NADA ලේඛනය තුළ මෙම නිර්වචනය සනාථ වී නැත.",
+    "detailedNotes_si": "මූලාශ්‍ර සමාලෝචනය අවශ්‍යයි; පොදු ප්‍රදර්ශනයෙන් තාවකාලිකව වළක්වා ඇත.",
     "relatedTermIds": [
       "term-nada"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 10"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "සැපයූ SRC-G10-NADA පිටු 2-12 තුළ මෙම යෙදුම සනාථ වී නැත"
     }
   },
   {
@@ -41,14 +40,14 @@
     "term_en": "Ahata Nada (Struck Sound)",
     "transliteration": "Āhata Nādaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "භෞතික වස්තූන් දෙකක් එකිනෙක ගැටීමෙන්, පිරිමැදීමෙන් හෝ වාතය පිඹීමෙන් උපදින, මිනිස් කනට ඇසෙන ප්‍රායෝගික සංගීත නාදයයි.",
-    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: ආහත නාදය, ආහත",
+    "definition_si": "සැපයූ මූලාශ්‍ර කෝෂය තුළ මෙම යෙදුම හෝ නිර්වචනය සනාථ වී නැත.",
+    "detailedNotes_si": "මූලාශ්‍ර සමාලෝචනය අවශ්‍යයි; පොදු ප්‍රදර්ශනයෙන් තාවකාලිකව වළක්වා ඇත.",
     "relatedTermIds": [
       "term-anahata-nada"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "පිටුව 12 (නාද ප්‍රභේද)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "සැපයූ SRC-G10-NADA පිටු 2-12 තුළ මෙම යෙදුම සනාථ වී නැත"
     }
   },
   {
@@ -57,66 +56,69 @@
     "term_en": "Anahata Nada (Unstruck / Cosmic Sound)",
     "transliteration": "Anāhata Nādaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "භෞතික ගැටීමකින් තොරව විශ්වයේ හෝ භාවනාවෙන් හදවත තුළ අත්විඳින අධ්‍යාත්මික නාදයයි. එය ප්‍රායෝගික ගායන වාදනයට යොදා නොගනී.",
-    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: අනාහත නාදය",
+    "definition_si": "සැපයූ මූලාශ්‍ර කෝෂය තුළ මෙම යෙදුම හෝ නිර්වචනය සනාථ වී නැත.",
+    "detailedNotes_si": "මූලාශ්‍ර සමාලෝචනය අවශ්‍යයි; පොදු ප්‍රදර්ශනයෙන් තාවකාලිකව වළක්වා ඇත.",
     "relatedTermIds": [
       "term-ahata-nada"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "පිටුව 12"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "සැපයූ SRC-G10-NADA පිටු 2-12 තුළ මෙම යෙදුම සනාථ වී නැත"
     }
   },
   {
     "id": "term-pitch",
-    "term_si": "තාරතාවය (උස්-මිටි බව)",
+    "term_si": "තාරතාවය (උච්චනීච ප්‍රභේදය / උස්-මිටි බව)",
     "term_en": "Pitch",
     "transliteration": "Tāratāvaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "නාදයක සිහින් (උස්) හෝ ගොරෝසු (මිටි) ස්වභාවයයි. එය තීරණය වන්නේ කම්පන සංඛ්‍යාතය (Frequency) මතය.",
-    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: තාරතාවය, තාරතාව, උස් මිටි බව",
+    "gradeBands": ["10-11"],
+    "definition_si": "නාදයක සංඛ්‍යාත වෙනස නිසා එය තවත් නාදයකින් වෙන්කර හඳුනාගැනීමට ලැබෙන ගුණයයි.",
+    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: තාරතාවය, තාරතාව, උච්චනීච ප්‍රභේදය, උස් මිටි බව",
     "relatedTermIds": [
       "term-intensity",
       "term-timbre",
       "term-frequency"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 12 (නාදයේ ලක්ෂණ)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 4"
     }
   },
   {
     "id": "term-intensity",
-    "term_si": "විපුලතාවය (තීව්‍රතාවය / මහත්-කුඩා බව)",
-    "term_en": "Intensity / Volume",
+    "term_si": "විපුලතාවය (රූප භේදය / මහත්-කුඩා බව)",
+    "term_en": "Intensity / Magnitude / Volume",
     "transliteration": "Vipulatāvaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "නාදයක ප්‍රබල හඬ (හයිය) හෝ මෘදු බවයි. එය තීරණය වන්නේ කම්පන විස්තාරය (Amplitude) මතය.",
-    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: විපුලතාවය, තීව්‍රතාවය, මහත් කුඩා බව",
+    "gradeBands": ["10-11"],
+    "definition_si": "නාදයක ප්‍රබල හඬ (හයිය) හෝ මෘදු බවයි. එය තීරණය වන්නේ කම්පන විස්තාරය (Amplitude) හා යෙදූ බලය/ශක්තිය මතය.",
+    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: විපුලතාවය, රූප භේදය, තීව්‍රතාවය, මහත් කුඩා බව",
     "relatedTermIds": [
       "term-pitch",
       "term-timbre"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 13"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 7, 8"
     }
   },
   {
     "id": "term-timbre",
-    "term_si": "ධ්වනි ගුණය (නාද ජාතිය)",
+    "term_si": "ධ්වනි ගුණය (ජාති භේදය / නාද ජාතිය)",
     "term_en": "Timbre / Quality",
     "transliteration": "Dhwani Guṇaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "එකම තාරතාවයෙන් හා තීව්‍රතාවයෙන් යුත් නාද දෙකක් වෙන්කොට හඳුනාගැනීමට උපකාරී වන නාදයේ සුවිශේෂී වර්ණය හෝ මාධ්‍ය ලක්ෂණයයි (උදා: වයලීන හා බටනලා හඬ වෙන්කර හඳුනාගැනීම).",
-    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: ධ්වනි ගුණය, නාද ගුණය, නාද ජාතිය",
+    "gradeBands": ["10-11"],
+    "definition_si": "පුද්ගල කටහඬක් හෝ සංගීත භාණ්ඩයක නාදයක් තවත් එකකින් වෙන්කර හඳුනාගැනීමට උපකාරී වන සුවිශේෂී ගුණයයි; තරංග රටාවේ වෙනස එම හඳුනාගැනීමට හේතු වේ.",
+    "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: ධ්වනි ගුණය, ජාති භේදය, නාද ගුණය, නාද ජාතිය",
     "relatedTermIds": [
       "term-pitch",
       "term-intensity"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G06-TG",
-      "pageOrSection": "පිටුව 14"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 3, 10, 11"
     }
   },
   {
@@ -125,15 +127,16 @@
     "term_en": "Frequency",
     "transliteration": "Saṅkhyātaya",
     "category_si": "ශබ්දය හා ධ්වනි විද්‍යාව",
-    "definition_si": "තත්පරයක් තුළ සිදුවන පූර්ණ කම්පන වාර ගණනයි. එය මනිනු ලබන්නේ හර්ට්ස් (Hz) ඒකක වලිනි.",
+    "gradeBands": ["10-11"],
+    "definition_si": "තත්පරයක් තුළ සිදුවන සම්පූර්ණ කම්පන වාර ගණනයි.",
     "detailedNotes_si": "සමාන හා විමර්ශන යෙදුම්: සංඛ්‍යාතය, Frequency",
     "relatedTermIds": [
       "term-pitch",
       "term-nada"
     ],
     "sourceReference": {
-      "sourceId": "SRC-NIE-G1011-TG",
-      "pageOrSection": "පිටුව 88 (සංගීත භෞතික විද්‍යාව)"
+      "sourceId": "SRC-G10-NADA",
+      "pageOrSection": "sg10_emus_chap8_nadaya.pdf පිටු 4, 5"
     }
   },
   {

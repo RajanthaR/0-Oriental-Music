@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { tablaSynth } from "@/lib/audio/tabla";
+import { tablaSynth, type TablaPlaybackHandle } from "@/lib/audio/tabla";
+import { normalizePracticeBpm } from "@/lib/audio/tempo";
 import { Play, Square, RotateCcw, Award, Sparkles, Touchpad } from "lucide-react";
 
 export interface RhythmTapGameProps {
@@ -15,6 +16,8 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
   totalBeats = 16,
   onComplete,
 }) => {
+  const safeBpm = normalizePracticeBpm(bpm, 80);
+  const safeTotalBeats = Number.isInteger(totalBeats) && totalBeats >= 1 && totalBeats <= 128 ? totalBeats : 16;
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentBeat, setCurrentBeat] = useState(0);
   const [accuracyList, setAccuracyList] = useState<number[]>([]);
@@ -22,16 +25,106 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
   const [feedbackColor, setFeedbackColor] = useState("text-text-muted");
   const [isFinished, setIsFinished] = useState(false);
 
-  const beatIntervalMs = (60 / bpm) * 1000;
+  const beatIntervalMs = (60 / safeBpm) * 1000;
   const expectedBeatTimesRef = useRef<number[]>([]);
   const tapTimesRef = useRef<number[]>([]);
+  const accuracyListRef = useRef<number[]>([]);
   const startTimeRef = useRef<number>(0);
   const timerRef = useRef<NodeJS.Timeout | number | null>(null);
+  const finishTimerRef = useRef<NodeJS.Timeout | number | null>(null);
+  const playbackHandlesRef = useRef<Set<TablaPlaybackHandle>>(new Set());
+  const mountedRef = useRef(true);
+  const sessionGenerationRef = useRef(0);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  const trackPlayback = useCallback((handle: TablaPlaybackHandle) => {
+    playbackHandlesRef.current.add(handle);
+    let malformed = false;
+    try {
+      void Promise.resolve(handle.ready).catch(() => undefined);
+    } catch {
+      malformed = true;
+    }
+    try {
+      void Promise.resolve(handle.finished).then(
+        () => playbackHandlesRef.current.delete(handle),
+        () => playbackHandlesRef.current.delete(handle),
+      );
+    } catch {
+      malformed = true;
+    }
+    if (malformed) {
+      playbackHandlesRef.current.delete(handle);
+      try {
+        handle();
+      } catch {
+        // A malformed/partially torn-down handle must not block other cleanup.
+      }
+    }
+  }, []);
+
+  const clearPlayback = useCallback(() => {
+    const handles = Array.from(playbackHandlesRef.current);
+    playbackHandlesRef.current.clear();
+    handles.forEach((cancel) => {
+      try {
+        cancel();
+      } catch {
+        // One failed cancellation must not strand the remaining session work.
+      }
+    });
+  }, []);
+
+  const clearTimers = useCallback(() => {
+    sessionGenerationRef.current += 1;
+    const timer = timerRef.current;
+    timerRef.current = null;
+    if (timer !== null) {
+      try {
+        clearInterval(timer as number);
+      } catch {
+        // Timer cancellation is best-effort during browser teardown.
+      }
+    }
+    const finishTimer = finishTimerRef.current;
+    finishTimerRef.current = null;
+    if (finishTimer !== null) {
+      try {
+        clearTimeout(finishTimer as number);
+      } catch {
+        // Timer cancellation is best-effort during browser teardown.
+      }
+    }
+    clearPlayback();
+  }, [clearPlayback]);
+
+  const reportAudioUnavailable = useCallback((generation: number) => {
+    if (!mountedRef.current || sessionGenerationRef.current !== generation) return;
+    setFeedbackText("මෙම උපාංගයේ තබ්ලා නාදය ආරම්භ කළ නොහැක. දෘශ්‍ය ස්පන්දනයට අනුව පුහුණු වන්න.");
+    setFeedbackColor("text-primary");
+  }, []);
+
+  const playTablaStroke = useCallback((bol: string, generation: number) => {
+    let ownedHandle: TablaPlaybackHandle | undefined;
+    const reportUnavailable = () => {
+      if (ownedHandle !== undefined && !playbackHandlesRef.current.has(ownedHandle)) return;
+      reportAudioUnavailable(generation);
+    };
+    try {
+      const handle = tablaSynth.playBol(bol, beatIntervalMs, reportUnavailable);
+      ownedHandle = handle;
+      trackPlayback(handle);
+    } catch {
+      reportUnavailable();
+    }
+  }, [beatIntervalMs, reportAudioUnavailable, trackPlayback]);
 
   const handleFinish = useCallback(() => {
+    if (!mountedRef.current) return;
     setIsPlaying(false);
     setIsFinished(true);
-    if (timerRef.current) clearInterval(timerRef.current as number);
+    clearTimers();
 
     // Calculate score
     const totalTaps = tapTimesRef.current.length;
@@ -42,11 +135,11 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
     }
 
     let accurateCount = 0;
-    accuracyList.forEach((diff) => {
+    accuracyListRef.current.forEach((diff) => {
       if (Math.abs(diff) < 180) accurateCount++;
     });
 
-    const scorePercent = Math.round((accurateCount / Math.max(totalTaps, totalBeats / 2)) * 100);
+    const scorePercent = Math.round((accurateCount / Math.max(totalTaps, safeTotalBeats / 2)) * 100);
 
     if (scorePercent >= 80) {
       setFeedbackText("විශිෂ්ටයි! ඔබේ රිද්ම නිරවද්‍යතාව ඉතා ඉහළයි! 🎉");
@@ -59,50 +152,75 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
       setFeedbackColor("text-primary");
     }
 
-    if (onComplete) onComplete(scorePercent);
-  }, [accuracyList, onComplete, totalBeats]);
+    onCompleteRef.current?.(scorePercent);
+  }, [clearTimers, safeTotalBeats]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      clearTimers();
+    };
+  }, [clearTimers]);
 
   useEffect(() => {
     if (isPlaying) {
       startTimeRef.current = Date.now();
       expectedBeatTimesRef.current = [];
       tapTimesRef.current = [];
+      accuracyListRef.current = [];
       setAccuracyList([]);
       setCurrentBeat(0);
       setIsFinished(false);
 
+      const sessionGeneration = sessionGenerationRef.current;
       let beatCount = 0;
       timerRef.current = setInterval(() => {
+        if (!mountedRef.current || sessionGenerationRef.current !== sessionGeneration) return;
         beatCount++;
         setCurrentBeat(beatCount);
         expectedBeatTimesRef.current.push(Date.now());
-        tablaSynth.playBol("ධා");
+        playTablaStroke("ධා", sessionGeneration);
 
-        if (beatCount >= totalBeats) {
-          setTimeout(() => {
-            handleFinish();
+        if (beatCount >= safeTotalBeats) {
+          const activeTimer = timerRef.current;
+          timerRef.current = null;
+          if (activeTimer !== null) {
+            try {
+              clearInterval(activeTimer as number);
+            } catch {
+              // Timer cancellation is best-effort; completion still settles.
+            }
+          }
+          finishTimerRef.current = setTimeout(() => {
+            if (mountedRef.current && sessionGenerationRef.current === sessionGeneration) {
+              handleFinish();
+            }
           }, 1000);
         }
       }, beatIntervalMs);
     } else {
-      if (timerRef.current) clearInterval(timerRef.current as number);
+      clearTimers();
     }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current as number);
-    };
-  }, [isPlaying, bpm, totalBeats, beatIntervalMs, handleFinish]);
+    return clearTimers;
+  }, [isPlaying, safeTotalBeats, beatIntervalMs, clearTimers, handleFinish, playTablaStroke]);
 
   const handleTap = () => {
     if (!isPlaying) return;
     const now = Date.now();
     tapTimesRef.current.push(now);
-    tablaSynth.playBol("තින්");
+    const sessionGeneration = sessionGenerationRef.current;
+    playTablaStroke("තින්", sessionGeneration);
 
     // Find closest expected beat
     const expected = expectedBeatTimesRef.current[expectedBeatTimesRef.current.length - 1];
     if (expected) {
       const diff = now - expected;
-      setAccuracyList((prev) => [...prev, diff]);
+      setAccuracyList((prev) => {
+        const next = [...prev, diff];
+        accuracyListRef.current = next;
+        return next;
+      });
 
       if (Math.abs(diff) < 90) {
         setFeedbackText("නියමයි! පරිපූර්ණ ස්පන්දනයක්! 🎯");
@@ -121,14 +239,17 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
   };
 
   const handleStart = () => {
+    sessionGenerationRef.current += 1;
     setIsPlaying(true);
     setFeedbackText("තාලයට අනුව තට්ටු කරන්න...");
     setFeedbackColor("text-text");
   };
 
   const handleReset = () => {
+    clearTimers();
     setIsPlaying(false);
     setCurrentBeat(0);
+    accuracyListRef.current = [];
     setAccuracyList([]);
     setIsFinished(false);
     setFeedbackText("ආරම්භ කිරීමට 'අරඹන්න' ඔබන්න");
@@ -198,7 +319,7 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
           {isPlaying ? "මෙතැන තට්ටු කරන්න (TAP)" : "ආරම්භ කළ පසු මෙතැන තට්ටු කරන්න"}
         </span>
         <span className="text-xs text-text-muted mt-1">
-          ස්පන්දනය: {currentBeat} / {totalBeats}
+          ස්පන්දනය: {currentBeat} / {safeTotalBeats}
         </span>
       </button>
 

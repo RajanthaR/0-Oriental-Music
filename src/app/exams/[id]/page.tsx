@@ -138,7 +138,7 @@ export default function ExamPaperTakePage() {
                     <div>
                       <span className="font-bold text-text block mb-1">මාදිලි පිළිතුර:</span>
                       <p className="text-forest-green font-bold text-sm">
-                        {q.correctShortAnswer_si?.join(" / ")}
+                        {q.type === "short-answer" ? q.correctShortAnswer_si.join(" / ") : ""}
                       </p>
                     </div>
 

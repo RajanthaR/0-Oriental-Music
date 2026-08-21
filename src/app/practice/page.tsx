@@ -93,7 +93,14 @@ export default function PracticeHubPage() {
 
         {activeTab === "tala" && (
           <div className="space-y-4">
-            <TalaVisualizer tala={talas[0]} />
+            {talas[0] ? (
+              <TalaVisualizer tala={talas[0]} />
+            ) : (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950">
+                <p className="font-bold">දැනට ප්‍රසිද්ධ පුහුණුවට සනාථ වූ තාලයක් නොමැත.</p>
+                <p className="mt-2 text-xs">ථේකා සහ මාත්‍රා ක්‍රියා පිළිබඳ මූලාශ්‍ර සමාලෝචනය අවසන් වූ පසු දෘශ්‍යකාරකය නැවත ලබා දෙනු ඇත.</p>
+              </div>
+            )}
           </div>
         )}
 

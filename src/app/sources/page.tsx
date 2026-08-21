@@ -25,15 +25,33 @@ export default function SourcesCatalogPage() {
           මෙය මූලාශ්‍ර නාමාවලියක් පමණි. ප්‍රකාශන හිමිකම්, ප්‍රකාශක, වර්ෂය, ස්ථානය සහ සමාලෝචන තොරතුරු සනාථ වී නොමැති අගයන් ලෙස පෙන්වනු ලැබේ. පොදු අන්තර්ගතය සඳහා මූලාශ්‍ර ලේඛනය, නිශ්චිත පිටුව සහ පිටු-ගුණාත්මකභාවය එකට පරීක්ෂා කළ යුතුය.
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-text-secondary">
-          <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">මූලාශ්‍ර වාර්තා</span>{inventory.sourceRecords}</div>
-          <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">උපුටාගත් ලේඛන</span>{inventory.sourceDocuments}</div>
-          <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">පිටු</span>{inventory.sourcePages}</div>
-          <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">පොදු වාර්තා</span>{publicRecords}</div>
+          {inventory.available ? (
+            <>
+              <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">මූලාශ්‍ර වාර්තා</span>{inventory.sourceRecords}</div>
+              <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">උපුටාගත් ලේඛන</span>{inventory.sourceDocuments}</div>
+              <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">පිටු</span>{inventory.sourcePages}</div>
+              <div className="rounded-xl bg-surface-warm border border-border-light p-3"><span className="font-bold block text-text">පොදු වාර්තා</span>{publicRecords}</div>
+            </>
+          ) : (
+            <div
+              role="alert"
+              className="col-span-2 sm:col-span-4 rounded-xl bg-amber-50 border border-amber-200 p-3 text-amber-950"
+            >
+              <span className="font-bold block text-text">මූලාශ්‍ර ගණන් ලබා ගත නොහැක</span>
+              මූලාශ්‍ර ලේඛන හෝ පිටු-ගුණාත්මක වාර්තා සනාථ කළ නොහැකි බැවින් ගණන් පෙන්වීම වළක්වා ඇත.
+            </div>
+          )}
         </div>
       </div>
 
       {/* Sources List */}
       <div className="space-y-4">
+        {sources.length === 0 ? (
+          <div role="status" className="rounded-3xl border border-amber-200 bg-amber-50 p-8 text-center text-sm text-amber-950">
+            <p className="font-bold">මූලාශ්‍ර තොරතුරු දැනට ලබා ගත නොහැක.</p>
+            <p className="mt-2 text-xs">මූලාශ්‍ර ලේඛන සනාථ කළ නොහැකි බැවින් ලැයිස්තුව තාවකාලිකව වසා ඇත.</p>
+          </div>
+        ) : null}
         {sources.map((src) => (
           <div
             key={src.id}

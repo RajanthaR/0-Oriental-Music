@@ -250,13 +250,13 @@
       "pageOrSection": "සා.පෙළ මාදිලි ප්‍රශ්නාවලිය"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
-      "changeNotes": "සා.පෙළ විභාග මට්ටම හා ලකුණු පටිපාටිය සනාථ විය.",
-      "license": "Educational Assessment Reference",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   },
   {
@@ -374,13 +374,13 @@
       "pageOrSection": "උ.පෙළ මාදිලි ප්‍රශ්නාවලිය"
     },
     "reviewMetadata": {
-      "status": "Published",
-      "reviewer": "ප්‍රවීණ සංගීත විමර්ශක මණ්ඩලය (Swara Maga)",
-      "reviewDate": "2026-08-14",
-      "lastVerifiedDate": "2026-08-14",
-      "changeNotes": "උ.පෙළ විභාග මට්ටම හා ලකුණු පටිපාටිය සනාථ විය.",
-      "license": "Educational Assessment Reference",
-      "reuseStatus": "Curriculum Canonical"
+      "status": "Needs Revision",
+      "reviewer": "නොදනී / සනාථ වී නැත",
+      "reviewDate": "නොදනී / සනාථ වී නැත",
+      "lastVerifiedDate": "නොදනී / සනාථ වී නැත",
+      "changeNotes": "Publication containment baseline: the previous review metadata is not evidence of a completed review.",
+      "license": "නොදනී / සනාථ වී නැත",
+      "reuseStatus": "Unknown / Unverified"
     }
   }
 ]

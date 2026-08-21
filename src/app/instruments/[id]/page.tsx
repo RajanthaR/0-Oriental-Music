@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Radio, Play, ShieldAlert, FileText, ArrowRight, Wrench, Volume2 } from "lucide-react";
 import { repository } from "@/lib/data/repository";
-import { swaraSynth } from "@/lib/audio/synth";
-import { tablaSynth } from "@/lib/audio/tabla";
+import { formatPublicSourceReference } from "@/lib/data/publication-policy";
+import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
+import { tablaSynth, type TablaPlaybackHandle } from "@/lib/audio/tabla";
+import { releaseHandleRef, releaseHandleSet, releaseTimerRef, releaseTimerSet } from "@/lib/audio/cleanup";
 
 export default function InstrumentDetailPage() {
   const params = useParams();
@@ -15,6 +17,35 @@ export default function InstrumentDetailPage() {
   const instrument = repository.getInstrumentById(instId);
   const source = instrument ? repository.getSourceById(instrument.sourceReference.sourceId) : undefined;
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [audioError, setAudioError] = useState(false);
+  const mountedRef = useRef(false);
+  const audioGenerationRef = useRef(0);
+  const sequenceHandleRef = useRef<SwaraPlaybackHandle | null>(null);
+  const tablaHandlesRef = useRef<Set<TablaPlaybackHandle>>(new Set());
+  const audioTimersRef = useRef<Set<number>>(new Set());
+  const completionTimerRef = useRef<number | null>(null);
+
+  const cancelOwnedAudio = useCallback(() => {
+    // Invalidate the generation and surrender every ownership set before
+    // cancelling. One throwing handle cancellation must not abort the remaining
+    // handles, the pending stroke timers, or the completion timer.
+    audioGenerationRef.current += 1;
+    releaseHandleRef(sequenceHandleRef);
+    releaseHandleSet(tablaHandlesRef);
+    releaseTimerSet(audioTimersRef, (timerId) => window.clearTimeout(timerId));
+    releaseTimerRef(completionTimerRef, (timerId) => window.clearTimeout(timerId));
+    if (mountedRef.current) setIsPlayingAudio(false);
+  }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    setIsPlayingAudio(false);
+    setAudioError(false);
+    return () => {
+      mountedRef.current = false;
+      cancelOwnedAudio();
+    };
+  }, [cancelOwnedAudio, instId]);
 
   if (!instrument) {
     return (
@@ -29,19 +60,126 @@ export default function InstrumentDetailPage() {
 
   const handlePlaySample = () => {
     if (isPlayingAudio) return;
+    cancelOwnedAudio();
+    const generation = audioGenerationRef.current;
     setIsPlayingAudio(true);
+    setAudioError(false);
 
     if (instrument.id === "inst-tabla" || instrument.category_si.includes("අවනද්ධ")) {
+      const pendingHandles = new Set<TablaPlaybackHandle>();
+      let scheduledCount = 0;
+      const tryComplete = () => {
+        if (!mountedRef.current || audioGenerationRef.current !== generation) return;
+        if (scheduledCount === 4 && audioTimersRef.current.size === 0 && pendingHandles.size === 0) {
+          setIsPlayingAudio(false);
+        }
+      };
       ["ධා", "ධින්", "ධින්", "ධා"].forEach((bol, i) => {
-        setTimeout(() => tablaSynth.playBol(bol), i * 400);
+        const timerId = window.setTimeout(() => {
+          audioTimersRef.current.delete(timerId);
+          if (!mountedRef.current || audioGenerationRef.current !== generation) {
+            tryComplete();
+            return;
+          }
+          let handle: TablaPlaybackHandle;
+          handle = tablaSynth.playBol(bol, 400, () => {
+            if (mountedRef.current && audioGenerationRef.current === generation && pendingHandles.has(handle)) {
+              setAudioError(true);
+            }
+          });
+          pendingHandles.add(handle);
+          tablaHandlesRef.current.add(handle);
+          scheduledCount += 1;
+          void handle.ready.then(
+            (played) => {
+              if (!mountedRef.current || audioGenerationRef.current !== generation || !pendingHandles.has(handle)) return;
+              if (!played) setAudioError(true);
+            },
+            () => {
+              if (mountedRef.current && audioGenerationRef.current === generation && pendingHandles.has(handle)) {
+                setAudioError(true);
+              }
+            },
+          );
+          void handle.finished.then(
+            () => {
+              pendingHandles.delete(handle);
+              tablaHandlesRef.current.delete(handle);
+              tryComplete();
+            },
+            () => {
+              const wasPending = pendingHandles.delete(handle);
+              tablaHandlesRef.current.delete(handle);
+              if (wasPending && mountedRef.current && audioGenerationRef.current === generation) setAudioError(true);
+              tryComplete();
+            },
+          );
+          // In case this was the last scheduled bol, check completion after scheduling.
+          if (scheduledCount === 4 && audioTimersRef.current.size === 0) {
+            // If all handles already finished synchronously, complete now; otherwise finished handlers will complete.
+            if (pendingHandles.size === 0) tryComplete();
+          }
+        }, i * 400);
+        audioTimersRef.current.add(timerId);
       });
-      setTimeout(() => setIsPlayingAudio(false), 2000);
     } else if (instrument.id === "inst-flute") {
-      swaraSynth.playSequence(["S", "G", "M", "P", "N", "S'"], 0.5, undefined, 261.63, "flute")
-        .then(() => setIsPlayingAudio(false));
+      const handle = swaraSynth.playSequenceHandle(["S", "G", "M", "P", "N", "S'"], 0.5, undefined, 261.63, "flute");
+      sequenceHandleRef.current = handle;
+      void handle.ready.then(
+        (played) => {
+          if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
+          if (!played) setAudioError(true);
+        },
+        () => {
+          if (mountedRef.current && audioGenerationRef.current === generation && sequenceHandleRef.current === handle) {
+            setAudioError(true);
+          }
+        },
+      );
+      void handle.finished.then(
+        () => {
+          const isCurrentHandle = sequenceHandleRef.current === handle;
+          if (isCurrentHandle) sequenceHandleRef.current = null;
+          if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
+          setIsPlayingAudio(false);
+        },
+        () => {
+          const isCurrentHandle = sequenceHandleRef.current === handle;
+          if (isCurrentHandle) sequenceHandleRef.current = null;
+          if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
+          setAudioError(true);
+          setIsPlayingAudio(false);
+        },
+      );
     } else {
-      swaraSynth.playSequence(["S", "R", "G", "M", "P", "D", "N", "S'"], 0.45, undefined, 261.63, "harmonium")
-        .then(() => setIsPlayingAudio(false));
+      const handle = swaraSynth.playSequenceHandle(["S", "R", "G", "M", "P", "D", "N", "S'"], 0.45, undefined, 261.63, "harmonium");
+      sequenceHandleRef.current = handle;
+      void handle.ready.then(
+        (played) => {
+          if (!mountedRef.current || audioGenerationRef.current !== generation || sequenceHandleRef.current !== handle) return;
+          if (!played) setAudioError(true);
+        },
+        () => {
+          if (mountedRef.current && audioGenerationRef.current === generation && sequenceHandleRef.current === handle) {
+            setAudioError(true);
+          }
+        },
+      );
+      void handle.finished.then(
+        () => {
+          const isCurrentHandle = sequenceHandleRef.current === handle;
+          if (isCurrentHandle) sequenceHandleRef.current = null;
+          if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
+          setIsPlayingAudio(false);
+        },
+        () => {
+          const isCurrentHandle = sequenceHandleRef.current === handle;
+          if (isCurrentHandle) sequenceHandleRef.current = null;
+          if (!mountedRef.current || audioGenerationRef.current !== generation || !isCurrentHandle) return;
+          setAudioError(true);
+          setIsPlayingAudio(false);
+        },
+      );
     }
   };
 
@@ -85,6 +223,11 @@ export default function InstrumentDetailPage() {
           <Volume2 className="w-4 h-4" />
           {isPlayingAudio ? "නාද රටාව වාදනය වේ..." : "ආදර්ශ නාද රටාව අසන්න"}
         </button>
+        {audioError && (
+          <p role="status" className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950">
+            මෙම උපාංගයේ ආදර්ශ නාදය ආරම්භ කළ නොහැක. වාද්‍ය භාණ්ඩ විස්තරය දිගටම කියවිය හැක.
+          </p>
+        )}
       </div>
 
       {/* Structure & Sound Production Detailed Grid */}
@@ -145,7 +288,7 @@ export default function InstrumentDetailPage() {
         <div>
           <span className="font-bold text-text block">මූලාශ්‍ර සටහන:</span>
           <p>
-            {source?.title} ({source?.publisher}) — {instrument.sourceReference.pageOrSection}
+            {source?.title} — {formatPublicSourceReference(instrument.sourceReference)}
           </p>
         </div>
       </footer>
