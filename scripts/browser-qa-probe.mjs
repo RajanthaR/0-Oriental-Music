@@ -1,5 +1,7 @@
 // Browser QA probe for the P02 follow-up slice.
-// Usage: node scripts/browser-qa-probe.mjs <baseURL> <outDir>
+// Prerequisite: playwright must be importable (install it in a scratch
+// directory outside the tracked tree and run this script from there, or add
+// it as a devDependency). Usage: node browser-qa-probe.mjs <baseURL> <outDir>
 import { chromium } from "playwright";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -66,7 +68,7 @@ for (const vp of viewports) {
       keyboardFocusWorks: false,
     };
     try {
-      const response = await page.goto(baseURL + encodeURI(route.path).replace(/%3Cscript/g, "%3Cscript"), { waitUntil: "networkidle", timeout: 30_000 });
+      const response = await page.goto(baseURL + encodeURI(route.path), { waitUntil: "networkidle", timeout: 30_000 });
       entry.status = response?.status() ?? null;
       // Horizontal overflow check
       entry.horizontalOverflow = await page.evaluate(

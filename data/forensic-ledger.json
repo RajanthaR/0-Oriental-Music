@@ -2426,5 +2426,34 @@
       "AH-C3-P1-15": "src/test/publication-containment.test.ts"
     },
     "disposition": "FIXED-PENDING-REREVIEW"
+  },
+  "p02FollowupStructuralDebt": {
+    "branch": "codex/p02-followup-structural-debt",
+    "base": "d323df54a30f52ea3a1bcad4c0b04daab7e5492e",
+    "scope": "Bounded Phase 2 follow-up: structural debt, automated guards, housekeeping. Not a content phase; no musical fact, publisher, year, location, licence, organization, reviewer, review date, or publication state is added or promoted.",
+    "workItems": {
+      "A1_foreign_script_guard": "src/test/ui-script-guard.test.ts — Vitest gate scanning src/app and src/components for Cyrillic/CJK/Kana/Hangul/Devanagari/Arabic/Hebrew/Greek/accented-Latin/Thai/Myanmar/Tamil characters in UI source; proven to fail when the historical 'временно' defect is reintroduced at src/app/sources/page.tsx#SourcesPage and to pass clean.",
+      "A2_structural_split": "content-validator.ts 1773→306 lines; publication-policy.ts 1688→984; content-contracts.ts 1154→920. New modules: lib/shared/bounded-values.ts (dependency-free bounded-graph primitives), lib/shared/curriculum-strands.ts, lib/evidence/source-evidence.ts + disposition-registry.ts, lib/data/dependency-rules.ts, decision-types.ts, evaluation-state.ts, snapshot-capture.ts, source-evidence-policy.ts, tala-disposition-policy.ts, publication-audit.ts, catalog-integrity.ts, lib/validation/validation-issues.ts. The data↔validation cycle is broken: every data→validation import targets dependency-free leaf modules and content-validator imports no data module at runtime.",
+      "A3_anchor_mechanism": "Numeric path:line anchors in FORENSIC_CORRECTION_LOG.md, P02_CLOSEOUT_FINDINGS.md, P02_MUSICAL_CORE_FIELD_MATRIX.md converted to stable path#symbol form; 228 anchors machine-verified resolvable via scripts/verify-symbol-anchors.mjs; automated guard appended to src/test/review-closeout.test.ts fails when numeric code anchors return or a cited symbol stops resolving.",
+      "A4_touch_targets": "Interactive controls raised to 44px minimum across navbar, footer, filters, quiz options, audio controls, breadcrumb links via min-h/min-w and padding only.",
+      "A5_dependency_upgrades": "next ^14.2.15→^15.5.23, postcss ^8.4.47→^8.5.26, vitest ^2.1.3→^3.2.7. npm audit: 10 vulnerabilities (1 critical) → 6 high, all remaining requiring out-of-scope majors (Next 16 / Vitest 4).",
+      "A6_housekeeping": "npm ci from scratch verified after removing the stale next-dev process that held next-swc.win32-x64-msvc.node (the historical EPERM cause); retained recovery worktree at dc7d582 confirmed fully contained in main via git cherry and removed; .claude/launch.json assessed and retained pending owner decision."
+    },
+    "verification": {
+      "tests": "19 files / 552 tests passing on final HEAD (base 18/549 +2 ui-script-guard +1 anchor guard)",
+      "typeCheck": "exit 0",
+      "lint": "no ESLint warnings or errors",
+      "build": "23 static pages",
+      "diffCheck": "clean",
+      "jsonParse": "all 20 JSON files under data/ and src/data/ parse",
+      "trackB": "21 public source rows all UNKNOWN_PROVENANCE with zero leaks (probe + source-metadata-consistency suite); all eight Tala IDs withheld from every public surface (graph-boundary suite); Deepchandi දීප්චන්දි remains retrieval-only rejection; browser QA at 1440x900 and 360x568 over 18 routes found zero console/page/hydration errors, zero horizontal overflow, zero sub-44px visible targets"
+    },
+    "anchorPathMaintenance": [
+      "AH-C1-V09 validateSourceTransparencyCollection → src/lib/data/publication-audit.ts",
+      "AH-C2-V04 and AH-C3-P1-05 quizAggregateEvidenceIssues → src/lib/data/publication-audit.ts",
+      "AH-C1-V16 hasValidPageQualityRegistry → src/lib/evidence/source-evidence.ts",
+      "AH-C2-V08 and AH-C3-P1-12 inspectDispositionRegistry/unclosedRequiredFields → src/lib/evidence/disposition-registry.ts"
+    ],
+    "disposition": "IMPLEMENTATION-COMPLETE-PENDING-REVIEW"
   }
 }

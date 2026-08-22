@@ -16,12 +16,11 @@ import {
   PUBLIC_GRADE_BAND_VALUES,
   cloneBoundedRecord,
   deepFreezeBoundedSnapshot,
-  isNonBlankString as isSharedNonBlankString,
+
   isRecord,
   normalizeRecordId,
   readOwnDataField,
 } from "@/lib/shared/bounded-values";
-import { UNKNOWN_PROVENANCE } from "@/lib/shared/bounded-values";
 import {
   getEvidenceRegistrySnapshot,
   parseSourceLocator,
@@ -42,6 +41,7 @@ import glossaryData from "@/data/glossary.json";
 import learningPathsData from "@/data/learning-paths.json";
 
 export { UNKNOWN_PROVENANCE } from "@/lib/shared/bounded-values";
+export type { EvidenceQuality } from "@/lib/evidence/source-evidence";
 
 export {
   PUBLIC_GRADE_BANDS,
@@ -101,10 +101,6 @@ import {
   type SourceDocumentSummary,
   isKnownQuarantinedEntityId,
 } from "@/lib/data/decision-types";
-
-function unsafeContextEvidence(): SourceEvidenceDecision {
-  return unsafeContextEvidenceShared();
-}
 
 export { DEPENDENCY_FIELD_RULES } from "@/lib/data/dependency-rules";
 import { DEPENDENCY_FIELD_RULES as dependencyFieldRules } from "@/lib/data/dependency-rules";
@@ -249,14 +245,8 @@ export interface ContextClaimPublicationDecision {
   sourceEvidence: SourceEvidenceDecision;
 }
 
-export interface PublicationInput {
-  id: string;
-  gradeBands: string[];
-  sourceReference?: SourceReference;
-}
-
-
-
+import { toPublicationInput as toPublicationInputImpl, type PublicationInput } from "@/lib/data/source-evidence-policy";
+export type { PublicationInput };
 
 function hasUnsupportedGrade(gradeBands: string[]): boolean {
   return gradeBands.includes("12-13");
@@ -284,24 +274,7 @@ function getGradeBands(value: PublicationRecordShape): string[] {
 }
 
 export function toPublicationInput(record: unknown): PublicationInput {
-  try {
-    const snapshot = cloneBoundedRecord(record);
-    if (!snapshot) return { id: "", gradeBands: [], sourceReference: undefined };
-    const value = getRecordShape(snapshot);
-    const id = readOwnDataField(value, "id");
-    return {
-      id: typeof id === "string" ? id : "",
-      gradeBands: getGradeBands(value),
-      sourceReference: resolveRecordSourceReference(value),
-    };
-  } catch {
-    return { id: "", gradeBands: [], sourceReference: undefined };
-  }
-}
-
-function resolveRecordSourceReference(value: PublicationRecordShape): SourceReference | undefined {
-  const reference = readOwnDataField(value, "sourceReference");
-  return isSourceReference(reference) ? reference : undefined;
+  return toPublicationInputImpl(record);
 }
 
 export function getSourceDocumentSummary(
@@ -612,7 +585,7 @@ function getRecordPublicationDecisionInternal(
   const isQuiz = decisionContext.catalogs.quizzes.some((quiz) => normalizeRecordId(readOwnDataField(quiz, "id")) === recordId);
   const baseDecision = isQuiz
     ? getQuizContainerPublicationDecision(safeRecord, decisionContext)
-    : getBasePublicationDecision(toPublicationInput(safeRecord), decisionContext);
+    : getBasePublicationDecision(toPublicationInputImpl(safeRecord), decisionContext);
   const reasonCodes = new Set(baseDecision.reasonCodes);
   const nestedDispositions = [...baseDecision.nestedDispositions];
   const withheldFields = [...baseDecision.withheldFields];
@@ -722,7 +695,7 @@ function getRecordPublicationDecisionInternal(
     const hasExplicitGrades = isCanonicalGradeBandArray(readOwnDataField(questionShape, "gradeBands"));
     const hasDirectSource = isSourceReference(readOwnDataField(questionShape, "sourceReference"));
     const hasValidQuestionShape = hasCanonicalQuestionShape(question);
-    const decision = getBasePublicationDecision(toPublicationInput(question), decisionContext);
+    const decision = getBasePublicationDecision(toPublicationInputImpl(question), decisionContext);
     nestedDispositions.push({
       path: `${group.path}[${index}]`,
       isPublic: decision.isPublic,
@@ -860,7 +833,7 @@ export function getContextClaimPublicationDecision(
         present: false,
         isPublic: false,
         reasonCode: "unsafe-evaluation-context",
-        sourceEvidence: unsafeContextEvidence(),
+        sourceEvidence: unsafeContextEvidenceShared(),
       };
     }
     const recordSnapshot = captureEvaluationValue(record, false);

@@ -15,21 +15,13 @@ const SOURCE_PUBLIC_FIELDS = [
 
 const SOURCE_TRANSPARENCY_FIELDS = ["evidenceState", "evidenceQuality"] as const;
 
-const SANITIZED_SOURCE_METADATA: Readonly<Record<string, string>> = {
-  publisher: UNKNOWN_PROVENANCE,
-  year: UNKNOWN_PROVENANCE,
-  location: UNKNOWN_PROVENANCE,
-  license: UNKNOWN_PROVENANCE,
-  tier: "මූලාශ්‍ර වාර්තාව (සනාථ නොකළ)",
-  status: "Unverified / source review pending",
-};
+// Single shared source of truth for the public unknown/unverified metadata
+// shape; the evidence layer owns the values so validation cannot drift from
+// publication projection.
+import { SANITIZED_SOURCE_METADATA, jsonValuesMatch } from "@/lib/evidence/source-evidence";
 
 function sourceValuesMatch(left: unknown, right: unknown): boolean {
-  try {
-    return JSON.stringify(left) === JSON.stringify(right);
-  } catch {
-    return false;
-  }
+  return jsonValuesMatch(left, right);
 }
 
 /**

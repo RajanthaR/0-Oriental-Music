@@ -95,7 +95,7 @@ const TRACEABILITY_DOCUMENT_PATHS = [
 ] as const;
 
 /** Matches numeric source anchors like `src/lib/foo.ts:123` or `…test.tsx:12, :48`. */
-const NUMERIC_SOURCE_ANCHOR = /(?:^|[\s(`])((?:src|data)\/[A-Za-z0-9_./-]+\.(?:ts|tsx|json)):(\d+)/g;
+const NUMERIC_SOURCE_ANCHOR = /(?:^|[^\w.\/])((?:src|data)\/[A-Za-z0-9_./-]+\.(?:ts|tsx|mjs|json)):(\d+)/g;
 
 function findNumericSourceAnchors(markdown: string): string[] {
   const findings: string[] = [];

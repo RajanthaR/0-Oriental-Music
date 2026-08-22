@@ -227,3 +227,26 @@ whole-entity quarantined; no musical or source field is promoted; the public
 boundary stays Grades 6-11; prior blocked runs and the rejected Deepchandi
 retrieval-only finding remain unchanged. No push, ready PR, merge, or deployment
 is authorized by this entry.
+
+## Phase 2 follow-up: structural debt, automated guards, and housekeeping
+
+Bounded follow-up slice on branch `codex/p02-followup-structural-debt`, base
+`d323df54a30f52ea3a1bcad4c0b04daab7e5492e` (the PR #2 merge commit). This is an
+application-structure and tooling slice: it adds no musical fact, publisher,
+year, location, licence, organization, reviewer, review date, or publication
+state.
+
+| Item | Applied change | Stable anchors | Disposition |
+|---|---|---|---|
+| A1 foreign-script guard | New Vitest gate rejects Cyrillic/CJK/Kana/Hangul/Devanagari/Arabic/Hebrew/Greek/accented-Latin/Thai/Myanmar/Tamil characters in UI source under `src/app` and `src/components`; proven to fail when the historical `временно` defect is reintroduced in the sources empty state and to pass clean. | `src/test/ui-script-guard.test.ts#keeps every UI source file under src/app and src/components free of foreign scripts` | **IMPLEMENTATION-COMPLETE-PENDING-REVIEW** |
+| A2 structural residual | Three >1000-line files split along real seams (`content-validator.ts` 1773→306, `publication-policy.ts` 1688→984, `content-contracts.ts` 1154→920) into dependency-free shared primitives, a neutral evidence layer, and focused policy/audit modules; the recorded data↔validation layering inversion is closed. Publication decisions are unchanged. | `src/lib/shared/bounded-values.ts#safeOwnEntries`, `src/lib/data/source-evidence-policy.ts#evaluateSourceReference`, `src/lib/data/tala-disposition-policy.ts#getTalaFieldDisposition`, `src/lib/data/publication-audit.ts#validatePublicCollection` | **IMPLEMENTATION-COMPLETE-PENDING-REVIEW** |
+| A3 anchor mechanism | Numeric line anchors converted to stable `path#symbol` form across this log, the closeout matrix, and the field matrix; 228 anchors machine-verified resolvable; automated guard fails on any returning numeric code anchor or unresolved symbol. Historical run IDs, verdicts, and the rejected Deepchandi disposition untouched — append only. | `src/test/review-closeout.test.ts#keeps traceability documents free of numeric code anchors (A3 mechanism, not manual refresh)`; `scripts/verify-symbol-anchors.mjs` | **IMPLEMENTATION-COMPLETE-PENDING-REVIEW** |
+| A4 touch targets | Interactive controls brought to a 44px minimum by padding/hit-area adjustments at both 1440×900 and 360×568 with zero horizontal overflow. | `src/components/layout/Navbar.tsx#Navbar`; browser QA artifacts under the session temp directory | **IMPLEMENTATION-COMPLETE-PENDING-REVIEW** |
+| A5 dependency upgrades | Minimal targeted upgrades only: `next ^14.2.15→^15.5.23`, `postcss ^8.4.47→^8.5.26`, `vitest ^2.1.3→^3.2.7`. npm audit falls from 10 vulnerabilities (1 critical) to 6 high; every remaining advisory requires an out-of-scope major (Next 16 / Vitest 4) and is reported as remaining. | `package.json`; `data/forensic-ledger.json` (`p02FollowupStructuralDebt.workItems.A5_dependency_upgrades`) | **PARTIAL BY DESIGN — majors out of scope** |
+| A6 housekeeping | `npm ci` from scratch verified after removing the stale dev server that held the SWC binary (the recorded EPERM cause reproduced as EBUSY); retained recovery worktree at `dc7d582` confirmed fully contained in main via `git cherry` (0 unique commits) and removed; `.claude/launch.json` assessed and retained pending owner decision; unapproved install scripts (`esbuild`, `sharp`, `unrs-resolver`) investigated — they do not affect test or build correctness. | `git worktree list`; `data/forensic-ledger.json` (`p02FollowupStructuralDebt`) | **COMPLETE** |
+
+Track B honesty re-verified on final HEAD: all eight Talas remain whole-entity
+quarantined with raw records retained; all 21 public source rows expose only the
+unknown/unverified provenance representation (probe: 0 leaks); `raga-bhairav`
+stays quarantined; the rejected Deepchandi retrieval-only disposition and every
+prior blocked run ID are preserved unchanged.
