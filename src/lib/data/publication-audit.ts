@@ -263,7 +263,7 @@ import {
   type PublicationValidationResult,
   type ValidationIssue,
 } from "@/lib/validation/validation-issues";
-import { validateCatalogIdentityContracts } from "@/lib/validation/content-validator";
+import { validateCatalogIdentityContracts } from "@/lib/validation/identity-contracts";
 import { validateForensicLedger } from "@/lib/data/catalog-integrity";
 import { inspectDispositionRegistry } from "@/lib/evidence/disposition-registry";
 import type { Lesson, Raga, Tala, Instrument, CulturalTradition, TheatreTradition } from "@/types/content";

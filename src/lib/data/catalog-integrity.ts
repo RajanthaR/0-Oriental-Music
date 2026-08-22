@@ -27,7 +27,7 @@ import {
   type PublicationValidationResult,
   type ValidationIssue,
 } from "@/lib/validation/validation-issues";
-import { validateCatalogIdentityContracts } from "@/lib/validation/content-validator";
+import { validateCatalogIdentityContracts } from "@/lib/validation/identity-contracts";
 import forensicLedgerData from "../../../data/forensic-ledger.json";
 
 function localEntityId(value: unknown, index: number): string {

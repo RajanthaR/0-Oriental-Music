@@ -215,7 +215,17 @@ describe("bounded graph limits at every public boundary", () => {
     },
     // Budget-scale shapes deliberately traverse every boundary repeatedly;
     // the default 5s per-test timeout cannot apply to that workload.
-    180_000,
+    //
+    // The budget is generous on purpose. Measured on one workstation, the
+    // 4,000-key wide shape ran 162s on a cold machine and 186-249s on later
+    // back-to-back runs -- the same spread at an unmodified HEAD, so it is
+    // machine variance, not a regression. At the previous 180s ceiling the
+    // suite therefore went red more often than green, and a slower CI runner
+    // would fail reliably. Raising the ceiling keeps the traversal workload
+    // and every assertion unchanged rather than shrinking the graph, which
+    // would weaken the budget-scale boundary coverage this test exists for.
+    // Making the traversal itself cheaper is the real fix and is deferred.
+    600_000,
   );
 
   it.each(AT_RECORD_LIMIT_SHAPES)(
