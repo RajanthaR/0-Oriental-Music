@@ -62,7 +62,7 @@ export const Navbar: React.FC = () => {
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-border shadow-warm-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
         {/* Brand Logo & Name */}
-        <Link href="/" className="flex items-center gap-2.5 group">
+        <Link href="/" className="flex items-center gap-2.5 group min-h-[44px]">
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-amber-400 shadow-warm-sm group-hover:scale-105 transition-transform">
             <Music className="w-5 h-5" />
           </div>
@@ -80,7 +80,7 @@ export const Navbar: React.FC = () => {
         <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold text-text-secondary">
           <Link
             href="/learning-paths"
-            className={`px-3 py-1.5 rounded-lg transition-colors hover:text-primary ${
+            className={`inline-flex items-center min-h-[44px] px-3 py-2 rounded-lg transition-colors hover:text-primary ${
               pathname.startsWith("/learning-paths") ? "bg-primary-50 text-primary font-bold" : ""
             }`}
           >
@@ -88,7 +88,7 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link
             href="/lessons"
-            className={`px-3 py-1.5 rounded-lg transition-colors hover:text-primary ${
+            className={`inline-flex items-center min-h-[44px] px-3 py-2 rounded-lg transition-colors hover:text-primary ${
               pathname.startsWith("/lessons") ? "bg-primary-50 text-primary font-bold" : ""
             }`}
           >
@@ -96,7 +96,7 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link
             href="/ragas"
-            className={`px-3 py-1.5 rounded-lg transition-colors hover:text-primary ${
+            className={`inline-flex items-center min-h-[44px] px-3 py-2 rounded-lg transition-colors hover:text-primary ${
               pathname.startsWith("/ragas") ? "bg-primary-50 text-primary font-bold" : ""
             }`}
           >
@@ -104,7 +104,7 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link
             href="/talas"
-            className={`px-3 py-1.5 rounded-lg transition-colors hover:text-primary ${
+            className={`inline-flex items-center min-h-[44px] px-3 py-2 rounded-lg transition-colors hover:text-primary ${
               pathname.startsWith("/talas") ? "bg-primary-50 text-primary font-bold" : ""
             }`}
           >
@@ -112,7 +112,7 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link
             href="/practice"
-            className={`px-3 py-1.5 rounded-lg transition-colors hover:text-primary ${
+            className={`inline-flex items-center min-h-[44px] px-3 py-2 rounded-lg transition-colors hover:text-primary ${
               pathname.startsWith("/practice") ? "bg-primary-50 text-primary font-bold" : ""
             }`}
           >
@@ -120,7 +120,7 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link
             href="/exams"
-            className={`px-3 py-1.5 rounded-lg transition-colors hover:text-primary ${
+            className={`inline-flex items-center min-h-[44px] px-3 py-2 rounded-lg transition-colors hover:text-primary ${
               pathname.startsWith("/exams") ? "bg-primary-50 text-primary font-bold" : ""
             }`}
           >
@@ -128,7 +128,7 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link
             href="/progress"
-            className={`px-3 py-1.5 rounded-lg transition-colors hover:text-primary ${
+            className={`inline-flex items-center min-h-[44px] px-3 py-2 rounded-lg transition-colors hover:text-primary ${
               pathname === "/progress" ? "bg-primary-50 text-primary font-bold" : ""
             }`}
           >
@@ -136,7 +136,7 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link
             href="/teachers"
-            className={`px-3 py-1.5 rounded-lg transition-colors hover:text-primary ${
+            className={`inline-flex items-center min-h-[44px] px-3 py-2 rounded-lg transition-colors hover:text-primary ${
               pathname.startsWith("/teachers") ? "bg-primary-50 text-primary font-bold" : ""
             }`}
           >
@@ -150,7 +150,7 @@ export const Navbar: React.FC = () => {
           <button
             type="button"
             onClick={toggleLowBandwidth}
-            className={`p-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all ${
+            className={`min-w-[44px] min-h-[44px] p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
               isLowBandwidth
                 ? "bg-amber-100 text-amber-900 border-amber-300"
                 : "bg-surface-warm text-text-muted border-border hover:bg-white"
@@ -167,7 +167,7 @@ export const Navbar: React.FC = () => {
           {/* Search Quick Link */}
           <Link
             href="/search"
-            className="p-2 rounded-xl border border-border bg-surface-warm text-text-secondary hover:text-primary hover:bg-white transition-all"
+            className="min-w-[44px] min-h-[44px] p-2.5 rounded-xl border border-border bg-surface-warm text-text-secondary hover:text-primary hover:bg-white transition-all flex items-center justify-center"
             aria-label="සෙවුම වෙත යන්න"
           >
             <Search className="w-4 h-4" />
@@ -177,7 +177,7 @@ export const Navbar: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl border border-border bg-surface-warm text-text"
+            className="lg:hidden min-w-[44px] min-h-[44px] p-2.5 rounded-xl border border-border bg-surface-warm text-text flex items-center justify-center"
             aria-label="මෙනුව විවෘත කරන්න"
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -197,7 +197,7 @@ export const Navbar: React.FC = () => {
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-all ${
+                  className={`flex items-center gap-2 min-h-[44px] px-3 py-2.5 rounded-xl border text-xs font-bold transition-all ${
                     isActive
                       ? "bg-primary text-white border-primary-dark shadow-sm"
                       : "bg-surface-warm text-text border-border-light hover:bg-white"

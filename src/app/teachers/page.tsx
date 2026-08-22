@@ -168,7 +168,7 @@ export default function TeacherWorkspacePage() {
                           e.stopPropagation();
                           setPrintLessonId(les.id);
                         }}
-                        className="p-1.5 rounded-lg border border-border bg-white text-text-muted hover:text-primary transition-colors text-[11px] flex items-center gap-1 shrink-0"
+                        className="min-w-[44px] min-h-[44px] p-2.5 flex items-center justify-center rounded-lg border border-border bg-white text-text-muted hover:text-primary transition-colors text-[11px] flex items-center gap-1 shrink-0"
                         title="මුද්‍රණය සඳහා සටහන බලන්න"
                       >
                         <Printer className="w-3.5 h-3.5" />

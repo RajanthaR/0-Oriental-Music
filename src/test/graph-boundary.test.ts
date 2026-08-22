@@ -129,7 +129,7 @@ const publicRagaId = String(ragas[0].id);
  * the publication summary. No exported validator or getter may throw for any
  * input, and the hostile record must never become publicly discoverable.
  */
-function expectBoundedFailClosed(record: RawRecord): void {
+async function expectBoundedFailClosed(record: RawRecord): Promise<void> {
   const rows = [...ragas, record];
   const combinedIsSafe = inspectGraph(rows).safe;
 
@@ -139,43 +139,51 @@ function expectBoundedFailClosed(record: RawRecord): void {
   expect(() => validateContentRecord(record, "raga")).not.toThrow();
   expect(() => validatePublicCollection("Raga", rows)).not.toThrow();
   expect(getRecordPublicationDecision(record).isPublic).toBe(false);
+  // Yield between the synchronous boundary groups so a budget-scale record
+  // cannot starve the Vitest worker's RPC channel (see the within-budget test).
+  return new Promise<void>((resolve) => setTimeout(resolve, 0)).then(() => {
+    return withInjectedRagasAsync(rows, () => {
+      // (b) repository list
+      expect(() => repository.getRagas()).not.toThrow();
+      // (c) repository direct lookup
+      expect(() => repository.getRagaById(publicRagaId)).not.toThrow();
+      expect(() => repository.getRagaById(String(record.id))).not.toThrow();
+      // (d) search
+      expect(() => searchIndex.search("raga")).not.toThrow();
+      expect(() => searchIndex.search(String(record.id))).not.toThrow();
+      expect(() => repository.getPublicSearchCatalogs()).not.toThrow();
+      // (e) publication summary
+      expect(() => repository.getPublicationSummary()).not.toThrow();
 
-  withInjectedRagas(rows, () => {
-    // (b) repository list
-    expect(() => repository.getRagas()).not.toThrow();
-    // (c) repository direct lookup
-    expect(() => repository.getRagaById(publicRagaId)).not.toThrow();
-    expect(() => repository.getRagaById(String(record.id))).not.toThrow();
-    // (d) search
-    expect(() => searchIndex.search("raga")).not.toThrow();
-    expect(() => searchIndex.search(String(record.id))).not.toThrow();
-    expect(() => repository.getPublicSearchCatalogs()).not.toThrow();
-    // (e) publication summary
-    expect(() => repository.getPublicationSummary()).not.toThrow();
+      // The hostile record is never public on any surface.
+      expect(repository.getRagas().some((raga) => raga.id === record.id)).toBe(false);
+      expect(repository.getRagaById(String(record.id))).toBeUndefined();
+      expect(searchIndex.search(String(record.id))).toEqual([]);
 
-    // The hostile record is never public on any surface.
-    expect(repository.getRagas().some((raga) => raga.id === record.id)).toBe(false);
-    expect(repository.getRagaById(String(record.id))).toBeUndefined();
-    expect(searchIndex.search(String(record.id))).toEqual([]);
+      const summary = repository.getPublicationSummary().ragas;
+      expect(summary.raw).toBe(rows.length);
 
-    const summary = repository.getPublicationSummary().ragas;
-    expect(summary.raw).toBe(rows.length);
-
-    if (combinedIsSafe) {
-      // The record alone is over budget; the catalog is not. Genuine records stay
-      // public and only the hostile one is withheld.
-      expect(repository.getRagaById(publicRagaId)?.id).toBe(publicRagaId);
-      expect(summary.public).toBe(repository.getRagas().length);
-      expect(summary.public).toBeGreaterThan(0);
-    } else {
-      // The combined catalog graph is over budget, so the whole catalog fails
-      // closed rather than serving a partially-traversed snapshot.
-      expect(repository.getRagas()).toEqual([]);
-      expect(repository.getRagaById(publicRagaId)).toBeUndefined();
-      expect(summary.public).toBe(0);
-      expect(summary.needsReview).toBe(rows.length);
-    }
+      if (combinedIsSafe) {
+        // The record alone is over budget; the catalog is not. Genuine records stay
+        // public and only the hostile one is withheld.
+        expect(repository.getRagaById(publicRagaId)?.id).toBe(publicRagaId);
+        expect(summary.public).toBe(repository.getRagas().length);
+        expect(summary.public).toBeGreaterThan(0);
+      } else {
+        // The combined catalog graph is over budget, so the whole catalog fails
+        // closed rather than serving a partially-traversed snapshot.
+        expect(repository.getRagas()).toEqual([]);
+        expect(repository.getRagaById(publicRagaId)).toBeUndefined();
+        expect(summary.public).toBe(0);
+        expect(summary.needsReview).toBe(rows.length);
+      }
+    });
   });
+}
+
+/** Async variant of withInjectedRagas so the yield above can restore the catalog after the probes settle. */
+async function withInjectedRagasAsync<T>(rows: unknown[], run: () => T): Promise<T> {
+  return withInjectedRagas(rows, run);
 }
 
 afterEach(() => {
@@ -193,35 +201,53 @@ describe("bounded graph limits at every public boundary", () => {
 
   it.each(WITHIN_BUDGET_SHAPES)(
     "keeps every boundary safe and the catalog serving for %s",
-    (_label, make) => {
+    async (_label, make) => {
       const record = make();
       const rows = [...ragas, record];
       expect(inspectGraph(record).safe).toBe(true);
       expect(inspectGraph(rows).safe).toBe(true);
-      expectBoundedFailClosed(record);
+      // Yield to the worker RPC loop between the synchronous boundary probes:
+      // budget-scale records (~4,000 keys) keep each probe busy long enough
+      // that Vitest 3 reports an onTaskUpdate transport timeout when the whole
+      // sequence runs without a macrotask break. Assertions are unchanged.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await expectBoundedFailClosed(record);
     },
+    // Budget-scale shapes deliberately traverse every boundary repeatedly;
+    // the default 5s per-test timeout cannot apply to that workload.
+    //
+    // The budget is generous on purpose. Measured on one workstation, the
+    // 4,000-key wide shape ran 162s on a cold machine and 186-249s on later
+    // back-to-back runs -- the same spread at an unmodified HEAD, so it is
+    // machine variance, not a regression. At the previous 180s ceiling the
+    // suite therefore went red more often than green, and a slower CI runner
+    // would fail reliably. Raising the ceiling keeps the traversal workload
+    // and every assertion unchanged rather than shrinking the graph, which
+    // would weaken the budget-scale boundary coverage this test exists for.
+    // Making the traversal itself cheaper is the real fix and is deferred.
+    600_000,
   );
 
   it.each(AT_RECORD_LIMIT_SHAPES)(
     "traverses %s alone but fails the combined catalog closed without throwing",
-    (_label, make) => {
+    async (_label, make) => {
       const record = make();
       const rows = [...ragas, record];
       // Exactly at the limit on its own...
       expect(inspectGraph(record).safe).toBe(true);
       // ...and one step over once the catalog wraps it.
       expect(inspectGraph(rows).safe).toBe(false);
-      expectBoundedFailClosed(record);
+      await expectBoundedFailClosed(record);
     },
   );
 
-  it.each(OVER_LIMIT_SHAPES)("fails %s closed without throwing at any boundary", (_label, make) => {
+  it.each(OVER_LIMIT_SHAPES)("fails %s closed without throwing at any boundary", async (_label, make) => {
     const record = make();
     expect(inspectGraph(record).safe).toBe(false);
     const decision = getRecordPublicationDecision(record);
     expect(decision.isPublic).toBe(false);
     expect(decision.reasonCodes.length).toBeGreaterThan(0);
-    expectBoundedFailClosed(record);
+    await expectBoundedFailClosed(record);
   });
 
   it("fails a sparse outer catalog container closed at the batch and summary boundaries", () => {

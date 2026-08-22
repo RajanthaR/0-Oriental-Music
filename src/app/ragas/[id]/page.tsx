@@ -98,7 +98,7 @@ export default function RagaDetailPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-text-muted mb-4">
-        <Link href="/ragas" className="hover:underline">
+        <Link href="/ragas" className="inline-flex items-center min-h-[44px] px-2 -mx-2 hover:underline">
           රාග ලෝකය
         </Link>
         <span>/</span>
@@ -158,7 +158,7 @@ export default function RagaDetailPage() {
             type="button"
             onClick={handlePlayArohana}
             disabled={playingPhraseIdx !== null}
-            className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-sm transition-all disabled:opacity-50"
+            className="flex items-center gap-2 min-h-[44px] bg-primary hover:bg-primary-dark text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-sm transition-all disabled:opacity-50"
           >
             <Play className="w-4 h-4 fill-current" />
             {playingPhraseIdx === 99 ? "වාදනය වේ..." : "ආරෝහණය අසන්න"}
@@ -167,7 +167,7 @@ export default function RagaDetailPage() {
             type="button"
             onClick={handlePlayAvarohana}
             disabled={playingPhraseIdx !== null}
-            className="flex items-center gap-2 bg-white hover:bg-surface-warm text-text font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl border border-border shadow-sm transition-all disabled:opacity-50"
+            className="flex items-center gap-2 min-h-[44px] bg-white hover:bg-surface-warm text-text font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl border border-border shadow-sm transition-all disabled:opacity-50"
           >
             <Play className="w-4 h-4 fill-current" />
             {playingPhraseIdx === 98 ? "වාදනය වේ..." : "අවරෝහණය අසන්න"}
@@ -232,7 +232,7 @@ export default function RagaDetailPage() {
                     type="button"
                     onClick={() => handlePlayPhrase(phrase.swaras, idx)}
                     disabled={playingPhraseIdx !== null}
-                    className="flex items-center justify-center gap-1.5 bg-accent hover:bg-accent-dark text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-sm shrink-0 disabled:opacity-50"
+                    className="flex items-center justify-center gap-1.5 min-h-[44px] bg-accent hover:bg-accent-dark text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-sm shrink-0 disabled:opacity-50"
                   >
                     <Play className="w-3.5 h-3.5 fill-current" />
                     {playingPhraseIdx === idx ? "වාදනය වේ..." : "ඛණ්ඩය අසන්න"}

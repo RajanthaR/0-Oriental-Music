@@ -77,6 +77,51 @@ function readWorkspaceFile(relativePath: string): string {
   return readFileSync(resolve(process.cwd(), relativePath), "utf8");
 }
 
+/**
+ * A3 anchor-drift guard.
+ *
+ * Numeric `path:line` anchors in the traceability documents drifted and were
+ * manually refreshed repeatedly (six recorded recurrences; the sixth
+ * refresh was itself stale). The controlling plan requires this to be fixed
+ * by mechanism: every cited symbol must resolve at its cited path, and no
+ * new numeric line anchors may appear for code/test targets. Historical run
+ * IDs, SHAs, dates, and prose line references inside quoted ledger text are
+ * not code anchors and are exempt.
+ */
+const TRACEABILITY_DOCUMENT_PATHS = [
+  "docs/FORENSIC_CORRECTION_LOG.md",
+  "docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md",
+  "docs/forensic-remediation/evidence/P02_MUSICAL_CORE_FIELD_MATRIX.md",
+] as const;
+
+/** Matches numeric source anchors like `src/lib/foo.ts:123` or `…test.tsx:12, :48`. */
+const NUMERIC_SOURCE_ANCHOR = /(?:^|[^\w.\/])((?:src|data)\/[A-Za-z0-9_./-]+\.(?:ts|tsx|mjs|json)):(\d+)/g;
+
+function findNumericSourceAnchors(markdown: string): string[] {
+  const findings: string[] = [];
+  for (const match of markdown.matchAll(NUMERIC_SOURCE_ANCHOR)) {
+    findings.push(`${match[1]}:${match[2]}`);
+  }
+  return findings;
+}
+
+/** Resolve a stable `path#symbol` anchor against the live tree. */
+function expectPathSymbolAnchor(anchor: string, label: string): void {
+  const separator = anchor.indexOf("#");
+  // Data-file anchors may legitimately cite exact lines because JSON is
+  // append-only and machine-stable; only code/test drift forced the refreshes.
+  const dataFileMatch = anchor.match(/^(data\/[A-Za-z0-9_./-]+\.json):(\d+)$/);
+  if (!anchor.includes("#") && dataFileMatch) {
+    expect(readWorkspaceFile(dataFileMatch[1]), `${label} data file`).toBeDefined();
+    return;
+  }
+  expect(separator, `${label} uses path#symbol form`).toBeGreaterThan(0);
+  const path = anchor.slice(0, separator);
+  const symbol = anchor.slice(separator + 1).replace(/\s+\(.*\)$/, "");
+  expect(path, `${label} path`).toMatch(/^(?:src|docs|data|AGENTS\.md)/);
+  expect(readWorkspaceFile(path), `${label} symbol ${symbol}`).toContain(symbol.split(" ")[0]);
+}
+
 function expectSemanticReference(reference: SemanticReference, label: string): void {
   expect(reference.path, `${label} path`).toMatch(/^(?:src|docs|AGENTS\.md)/);
   expect(reference.symbol, `${label} symbol`).not.toBe("");
@@ -556,5 +601,19 @@ describe("Phase 2 final contract closeout", () => {
     } finally {
       rawRagas.length = originalLength;
     }
+  });
+
+  it("keeps traceability documents free of numeric code anchors (A3 mechanism, not manual refresh)", () => {
+    const violations: Array<{ document: string; anchor: string }> = [];
+    for (const documentPath of TRACEABILITY_DOCUMENT_PATHS) {
+      const markdown = readWorkspaceFile(documentPath);
+      for (const anchor of findNumericSourceAnchors(markdown)) {
+        violations.push({ document: documentPath, anchor });
+      }
+    }
+    expect(
+      violations,
+      `Numeric path:line anchors drifted again. Convert them to stable path#symbol form instead of refreshing the numbers:\n${violations.map((v) => `${v.document}: ${v.anchor}`).join("\n")}`,
+    ).toEqual([]);
   });
 });

@@ -97,7 +97,7 @@ export const PitchDetectorView: React.FC<PitchDetectorViewProps> = ({
               handleStopMic();
               setMode("microphone");
             }}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all ${
+            className={`flex items-center gap-1 min-h-[44px] px-3 py-2 rounded-lg transition-all ${
               mode === "microphone" ? "bg-primary text-white shadow-sm" : "text-text-secondary"
             }`}
           >
@@ -110,7 +110,7 @@ export const PitchDetectorView: React.FC<PitchDetectorViewProps> = ({
               handleStopMic();
               setMode("keyboard");
             }}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all ${
+            className={`flex items-center gap-1 min-h-[44px] px-3 py-2 rounded-lg transition-all ${
               mode === "keyboard" ? "bg-primary text-white shadow-sm" : "text-text-secondary"
             }`}
           >

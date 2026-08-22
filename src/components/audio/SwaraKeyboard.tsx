@@ -261,7 +261,7 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
               <button
                 type="button"
                 onClick={() => setSaptaka("mandra")}
-                className={`px-2.5 py-1 rounded-md transition-all ${
+                className={`min-h-[44px] px-3 py-2 rounded-md transition-all ${
                   saptaka === "mandra" ? "bg-primary text-white shadow-sm" : "text-text-secondary hover:text-text"
                 }`}
               >
@@ -270,7 +270,7 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
               <button
                 type="button"
                 onClick={() => setSaptaka("madhya")}
-                className={`px-2.5 py-1 rounded-md transition-all ${
+                className={`min-h-[44px] px-3 py-2 rounded-md transition-all ${
                   saptaka === "madhya" ? "bg-primary text-white shadow-sm" : "text-text-secondary hover:text-text"
                 }`}
               >
@@ -279,7 +279,7 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
               <button
                 type="button"
                 onClick={() => setSaptaka("tara")}
-                className={`px-2.5 py-1 rounded-md transition-all ${
+                className={`min-h-[44px] px-3 py-2 rounded-md transition-all ${
                   saptaka === "tara" ? "bg-primary text-white shadow-sm" : "text-text-secondary hover:text-text"
                 }`}
               >
@@ -291,7 +291,7 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
             <select
               value={timbre}
               onChange={(e) => setTimbre(e.target.value as "harmonium" | "flute" | "pure")}
-              className="text-xs border border-border rounded-lg px-2.5 py-1.5 bg-white text-text-secondary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="min-h-[44px] text-xs border border-border rounded-lg px-3 py-2 bg-white text-text-secondary focus:outline-none focus:ring-1 focus:ring-primary"
               aria-label="වාද්‍ය භාණ්ඩ නාදය තෝරන්න"
             >
               <option value="harmonium">හාමෝනියම් (Harmonium)</option>
@@ -303,7 +303,7 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
               type="button"
               onClick={handlePlayScaleArohana}
               disabled={isPlayingScale}
-              className="flex items-center gap-1.5 bg-accent hover:bg-accent-dark text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 min-h-[44px] bg-accent hover:bg-accent-dark text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition-all disabled:opacity-50"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               {isPlayingScale ? "වාදනය වේ..." : "ආරෝහණය අසන්න"}
@@ -342,8 +342,8 @@ export const SwaraKeyboard: React.FC<SwaraKeyboardProps> = ({
                   relative flex flex-col justify-end items-center pb-2 transition-all rounded-b-lg border
                   ${
                     isBlack
-                      ? "w-8 sm:w-10 h-28 sm:h-32 -mx-4 sm:-mx-5 z-10 bg-slate-900 border-slate-950 text-white shadow-md"
-                      : "w-11 sm:w-14 h-40 sm:h-44 z-0 bg-white border-border text-text shadow-sm"
+                      ? "w-10 sm:w-11 h-28 sm:h-32 -mx-3.5 sm:-mx-5 z-10 bg-slate-900 border-slate-950 text-white shadow-md"
+                      : "w-11 sm:w-14 h-40 sm:h-44 min-w-[44px] z-0 bg-white border-border text-text shadow-sm"
                   }
                   ${
                     isCurrentPlaying
