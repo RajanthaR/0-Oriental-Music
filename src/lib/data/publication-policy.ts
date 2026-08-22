@@ -1,23 +1,34 @@
 import type { ReviewMetadata, SourceReference } from "@/types/content";
 import {
-  cloneBoundedRecord,
   createUnverifiedReviewMetadata as createContractUnverifiedReviewMetadata,
   inspectGraph,
-  MAX_GRAPH_DEPTH,
-  MAX_GRAPH_NODES,
   isMetadataBearingKind,
   isPublicQuestionType,
-  isRecord,
   isQuestion,
   isSourceReference as isContractSourceReference,
-  normalizeEntityId,
-  normalizeRecordId,
-  readOwnDataField,
   projectPublicRecord,
   validateContentRecord,
-  UNKNOWN_PROVENANCE,
   type ContentEntityKind,
 } from "@/lib/validation/content-contracts";
+import {
+  MAX_GRAPH_DEPTH,
+  MAX_GRAPH_NODES,
+  PUBLIC_GRADE_BAND_VALUES,
+  cloneBoundedRecord,
+  deepFreezeBoundedSnapshot,
+  isNonBlankString as isSharedNonBlankString,
+  isRecord,
+  normalizeRecordId,
+  readOwnDataField,
+} from "@/lib/shared/bounded-values";
+import { UNKNOWN_PROVENANCE } from "@/lib/shared/bounded-values";
+import {
+  getEvidenceRegistrySnapshot,
+  parseSourceLocator,
+  type EvidenceQuality,
+  type SourceDocumentRecord,
+  type SourcePageQualityRecord,
+} from "@/lib/evidence/source-evidence";
 import sourcesData from "@/data/sources.json";
 import lessonsData from "@/data/lessons.json";
 import ragasData from "@/data/ragas.json";
@@ -29,18 +40,16 @@ import culturalTraditionsData from "@/data/cultural-traditions.json";
 import theatreTraditionsData from "@/data/theatre-traditions.json";
 import glossaryData from "@/data/glossary.json";
 import learningPathsData from "@/data/learning-paths.json";
-import sourceDocumentsData from "../../../data/source-documents.json";
-import sourcePageQualityData from "../../../data/source-page-quality.json";
-import musicalCoreFieldDispositionsData from "../../../data/musical-core-field-dispositions.json";
-import { inspectDispositionRegistry } from "@/lib/validation/disposition-registry";
 
-export { UNKNOWN_PROVENANCE } from "@/lib/validation/content-contracts";
+export { UNKNOWN_PROVENANCE } from "@/lib/shared/bounded-values";
 
-export const PUBLIC_GRADE_BANDS = ["6-7", "8-9", "10-11"] as const;
+export const PUBLIC_GRADE_BANDS = PUBLIC_GRADE_BAND_VALUES;
 export type PublicGradeBand = (typeof PUBLIC_GRADE_BANDS)[number];
 
 export type PublicationState = "public" | "quarantined" | "needs-review";
-export type EvidenceQuality = "A" | "B" | "C" | "D" | "mixed" | "missing";
+
+export type { EvidenceQuality } from "@/lib/evidence/source-evidence";
+export type { SourceDocumentRecord, SourcePageQualityRecord } from "@/lib/evidence/source-evidence";
 
 export type SourceEvidenceFailureCode =
   | "missing-source-reference"
@@ -139,21 +148,6 @@ export function isKnownQuarantinedEntityId(value: unknown): boolean {
   return !!id && KNOWN_QUARANTINED_ENTITY_IDS.has(id);
 }
 
-type SourceDocumentRecord = {
-  id: string;
-  slug: string;
-  originalFilename: string;
-  pageCount: number;
-  reviewStatus: string;
-};
-
-type SourcePageQualityRecord = {
-  documentSlug: string;
-  pageNumber: number;
-  confidence: EvidenceQuality;
-  hasSinhalaText: boolean;
-};
-
 export type PublicationCatalogSnapshot = {
   readonly sources: readonly unknown[];
   readonly lessons: readonly unknown[];
@@ -219,32 +213,8 @@ function unsafeContextEvidence(): SourceEvidenceDecision {
   };
 }
 
-type DependencyRule = {
-  readonly blocking: boolean;
-  readonly catalog: keyof PublicationCatalogSnapshot;
-};
-
-function freezeDependencyRules<T extends Record<string, DependencyRule>>(rules: T): Readonly<T> {
-  Object.values(rules).forEach((rule) => Object.freeze(rule));
-  return Object.freeze(rules);
-}
-
-/** One dependency policy for every recognized nested reference. */
-export const DEPENDENCY_FIELD_RULES: ReadonlyMap<string, DependencyRule> = new Map<string, DependencyRule>([
-  ["prerequisites", Object.freeze({ blocking: true, catalog: "lessons" } as const)],
-  ["steps[].lessonId", Object.freeze({ blocking: true, catalog: "lessons" } as const)],
-  ["nextRecommendedLessonId", Object.freeze({ blocking: false, catalog: "lessons" } as const)],
-  ["quizId", Object.freeze({ blocking: false, catalog: "quizzes" } as const)],
-  ["masteryQuizId", Object.freeze({ blocking: true, catalog: "quizzes" } as const)],
-  ["nextRecommendedPathId", Object.freeze({ blocking: false, catalog: "learningPaths" } as const)],
-  ["lessonId", Object.freeze({ blocking: true, catalog: "lessons" } as const)],
-  ["talaId", Object.freeze({ blocking: true, catalog: "talas" } as const)],
-  ["targetTalaId", Object.freeze({ blocking: true, catalog: "talas" } as const)],
-  ["audioTalaId", Object.freeze({ blocking: true, catalog: "talas" } as const)],
-  ["ragaId", Object.freeze({ blocking: true, catalog: "ragas" } as const)],
-  ["targetRagaId", Object.freeze({ blocking: true, catalog: "ragas" } as const)],
-  ["selectedRagaId", Object.freeze({ blocking: true, catalog: "ragas" } as const)],
-]);
+export { DEPENDENCY_FIELD_RULES } from "@/lib/data/dependency-rules";
+import { DEPENDENCY_FIELD_RULES as dependencyFieldRules } from "@/lib/data/dependency-rules";
 
 type SourceRecord = {
   id: string;
@@ -299,17 +269,7 @@ function captureEvaluationValue(value: unknown, freezeSnapshot: boolean = true):
     const snapshot = cloneBoundedRecord(value);
     if (snapshot === undefined) return undefined;
     if (!freezeSnapshot) return snapshot;
-    const pending: object[] = snapshot && typeof snapshot === "object" ? [snapshot] : [];
-    const seen = new WeakSet<object>();
-    while (pending.length > 0) {
-      const current = pending.pop() as object;
-      if (seen.has(current)) continue;
-      seen.add(current);
-      Object.values(current).forEach((child) => {
-        if (child && typeof child === "object") pending.push(child);
-      });
-      Object.freeze(current);
-    }
+    deepFreezeBoundedSnapshot(snapshot);
     return snapshot;
   } catch {
     return undefined;
@@ -319,58 +279,6 @@ function captureEvaluationValue(value: unknown, freezeSnapshot: boolean = true):
 function captureEvaluationArray(value: unknown): unknown[] | undefined {
   const snapshot = captureEvaluationValue(value);
   return Array.isArray(snapshot) ? snapshot : undefined;
-}
-
-function isSourceDocumentRecord(value: unknown): value is SourceDocumentRecord {
-  const hasText = (field: string) => {
-    const candidate = isRecord(value) ? readOwnDataField(value, field) : undefined;
-    return typeof candidate === "string" && candidate.trim().length > 0;
-  };
-  return isRecord(value) && hasText("id") && hasText("slug") && hasText("originalFilename") &&
-    Number.isSafeInteger(readOwnDataField(value, "pageCount")) &&
-    (readOwnDataField(value, "pageCount") as number) > 0 && hasText("reviewStatus");
-}
-
-function isSourcePageQualityRecord(value: unknown): value is SourcePageQualityRecord {
-  const confidence = isRecord(value) ? readOwnDataField(value, "confidence") : undefined;
-  const documentSlug = isRecord(value) ? readOwnDataField(value, "documentSlug") : undefined;
-  return isRecord(value) && typeof documentSlug === "string" && documentSlug.trim().length > 0 &&
-    Number.isSafeInteger(readOwnDataField(value, "pageNumber")) &&
-    (readOwnDataField(value, "pageNumber") as number) > 0 &&
-    (confidence === "A" || confidence === "B" || confidence === "C" || confidence === "D") &&
-    typeof readOwnDataField(value, "hasSinhalaText") === "boolean";
-}
-
-function hasValidPageQualityRegistry(
-  documents: SourceDocumentRecord[],
-  pages: SourcePageQualityRecord[],
-): boolean {
-  const pageCountsBySlug = new Map<string, number>();
-  for (const document of documents) {
-    if (pageCountsBySlug.has(document.slug)) return false;
-    pageCountsBySlug.set(document.slug, document.pageCount);
-  }
-  const seenPages = new Set<string>();
-  for (const page of pages) {
-    const pageCount = pageCountsBySlug.get(page.documentSlug);
-    const key = `${page.documentSlug}:${page.pageNumber}`;
-    if (pageCount === undefined || page.pageNumber > pageCount || seenPages.has(key)) return false;
-    seenPages.add(key);
-  }
-  return true;
-}
-
-// Publication gating and forensic validation share one registry contract. An
-// incomplete, conflicting, or malformed registry — a wrong policy, drifted
-// required-field lists, an unresolvable issue anchor, a bad status, or a
-// duplicate/denormalized talaId — makes the evaluation context unsafe rather
-// than leaving publication gating with a weaker subset of the rules.
-function hasCompleteDispositionRegistry(value: unknown): boolean {
-  try {
-    return inspectDispositionRegistry(value).ok;
-  } catch {
-    return false;
-  }
 }
 
 function registerKnownKinds(
@@ -422,15 +330,10 @@ export function createPublicationEvaluationContext(
     capturedCatalogs[key] = snapshot ?? [];
     rawCounts[key] = snapshot?.length ?? readDeclaredArrayLength(rawCatalog);
   }
-  const capturedDocuments = captureEvaluationArray(sourceDocumentsData);
-  const capturedPageQuality = captureEvaluationArray(sourcePageQualityData);
-  const capturedDispositions = captureEvaluationValue(musicalCoreFieldDispositionsData);
-  const sourceDocuments = (capturedDocuments ?? []) as SourceDocumentRecord[];
-  const sourcePages = (capturedPageQuality ?? []) as SourcePageQualityRecord[];
-  if (!capturedDocuments || !capturedDocuments.every(isSourceDocumentRecord) ||
-    !capturedPageQuality || !capturedPageQuality.every(isSourcePageQualityRecord) ||
-    !hasValidPageQualityRegistry(sourceDocuments, sourcePages) ||
-    capturedDispositions === undefined || !hasCompleteDispositionRegistry(capturedDispositions)) safe = false;
+  const evidence = getEvidenceRegistrySnapshot();
+  const sourceDocuments = [...evidence.sourceDocuments] as SourceDocumentRecord[];
+  const sourcePages = [...evidence.sourcePageQuality] as SourcePageQualityRecord[];
+  if (!evidence.safe) safe = false;
 
   Object.freeze(capturedCatalogs);
   const context: PublicationEvaluationContext = Object.freeze({
@@ -440,7 +343,7 @@ export function createPublicationEvaluationContext(
   const state: PublicationEvaluationState = {
     sourceDocuments,
     sourcePageQuality: sourcePages,
-    musicalCoreFieldDispositions: capturedDispositions,
+    musicalCoreFieldDispositions: evidence.musicalCoreFieldDispositions,
     knownKinds: new Map<string, ContentEntityKind | "ambiguous">(),
     snapshots: new WeakMap<object, Record<string, unknown>>(),
     stack: new Set<string>(),
@@ -534,7 +437,7 @@ export interface TalaBolFieldDisposition extends TalaFieldDispositionField {
   matra: number;
 }
 
-const talaFieldDispositions = musicalCoreFieldDispositionsData as {
+type TalaFieldDispositionsRegistry = {
   requiredFields: string[];
   unclosedRequiredFields: string[];
   talas: Array<{
@@ -585,59 +488,6 @@ type LocatorParseResult = {
   mismatchedDocument: boolean;
   malformed: boolean;
 };
-
-function parseSourceLocator(pageOrSection: string, expectedFilename: string): LocatorParseResult {
-  const MAX_LOCATOR_LENGTH = 4_096;
-  const MAX_LOCATOR_TERMS = 256;
-  const MAX_LOCATOR_PAGES = 1_024;
-  if (pageOrSection.length > MAX_LOCATOR_LENGTH || expectedFilename.length > MAX_LOCATOR_LENGTH) {
-    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
-  }
-  if (/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/.test(pageOrSection) || /[\uFF0E\uFE52\uFF61]/.test(pageOrSection)) {
-    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
-  }
-
-  const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const pageList = "([0-9]+(?:\\s*[-–]\\s*[0-9]+)?(?:\\s*,\\s*[0-9]+(?:\\s*[-–]\\s*[0-9]+)?)*)";
-  const exactPattern = new RegExp(
-    `^${escapeRegex(expectedFilename.trim())}\\s+(?:පිටුව|පිටු|pdf\\s*pages?|pages?)\\s+${pageList}$`,
-    "i"
-  );
-  const exactMatch = pageOrSection.trim().match(exactPattern);
-  if (!exactMatch) {
-    const pdfTokenCount = Array.from(pageOrSection.matchAll(/\.pdf/gi)).length;
-    const startsWithExpected = pageOrSection.trim().toLocaleLowerCase().startsWith(expectedFilename.trim().toLocaleLowerCase());
-    return { pageNumbers: [], mismatchedDocument: pdfTokenCount > 1 || (pdfTokenCount === 1 && !startsWithExpected), malformed: true };
-  }
-
-  const pageClause = exactMatch[1];
-  if (!pageClause) {
-    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
-  }
-  const pageTokens = pageClause.split(",");
-  if (pageTokens.length > MAX_LOCATOR_TERMS) {
-    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
-  }
-  const pages = new Set<number>();
-  for (const token of pageTokens) {
-    const range = token.trim().split(/\s*[-–]\s*/);
-    const start = Number(range[0]);
-    const end = range[1] === undefined ? start : Number(range[1]);
-    if (!Number.isInteger(start) || !Number.isInteger(end) || start < 1 || end < start || end - start > 1000) {
-      return { pageNumbers: [], mismatchedDocument: false, malformed: true };
-    }
-    if (pages.size + (end - start + 1) > MAX_LOCATOR_PAGES) {
-      return { pageNumbers: [], mismatchedDocument: false, malformed: true };
-    }
-    for (let page = start; page <= end; page += 1) pages.add(page);
-  }
-
-  return {
-    pageNumbers: Array.from(pages).sort((a, b) => a - b),
-    mismatchedDocument: false,
-    malformed: false,
-  };
-}
 
 function explicitPageReferences(pageOrSection: string, expectedFilename: string): LocatorParseResult {
   return parseSourceLocator(pageOrSection, expectedFilename);
@@ -1028,7 +878,7 @@ export function getTalaFieldDisposition(
     const talaId = normalizeRecordId(typeof talaOrId === "string" ? talaOrId : suppliedId);
     const dispositionRegistry = getEvaluationState(context).musicalCoreFieldDispositions;
     const registry = isRecord(dispositionRegistry)
-      ? dispositionRegistry as typeof talaFieldDispositions
+      ? dispositionRegistry as TalaFieldDispositionsRegistry
       : undefined;
     const entries = registry && Array.isArray(registry.talas) ? registry.talas : [];
     const matchingEntries = entries.filter((candidate) => normalizeRecordId(candidate.talaId) === talaId);
@@ -1139,7 +989,7 @@ function collectDependencyDispositions(
     const record = current.value as Record<string, unknown>;
     const prefix = current.path ? `${current.path}.` : "";
     const prerequisites = readOwnDataField(record, "prerequisites");
-    const prerequisiteRule = DEPENDENCY_FIELD_RULES.get("prerequisites");
+    const prerequisiteRule = dependencyFieldRules.get("prerequisites");
     if (prerequisiteRule && Array.isArray(prerequisites)) {
       prerequisites.forEach((dependencyId, index) => addDependency(
         dependencyId,
@@ -1149,7 +999,7 @@ function collectDependencyDispositions(
       ));
     }
     const steps = readOwnDataField(record, "steps");
-    const stepRule = DEPENDENCY_FIELD_RULES.get("steps[].lessonId");
+    const stepRule = dependencyFieldRules.get("steps[].lessonId");
     if (stepRule && Array.isArray(steps)) {
       steps.forEach((step, index) => {
         const lessonId = step && typeof step === "object" && !Array.isArray(step)
@@ -1168,7 +1018,7 @@ function collectDependencyDispositions(
       if (key === "prerequisites" || key === "steps" || key === "lessonId") continue;
       const child = readOwnDataField(record, key);
       const childPath = `${prefix}${key}`;
-      const dependencyRule = DEPENDENCY_FIELD_RULES.get(key);
+      const dependencyRule = dependencyFieldRules.get(key);
       if (dependencyRule) {
         addDependency(child, childPath, dependencyRule.blocking, decisionContext.catalogs[dependencyRule.catalog]);
       }
@@ -1401,7 +1251,7 @@ function getRecordPublicationDecisionInternal(
     parentIsActiveBacklink || getRecordPublicationDecisionInternal(parent, decisionContext, parent).isPublic
   ));
   if (isQuiz) {
-    const parentRule = DEPENDENCY_FIELD_RULES.get("lessonId");
+    const parentRule = dependencyFieldRules.get("lessonId");
     if (!parentRule) throw new Error("Missing dependency rule for lessonId");
     nestedDispositions.push({
       path: "lessonId",
