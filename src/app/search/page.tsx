@@ -70,7 +70,7 @@ export default function SearchPage() {
               key={sample}
               type="button"
               onClick={() => setQuery(sample)}
-              className="bg-surface-warm hover:bg-amber-100 text-text px-2.5 py-1 rounded-lg border border-border-light transition-all"
+              className="bg-surface-warm hover:bg-amber-100 text-text min-h-[44px] px-3 py-2 rounded-lg border border-border-light transition-all"
             >
               {sample}
             </button>
@@ -92,7 +92,7 @@ export default function SearchPage() {
               <button
                 type="button"
                 onClick={() => setQuery("")}
-                className="mt-4 rounded-xl bg-primary px-4 py-2 font-bold text-white"
+                className="mt-4 rounded-xl bg-primary px-4 py-2.5 min-h-[44px] font-bold text-white"
               >
                 සෙවුම හිස් කරන්න
               </button>

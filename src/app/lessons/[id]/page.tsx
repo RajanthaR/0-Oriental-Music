@@ -149,7 +149,7 @@ export default function LessonDetailPage() {
       {/* 1. Breadcrumb & Grade Tag */}
       <div className="flex flex-wrap items-center justify-between gap-2 mb-4 text-xs text-text-muted">
         <div className="flex items-center gap-2">
-          <Link href="/lessons" className="hover:underline">
+          <Link href="/lessons" className="inline-flex items-center min-h-[44px] px-2 -mx-2 hover:underline">
             පාඩම් මාලාව
           </Link>
           <span>/</span>
@@ -160,7 +160,7 @@ export default function LessonDetailPage() {
           <button
             type="button"
             onClick={handleToggleSave}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1 min-h-[44px] px-3 py-2 rounded-lg border text-xs font-semibold transition-all ${
               isSaved
                 ? "bg-amber-50 text-accent border-accent"
                 : "bg-surface-warm border-border text-text hover:bg-white"
@@ -224,7 +224,7 @@ export default function LessonDetailPage() {
                   <Link
                     key={pId}
                     href={`/lessons/${pId}`}
-                    className="bg-white px-2.5 py-1 rounded-lg border border-primary-200 text-primary font-semibold hover:underline"
+                    className="bg-white min-h-[44px] px-3 py-2 inline-flex items-center rounded-lg border border-primary-200 text-primary font-semibold hover:underline"
                   >
                     {pLes?.title_si || pId} →
                   </Link>
@@ -254,7 +254,7 @@ export default function LessonDetailPage() {
                     setDiagnosticSelected(idx);
                     setShowDiagnosticResult(true);
                   }}
-                  className={`p-2.5 rounded-xl border text-xs text-left transition-all ${
+                  className={`min-h-[44px] p-2.5 rounded-xl border text-xs text-left transition-all flex items-center ${
                     diagnosticSelected === idx
                       ? "bg-amber-200/80 border-accent font-bold text-text"
                       : "bg-white border-border hover:bg-amber-100/40 text-text"

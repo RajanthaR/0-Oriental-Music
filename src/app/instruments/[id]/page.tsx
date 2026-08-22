@@ -187,7 +187,7 @@ export default function InstrumentDetailPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-8">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-text-muted">
-        <Link href="/instruments" className="hover:underline">
+        <Link href="/instruments" className="inline-flex items-center min-h-[44px] px-2 -mx-2 hover:underline">
           වාද්‍ය භාණ්ඩ
         </Link>
         <span>/</span>

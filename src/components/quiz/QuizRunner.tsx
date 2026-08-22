@@ -284,7 +284,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
                   type="button"
                   onClick={() => handleSelectMCQ(opt.id)}
                   disabled={isSubmitted}
-                  className={`w-full text-left p-3.5 rounded-xl border-2 transition-all flex items-center justify-between text-xs sm:text-sm font-medium ${style}`}
+                  className={`w-full text-left min-h-[44px] p-3.5 rounded-xl border-2 transition-all flex items-center justify-between text-xs sm:text-sm font-medium ${style}`}
                 >
                   <span>{opt.text_si}</span>
                   {isSubmitted && (
@@ -325,7 +325,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({ quiz, onComplete }) => {
                   type="button"
                   onClick={() => handleToggleMultiSelect(opt.id)}
                   disabled={isSubmitted}
-                  className={`w-full text-left p-3.5 rounded-xl border-2 transition-all flex items-center gap-3 text-xs sm:text-sm ${style}`}
+                  className={`w-full text-left min-h-[44px] p-3.5 rounded-xl border-2 transition-all flex items-center gap-3 text-xs sm:text-sm ${style}`}
                 >
                   <input
                     type="checkbox"

@@ -35,7 +35,7 @@ export default function TalasDirectoryPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="තාලයේ නම හෝ මාත්‍රා ප්‍රමාණය සෙවීම..."
-            className="w-full bg-surface-warm border border-border rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full bg-surface-warm border border-border rounded-xl pl-10 pr-4 py-3 min-h-[44px] text-xs sm:text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
       </div>

@@ -1,6 +1,25 @@
 import type { CurriculumStrandId } from "@/lib/data/curriculum-strands";
 import { CURRICULUM_STRAND_IDS } from "@/lib/data/curriculum-strands";
 import { normalizeSinhalaText } from "@/lib/search/normalize-sinhala";
+import {
+  MAX_GRAPH_DEPTH,
+  MAX_GRAPH_NODES,
+  MAX_ARRAY_ITEMS,
+  UNKNOWN_PROVENANCE,
+  captureSafeSnapshot,
+  cloneBoundedRecord,
+  inspectGraph,
+  isDenseArray,
+  isGradeBand,
+  isNonBlankString,
+  isRecord,
+  normalizeEntityId,
+  normalizeRecordId,
+  readOwnDataField,
+  safeOwnEntries,
+  type GraphFailureReason,
+  type GraphSafetyResult,
+} from "@/lib/shared/bounded-values";
 
 /**
  * Runtime contracts for the JSON content boundary.
@@ -8,13 +27,30 @@ import { normalizeSinhalaText } from "@/lib/search/normalize-sinhala";
  * This module deliberately does not import the repository or publication
  * policy.  Raw JSON is untrusted input and must be narrowed here before any
  * policy, route, or repository code dereferences a learner-visible field.
+ *
+ * Bounded-graph primitives (descriptor-safe own-entry reads, detached
+ * snapshots, iterative traversal limits, identity normalization, dense-array
+ * checks) live in `@/lib/shared/bounded-values`, which both this layer and
+ * `lib/data` import without a cross-layer edge.  They are re-exported here so
+ * every existing importer keeps its path and the forensic ledger's recorded
+ * `path#symbol` anchors keep resolving at this file.
  */
 
-export const MAX_GRAPH_DEPTH = 256;
-export const MAX_GRAPH_NODES = 10_000;
-export const MAX_ARRAY_ITEMS = 10_000;
-
-export const UNKNOWN_PROVENANCE = "නොදනී / සනාථ වී නැත";
+export {
+  MAX_GRAPH_DEPTH,
+  MAX_GRAPH_NODES,
+  MAX_ARRAY_ITEMS,
+  UNKNOWN_PROVENANCE,
+  cloneBoundedRecord,
+  inspectGraph,
+  isDenseArray,
+  isNonBlankString,
+  isRecord,
+  normalizeEntityId,
+  normalizeRecordId,
+  readOwnDataField,
+};
+export type { GraphFailureReason, GraphSafetyResult };
 
 export const GRADE_BANDS = ["6-7", "8-9", "10-11", "12-13"] as const;
 export type RuntimeGradeBand = (typeof GRADE_BANDS)[number];
@@ -153,122 +189,6 @@ export interface ContentContractResult {
   issues: ContractIssue[];
 }
 
-export type GraphFailureReason = "cycle" | "depth-limit" | "node-limit" | "unreadable";
-
-export interface GraphSafetyResult {
-  safe: boolean;
-  nodes: number;
-  reason?: GraphFailureReason;
-  depth?: number;
-}
-
-const DANGEROUS_JSON_KEYS = new Set(["__proto__", "prototype", "constructor"]);
-
-type SafeOwnEntry = { key: string; value: unknown };
-type SafeOwnEntries = {
-  isArray: boolean;
-  length: number;
-  entries: SafeOwnEntry[];
-};
-
-/**
- * Read only descriptor values from a plain JSON-shaped object.  This is the
- * trust boundary for runtime content: no accessor is invoked and no
- * inherited value is accepted.  All reflective operations are guarded since
- * a Proxy can throw from any of them.
- *
- * The enumerable traversal is intentionally incremental and bounded instead
- * of asking Reflect.ownKeys() for an unbounded key list before applying the
- * width limit.  JavaScript still lets a Proxy's ownKeys trap materialize an
- * arbitrarily large list before `for...in` can observe it; that unavoidable
- * userland limitation is why this function catches every reflective failure
- * and fails closed, rather than claiming a Proxy allocation bound.
- */
-function safeOwnEntries(value: object): SafeOwnEntries | undefined {
-  try {
-    const isArray = Array.isArray(value);
-    const prototype = Object.getPrototypeOf(value);
-    if (isArray) {
-      if (prototype !== Array.prototype && prototype !== null) return undefined;
-    } else if (prototype !== Object.prototype && prototype !== null) {
-      return undefined;
-    }
-
-    const entries: SafeOwnEntry[] = [];
-    const maximumEntries = isArray ? MAX_ARRAY_ITEMS : MAX_GRAPH_NODES;
-
-    // `for...in` exposes enumerable string keys one at a time.  Descriptor
-    // reads identify inherited keys without invoking a getter and let us
-    // reject enumerable accessors before their values are touched.
-    for (const key in value) {
-      const descriptor = Object.getOwnPropertyDescriptor(value, key);
-      if (!descriptor) continue;
-      if (entries.length >= maximumEntries) return undefined;
-      if (DANGEROUS_JSON_KEYS.has(key) || !descriptor.enumerable || !("value" in descriptor) ||
-          Object.prototype.hasOwnProperty.call(descriptor, "get") ||
-          Object.prototype.hasOwnProperty.call(descriptor, "set")) return undefined;
-      entries.push({ key, value: descriptor.value });
-    }
-
-    // Non-enumerable and symbol properties are outside the JSON content
-    // model and are intentionally ignored.  Avoiding a second own-key scan
-    // also ensures a stateful Proxy cannot change the record between capture
-    // passes; every accepted field comes from the single descriptor snapshot
-    // above and public projections remain explicit allowlists.
-
-    if (!isArray) {
-      return { isArray: false, length: entries.length, entries };
-    }
-
-    const lengthDescriptor = Object.getOwnPropertyDescriptor(value, "length");
-    if (!lengthDescriptor || lengthDescriptor.enumerable || !("value" in lengthDescriptor) ||
-        typeof lengthDescriptor.value !== "number" || !Number.isInteger(lengthDescriptor.value) ||
-        lengthDescriptor.value < 0 || lengthDescriptor.value > MAX_ARRAY_ITEMS ||
-        entries.length !== lengthDescriptor.value) return undefined;
-
-    const indexedEntries: SafeOwnEntry[] = [];
-    indexedEntries.length = lengthDescriptor.value;
-    for (const entry of entries) {
-      if (entry.key === "length" || !/^\d+$/.test(entry.key)) return undefined;
-      const index = Number(entry.key);
-      if (!Number.isSafeInteger(index) || index < 0 || index >= lengthDescriptor.value || String(index) !== entry.key || indexedEntries[index]) {
-        return undefined;
-      }
-      indexedEntries[index] = entry;
-    }
-    for (let index = 0; index < indexedEntries.length; index += 1) {
-      if (!indexedEntries[index]) return undefined;
-    }
-    return { isArray: true, length: lengthDescriptor.value, entries: indexedEntries };
-  } catch {
-    return undefined;
-  }
-}
-
-function hasPlainDataShape(value: unknown): value is Record<string, unknown> {
-  if (value === null || typeof value !== "object") return false;
-  try {
-    return !Array.isArray(value) && safeOwnEntries(value)?.isArray === false;
-  } catch {
-    return false;
-  }
-}
-
-export function isRecord(value: unknown): value is Record<string, unknown> {
-  return hasPlainDataShape(value);
-}
-
-/** Safe descriptor-value access for policy and validation helpers. */
-export function readOwnDataField(value: unknown, field: string): unknown {
-  if (typeof field !== "string" || DANGEROUS_JSON_KEYS.has(field) || value === null || typeof value !== "object") return undefined;
-  try {
-    const entries = safeOwnEntries(value);
-    return entries?.entries.find((entry) => entry.key === field)?.value;
-  } catch {
-    return undefined;
-  }
-}
-
 function hasOwn(value: Record<string, unknown>, field: string): boolean {
   return readOwnDataField(value, field) !== undefined || (() => {
     try {
@@ -281,10 +201,6 @@ function hasOwn(value: Record<string, unknown>, field: string): boolean {
 
 function read(value: unknown, field: string): unknown {
   return readOwnDataField(value, field);
-}
-
-export function isNonBlankString(value: unknown): value is string {
-  return typeof value === "string" && value.trim().length > 0;
 }
 
 function isFiniteNumber(value: unknown): value is number {
@@ -311,47 +227,9 @@ function isOptionalStringArray(value: unknown): boolean {
   return value === undefined || isStringArray(value, true);
 }
 
-function isGradeBand(value: unknown): value is RuntimeGradeBand {
-  return isOneOf(GRADE_BANDS, value);
-}
-
 export function isGradeBandArray(value: unknown, allowEmpty = false): value is RuntimeGradeBand[] {
   const snapshot = captureSafeSnapshot(value);
   return Array.isArray(snapshot) && (allowEmpty || snapshot.length > 0) && snapshot.every(isGradeBand);
-}
-
-// Keep this explicit rather than using Unicode property escapes: the project
-// intentionally type-checks without an ES2015 `target`, while these ranges
-// cover ASCII/C1 controls, zero-width markers, and the bidi format controls
-// that can make two visible IDs look identical.
-const FORBIDDEN_ENTITY_ID_CONTROLS = /[\u0000-\u001F\u007F-\u009F\u00AD\u0600-\u0605\u061C\u180E\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/;
-
-/**
- * Return one canonical identity for entity and nested-question IDs.  Invalid
- * values return undefined so callers cannot accidentally use an empty or
- * control-bearing string as an identity key.
- */
-export function normalizeEntityId(value: unknown): string | undefined {
-  if (typeof value !== "string") return undefined;
-  const normalized = value.normalize("NFC").trim();
-  if (!normalized || FORBIDDEN_ENTITY_ID_CONTROLS.test(normalized)) return undefined;
-  return normalized;
-}
-
-export function normalizeRecordId(value: unknown): string {
-  return normalizeEntityId(value) ?? "";
-}
-
-export function isDenseArray(value: unknown): value is unknown[] {
-  if (!Array.isArray(value)) return false;
-  try {
-    for (let index = 0; index < value.length; index += 1) {
-      if (!Object.prototype.hasOwnProperty.call(value, index)) return false;
-    }
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 export function isCurriculumStrandId(value: unknown): value is CurriculumStrandId {
@@ -782,64 +660,6 @@ export function identifyContentKind(value: unknown): ContentEntityKind | undefin
   return matches.length === 1 ? matches[0] : undefined;
 }
 
-/** Capture a bounded, detached plain-data snapshot without invoking getters. */
-function captureSafeSnapshot<T>(value: T, knownGraphSafety?: GraphSafetyResult): T | undefined {
-  if (value === null || typeof value !== "object") return value;
-  try {
-    if (knownGraphSafety && !knownGraphSafety.safe) return undefined;
-    const rootEntries = safeOwnEntries(value as object);
-    if (!rootEntries) return undefined;
-    const root: unknown = rootEntries.isArray ? [] : {};
-    const seen = new WeakMap<object, object>();
-    const colors = new WeakMap<object, 1 | 2>();
-    const stack: Array<{ source: object; target: object; depth: number; entries: SafeOwnEntry[]; index: number }> = [{
-      source: value as object,
-      target: root as object,
-      depth: 0,
-      entries: rootEntries.entries,
-      index: 0,
-    }];
-    seen.set(value as object, root as object);
-    colors.set(value as object, 1);
-    let nodes = 1;
-    while (stack.length > 0) {
-      const current = stack[stack.length - 1];
-      if (current.index >= current.entries.length) {
-        colors.set(current.source, 2);
-        stack.pop();
-        continue;
-      }
-      const entry = current.entries[current.index++];
-      const child = entry.value;
-      if (child === null || typeof child !== "object") {
-        (current.target as Record<string, unknown>)[entry.key] = child;
-        continue;
-      }
-      const childDepth = current.depth + 1;
-      if (childDepth > MAX_GRAPH_DEPTH) return undefined;
-      const color = colors.get(child);
-      if (color === 1) return undefined;
-      const existing = seen.get(child);
-      if (existing && color === 2) {
-        (current.target as Record<string, unknown>)[entry.key] = existing;
-        continue;
-      }
-      if (nodes >= MAX_GRAPH_NODES) return undefined;
-      const childEntries = safeOwnEntries(child);
-      if (!childEntries) return undefined;
-      const target = childEntries.isArray ? [] : {};
-      seen.set(child, target);
-      colors.set(child, 1);
-      nodes += 1;
-      (current.target as Record<string, unknown>)[entry.key] = target;
-      stack.push({ source: child, target, depth: childDepth, entries: childEntries.entries, index: 0 });
-    }
-    return root as T;
-  } catch {
-    return undefined;
-  }
-}
-
 export function validateContentRecord(
   value: unknown,
   expectedKind?: ContentEntityKind,
@@ -882,55 +702,6 @@ export function validateContentRecord(
   } catch {
     return { kind: expectedKind, isValid: false, issues: [{ field: "record", message: "Record could not be safely validated." }] };
   }
-}
-
-/** Iterative cycle/depth/node guard shared by all public-boundary operations. */
-export function inspectGraph(value: unknown): GraphSafetyResult {
-  if (value === null || typeof value !== "object") return { safe: true, nodes: 0 };
-  type Frame = { value: object; depth: number; entries: SafeOwnEntry[]; index: number };
-  const colors = new WeakMap<object, 1 | 2>();
-  const stack: Frame[] = [];
-  let nodes = 0;
-  const push = (candidate: object, depth: number): GraphSafetyResult | undefined => {
-    if (depth > MAX_GRAPH_DEPTH) return { safe: false, nodes, reason: "depth-limit", depth };
-    const color = colors.get(candidate);
-    if (color === 1) return { safe: false, nodes, reason: "cycle", depth };
-    if (color === 2) return undefined;
-    if (nodes >= MAX_GRAPH_NODES) return { safe: false, nodes, reason: "node-limit", depth };
-    try {
-      if (Array.isArray(candidate)) {
-        const lengthDescriptor = Object.getOwnPropertyDescriptor(candidate, "length");
-        if (lengthDescriptor && "value" in lengthDescriptor && typeof lengthDescriptor.value === "number" && lengthDescriptor.value > MAX_ARRAY_ITEMS) {
-          return { safe: false, nodes, reason: "node-limit", depth };
-        }
-      }
-    } catch {
-      return { safe: false, nodes, reason: "unreadable", depth };
-    }
-    const own = safeOwnEntries(candidate);
-    if (!own) return { safe: false, nodes, reason: "unreadable", depth };
-    if (own.length > MAX_GRAPH_NODES) return { safe: false, nodes, reason: "node-limit", depth };
-    nodes += 1;
-    colors.set(candidate, 1);
-    stack.push({ value: candidate, depth, entries: own.entries, index: 0 });
-    return undefined;
-  };
-  const initialFailure = push(value, 0);
-  if (initialFailure) return initialFailure;
-  while (stack.length > 0) {
-    const frame = stack[stack.length - 1];
-    if (frame.index >= frame.entries.length) {
-      colors.set(frame.value, 2);
-      stack.pop();
-      continue;
-    }
-    const child = frame.entries[frame.index++].value;
-    if (child !== null && typeof child === "object") {
-      const failure = push(child, frame.depth + 1);
-      if (failure) return failure;
-    }
-  }
-  return { safe: true, nodes };
 }
 
 const PUBLIC_FIELDS: Record<ContentEntityKind, readonly string[]> = {
@@ -1142,11 +913,6 @@ export function createUnverifiedReviewMetadata(): Record<string, string> {
     license: UNKNOWN_PROVENANCE,
     reuseStatus: "Unknown / Unverified",
   };
-}
-
-/** Detached all-field copy for review/admin views; unlike the old clone this is iterative and bounded. */
-export function cloneBoundedRecord<T>(value: T, knownGraphSafety?: GraphSafetyResult): T | undefined {
-  return captureSafeSnapshot(value, knownGraphSafety);
 }
 
 export function isMetadataBearingKind(kind: ContentEntityKind | undefined): boolean {

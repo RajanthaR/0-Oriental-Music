@@ -1,23 +1,33 @@
 import type { ReviewMetadata, SourceReference } from "@/types/content";
 import {
-  cloneBoundedRecord,
   createUnverifiedReviewMetadata as createContractUnverifiedReviewMetadata,
   inspectGraph,
-  MAX_GRAPH_DEPTH,
-  MAX_GRAPH_NODES,
   isMetadataBearingKind,
   isPublicQuestionType,
-  isRecord,
   isQuestion,
   isSourceReference as isContractSourceReference,
-  normalizeEntityId,
-  normalizeRecordId,
-  readOwnDataField,
   projectPublicRecord,
   validateContentRecord,
-  UNKNOWN_PROVENANCE,
   type ContentEntityKind,
 } from "@/lib/validation/content-contracts";
+import {
+  MAX_GRAPH_DEPTH,
+  MAX_GRAPH_NODES,
+  PUBLIC_GRADE_BAND_VALUES,
+  cloneBoundedRecord,
+  deepFreezeBoundedSnapshot,
+
+  isRecord,
+  normalizeRecordId,
+  readOwnDataField,
+} from "@/lib/shared/bounded-values";
+import {
+  getEvidenceRegistrySnapshot,
+  parseSourceLocator,
+  type EvidenceQuality,
+  type SourceDocumentRecord,
+  type SourcePageQualityRecord,
+} from "@/lib/evidence/source-evidence";
 import sourcesData from "@/data/sources.json";
 import lessonsData from "@/data/lessons.json";
 import ragasData from "@/data/ragas.json";
@@ -29,256 +39,71 @@ import culturalTraditionsData from "@/data/cultural-traditions.json";
 import theatreTraditionsData from "@/data/theatre-traditions.json";
 import glossaryData from "@/data/glossary.json";
 import learningPathsData from "@/data/learning-paths.json";
-import sourceDocumentsData from "../../../data/source-documents.json";
-import sourcePageQualityData from "../../../data/source-page-quality.json";
-import musicalCoreFieldDispositionsData from "../../../data/musical-core-field-dispositions.json";
-import { inspectDispositionRegistry } from "@/lib/validation/disposition-registry";
 
-export { UNKNOWN_PROVENANCE } from "@/lib/validation/content-contracts";
+export { UNKNOWN_PROVENANCE } from "@/lib/shared/bounded-values";
+export type { EvidenceQuality } from "@/lib/evidence/source-evidence";
 
-export const PUBLIC_GRADE_BANDS = ["6-7", "8-9", "10-11"] as const;
-export type PublicGradeBand = (typeof PUBLIC_GRADE_BANDS)[number];
+export {
+  PUBLIC_GRADE_BANDS,
+  type PublicGradeBand,
+  type PublicationState,
+  type SourceEvidenceFailureCode,
+  type PublicationReasonCode,
+  type SourceEvidenceReasonCode,
+  type SourceEvidenceDecision,
+  type PublicationDecision,
+  type NestedPublicationDisposition,
+  type SourceDocumentSummary,
+  isKnownQuarantinedEntityId,
+} from "@/lib/data/decision-types";
+export type {
+  PublicationCatalogSnapshot,
+  PublicationCatalogInputs,
+  PublicationEvaluationContext,
+} from "@/lib/data/evaluation-state";
+import {
+  countSourceRecordsById,
+  evaluateSourceReference as evaluateSourceReferenceImpl,
+  getSourceCorpusInventory as getSourceCorpusInventoryImpl,
+  getSourceDocumentSummary as getSourceDocumentSummaryImpl,
+  getSourceRecordsById,
+  unsafeContextEvidence as unsafeContextEvidenceShared,
+} from "@/lib/data/source-evidence-policy";
+import { captureEvaluationValue, captureEvaluationArray } from "@/lib/data/snapshot-capture";
+export {
+  getTalaFieldDisposition,
+  type TalaFieldDispositionStatus,
+  type TalaFieldDisposition,
+  type TalaFieldDispositionField,
+  type TalaBolFieldDisposition,
+} from "@/lib/data/tala-disposition-policy";
+import { getTalaFieldDisposition } from "@/lib/data/tala-disposition-policy";
+import {
+  getSafeEvaluationState,
+  getEvaluationState,
+  registerKnownKinds,
+  setPublicationEvaluationState,
+  type PublicationCatalogInputs,
+  type PublicationCatalogSnapshot,
+  type PublicationEvaluationContext,
+  type PublicationEvaluationState,
+} from "@/lib/data/evaluation-state";
+import {
+  PUBLIC_GRADE_BANDS as publicGradeBands,
+  type PublicGradeBand,
+  type PublicationState,
+  type SourceEvidenceFailureCode,
+  type PublicationReasonCode,
+  type SourceEvidenceReasonCode,
+  type SourceEvidenceDecision,
+  type PublicationDecision,
+  type NestedPublicationDisposition,
+  type SourceDocumentSummary,
+  isKnownQuarantinedEntityId,
+} from "@/lib/data/decision-types";
 
-export type PublicationState = "public" | "quarantined" | "needs-review";
-export type EvidenceQuality = "A" | "B" | "C" | "D" | "mixed" | "missing";
-
-export type SourceEvidenceFailureCode =
-  | "missing-source-reference"
-  | "unknown-source"
-  | "ambiguous-source-record"
-  | "ambiguous-source-document"
-  | "source-document-needs-review"
-  | "mismatched-source-document"
-  | "missing-page-evidence"
-  | "page-out-of-range"
-  | "low-quality-page-evidence"
-  | "source-grade-mismatch"
-  | "unsafe-evaluation-context";
-
-export type PublicationReasonCode =
-  | "unsupported-grade"
-  | "known-forensic-issue"
-  | "missing-grade-scope"
-  | "parent-lesson-unavailable"
-  | "empty-question-set"
-  | "nested-question-unpublishable"
-  | "unpaired-context-claim"
-  | "field-disposition-needs-review"
-  | "dependent-entity-unavailable"
-  | "dependency-cycle"
-  | "duplicate-record-id"
-  | "malformed-record"
-  | "unknown-record-kind"
-  | "unsafe-container"
-  | "non-array"
-  | "evaluation-failed"
-  | SourceEvidenceFailureCode;
-
-export type SourceEvidenceReasonCode = SourceEvidenceFailureCode | "supportable";
-
-export interface SourceEvidenceDecision {
-  sourceId?: string;
-  documentId?: string;
-  documentSlug?: string;
-  pageNumbers: number[];
-  quality: EvidenceQuality;
-  supportable: boolean;
-  reasonCode: SourceEvidenceReasonCode;
-  reason: string;
-}
-
-export interface PublicationDecision {
-  state: PublicationState;
-  isPublic: boolean;
-  gradeBands: string[];
-  reasonCodes: PublicationReasonCode[];
-  sourceEvidence: SourceEvidenceDecision;
-  reviewState: "needs-review";
-  nestedDispositions: NestedPublicationDisposition[];
-  withheldFields: string[];
-  /** The exact sanitized value public repositories may expose. */
-  publicProjection?: unknown;
-}
-
-export interface NestedPublicationDisposition {
-  path: string;
-  isPublic: boolean;
-  blocking: boolean;
-  reasonCodes: PublicationReasonCode[];
-}
-
-export interface SourceDocumentSummary {
-  documentId?: string;
-  documentSlug?: string;
-  reviewStatus: string;
-  pageCount: number;
-  evidenceQuality: EvidenceQuality;
-}
-
-/**
- * These identifiers are intentionally retained in the raw datasets and are
- * blocked centrally until a later phase supplies claim-level correction
- * evidence. A route must never decide this independently.
- */
-const KNOWN_QUARANTINED_ENTITY_IDS = new Set([
-  "les-raga-bhairav",
-  "les-exam-skills",
-  "raga-bhairav",
-  "tala-roopak",
-  "tala-lawani",
-  "tala-khemta",
-  "exam-al-model-01",
-  "path-exam-prep",
-  "term-sound",
-  "term-ahata-nada",
-  "term-anahata-nada",
-]);
-
-export function isKnownQuarantinedEntityId(value: unknown): boolean {
-  const id = normalizeRecordId(value);
-  return !!id && KNOWN_QUARANTINED_ENTITY_IDS.has(id);
-}
-
-type SourceDocumentRecord = {
-  id: string;
-  slug: string;
-  originalFilename: string;
-  pageCount: number;
-  reviewStatus: string;
-};
-
-type SourcePageQualityRecord = {
-  documentSlug: string;
-  pageNumber: number;
-  confidence: EvidenceQuality;
-  hasSinhalaText: boolean;
-};
-
-export type PublicationCatalogSnapshot = {
-  readonly sources: readonly unknown[];
-  readonly lessons: readonly unknown[];
-  readonly ragas: readonly unknown[];
-  readonly talas: readonly unknown[];
-  readonly instruments: readonly unknown[];
-  readonly culturalTraditions: readonly unknown[];
-  readonly theatreTraditions: readonly unknown[];
-  readonly glossary: readonly unknown[];
-  readonly learningPaths: readonly unknown[];
-  readonly quizzes: readonly unknown[];
-  readonly examPapers: readonly unknown[];
-};
-
-export type PublicationCatalogInputs = Partial<Record<keyof PublicationCatalogSnapshot, unknown>>;
-
-/**
- * All decisions belonging to one public operation share these detached
- * inputs.  This prevents identity, evidence, dependency, and projection
- * code from observing different versions of caller-owned or mutable catalog
- * data.
- */
-export interface PublicationEvaluationContext {
-  readonly catalogs: PublicationCatalogSnapshot;
-  readonly safe: boolean;
-}
-
-type PublicationEvaluationState = {
-  sourceDocuments: SourceDocumentRecord[];
-  sourcePageQuality: SourcePageQualityRecord[];
-  musicalCoreFieldDispositions: unknown;
-  knownKinds: Map<string, ContentEntityKind | "ambiguous">;
-  snapshots: WeakMap<object, Record<string, unknown>>;
-  stack: Set<string>;
-  memo: WeakMap<object, PublicationDecision>;
-  rawCounts: Readonly<Record<keyof PublicationCatalogSnapshot, number>>;
-};
-
-const PUBLICATION_CONTEXT_STATE = new WeakMap<PublicationEvaluationContext, PublicationEvaluationState>();
-
-function getEvaluationState(context: PublicationEvaluationContext): PublicationEvaluationState {
-  const state = PUBLICATION_CONTEXT_STATE.get(context);
-  if (!state) throw new Error("Unknown publication evaluation context.");
-  return state;
-}
-
-function getSafeEvaluationState(context: PublicationEvaluationContext): PublicationEvaluationState | undefined {
-  try {
-    if (!context || context.safe !== true) return undefined;
-    return PUBLICATION_CONTEXT_STATE.get(context);
-  } catch {
-    return undefined;
-  }
-}
-
-function unsafeContextEvidence(): SourceEvidenceDecision {
-  return {
-    pageNumbers: [],
-    quality: "missing",
-    supportable: false,
-    reasonCode: "unsafe-evaluation-context",
-    reason: "The publication evaluation context is malformed, unregistered, or incomplete.",
-  };
-}
-
-type DependencyRule = {
-  readonly blocking: boolean;
-  readonly catalog: keyof PublicationCatalogSnapshot;
-};
-
-function freezeDependencyRules<T extends Record<string, DependencyRule>>(rules: T): Readonly<T> {
-  Object.values(rules).forEach((rule) => Object.freeze(rule));
-  return Object.freeze(rules);
-}
-
-/** One dependency policy for every recognized nested reference. */
-export const DEPENDENCY_FIELD_RULES: ReadonlyMap<string, DependencyRule> = new Map<string, DependencyRule>([
-  ["prerequisites", Object.freeze({ blocking: true, catalog: "lessons" } as const)],
-  ["steps[].lessonId", Object.freeze({ blocking: true, catalog: "lessons" } as const)],
-  ["nextRecommendedLessonId", Object.freeze({ blocking: false, catalog: "lessons" } as const)],
-  ["quizId", Object.freeze({ blocking: false, catalog: "quizzes" } as const)],
-  ["masteryQuizId", Object.freeze({ blocking: true, catalog: "quizzes" } as const)],
-  ["nextRecommendedPathId", Object.freeze({ blocking: false, catalog: "learningPaths" } as const)],
-  ["lessonId", Object.freeze({ blocking: true, catalog: "lessons" } as const)],
-  ["talaId", Object.freeze({ blocking: true, catalog: "talas" } as const)],
-  ["targetTalaId", Object.freeze({ blocking: true, catalog: "talas" } as const)],
-  ["audioTalaId", Object.freeze({ blocking: true, catalog: "talas" } as const)],
-  ["ragaId", Object.freeze({ blocking: true, catalog: "ragas" } as const)],
-  ["targetRagaId", Object.freeze({ blocking: true, catalog: "ragas" } as const)],
-  ["selectedRagaId", Object.freeze({ blocking: true, catalog: "ragas" } as const)],
-]);
-
-type SourceRecord = {
-  id: string;
-  originalFilename: string;
-  grades: string[];
-};
-
-function getValidatedSourceRecords(context: PublicationEvaluationContext): SourceRecord[] {
-  return context.catalogs.sources.flatMap((candidate) =>
-    validateContentRecord(candidate, "source").isValid && isRecord(candidate)
-      ? [candidate as unknown as SourceRecord]
-      : []
-  );
-}
-
-function getSourceRecordsById(sourceId: string, context: PublicationEvaluationContext): SourceRecord[] {
-  const normalizedSourceId = normalizeRecordId(sourceId);
-  const matches: SourceRecord[] = [];
-  for (const candidate of context.catalogs.sources) {
-    if (!isRecord(candidate) || normalizeRecordId(readOwnDataField(candidate, "id")) !== normalizedSourceId) continue;
-    if (!validateContentRecord(candidate, "source").isValid) continue;
-    matches.push(candidate as unknown as SourceRecord);
-  }
-  return matches;
-}
-
-function countSourceRecordsById(sourceId: string, context: PublicationEvaluationContext): number {
-  const normalizedSourceId = normalizeRecordId(sourceId);
-  let count = 0;
-  for (const candidate of context.catalogs.sources) {
-    if (isRecord(candidate) && normalizeRecordId(readOwnDataField(candidate, "id")) === normalizedSourceId) count += 1;
-  }
-  return count;
-}
+export { DEPENDENCY_FIELD_RULES } from "@/lib/data/dependency-rules";
+import { DEPENDENCY_FIELD_RULES as dependencyFieldRules } from "@/lib/data/dependency-rules";
 
 const RAW_PUBLICATION_CATALOGS: Array<[ContentEntityKind, keyof PublicationCatalogSnapshot, unknown[]]> = [
   ["lesson", "lessons", lessonsData as unknown[]],
@@ -293,100 +118,6 @@ const RAW_PUBLICATION_CATALOGS: Array<[ContentEntityKind, keyof PublicationCatal
   ["exam-paper", "examPapers", examPapersData as unknown[]],
   ["source", "sources", sourcesData as unknown[]],
 ];
-
-function captureEvaluationValue(value: unknown, freezeSnapshot: boolean = true): unknown | undefined {
-  try {
-    const snapshot = cloneBoundedRecord(value);
-    if (snapshot === undefined) return undefined;
-    if (!freezeSnapshot) return snapshot;
-    const pending: object[] = snapshot && typeof snapshot === "object" ? [snapshot] : [];
-    const seen = new WeakSet<object>();
-    while (pending.length > 0) {
-      const current = pending.pop() as object;
-      if (seen.has(current)) continue;
-      seen.add(current);
-      Object.values(current).forEach((child) => {
-        if (child && typeof child === "object") pending.push(child);
-      });
-      Object.freeze(current);
-    }
-    return snapshot;
-  } catch {
-    return undefined;
-  }
-}
-
-function captureEvaluationArray(value: unknown): unknown[] | undefined {
-  const snapshot = captureEvaluationValue(value);
-  return Array.isArray(snapshot) ? snapshot : undefined;
-}
-
-function isSourceDocumentRecord(value: unknown): value is SourceDocumentRecord {
-  const hasText = (field: string) => {
-    const candidate = isRecord(value) ? readOwnDataField(value, field) : undefined;
-    return typeof candidate === "string" && candidate.trim().length > 0;
-  };
-  return isRecord(value) && hasText("id") && hasText("slug") && hasText("originalFilename") &&
-    Number.isSafeInteger(readOwnDataField(value, "pageCount")) &&
-    (readOwnDataField(value, "pageCount") as number) > 0 && hasText("reviewStatus");
-}
-
-function isSourcePageQualityRecord(value: unknown): value is SourcePageQualityRecord {
-  const confidence = isRecord(value) ? readOwnDataField(value, "confidence") : undefined;
-  const documentSlug = isRecord(value) ? readOwnDataField(value, "documentSlug") : undefined;
-  return isRecord(value) && typeof documentSlug === "string" && documentSlug.trim().length > 0 &&
-    Number.isSafeInteger(readOwnDataField(value, "pageNumber")) &&
-    (readOwnDataField(value, "pageNumber") as number) > 0 &&
-    (confidence === "A" || confidence === "B" || confidence === "C" || confidence === "D") &&
-    typeof readOwnDataField(value, "hasSinhalaText") === "boolean";
-}
-
-function hasValidPageQualityRegistry(
-  documents: SourceDocumentRecord[],
-  pages: SourcePageQualityRecord[],
-): boolean {
-  const pageCountsBySlug = new Map<string, number>();
-  for (const document of documents) {
-    if (pageCountsBySlug.has(document.slug)) return false;
-    pageCountsBySlug.set(document.slug, document.pageCount);
-  }
-  const seenPages = new Set<string>();
-  for (const page of pages) {
-    const pageCount = pageCountsBySlug.get(page.documentSlug);
-    const key = `${page.documentSlug}:${page.pageNumber}`;
-    if (pageCount === undefined || page.pageNumber > pageCount || seenPages.has(key)) return false;
-    seenPages.add(key);
-  }
-  return true;
-}
-
-// Publication gating and forensic validation share one registry contract. An
-// incomplete, conflicting, or malformed registry — a wrong policy, drifted
-// required-field lists, an unresolvable issue anchor, a bad status, or a
-// duplicate/denormalized talaId — makes the evaluation context unsafe rather
-// than leaving publication gating with a weaker subset of the rules.
-function hasCompleteDispositionRegistry(value: unknown): boolean {
-  try {
-    return inspectDispositionRegistry(value).ok;
-  } catch {
-    return false;
-  }
-}
-
-function registerKnownKinds(
-  knownKinds: Map<string, ContentEntityKind | "ambiguous">,
-  kind: ContentEntityKind,
-  records: readonly unknown[],
-): void {
-  records.forEach((record) => {
-    if (!isRecord(record)) return;
-    const id = readOwnDataField(record, "id");
-    const normalizedId = normalizeRecordId(id);
-    if (!normalizedId) return;
-    const previous = knownKinds.get(normalizedId);
-    knownKinds.set(normalizedId, previous ? "ambiguous" : kind);
-  });
-}
 
 type CatalogInputRead = { present: boolean; safe: boolean; value?: unknown };
 
@@ -422,15 +153,10 @@ export function createPublicationEvaluationContext(
     capturedCatalogs[key] = snapshot ?? [];
     rawCounts[key] = snapshot?.length ?? readDeclaredArrayLength(rawCatalog);
   }
-  const capturedDocuments = captureEvaluationArray(sourceDocumentsData);
-  const capturedPageQuality = captureEvaluationArray(sourcePageQualityData);
-  const capturedDispositions = captureEvaluationValue(musicalCoreFieldDispositionsData);
-  const sourceDocuments = (capturedDocuments ?? []) as SourceDocumentRecord[];
-  const sourcePages = (capturedPageQuality ?? []) as SourcePageQualityRecord[];
-  if (!capturedDocuments || !capturedDocuments.every(isSourceDocumentRecord) ||
-    !capturedPageQuality || !capturedPageQuality.every(isSourcePageQualityRecord) ||
-    !hasValidPageQualityRegistry(sourceDocuments, sourcePages) ||
-    capturedDispositions === undefined || !hasCompleteDispositionRegistry(capturedDispositions)) safe = false;
+  const evidence = getEvidenceRegistrySnapshot();
+  const sourceDocuments = [...evidence.sourceDocuments] as SourceDocumentRecord[];
+  const sourcePages = [...evidence.sourcePageQuality] as SourcePageQualityRecord[];
+  if (!evidence.safe) safe = false;
 
   Object.freeze(capturedCatalogs);
   const context: PublicationEvaluationContext = Object.freeze({
@@ -440,14 +166,14 @@ export function createPublicationEvaluationContext(
   const state: PublicationEvaluationState = {
     sourceDocuments,
     sourcePageQuality: sourcePages,
-    musicalCoreFieldDispositions: capturedDispositions,
+    musicalCoreFieldDispositions: evidence.musicalCoreFieldDispositions,
     knownKinds: new Map<string, ContentEntityKind | "ambiguous">(),
     snapshots: new WeakMap<object, Record<string, unknown>>(),
     stack: new Set<string>(),
     memo: new WeakMap<object, PublicationDecision>(),
     rawCounts: Object.freeze(rawCounts),
   };
-  PUBLICATION_CONTEXT_STATE.set(context, state);
+  setPublicationEvaluationState(context, state);
 
   for (const [kind, key] of RAW_PUBLICATION_CATALOGS) {
     const records = context.catalogs[key];
@@ -511,39 +237,6 @@ type PublicationRecordShape = {
   sourceReference?: unknown;
 };
 
-export type TalaFieldDispositionStatus = "verified" | "needs-review";
-
-export interface TalaFieldDisposition {
-  talaId: string;
-  context: TalaFieldDispositionField;
-  theka: TalaFieldDispositionField;
-  bols: TalaBolFieldDisposition[];
-  allRequiredFieldsVerified: boolean;
-}
-
-export interface TalaFieldDispositionField {
-  status: TalaFieldDispositionStatus;
-  value?: string;
-  sourceReference?: SourceReference;
-  quality: EvidenceQuality | "N/A";
-  issueId: string;
-  scope?: "claim" | "not-claimed";
-}
-
-export interface TalaBolFieldDisposition extends TalaFieldDispositionField {
-  matra: number;
-}
-
-const talaFieldDispositions = musicalCoreFieldDispositionsData as {
-  requiredFields: string[];
-  unclosedRequiredFields: string[];
-  talas: Array<{
-    talaId: string;
-    context: TalaFieldDispositionField;
-    theka: TalaFieldDispositionField;
-    bols: TalaBolFieldDisposition[];
-  }>;
-};
 
 export interface ContextClaimPublicationDecision {
   present: boolean;
@@ -552,167 +245,23 @@ export interface ContextClaimPublicationDecision {
   sourceEvidence: SourceEvidenceDecision;
 }
 
-export interface PublicationInput {
-  id: string;
-  gradeBands: string[];
-  sourceReference?: SourceReference;
-}
+import { toPublicationInput as toPublicationInputImpl, type PublicationInput } from "@/lib/data/source-evidence-policy";
+export type { PublicationInput };
 
-type SourceResolution =
-  | { status: "missing-source" }
-  | { status: "ambiguous-source-record" }
-  | { status: "missing-document" }
-  | { status: "ambiguous-document" }
-  | { status: "found"; document: SourceDocumentRecord };
-
-function resolveSourceDocument(sourceId: string, context: PublicationEvaluationContext): SourceResolution {
-  if (countSourceRecordsById(sourceId, context) > 1) return { status: "ambiguous-source-record" };
-  const sourceMatches = getSourceRecordsById(sourceId, context);
-  if (sourceMatches.length === 0) return { status: "missing-source" };
-  if (sourceMatches.length > 1) return { status: "ambiguous-source-record" };
-  const source = sourceMatches[0];
-
-  const matches = getEvaluationState(context).sourceDocuments.filter(
-    (document) => document.originalFilename === source.originalFilename
-  );
-  if (matches.length === 0) return { status: "missing-document" };
-  if (matches.length > 1) return { status: "ambiguous-document" };
-  return { status: "found", document: matches[0] };
-}
-
-type LocatorParseResult = {
-  pageNumbers: number[];
-  mismatchedDocument: boolean;
-  malformed: boolean;
-};
-
-function parseSourceLocator(pageOrSection: string, expectedFilename: string): LocatorParseResult {
-  const MAX_LOCATOR_LENGTH = 4_096;
-  const MAX_LOCATOR_TERMS = 256;
-  const MAX_LOCATOR_PAGES = 1_024;
-  if (pageOrSection.length > MAX_LOCATOR_LENGTH || expectedFilename.length > MAX_LOCATOR_LENGTH) {
-    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
-  }
-  if (/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/.test(pageOrSection) || /[\uFF0E\uFE52\uFF61]/.test(pageOrSection)) {
-    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
-  }
-
-  const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const pageList = "([0-9]+(?:\\s*[-–]\\s*[0-9]+)?(?:\\s*,\\s*[0-9]+(?:\\s*[-–]\\s*[0-9]+)?)*)";
-  const exactPattern = new RegExp(
-    `^${escapeRegex(expectedFilename.trim())}\\s+(?:පිටුව|පිටු|pdf\\s*pages?|pages?)\\s+${pageList}$`,
-    "i"
-  );
-  const exactMatch = pageOrSection.trim().match(exactPattern);
-  if (!exactMatch) {
-    const pdfTokenCount = Array.from(pageOrSection.matchAll(/\.pdf/gi)).length;
-    const startsWithExpected = pageOrSection.trim().toLocaleLowerCase().startsWith(expectedFilename.trim().toLocaleLowerCase());
-    return { pageNumbers: [], mismatchedDocument: pdfTokenCount > 1 || (pdfTokenCount === 1 && !startsWithExpected), malformed: true };
-  }
-
-  const pageClause = exactMatch[1];
-  if (!pageClause) {
-    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
-  }
-  const pageTokens = pageClause.split(",");
-  if (pageTokens.length > MAX_LOCATOR_TERMS) {
-    return { pageNumbers: [], mismatchedDocument: false, malformed: true };
-  }
-  const pages = new Set<number>();
-  for (const token of pageTokens) {
-    const range = token.trim().split(/\s*[-–]\s*/);
-    const start = Number(range[0]);
-    const end = range[1] === undefined ? start : Number(range[1]);
-    if (!Number.isInteger(start) || !Number.isInteger(end) || start < 1 || end < start || end - start > 1000) {
-      return { pageNumbers: [], mismatchedDocument: false, malformed: true };
-    }
-    if (pages.size + (end - start + 1) > MAX_LOCATOR_PAGES) {
-      return { pageNumbers: [], mismatchedDocument: false, malformed: true };
-    }
-    for (let page = start; page <= end; page += 1) pages.add(page);
-  }
-
-  return {
-    pageNumbers: Array.from(pages).sort((a, b) => a - b),
-    mismatchedDocument: false,
-    malformed: false,
-  };
-}
-
-function explicitPageReferences(pageOrSection: string, expectedFilename: string): LocatorParseResult {
-  return parseSourceLocator(pageOrSection, expectedFilename);
-}
-
-
-function uniquePageEvidence(
-  documentSlug: string,
-  pageNumbers: number[],
-  context: PublicationEvaluationContext,
-): SourcePageQualityRecord[] | undefined {
-  const requestedPages = new Set(pageNumbers);
-  const evidenceByPage = new Map<number, SourcePageQualityRecord>();
-  for (const page of getEvaluationState(context).sourcePageQuality) {
-    if (page.documentSlug !== documentSlug || !requestedPages.has(page.pageNumber)) continue;
-    if (evidenceByPage.has(page.pageNumber)) return undefined;
-    evidenceByPage.set(page.pageNumber, page);
-  }
-  if (evidenceByPage.size !== requestedPages.size) return undefined;
-  return pageNumbers.map((pageNumber) => evidenceByPage.get(pageNumber) as SourcePageQualityRecord);
-}
-
-function qualityForPages(documentSlug: string, pageNumbers: number[], context: PublicationEvaluationContext): EvidenceQuality {
-  const evidence = uniquePageEvidence(documentSlug, pageNumbers, context);
-  if (!evidence) return "missing";
-  const qualities = evidence.map((page) => page.confidence);
-
-  if (qualities.length === 0) return "missing";
-  
-  const uniqueQualities = new Set(qualities);
-  if (uniqueQualities.has("D")) return uniqueQualities.size === 1 ? "D" : "mixed";
-  if (uniqueQualities.has("C")) return uniqueQualities.size === 1 ? "C" : "mixed";
-  if (uniqueQualities.has("B")) return uniqueQualities.size === 1 ? "B" : "mixed";
-  return "A";
-}
-
-function hasReadablePages(documentSlug: string, pageNumbers: number[], context: PublicationEvaluationContext): boolean {
-  const citedPages = uniquePageEvidence(documentSlug, pageNumbers, context);
-  return Boolean(citedPages?.every(
-    (page) => (page.confidence === "A" || page.confidence === "B") && page.hasSinhalaText
-  ));
-}
-
-function getRecordShape(record: unknown): PublicationRecordShape {
-  return isRecord(record) ? (record as PublicationRecordShape) : {};
+function hasUnsupportedGrade(gradeBands: string[]): boolean {
+  return gradeBands.includes("12-13");
 }
 
 function isSourceReference(value: unknown): value is SourceReference {
   return isContractSourceReference(value);
 }
 
-function resolveRecordSourceReference(value: PublicationRecordShape): SourceReference | undefined {
-  const reference = readOwnDataField(value, "sourceReference");
-  return isSourceReference(reference) ? reference : undefined;
-}
-
-export function toPublicationInput(record: unknown): PublicationInput {
-  try {
-    const snapshot = cloneBoundedRecord(record);
-    if (!snapshot) return { id: "", gradeBands: [], sourceReference: undefined };
-    const value = getRecordShape(snapshot);
-    const id = readOwnDataField(value, "id");
-    return {
-      id: typeof id === "string" ? id : "",
-      gradeBands: getGradeBands(value),
-      sourceReference: resolveRecordSourceReference(value),
-    };
-  } catch {
-    return { id: "", gradeBands: [], sourceReference: undefined };
-  }
+function getRecordShape(record: unknown): PublicationRecordShape {
+  return isRecord(record) ? (record as PublicationRecordShape) : {};
 }
 
 function getGradeBands(value: PublicationRecordShape): string[] {
   const bands = new Set<string>();
-
   const gradeBand = readOwnDataField(value, "gradeBand");
   const gradeBands = readOwnDataField(value, "gradeBands");
   if (typeof gradeBand === "string") bands.add(gradeBand);
@@ -721,70 +270,24 @@ function getGradeBands(value: PublicationRecordShape): string[] {
       if (typeof band === "string") bands.add(band);
     });
   }
-
   return Array.from(bands);
+}
+
+export function toPublicationInput(record: unknown): PublicationInput {
+  return toPublicationInputImpl(record);
 }
 
 export function getSourceDocumentSummary(
   sourceId: string,
   context: PublicationEvaluationContext = createPublicationEvaluationContext(),
 ): SourceDocumentSummary {
-  try {
-    if (!getSafeEvaluationState(context)) {
-      return {
-        reviewStatus: "Unverified / unsafe evaluation context",
-        pageCount: 0,
-        evidenceQuality: "missing",
-      };
-    }
-    const resolution = resolveSourceDocument(sourceId, context);
-    if (resolution.status === "missing-source") {
-      return {
-        reviewStatus: "No matching source record",
-        pageCount: 0,
-        evidenceQuality: "missing",
-      };
-    }
-    if (resolution.status !== "found") {
-      return {
-        reviewStatus:
-          resolution.status === "missing-document"
-            ? "No matching extracted document"
-            : resolution.status === "ambiguous-source-record"
-            ? "Ambiguous source record ID"
-            : "Ambiguous extracted document mapping",
-        pageCount: 0,
-        evidenceQuality: "missing",
-      };
-    }
+  return getSourceDocumentSummaryImpl(sourceId, context);
+}
 
-    const document = resolution.document;
-    const state = getEvaluationState(context);
-    const pages = state.sourcePageQuality.filter((page) => page.documentSlug === document.slug);
-    const quality = pages.length === 0
-      ? "missing"
-      : pages.some((page) => page.confidence === "D")
-      ? "mixed"
-      : pages.some((page) => page.confidence === "C")
-      ? "C"
-      : pages.some((page) => page.confidence === "B")
-      ? "B"
-      : "A";
-
-    return {
-      documentId: document.id,
-      documentSlug: document.slug,
-      reviewStatus: document.reviewStatus,
-      pageCount: document.pageCount,
-      evidenceQuality: quality,
-    };
-  } catch {
-    return {
-      reviewStatus: "Unverified / unsafe evaluation context",
-      pageCount: 0,
-      evidenceQuality: "missing",
-    };
-  }
+export function getSourceCorpusInventory(
+  context: PublicationEvaluationContext = createPublicationEvaluationContext(),
+): SourceCorpusInventory {
+  return getSourceCorpusInventoryImpl(context);
 }
 
 export type SourceCorpusUnavailableReason = "unsafe-evaluation-context" | "inventory-read-failed";
@@ -801,178 +304,12 @@ export type SourceCorpusInventory =
       available: false;
       reason: SourceCorpusUnavailableReason;
     };
-
-/**
- * Report the extracted-source inventory, or an explicit unavailable state.
- *
- * The counts are only meaningful when the evaluation context is safe. A
- * malformed source-document row, page-quality row, page registry, or Tala
- * disposition registry already clears `context.safe`, and this boundary must not
- * present numbers derived from that state as an ordinary inventory.
- */
-export function getSourceCorpusInventory(
-  context: PublicationEvaluationContext = createPublicationEvaluationContext(),
-): SourceCorpusInventory {
-  try {
-    const state = getSafeEvaluationState(context);
-    if (!state) return { available: false, reason: "unsafe-evaluation-context" };
-    const qualityCounts = state.sourcePageQuality.reduce<Record<string, number>>((counts, page) => {
-      counts[page.confidence] = (counts[page.confidence] || 0) + 1;
-      return counts;
-    }, Object.create(null) as Record<string, number>);
-    return {
-      available: true,
-      sourceRecords: getValidatedSourceRecords(context).length,
-      sourceDocuments: state.sourceDocuments.length,
-      sourcePages: state.sourceDocuments.reduce((sum, document) => sum + document.pageCount, 0),
-      qualityCounts,
-    };
-  } catch {
-    return { available: false, reason: "inventory-read-failed" };
-  }
-}
-
 export function evaluateSourceReference(
   reference: SourceReference | undefined,
   context: PublicationEvaluationContext = createPublicationEvaluationContext(),
 ): SourceEvidenceDecision {
-  try {
-    if (!getSafeEvaluationState(context)) return unsafeContextEvidence();
-    const referenceSnapshot = captureEvaluationValue(reference, false);
-    const sourceIdValue = isSourceReference(referenceSnapshot) ? readOwnDataField(referenceSnapshot, "sourceId") : undefined;
-    const pageOrSectionValue = isSourceReference(referenceSnapshot) ? readOwnDataField(referenceSnapshot, "pageOrSection") : undefined;
-    const sourceId = typeof sourceIdValue === "string" ? sourceIdValue : undefined;
-    const pageOrSection = typeof pageOrSectionValue === "string" ? pageOrSectionValue : undefined;
-    if (!sourceId || !pageOrSection?.trim()) {
-      return {
-        pageNumbers: [],
-        quality: "missing",
-        supportable: false,
-        reasonCode: "missing-source-reference",
-        reason: "Claim-level source ID and exact page/section evidence are required.",
-      };
-    }
-
-    const resolution = resolveSourceDocument(sourceId, context);
-    if (resolution.status !== "found") {
-      const isAmbiguous = resolution.status === "ambiguous-document" || resolution.status === "ambiguous-source-record";
-      return {
-        sourceId,
-        pageNumbers: [],
-        quality: "missing",
-        supportable: false,
-        reasonCode: isAmbiguous
-          ? resolution.status === "ambiguous-source-record" ? "ambiguous-source-record" : "ambiguous-source-document"
-          : "unknown-source",
-        reason:
-          resolution.status === "missing-source"
-            ? "The source ID is not present in the canonical source catalog."
-            : resolution.status === "missing-document"
-            ? "The supplied source catalog has no matching extracted document."
-            : resolution.status === "ambiguous-source-record"
-            ? "The source ID maps to more than one canonical source record."
-            : "The source filename maps to more than one extracted document.",
-      };
-    }
-
-    const document = resolution.document;
-    const locator = explicitPageReferences(pageOrSection, document.originalFilename);
-    if (locator.mismatchedDocument) {
-      return {
-        sourceId,
-        documentId: document.id,
-        documentSlug: document.slug,
-        pageNumbers: [],
-        quality: "missing",
-        supportable: false,
-        reasonCode: "mismatched-source-document",
-        reason: "The page locator names a PDF other than the document selected by its source ID.",
-      };
-    }
-
-    const pageNumbers = locator.pageNumbers;
-    const inRangePages = pageNumbers.filter((page) => page <= document.pageCount);
-    const quality = qualityForPages(document.slug, inRangePages, context);
-
-    if (locator.malformed || pageNumbers.length === 0) {
-      return {
-        sourceId,
-        documentId: document.id,
-        documentSlug: document.slug,
-        pageNumbers: [],
-        quality: "missing",
-        supportable: false,
-        reasonCode: "missing-page-evidence",
-        reason: "No exact numeric page evidence was supplied.",
-      };
-    }
-
-    if (inRangePages.length !== pageNumbers.length) {
-      return {
-        sourceId,
-        documentId: document.id,
-        documentSlug: document.slug,
-        pageNumbers: [],
-        quality: "missing",
-        supportable: false,
-        reasonCode: "page-out-of-range",
-        reason: "At least one cited page number falls outside the extracted document page range.",
-      };
-    }
-
-    if (document.reviewStatus !== "Source Triaged") {
-      return {
-        sourceId,
-        documentId: document.id,
-        documentSlug: document.slug,
-        pageNumbers: inRangePages,
-        quality,
-        supportable: false,
-        reasonCode: "source-document-needs-review",
-        reason: `The extracted document is ${document.reviewStatus}; source triage is not complete.`,
-      };
-    }
-
-    if (!hasReadablePages(document.slug, inRangePages, context)) {
-      return {
-        sourceId,
-        documentId: document.id,
-        documentSlug: document.slug,
-        pageNumbers: inRangePages,
-        quality,
-        supportable: false,
-        reasonCode: "low-quality-page-evidence",
-        reason: "The cited pages do not contain an A/B readable Sinhala evidence page.",
-      };
-    }
-
-    return {
-      sourceId,
-      documentId: document.id,
-      documentSlug: document.slug,
-      pageNumbers: inRangePages,
-      quality,
-      supportable: true,
-      reasonCode: "supportable",
-      reason: "The source ID, extracted document, page range, and readable page evidence agree.",
-    };
-  } catch {
-    return {
-      pageNumbers: [],
-      quality: "missing",
-      supportable: false,
-      reasonCode: "missing-source-reference",
-      reason: "Claim-level source ID and exact page/section evidence are required.",
-    };
-  }
+  return evaluateSourceReferenceImpl(reference, context);
 }
-
-
-
-function hasUnsupportedGrade(gradeBands: string[]): boolean {
-  return gradeBands.includes("12-13");
-}
-
 function hasPublicGrade(gradeBands: string[]): boolean {
   return gradeBands.length > 0 && gradeBands.every(isPublicGradeBand);
 }
@@ -1016,74 +353,6 @@ function gradeScopeMatchesSource(
   return gradeBands.every((band) => bandContainsSourceGrade(band, source.grades));
 }
 
-export function getTalaFieldDisposition(
-  talaOrId: string | unknown,
-  context: PublicationEvaluationContext = createPublicationEvaluationContext(),
-): TalaFieldDisposition | undefined {
-  try {
-    if (!getSafeEvaluationState(context)) return undefined;
-    const suppliedSnapshot = typeof talaOrId === "string" ? undefined : captureEvaluationValue(talaOrId, false);
-    const supplied = isRecord(suppliedSnapshot) ? suppliedSnapshot : undefined;
-    const suppliedId = readOwnDataField(supplied, "id");
-    const talaId = normalizeRecordId(typeof talaOrId === "string" ? talaOrId : suppliedId);
-    const dispositionRegistry = getEvaluationState(context).musicalCoreFieldDispositions;
-    const registry = isRecord(dispositionRegistry)
-      ? dispositionRegistry as typeof talaFieldDispositions
-      : undefined;
-    const entries = registry && Array.isArray(registry.talas) ? registry.talas : [];
-    const matchingEntries = entries.filter((candidate) => normalizeRecordId(candidate.talaId) === talaId);
-    if (matchingEntries.length !== 1) return undefined;
-    const entry = matchingEntries[0];
-    if (!entry) return undefined;
-  const tala = (supplied ?? context.catalogs.talas.find((candidate) => normalizeRecordId(readOwnDataField(candidate, "id")) === talaId)) as {
-    id?: unknown;
-    context_si?: unknown;
-    contextSourceReference?: unknown;
-    theka_si?: unknown;
-    bols?: unknown;
-  } | undefined;
-  const hasPublishableFieldEvidence = (field: TalaFieldDispositionField): boolean =>
-    field.quality === "A" || field.quality === "B"
-      ? evaluateSourceReference(field.sourceReference, context).supportable
-      : false; // quality-gated publish decision; see hasLedgerConsistentEvidence in content-validator for ledger self-consistency
-  const contextVerified = entry.context.status === "verified" && (
-    entry.context.scope === "not-claimed"
-      ? !tala?.context_si && !tala?.contextSourceReference && entry.context.quality === "N/A"
-      : Boolean(
-          typeof tala?.context_si === "string" &&
-          entry.context.value === tala.context_si &&
-          isSourceReference(tala.contextSourceReference) &&
-          entry.context.sourceReference?.sourceId === tala.contextSourceReference.sourceId &&
-          entry.context.sourceReference.pageOrSection === tala.contextSourceReference.pageOrSection &&
-          hasPublishableFieldEvidence(entry.context)
-        )
-  );
-  const allRequiredFieldsVerified =
-    Boolean(tala) &&
-    Boolean(registry) &&
-    // Guard the array before reading it: an absent or malformed list must fail
-    // closed here rather than throwing out to the enclosing catch.
-    Array.isArray(registry?.unclosedRequiredFields) &&
-    !registry.unclosedRequiredFields.includes("structure") &&
-    contextVerified &&
-    entry.theka.status === "verified" &&
-    entry.theka.value === tala?.theka_si &&
-    hasPublishableFieldEvidence(entry.theka) &&
-    entry.bols.length > 0 &&
-    entry.bols.every((bol, index) =>
-      bol.status === "verified" &&
-      bol.matra === index + 1 &&
-      Array.isArray(tala?.bols) &&
-      bol.matra === (tala.bols[index] as { matra?: unknown } | undefined)?.matra &&
-      bol.value === (tala.bols[index] as { bol_si?: unknown } | undefined)?.bol_si &&
-      hasPublishableFieldEvidence(bol)
-    ) &&
-    Array.isArray(tala?.bols) && tala.bols.length === entry.bols.length;
-    return { ...entry, allRequiredFieldsVerified };
-  } catch {
-    return undefined;
-  }
-}
 
 function collectDependencyDispositions(
   value: unknown,
@@ -1139,7 +408,7 @@ function collectDependencyDispositions(
     const record = current.value as Record<string, unknown>;
     const prefix = current.path ? `${current.path}.` : "";
     const prerequisites = readOwnDataField(record, "prerequisites");
-    const prerequisiteRule = DEPENDENCY_FIELD_RULES.get("prerequisites");
+    const prerequisiteRule = dependencyFieldRules.get("prerequisites");
     if (prerequisiteRule && Array.isArray(prerequisites)) {
       prerequisites.forEach((dependencyId, index) => addDependency(
         dependencyId,
@@ -1149,7 +418,7 @@ function collectDependencyDispositions(
       ));
     }
     const steps = readOwnDataField(record, "steps");
-    const stepRule = DEPENDENCY_FIELD_RULES.get("steps[].lessonId");
+    const stepRule = dependencyFieldRules.get("steps[].lessonId");
     if (stepRule && Array.isArray(steps)) {
       steps.forEach((step, index) => {
         const lessonId = step && typeof step === "object" && !Array.isArray(step)
@@ -1168,7 +437,7 @@ function collectDependencyDispositions(
       if (key === "prerequisites" || key === "steps" || key === "lessonId") continue;
       const child = readOwnDataField(record, key);
       const childPath = `${prefix}${key}`;
-      const dependencyRule = DEPENDENCY_FIELD_RULES.get(key);
+      const dependencyRule = dependencyFieldRules.get(key);
       if (dependencyRule) {
         addDependency(child, childPath, dependencyRule.blocking, decisionContext.catalogs[dependencyRule.catalog]);
       }
@@ -1316,7 +585,7 @@ function getRecordPublicationDecisionInternal(
   const isQuiz = decisionContext.catalogs.quizzes.some((quiz) => normalizeRecordId(readOwnDataField(quiz, "id")) === recordId);
   const baseDecision = isQuiz
     ? getQuizContainerPublicationDecision(safeRecord, decisionContext)
-    : getBasePublicationDecision(toPublicationInput(safeRecord), decisionContext);
+    : getBasePublicationDecision(toPublicationInputImpl(safeRecord), decisionContext);
   const reasonCodes = new Set(baseDecision.reasonCodes);
   const nestedDispositions = [...baseDecision.nestedDispositions];
   const withheldFields = [...baseDecision.withheldFields];
@@ -1401,7 +670,7 @@ function getRecordPublicationDecisionInternal(
     parentIsActiveBacklink || getRecordPublicationDecisionInternal(parent, decisionContext, parent).isPublic
   ));
   if (isQuiz) {
-    const parentRule = DEPENDENCY_FIELD_RULES.get("lessonId");
+    const parentRule = dependencyFieldRules.get("lessonId");
     if (!parentRule) throw new Error("Missing dependency rule for lessonId");
     nestedDispositions.push({
       path: "lessonId",
@@ -1426,7 +695,7 @@ function getRecordPublicationDecisionInternal(
     const hasExplicitGrades = isCanonicalGradeBandArray(readOwnDataField(questionShape, "gradeBands"));
     const hasDirectSource = isSourceReference(readOwnDataField(questionShape, "sourceReference"));
     const hasValidQuestionShape = hasCanonicalQuestionShape(question);
-    const decision = getBasePublicationDecision(toPublicationInput(question), decisionContext);
+    const decision = getBasePublicationDecision(toPublicationInputImpl(question), decisionContext);
     nestedDispositions.push({
       path: `${group.path}[${index}]`,
       isPublic: decision.isPublic,
@@ -1564,7 +833,7 @@ export function getContextClaimPublicationDecision(
         present: false,
         isPublic: false,
         reasonCode: "unsafe-evaluation-context",
-        sourceEvidence: unsafeContextEvidence(),
+        sourceEvidence: unsafeContextEvidenceShared(),
       };
     }
     const recordSnapshot = captureEvaluationValue(record, false);
@@ -1684,5 +953,5 @@ export function formatPublicSourceReference(reference: SourceReference): string 
 }
 
 export function isPublicGradeBand(value: string): value is PublicGradeBand {
-  return PUBLIC_GRADE_BANDS.includes(value as PublicGradeBand);
+  return publicGradeBands.includes(value as PublicGradeBand);
 }

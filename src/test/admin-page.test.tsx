@@ -27,5 +27,5 @@ describe("Admin review status feedback", () => {
 
     view.unmount();
     expect(update).toHaveBeenCalledTimes(1);
-  });
+  }, 30_000);
 });

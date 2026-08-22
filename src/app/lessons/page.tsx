@@ -58,7 +58,7 @@ export default function LessonsDirectoryPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="පාඩම් මාතෘකාව, ස්වර, තාල හෝ සංකල්ප සෙවීම..."
-            className="w-full bg-surface-warm border border-border rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full bg-surface-warm border border-border rounded-xl pl-10 pr-4 py-3 min-h-[44px] text-xs sm:text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
@@ -70,7 +70,7 @@ export default function LessonsDirectoryPage() {
               key={grade}
               type="button"
               onClick={() => setSelectedGrade(grade)}
-              className={`px-3 py-1 rounded-lg font-bold transition-all ${
+              className={`min-h-[44px] px-3 py-2 rounded-lg font-bold transition-all ${
                 selectedGrade === grade
                   ? "bg-primary text-white shadow-sm"
                   : "bg-surface-warm text-text hover:bg-white border border-border-light"
@@ -87,7 +87,7 @@ export default function LessonsDirectoryPage() {
           <select
             value={selectedStrand}
             onChange={(e) => setSelectedStrand(e.target.value)}
-            className="bg-surface-warm border border-border rounded-lg px-3 py-1.5 text-xs text-text focus:ring-1 focus:ring-primary"
+            className="min-h-[44px] bg-surface-warm border border-border rounded-lg px-3 py-2 text-xs text-text focus:ring-1 focus:ring-primary"
           >
             <option value="all">සියලු විෂය ධාරා</option>
             {strands.map((s) => (
@@ -120,7 +120,7 @@ export default function LessonsDirectoryPage() {
                   <button
                     type="button"
                     onClick={(e) => toggleSave(e, lesson.id)}
-                    className="p-1 rounded-lg text-text-muted hover:text-accent transition-colors"
+                    className="min-w-[44px] min-h-[44px] p-2 flex items-center justify-center rounded-lg text-text-muted hover:text-accent transition-colors"
                     title={isSaved ? "සුරැකූ ලැයිස්තුවෙන් ඉවත් කරන්න" : "පාඩම සුරකින්න"}
                   >
                     {isSaved ? (

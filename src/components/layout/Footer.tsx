@@ -31,32 +31,32 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-xs text-[#B8AEA3]">
               <li>
-                <Link href="/strands/strand-fundamentals" className="hover:text-amber-400 transition-colors">
+                <Link href="/strands/strand-fundamentals" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   මූලික සංගීත දැනුම
                 </Link>
               </li>
               <li>
-                <Link href="/strands/strand-swara-shruti" className="hover:text-amber-400 transition-colors">
+                <Link href="/strands/strand-swara-shruti" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   ස්වර හා ශ්‍රැති වාදය
                 </Link>
               </li>
               <li>
-                <Link href="/strands/strand-laya-tala" className="hover:text-amber-400 transition-colors">
+                <Link href="/strands/strand-laya-tala" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   ලය හා තාල ශාස්ත්‍රය
                 </Link>
               </li>
               <li>
-                <Link href="/strands/strand-ragas" className="hover:text-amber-400 transition-colors">
+                <Link href="/strands/strand-ragas" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   රාග ලෝකය
                 </Link>
               </li>
               <li>
-                <Link href="/instruments" className="hover:text-amber-400 transition-colors">
+                <Link href="/instruments" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   පෙරදිග හා දේශීය වාද්‍ය භාණ්ඩ
                 </Link>
               </li>
               <li>
-                <Link href="/traditions" className="hover:text-amber-400 transition-colors">
+                <Link href="/traditions" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   ශ්‍රී ලාංකීය ජන හා නාට්‍ය සංගීතය
                 </Link>
               </li>
@@ -70,32 +70,32 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-xs text-[#B8AEA3]">
               <li>
-                <Link href="/practice" className="hover:text-amber-400 transition-colors">
+                <Link href="/practice" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   ස්වර යතුරුපුවරුව & තාන්පුරය
                 </Link>
               </li>
               <li>
-                <Link href="/practice?tool=pitch" className="hover:text-amber-400 transition-colors">
+                <Link href="/practice?tool=pitch" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   දේශීය හඬ තාරතා පුහුණුව
                 </Link>
               </li>
               <li>
-                <Link href="/practice?tool=tala" className="hover:text-amber-400 transition-colors">
+                <Link href="/practice?tool=tala" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   තාල දෘශ්‍යකාරකය
                 </Link>
               </li>
               <li>
-                <Link href="/exams" className="hover:text-amber-400 transition-colors">
+                <Link href="/exams" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   සා.පෙළ මාදිලි ප්‍රශ්න (සමාලෝචනයට යටත්)
                 </Link>
               </li>
               <li>
-                <Link href="/glossary" className="hover:text-amber-400 transition-colors">
+                <Link href="/glossary" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   සිංහල සංගීත ශබ්දකෝෂය
                 </Link>
               </li>
               <li>
-                <Link href="/teachers" className="hover:text-amber-400 transition-colors">
+                <Link href="/teachers" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   ගුරුවරුන් සඳහා වන මෙවලම්
                 </Link>
               </li>
@@ -109,27 +109,27 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-xs text-[#B8AEA3]">
               <li>
-                <Link href="/sources" className="hover:text-amber-400 transition-colors">
+                <Link href="/sources" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   නිල මූලාශ්‍ර නාමාවලිය (SOURCES.md)
                 </Link>
               </li>
               <li>
-                <Link href="/attributions" className="hover:text-amber-400 transition-colors">
+                <Link href="/attributions" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   හිමිකම් හා ගෞරව සම්ප්‍රදාය (ATTRIBUTIONS.md)
                 </Link>
               </li>
               <li>
-                <Link href="/curriculum-map" className="hover:text-amber-400 transition-colors">
+                <Link href="/curriculum-map" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   විෂය නිර්දේශ සිතියම (Curriculum Map)
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-amber-400 transition-colors">
+                <Link href="/privacy" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors">
                   ළමා ආරක්ෂාව හා රහස්‍යතාව
                 </Link>
               </li>
               <li>
-                <Link href="/admin" className="hover:text-amber-400 transition-colors font-bold text-amber-300">
+                <Link href="/admin" className="inline-flex items-center min-h-[44px] py-2 hover:text-amber-400 transition-colors font-bold text-amber-300">
                   පරිපාලන සමාලෝචන පද්ධතිය (CMS)
                 </Link>
               </li>

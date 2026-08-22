@@ -137,7 +137,10 @@ describe("Search Engine & Sinhala Normalizer Suite", () => {
     });
     expect(() => repository.getLessons(filters as { query?: string })).not.toThrow();
     expect(repository.getLessons(filters as { query?: string })).toEqual([]);
-  });
+    // This test re-evaluates every catalog through seven getters under hostile
+    // Proxies; under full-suite parallel load it can exceed the 5s default
+    // without any single assertion being slow.
+  }, 30_000);
 
   it("rejects nonblank strings that normalize to no searchable characters", () => {
     const fixture = [{ id: "featured", title_si: "ස්වර පාඩම" }];
