@@ -1,0 +1,33 @@
+type SourceRecord = {
+  id: string;
+  originalFilename: string;
+  grades: string[];
+};
+
+function getValidatedSourceRecords(context: PublicationEvaluationContext): SourceRecord[] {
+  return context.catalogs.sources.flatMap((candidate) =>
+    validateContentRecord(candidate, "source").isValid && isRecord(candidate)
+      ? [candidate as unknown as SourceRecord]
+      : []
+  );
+}
+
+function getSourceRecordsById(sourceId: string, context: PublicationEvaluationContext): SourceRecord[] {
+  const normalizedSourceId = normalizeRecordId(sourceId);
+  const matches: SourceRecord[] = [];
+  for (const candidate of context.catalogs.sources) {
+    if (!isRecord(candidate) || normalizeRecordId(readOwnDataField(candidate, "id")) !== normalizedSourceId) continue;
+    if (!validateContentRecord(candidate, "source").isValid) continue;
+    matches.push(candidate as unknown as SourceRecord);
+  }
+  return matches;
+}
+
+function countSourceRecordsById(sourceId: string, context: PublicationEvaluationContext): number {
+  const normalizedSourceId = normalizeRecordId(sourceId);
+  let count = 0;
+  for (const candidate of context.catalogs.sources) {
+    if (isRecord(candidate) && normalizeRecordId(readOwnDataField(candidate, "id")) === normalizedSourceId) count += 1;
+  }
+  return count;
+}
