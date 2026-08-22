@@ -15,7 +15,7 @@ export function TalaDirectoryResults({ allTalas, talas, onClearSearch }: TalaDir
       <div className="rounded-3xl border border-amber-200 bg-amber-50 p-8 text-center text-sm text-amber-950">
         <p className="font-bold">දැනට ප්‍රසිද්ධ භාවිතයට සනාථ වූ තාල නොමැත.</p>
         <p className="mt-2 text-xs">මූලාශ්‍ර සමාලෝචනය අවසන් වන තෙක් අසනාථ තාල සහ ථේකා ප්‍රදර්ශනය නොකෙරේ.</p>
-        <Link href="/sources" className="mt-4 inline-block font-bold text-primary underline">
+        <Link href="/sources" className="mt-4 inline-flex items-center min-h-[44px] px-4 font-bold text-primary underline">
           මූලාශ්‍ර සටහන් බලන්න
         </Link>
       </div>
@@ -29,7 +29,7 @@ export function TalaDirectoryResults({ allTalas, talas, onClearSearch }: TalaDir
         <button
           type="button"
           onClick={onClearSearch}
-          className="mt-4 rounded-xl bg-primary px-4 py-2 font-bold text-white"
+          className="mt-4 rounded-xl bg-primary px-4 py-2.5 min-h-[44px] font-bold text-white"
         >
           සෙවුම හිස් කරන්න
         </button>

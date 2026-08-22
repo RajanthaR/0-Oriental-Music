@@ -199,7 +199,7 @@ export default function AdminReviewDashboardPage() {
           <button
             type="button"
             onClick={() => setSelectedStatusFilter("all")}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
+            className={`min-h-[44px] px-3 py-2 rounded-xl font-bold transition-all ${
               selectedStatusFilter === "all"
                 ? "bg-primary text-white shadow-sm"
                 : "bg-surface-warm text-text border border-border-light hover:bg-white"
@@ -214,7 +214,7 @@ export default function AdminReviewDashboardPage() {
                 key={st}
                 type="button"
                 onClick={() => setSelectedStatusFilter(st)}
-                className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
+                className={`min-h-[44px] px-3 py-2 rounded-xl font-bold transition-all ${
                   selectedStatusFilter === st
                     ? "bg-primary text-white shadow-sm"
                     : "bg-surface-warm text-text border border-border-light hover:bg-white"
@@ -277,7 +277,7 @@ export default function AdminReviewDashboardPage() {
                       onChange={(e) =>
                         handleUpdateStatus(les.id, e.target.value as ReviewStatus)
                       }
-                      className="bg-surface-warm border border-border rounded-lg px-2 py-1 text-[11px] text-text font-medium"
+                      className="min-h-[44px] bg-surface-warm border border-border rounded-lg px-3 py-2 text-[11px] text-text font-medium"
                       aria-label="තත්ත්වය වෙනස් කරන්න"
                     >
                       {statuses.map((st) => (

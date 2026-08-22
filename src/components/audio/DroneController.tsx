@@ -157,7 +157,7 @@ export const DroneController: React.FC = () => {
                 key={mode}
                 type="button"
                 onClick={() => handleFirstStringChange(mode)}
-                className={`py-1.5 font-bold rounded text-center transition-all ${
+                className={`min-h-[44px] px-2 py-1.5 font-bold rounded text-center transition-all ${
                   firstString === mode ? "bg-primary text-white shadow-sm" : "text-text hover:bg-white"
                 }`}
               >
