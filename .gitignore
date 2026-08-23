@@ -32,3 +32,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Tool-local agent configuration (owner decision 2026-08-23: untrack)
+.claude/launch.json

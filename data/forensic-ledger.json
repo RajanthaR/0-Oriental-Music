@@ -2507,7 +2507,7 @@
     },
     "a6Decisions": {
       "testFileSplits": "DEFERRED: publication-containment.test.ts (1535 lines), components.test.tsx (1185), publication-parity.test.ts (1069), synth.test.ts (1044) exceed comfortable review size, but no low-risk seam presented itself that would not reshelve shared fixtures and mutation matrices mid-slice; splitting for line count alone adds churn without behavioral gain. Left as recorded debt for a dedicated structural pass.",
-      "claudeLaunchJson": ".claude/launch.json remains tracked. RECOMMENDATION (owner decision pending, not executed): tool-local agent configuration does not belong in version control; move it to a developer-specific ignored path once no workflow depends on the committed copy."
+      "claudeLaunchJson": ".claude/launch.json remains tracked. RESOLVED by owner decision 2026-08-23: .claude/launch.json untracked via .gitignore and git rm --cached; the local file is retained for the developer and no workflow depends on the committed copy."
     },
     "reviewRecord": {
       "method": "Ten review lenses dispatched as independent subagents (correctness, maintainability, agent-native, learnings-researcher, security, performance, reliability, adversarial, project-standards, testing); every finding reproduced before fixing; rejected findings recorded with evidence; one reviewer failed mid-run and was retried to completion.",
