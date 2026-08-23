@@ -40,3 +40,7 @@ for (const anchor of anchors) {
   }
 }
 console.log(`${ok} resolved, ${bad} unresolved`);
+// Fail the run when any cited anchor no longer resolves. This script gates
+// CI (see .github/workflows/ci.yml), so unresolved anchors must turn the
+// job red instead of printing a count nobody reads.
+if (bad > 0) process.exitCode = 1;
