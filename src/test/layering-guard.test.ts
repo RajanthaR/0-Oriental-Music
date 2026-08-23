@@ -162,17 +162,71 @@ describe("module layering", () => {
   });
 
   it.each([
-    ["@/lib/data/publication-policy", "@/lib/data/source-evidence-policy"],
-    ["@/lib/data/publication-policy", "@/lib/data/tala-disposition-policy"],
-    ["@/lib/data/repository", "@/lib/search/search-engine"],
-  ])("evaluates %s first without exposing an uninitialized cyclic binding", async (firstSpec, secondSpec) => {
-    vi.resetModules();
-    await expect(import(firstSpec)).resolves.toBeTruthy();
-    await expect(import(secondSpec)).resolves.toBeTruthy();
-    // Re-importing in the swapped order must not throw either: every cyclic
-    // binding is call-time-only, so neither order can read `undefined`.
-    vi.resetModules();
-    await expect(import(secondSpec)).resolves.toBeTruthy();
-    await expect(import(firstSpec)).resolves.toBeTruthy();
-  });
+    [
+      "@/lib/data/publication-policy",
+      "@/lib/data/tala-disposition-policy",
+      (ns: Record<string, unknown>) =>
+        expect(typeof ns.createPublicationEvaluationContext).toBe("function"),
+      // The real claimed property is call-time dereference: the default
+      // context parameter internally calls policy's factory through this
+      // module's own import view. Invoke it without a context and require a
+      // usable result instead of asserting on the namespace view, which
+      // vitest's module registry does not reliably expose for cyclic
+      // bindings.
+      async (ns: Record<string, unknown>) => {
+        expect(typeof ns.getTalaFieldDisposition).toBe("function");
+        const disposition = await (ns.getTalaFieldDisposition as (id: string) => Promise<unknown>)(
+          "tala-khemta",
+        );
+        expect(disposition === undefined || typeof disposition === "object").toBe(true);
+      },
+    ],
+    [
+      "@/lib/data/publication-policy",
+      "@/lib/data/source-evidence-policy",
+      (ns: Record<string, unknown>) =>
+        expect(typeof ns.createPublicationEvaluationContext).toBe("function"),
+      async (ns: Record<string, unknown>) => {
+        expect(typeof ns.evaluateSourceReference).toBe("function");
+        const decision = await (ns.evaluateSourceReference as (
+          reference: unknown,
+        ) => Promise<{ supportable?: boolean }>)({ sourceId: "SRC-G10-NADA", pageOrSection: "p. 3" });
+        expect(decision && typeof decision === "object").toBe(true);
+      },
+    ],
+    [
+      "@/lib/data/repository",
+      "@/lib/search/search-engine",
+      (ns: Record<string, unknown>) => expect(typeof ns.repository).toBe("object"),
+      async (ns: Record<string, unknown>) => {
+        expect(typeof ns.searchIndex).toBe("object");
+        // searchIndex.search dereferences repository at call time; a featured
+        // query exercises it end to end without throwing or reading an
+        // uninitialized binding.
+        expect(() => (ns.searchIndex as { search: () => unknown }).search()).not.toThrow();
+      },
+    ],
+  ])(
+    "evaluates %s first with cyclic bindings call-time-usable in both orders",
+    async (
+      firstSpec,
+      secondSpec,
+      checkFirst: (ns: Record<string, unknown>) => void,
+      checkSecond: (ns: Record<string, unknown>) => Promise<void>,
+    ) => {
+      // Order 1: first module evaluates before its cyclic partner.
+      vi.resetModules();
+      const first = (await import(firstSpec)) as Record<string, unknown>;
+      checkFirst(first);
+      const second = (await import(secondSpec)) as Record<string, unknown>;
+      await checkSecond(second);
+      // Order 2: reversed. Every cyclic binding is call-time-only, so neither
+      // order may observe an uninitialized value at call time.
+      vi.resetModules();
+      const secondReversed = (await import(secondSpec)) as Record<string, unknown>;
+      const firstReversed = (await import(firstSpec)) as Record<string, unknown>;
+      checkFirst(firstReversed);
+      await checkSecond(secondReversed);
+    },
+  );
 });
