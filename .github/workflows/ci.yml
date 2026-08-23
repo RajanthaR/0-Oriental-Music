@@ -29,7 +29,8 @@ jobs:
         uses: actions/checkout@v4
 
       # Node 22 is the current LTS line and matches the development
-      # workstation (v22.16.0); the engines floor for this project is >= 18.
+      # workstation (v22.16.0); README documents Node 18+ as the minimum
+      # (documentation-level requirement, no package.json engines field).
       - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
