@@ -224,8 +224,11 @@ describe("bounded graph limits at every public boundary", () => {
     // The walk now iterates one safeOwnEntries() descriptor snapshot, which is
     // linear. Measured after the fix: each budget-scale boundary probe runs in
     // tens of milliseconds and this whole file passes in ~16s wall clock; the
-    // publication-decision parity dump is byte-identical before/after
-    // (SHA256 ACA5F89351669D48718A88857CC0F22C1DDC4582CFE8027A04277DC5144F0787).
+    // publication-decision parity dump is byte-identical between pristine
+    // 1d0ee6a and the fixed tree (SHA256
+    // 832A96F0479E320E7A57FDBE9F153312607AEBFC3690E632A2D60AB0556BF9BC;
+    // an earlier draft of this comment cited ACA5F893..., which was a
+    // probe-internal intermediate hash, not the baseline-vs-final oracle).
     // 60s leaves more than an order of magnitude of headroom over measured
     // per-test cost while staying bounded; the graph shapes, boundaries, and
     // assertions are unchanged.

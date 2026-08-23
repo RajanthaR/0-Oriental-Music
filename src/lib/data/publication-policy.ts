@@ -437,8 +437,14 @@ function collectDependencyDispositions(
     // keeps this walk linear. Re-reading each key through readOwnDataField()
     // here made wide records quadratic (O(keys²) descriptor reads), which is
     // what dominated the budget-scale boundary workload.
+    //
+    // An unreadable record is skipped individually (continue), preserving the
+    // old per-field fail-closed granularity; queued siblings still contribute
+    // their dispositions. Through exported boundaries this branch is
+    // unreachable: every caller passes captureSafeSnapshot output whose
+    // members are plain objects, so it only guards future internal callers.
     const own = safeOwnEntries(record);
-    if (!own) return;
+    if (!own) continue;
     for (const { key, value: child } of own.entries) {
       if (key === "prerequisites" || key === "steps" || key === "lessonId") continue;
       const childPath = `${prefix}${key}`;

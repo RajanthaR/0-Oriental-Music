@@ -183,7 +183,9 @@ describe("module layering", () => {
       ]),
     ]);
 
-    const observed = findCycles(graph).map((cycle) => canonicalCycleSet(cycle));
+    // Deduplicate: two distinct simple cycles over one module set must not
+    // masquerade as a fourth unauthorized cycle.
+    const observed = [...new Set(findCycles(graph).map((cycle) => canonicalCycleSet(cycle)))];
     expect(observed.sort()).toEqual([...allowed].sort());
   });
 
