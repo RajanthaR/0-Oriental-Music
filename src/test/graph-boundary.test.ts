@@ -216,16 +216,25 @@ describe("bounded graph limits at every public boundary", () => {
     // Budget-scale shapes deliberately traverse every boundary repeatedly;
     // the default 5s per-test timeout cannot apply to that workload.
     //
-    // The budget is generous on purpose. Measured on one workstation, the
-    // 4,000-key wide shape ran 162s on a cold machine and 186-249s on later
-    // back-to-back runs -- the same spread at an unmodified HEAD, so it is
-    // machine variance, not a regression. At the previous 180s ceiling the
-    // suite therefore went red more often than green, and a slower CI runner
-    // would fail reliably. Raising the ceiling keeps the traversal workload
-    // and every assertion unchanged rather than shrinking the graph, which
-    // would weaken the budget-scale boundary coverage this test exists for.
-    // Making the traversal itself cheaper is the real fix and is deferred.
-    600_000,
+    // History: the wide shape originally ran ~90-250s per attempt on one
+    // workstation (monotonic machine variance), which forced a 600s ceiling.
+    // Profiling showed 86% of samples inside safeOwnEntries: the dependency
+    // walk re-enumerated every record's own keys once per key
+    // (readOwnDataField per Object.keys entry), making wide records quadratic.
+    // The walk now iterates one safeOwnEntries() descriptor snapshot, which is
+    // linear. Measured after the fix: each budget-scale boundary probe runs in
+    // tens of milliseconds and this whole file passes in ~16s wall clock (~20s
+    // under full-suite parallel load). The publication-decision parity dump
+    // was measured byte-identical between pristine 1d0ee6a and the fixed tree
+    // (SHA256 832A96F0479E320E7A57FDBE9F153312607AEBFC3690E632A2D60AB0556BF9BC)
+    // via scripts/dump-publication-parity.mjs — an earlier draft cited
+    // ACA5F893..., a probe-internal intermediate hash. Expect well under 10s
+    // per hosted-CI run of this file; >30s would mean the traversal went
+    // superlinear again, not slow hardware.
+    // 60s leaves more than an order of magnitude of headroom over measured
+    // per-test cost while staying bounded; the graph shapes, boundaries, and
+    // assertions are unchanged.
+    60_000,
   );
 
   it.each(AT_RECORD_LIMIT_SHAPES)(

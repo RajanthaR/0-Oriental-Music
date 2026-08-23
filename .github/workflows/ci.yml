@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Cancel superseded runs on the same ref so a rapid push sequence does not
+# queue a backlog of full-suite runs.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: type-check, lint, test, build
+    # The suite is ~90-155s locally on a rested machine; hosted runners are
+    # typically slower and this job also installs dependencies and builds.
+    # 30 minutes is generous headroom over observed duration while staying
+    # bounded so a hung step fails the job instead of burning 6 hours.
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Node 22 is the current LTS line and matches the development
+      # workstation (v22.16.0); README documents Node 18+ as the minimum
+      # (documentation-level requirement, no package.json engines field).
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # npm ci must work from scratch on every run: it is the gate that proves
+      # the lockfile is intact. Caching npm's download cache (~/.npm) speeds
+      # this up but never substitutes for a clean install, so a corrupt or
+      # out-of-sync package-lock.json still fails the job here.
+      - name: Install dependencies (npm ci)
+        run: npm ci
+
+      - name: Type-check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      # The forensic ledger's path#symbol anchors decay silently unless the
+      # verifier runs somewhere mandatory; this is the machine proof behind
+      # the "N resolved, 0 unresolved" claims in the traceability documents.
+      - name: Verify traceability anchors
+        run: node scripts/verify-symbol-anchors.mjs
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build

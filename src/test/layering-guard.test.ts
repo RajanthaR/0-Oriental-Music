@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { canonicalCycleSet, cyclicModuleSets, type Graph } from "./support/cycles";
 import fs from "fs";
 import path from "path";
 
@@ -21,8 +22,6 @@ import path from "path";
  */
 
 const LIB = path.join(process.cwd(), "src", "lib");
-
-type Graph = Map<string, Set<string>>;
 
 function sourceFiles(dir: string): string[] {
   const out: string[] = [];
@@ -83,42 +82,18 @@ function layerOf(file: string): "data" | "validation" | null {
   return null;
 }
 
-/** Every cycle through `node`, reported as readable path chains. */
-function findCycles(graph: Graph): string[][] {
-  const cycles: string[][] = [];
-  const stack: string[] = [];
-  const onStack = new Set<string>();
-  const done = new Set<string>();
-
-  const walk = (node: string): void => {
-    stack.push(node);
-    onStack.add(node);
-    for (const next of graph.get(node) ?? []) {
-      if (onStack.has(next)) {
-        cycles.push([...stack.slice(stack.indexOf(next)), next]);
-      } else if (!done.has(next) && graph.has(next)) {
-        walk(next);
-      }
-    }
-    stack.pop();
-    onStack.delete(node);
-    done.add(node);
-  };
-
-  for (const node of graph.keys()) if (!done.has(node)) walk(node);
-  return cycles;
-}
 
 describe("module layering", () => {
   const graph = buildGraph();
+  const cyclicSets = cyclicModuleSets(graph).map((set) => canonicalCycleSet(set));
 
   it("has no runtime import cycle crossing the data/validation boundary", () => {
-    const crossLayer = findCycles(graph)
-      .filter((cycle) => {
-        const layers = new Set(cycle.map(layerOf).filter(Boolean));
+    const crossLayer = cyclicModuleSets(graph)
+      .filter((component) => {
+        const layers = new Set(component.map(layerOf).filter(Boolean));
         return layers.has("data") && layers.has("validation");
       })
-      .map((cycle) => cycle.join(" -> "));
+      .map((component) => component.join(" -> "));
 
     expect(crossLayer).toEqual([]);
   });
@@ -139,4 +114,119 @@ describe("module layering", () => {
 
     expect(offenders).toEqual([]);
   });
+
+  /**
+   * Accepted same-layer residual, now mechanically pinned (M1).
+   *
+   * The Phase 2 follow-up recorded a lazy same-layer factory cycle as an
+   * accepted structural residual; the acceptance record itself lives in the
+   * PR #4 review narrative and data/forensic-ledger.json, not in a
+   * resolvable in-repo symbol — so this comment deliberately states the
+   * provenance instead of citing a path#symbol anchor that does not exist.
+   *
+   * This slice enumerated every runtime import cycle under src/lib
+   * mechanically. Correction found by switching to complete SCC
+   * decomposition: the earlier DFS back-edge walk reported two separate
+   * pairs, but `publication-policy`, `source-evidence-policy`, and
+   * `tala-disposition-policy` are actually ONE strongly connected module set
+   * of three (policy imports both policies; both import policy's context
+   * factory; tala-disposition also imports source-evidence). The second
+   * cyclic set is the `repository` <-> `search-engine` pair. Every
+   * cyclically imported binding is dereferenced only inside function bodies
+   * at call time (default-parameter factories and per-call lookups), never
+   * at module top level, and each set evaluates cleanly under either import
+   * order.
+   *
+   * That property is what this guard pins. If any new cycle appears anywhere,
+   * if one of these intended sets gains or loses a member, or if a member
+   * stops evaluating under reversed import order, this test fails instead of
+   * drifting silently.
+   */
+  it("allows exactly the documented lazy same-layer cycle sets", () => {
+    const allowed = new Set([
+      canonicalCycleSet([
+        "src/lib/data/publication-policy.ts",
+        "src/lib/data/source-evidence-policy.ts",
+        "src/lib/data/tala-disposition-policy.ts",
+      ]),
+      canonicalCycleSet([
+        "src/lib/data/repository.ts",
+        "src/lib/search/search-engine.ts",
+      ]),
+    ]);
+
+    // SCC decomposition is complete and order-independent by construction;
+    // deduplication keeps the comparison a set of distinct module sets.
+    const observed = [...new Set(cyclicSets)];
+    expect(observed.sort()).toEqual([...allowed].sort());
+  });
+
+  it.each([
+    [
+      "@/lib/data/publication-policy",
+      "@/lib/data/tala-disposition-policy",
+      (ns: Record<string, unknown>) =>
+        expect(typeof ns.createPublicationEvaluationContext).toBe("function"),
+      // The real claimed property is call-time dereference: the default
+      // context parameter internally calls policy's factory through this
+      // module's own import view. Invoke it without a context and require a
+      // usable result instead of asserting on the namespace view, which
+      // vitest's module registry does not reliably expose for cyclic
+      // bindings.
+      async (ns: Record<string, unknown>) => {
+        expect(typeof ns.getTalaFieldDisposition).toBe("function");
+        const disposition = await (ns.getTalaFieldDisposition as (id: string) => Promise<unknown>)(
+          "tala-khemta",
+        );
+        expect(disposition === undefined || typeof disposition === "object").toBe(true);
+      },
+    ],
+    [
+      "@/lib/data/publication-policy",
+      "@/lib/data/source-evidence-policy",
+      (ns: Record<string, unknown>) =>
+        expect(typeof ns.createPublicationEvaluationContext).toBe("function"),
+      async (ns: Record<string, unknown>) => {
+        expect(typeof ns.evaluateSourceReference).toBe("function");
+        const decision = await (ns.evaluateSourceReference as (
+          reference: unknown,
+        ) => Promise<{ supportable?: boolean }>)({ sourceId: "SRC-G10-NADA", pageOrSection: "p. 3" });
+        expect(decision && typeof decision === "object").toBe(true);
+      },
+    ],
+    [
+      "@/lib/data/repository",
+      "@/lib/search/search-engine",
+      (ns: Record<string, unknown>) => expect(typeof ns.repository).toBe("object"),
+      async (ns: Record<string, unknown>) => {
+        expect(typeof ns.searchIndex).toBe("object");
+        // searchIndex.search dereferences repository at call time; a featured
+        // query exercises it end to end without throwing or reading an
+        // uninitialized binding.
+        expect(() => (ns.searchIndex as { search: () => unknown }).search()).not.toThrow();
+      },
+    ],
+  ])(
+    "evaluates %s first with cyclic bindings call-time-usable in both orders",
+    async (
+      firstSpec,
+      secondSpec,
+      checkFirst: (ns: Record<string, unknown>) => void,
+      checkSecond: (ns: Record<string, unknown>) => Promise<void>,
+    ) => {
+      // Order 1: first module evaluates before its cyclic partner.
+      vi.resetModules();
+      const first = (await import(firstSpec)) as Record<string, unknown>;
+      checkFirst(first);
+      const second = (await import(secondSpec)) as Record<string, unknown>;
+      await checkSecond(second);
+      // Order 2: reversed. Every cyclic binding is call-time-only, so neither
+      // order may observe an uninitialized value at call time.
+      vi.resetModules();
+      const secondReversed = (await import(secondSpec)) as Record<string, unknown>;
+      const firstReversed = (await import(firstSpec)) as Record<string, unknown>;
+      checkFirst(firstReversed);
+      await checkSecond(secondReversed);
+    },
+  );
 });

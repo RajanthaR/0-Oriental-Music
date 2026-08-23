@@ -1339,8 +1339,12 @@
           "exactSection": "tests: rejects both CMS publication entry points when raw metadata is synthesized or incomplete; rejects every required route-rendered Raga and Lesson shape",
           "semanticReferences": [
             {
-              "path": "src/test/content-contracts.test.ts",
-              "symbol": "tests: rejects both CMS publication entry points when raw metadata is synthesized or incomplete; rejects every required route-rendered Raga and Lesson shape"
+              "path": "src/test/review-closeout.test.ts",
+              "symbol": "tests: rejects both CMS publication entry points when raw metadata is synthesized or incomplete"
+            },
+            {
+              "path": "src/test/publication-containment.test.ts",
+              "symbol": "tests: rejects every required route-rendered Raga and Lesson shape"
             }
           ]
         }
@@ -1376,7 +1380,7 @@
           "semanticReferences": [
             {
               "path": "src/test/content-contracts.test.ts",
-              "symbol": "tests: rejects unsupported finite-domain values across every known entity contract"
+              "symbol": "tests: rejects an invalid finite-domain %s"
             }
           ]
         }
@@ -1473,7 +1477,7 @@
           "semanticReferences": [
             {
               "path": "src/lib/search/search-engine.ts",
-              "symbol": "classifySearchQuery, searchFilter, and SearchIndex.search"
+              "symbol": "classifySearchQuery, searchFilter, and SearchIndex"
             }
           ]
         },
@@ -1484,7 +1488,7 @@
           "semanticReferences": [
             {
               "path": "src/test/search-engine.test.ts",
-              "symbol": "tests: treats raw-empty and normalized-empty queries as different states"
+              "symbol": "tests: keeps featured results for raw empty input but rejects normalized-empty controls"
             }
           ]
         }
@@ -1514,13 +1518,24 @@
           ]
         },
         {
-          "path": "src/test/synth.test.ts and src/test/components.test.tsx",
+          "path": "src/test/components.test.tsx",
           "locator": "initialization, active-node, delay, StrictMode, replacement, unmount, and co-mounted ownership regressions",
-          "exactSection": "tests: cancels owned Swara tone and scale work; retains ready Swara ownership until finished",
+          "exactSection": "tests: cancels owned Swara tone and scale work on replacement and unmount; retains ready Swara ownership until finished on every direct-tone consumer",
           "semanticReferences": [
             {
-              "path": "src/test/synth.test.ts and src/test/components.test.tsx",
-              "symbol": "tests: cancels owned Swara tone and scale work; retains ready Swara ownership until finished"
+              "path": "src/test/components.test.tsx",
+              "symbol": "tests: cancels owned Swara tone and scale work on replacement and unmount; retains ready Swara ownership until finished on every direct-tone consumer"
+            }
+          ]
+        },
+        {
+          "path": "src/test/synth.test.ts",
+          "locator": "engine-level handle ownership regressions (unit layer beneath the component regressions above)",
+          "exactSection": "tests: returns idempotent Swara handles that stop active nodes; keeps a Swara owner until the voice cleanup actually finishes",
+          "semanticReferences": [
+            {
+              "path": "src/test/synth.test.ts",
+              "symbol": "tests: returns idempotent Swara handles that stop active nodes; keeps a Swara owner until the voice cleanup actually finishes"
             }
           ]
         }
@@ -2433,14 +2448,15 @@
     "scope": "Bounded Phase 2 follow-up: structural debt, automated guards, housekeeping. Not a content phase; no musical fact, publisher, year, location, licence, organization, reviewer, review date, or publication state is added or promoted.",
     "workItems": {
       "A1_foreign_script_guard": "src/test/ui-script-guard.test.ts — Vitest gate scanning src/app and src/components for Cyrillic/CJK/Kana/Hangul/Devanagari/Arabic/Hebrew/Greek/accented-Latin/Thai/Myanmar/Tamil characters in UI source; proven to fail when the historical 'временно' defect is reintroduced at src/app/sources/page.tsx#SourcesPage and to pass clean.",
-      "A2_structural_split": "content-validator.ts 1773→306 lines; publication-policy.ts 1688→984; content-contracts.ts 1154→920. New modules: lib/shared/bounded-values.ts (dependency-free bounded-graph primitives), lib/shared/curriculum-strands.ts, lib/evidence/source-evidence.ts + disposition-registry.ts, lib/data/dependency-rules.ts, decision-types.ts, evaluation-state.ts, snapshot-capture.ts, source-evidence-policy.ts, tala-disposition-policy.ts, publication-audit.ts, catalog-integrity.ts, lib/validation/validation-issues.ts. The data↔validation cycle is broken: every data→validation import targets dependency-free leaf modules and content-validator imports no data module at runtime.",
-      "A3_anchor_mechanism": "Numeric path:line anchors in FORENSIC_CORRECTION_LOG.md, P02_CLOSEOUT_FINDINGS.md, P02_MUSICAL_CORE_FIELD_MATRIX.md converted to stable path#symbol form; 228 anchors machine-verified resolvable via scripts/verify-symbol-anchors.mjs; automated guard appended to src/test/review-closeout.test.ts fails when numeric code anchors return or a cited symbol stops resolving.",
+      "A2_structural_split": "content-validator.ts 1773→140 lines (306 at the initial split, further reduced by the cycle-closure commit 4ab4707); publication-policy.ts 1688→956 at merge head 1d0ee6a (967 after this slice's traversal-fix comments); content-contracts.ts 1154→920. New modules: lib/shared/bounded-values.ts (dependency-free bounded-graph primitives), lib/shared/curriculum-strands.ts, lib/evidence/source-evidence.ts + disposition-registry.ts, lib/data/dependency-rules.ts, decision-types.ts, evaluation-state.ts, snapshot-capture.ts, source-evidence-policy.ts, tala-disposition-policy.ts, publication-audit.ts, catalog-integrity.ts, lib/validation/validation-issues.ts. Correction (recorded by the P02 CI-and-traversal-cost slice): an earlier version of this entry claimed 'content-validator imports no data module at runtime'. That was false — content-validator runtime-imports evaluateSourceReference, createPublicationEvaluationContext, and UNKNOWN_PROVENANCE from @/lib/data/publication-policy, and re-exports from @/lib/data/publication-audit and @/lib/data/catalog-integrity, while two data modules import it back. The real, provable property is that the cross-layer runtime import graph is ACYCLIC (no import cycle crosses the data/validation boundary), and every data→validation edge targets a validation-layer module that never imports back into data (content-contracts.ts, identity-contracts.ts, validation-issues.ts — the first of which consumes data/curriculum-strands, so 'dependency-free leaf' describes only identity-contracts.ts, validation-issues.ts, and the shared lib/shared/bounded-values.ts primitive). src/test/layering-guard.test.ts mechanically fails any future runtime import cycle crossing that boundary; it was proven to fail by restoring the historical import.",
+      "A2b_identity_contracts_extraction": "Recorded late: commit 4ab47074daa3d8472751f9a3bef55bb4f2d10b08 landed after this section was first written and was initially absent from the ledger. It extracted validateCatalogIdentityContracts into the dependency-free leaf src/lib/validation/identity-contracts.ts (both former data-layer importers now point there; content-validator re-exports the symbol so the public API is unchanged), added src/test/layering-guard.test.ts enforcing data/validation acyclicity, and raised the graph-boundary budget-scale timeout ceiling to 600s as an interim measure. That interim ceiling was superseded by the traversal cost fix in this slice (see p02CiAndTraversalCost).",
+      "A3_anchor_mechanism": "Numeric path:line anchors in FORENSIC_CORRECTION_LOG.md, P02_CLOSEOUT_FINDINGS.md, P02_MUSICAL_CORE_FIELD_MATRIX.md converted to stable path#symbol form; 233 anchors machine-verified resolvable via scripts/verify-symbol-anchors.mjs ('node scripts/verify-symbol-anchors.mjs' reports '233 resolved, 0 unresolved' at the PR #4 merge head; the previously recorded 228 was the count before commit 4ab4707 added five more); automated guard appended to src/test/review-closeout.test.ts fails when numeric code anchors return or a cited symbol stops resolving.",
       "A4_touch_targets": "Interactive controls raised to 44px minimum across navbar, footer, filters, quiz options, audio controls, breadcrumb links via min-h/min-w and padding only.",
       "A5_dependency_upgrades": "next ^14.2.15→^15.5.23, postcss ^8.4.47→^8.5.26, vitest ^2.1.3→^3.2.7. npm audit: 10 vulnerabilities (1 critical) → 6 high, all remaining requiring out-of-scope majors (Next 16 / Vitest 4).",
       "A6_housekeeping": "npm ci from scratch verified after removing the stale next-dev process that held next-swc.win32-x64-msvc.node (the historical EPERM cause); retained recovery worktree at dc7d582 confirmed fully contained in main via git cherry and removed; .claude/launch.json assessed and retained pending owner decision."
     },
     "verification": {
-      "tests": "19 files / 552 tests passing on final HEAD (base 18/549 +2 ui-script-guard +1 anchor guard)",
+      "tests": "20 files / 555 tests passing on final HEAD (base 18/549 +2 ui-script-guard +1 anchor guard; 552 at c10a361 before the cycle-closure commit added the layering guard file and one test)",
       "typeCheck": "exit 0",
       "lint": "no ESLint warnings or errors",
       "build": "23 static pages",
@@ -2454,6 +2470,70 @@
       "AH-C1-V16 hasValidPageQualityRegistry → src/lib/evidence/source-evidence.ts",
       "AH-C2-V08 and AH-C3-P1-12 inspectDispositionRegistry/unclosedRequiredFields → src/lib/evidence/disposition-registry.ts"
     ],
-    "disposition": "IMPLEMENTATION-COMPLETE-PENDING-REVIEW"
+    "disposition": "MERGED-VIA-PR-4 (merge commit 1d0ee6a11d7a05306252b110b019abd8be9e2965; the earlier IMPLEMENTATION-COMPLETE-PENDING-REVIEW disposition is superseded by this merge record, not deleted)"
+  },
+  "p02CiAndTraversalCost": {
+    "branch": "codex/p02-ci-and-traversal-cost",
+    "base": "1d0ee6a11d7a05306252b110b019abd8be9e2965",
+    "scope": "Bounded maintenance slice: real hosted CI, budget-scale traversal cost reduction, forensic traceability reconciliation, closure of recorded residuals from the previous slice (lazy same-layer cycle pinning, ui-script-guard .css/.svg coverage, eslint-config-next alignment), advisory dispositioning, and A4 deferred-item assessment. Not a content phase; no musical fact, publisher, year, location, licence, organization, reviewer, review date, or publication state is added or promoted.",
+    "correctionsToP02FollowupStructuralDebt": [
+      "A2_structural_split: the 'content-validator imports no data module at runtime' claim was false and is now corrected to describe the acyclic property with its mechanical guard; line counts restated from measured newline counts.",
+      "A2b: commit 4ab4707 was absent from this ledger entirely and is now recorded (identity-contracts leaf extraction, layering guard, interim 600s timeout).",
+      "A3_anchor_mechanism: 228 corrected to 233 anchors as reported by scripts/verify-symbol-anchors.mjs at the merge head.",
+      "verification.tests: 19 files / 552 corrected to 20 files / 555 on the final HEAD of that section.",
+      "disposition: IMPLEMENTATION-COMPLETE-PENDING-REVIEW superseded by MERGED-VIA-PR-4 with the merge commit SHA."
+    ],
+    "a4SemanticResolution": {
+      "scope": "The deferred item 'Semantic resolution of forensic-ledger evidence targets': entries whose evidence pointers are structurally valid but not semantically resolved.",
+      "found": [
+        "12 compound prose-style anchors in issues[].evidence[].semanticReferences were never mechanically verified (the A3 anchor mechanism deliberately skips them).",
+        "9 cited tokens pointed at text that does not exist: test titles quoted with wording or in files that do not match the tree, one nonexistent symbol form 'SearchIndex.search', and a two-file citation whose first file contains neither named regression.",
+        "27 evidence pointers reference external artifact directories (C:/tmp/compound-engineering/... review artifacts) outside this repository; they remain historical pointers by policy and are not fabricable."
+      ],
+      "resolved": [
+        "New guard src/test/ledger-semantic-resolution.test.ts resolves every compound anchor token mechanically (symbols against source files; 'tests:' entries as exact double-quoted test titles), proven to fail on an injected dead symbol.",
+        "Citations corrected to point only at text that verifiably exists today; no new musical fact, reviewer, date, or publication state was introduced - every correction re-points an existing claim at its existing implementation/test evidence.",
+        "External artifact paths documented as accepted historical pointers, not silently deleted: their run IDs and verdicts stay preserved above."
+      ],
+      "legacyValidatorDebt": "The second deferred item ('Legacy validator debt not naturally closed by the shared collection boundary') remains OPEN: src/lib/validation/content-validator.ts still carries validateSelectedSourceMetadata over four selected Phase 2 source IDs plus thin re-exports. Closing it means redesigning source-metadata validation onto the shared collection boundary, which is structural scope beyond this bounded maintenance slice; it is recorded here rather than half-closed."
+    },
+    "a5AdvisoryDisposition": {
+      "measuredAt": "after eslint-config-next 15.5.23 alignment commit",
+      "remaining": "3 high, 0 critical, 0 moderate (down from 6 high at this slice's base)",
+      "next": "Advisory reaches next transitively through its bundled postcss/sharp dependencies; every available fix path is the Next 16 major (npm audit reports fixAvailable next@16.3.2, semver-major). Exposure for THIS app: statically built 23-page site on Vercel, images.unoptimized=true in next.config.mjs, zero next/Image imports under src/, no self-hosted Node runtime serving user requests - the affected optimizer/dev surfaces do not execute in production. DEFERRED with reasoning rather than upgraded: Next 16 is an explicitly out-of-scope major for this bounded slice, and executing it would invalidate the parity-oracle baseline and require full browser re-verification disproportionate to the assessed exposure.",
+      "postcss": "GHSA-qx2v-qp2m-jg93: XSS via unescaped </style> in CSS stringify output. postcss 8.5.26 runs only at build time over first-party stylesheet sources; it never processes untrusted input at runtime. No production-reachable attacker-controlled CSS exists. DEFERRED: same Next 16 major chain.",
+      "sharp": "GHSA-f88m-g3jw-g9cj: inherited libvips vulnerabilities. sharp is next's optional image-optimizer dependency; with unoptimized images and no Image component usage the sharp code path does not run. DEFERRED: same Next 16 major chain.",
+      "policy": "npm audit fix --force was NOT run, per slice rules."
+    },
+    "a6Decisions": {
+      "testFileSplits": "DEFERRED: publication-containment.test.ts (1535 lines), components.test.tsx (1185), publication-parity.test.ts (1069), synth.test.ts (1044) exceed comfortable review size, but no low-risk seam presented itself that would not reshelve shared fixtures and mutation matrices mid-slice; splitting for line count alone adds churn without behavioral gain. Left as recorded debt for a dedicated structural pass.",
+      "claudeLaunchJson": ".claude/launch.json remains tracked. RESOLVED by owner decision 2026-08-23: .claude/launch.json untracked via .gitignore and git rm --cached; the local file is retained for the developer and no workflow depends on the committed copy."
+    },
+    "reviewRecord": {
+      "method": "Ten review lenses dispatched as independent subagents (correctness, maintainability, agent-native, learnings-researcher, security, performance, reliability, adversarial, project-standards, testing); every finding reproduced before fixing; rejected findings recorded with evidence; one reviewer failed mid-run and was retried to completion.",
+      "keyFindingsApplied": [
+        "P1 duplicate A3_anchor_mechanism key (three lenses converged on it independently): JSON.parse last-wins shadowed the corrected 233 text behind the stale 228 entry; fixed and made class-impossible by src/test/json-duplicate-keys.test.ts with a parsed-value binding.",
+        "P1 anchor verifier could never fail and masked a live dead anchor: script now exits nonzero on unresolved anchors; proven both ways.",
+        "P2 walk-abort granularity: collectDependencyDispositions now skips an unreadable record individually (continue) instead of abandoning queued siblings.",
+        "P2 incomplete DFS cycle inventory: replaced with complete Tarjan SCC decomposition in a shared engine with synthetic-graph fixtures; discovered the true topology is ONE three-module strongly connected set plus repository<->search-engine - the earlier 'two separate pairs' reading was an enumeration artifact.",
+        "P2 semantically lossy citation edit: synth.test.ts's real surviving Swara-ownership titles restored beside the components citations.",
+        "P2 parity oracle had no committed reproducer: scripts/dump-publication-parity.mjs added and verified to regenerate 832A96F0479E320E7A57FDBE9F153312607AEBFC3690E632A2D60AB0556BF9BC.",
+        "P2/P3s also applied: anchor-verifier CI step, Node-floor comment precision, cycle-set deduplication (superseded by SCC rewrite), comma-tolerant multi-file citation splitting, ui-script-guard breadth pin, A5 row superseding pointer, ledger line-count measurement-head annotations, call-time binding usability proofs."
+      ],
+      "rejectedFindings": [
+        "'package.json declares engines >=18' (correctness lens): rejected with evidence - no engines field exists; the CI comment was corrected to cite README's documentation-level floor instead.",
+        "Oxford-comma semanticReferences paths (correctness lens self-suppressed; reliability lens asserted they exist): settled mechanically - zero multi-file paths inside semanticReferences blocks; comma tolerance still added defensively.",
+        "'zero .svg UI files' (agent-native lens): rejected with evidence - src/app/icon.svg exists and is covered by the guard breadth pin."
+      ],
+      "acceptedResidualsFromReview": [
+        "Namespace-view introspection is unreliable for cyclic bindings under vitest; guards assert call-time usability instead.",
+        "verify-symbol-anchors.mjs matches only the first token of each cited symbol; tightening deferred - it is now fail-closed in CI so drift surfaces.",
+        "Semantic resolver accepts quoted source-text matches including it.each templates; acceptable floor, documented.",
+        "60s budget-scale ceiling calibrated on one workstation; first hosted CI run doubles as the calibration experiment (>30s means superlinear regression, not slow hardware).",
+        "CI runs ubuntu-latest while historical verification was win32-specific; SWC-binary incident class would surface late off-CI."
+      ],
+      "coverageNote": "project-standards lens was dispatched late (initial dispatch missed two always-on personas; corrected mid-review). All ten lenses returned artifacts or compact reports; none missing at close."
+    },
+    "status": "IMPLEMENTATION-COMPLETE-PENDING-REVIEW-ACCEPTANCE"
   }
 }

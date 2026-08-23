@@ -11,10 +11,13 @@ import { join } from "node:path";
  * caught only by a manual repo-wide Cyrillic sweep. Human and model review
  * demonstrably do not catch this class of defect; this mechanical check does.
  *
- * Scope: user-facing UI source under src/app/ and src/components/. Test files
- * are intentionally out of scope: src/test/quiz-runner.test.tsx and
- * src/test/content-contracts.test.ts legitimately contain NFC/NFD
- * accented-Latin fixtures ("q-é").
+ * Scope: user-facing UI source and style/asset files under src/app/ and
+ * src/components/ — .ts/.tsx plus .css/.svg (CSS `content:` strings and SVG
+ * `<text>` are real user-visible text channels; both asset kinds were
+ * previously excluded as a recorded residual, and the P02 CI-and-traversal
+ * slice closed that gap). Test files are intentionally out of scope:
+ * src/test/quiz-runner.test.tsx and src/test/content-contracts.test.ts
+ * legitimately contain NFC/NFD accented-Latin fixtures ("q-é").
  *
  * Allowed scripts: Sinhala (U+0D80–U+0DFF), plain ASCII (English technical
  * terms and bilingual labels are legitimate and widespread), and standard
@@ -65,7 +68,7 @@ function findUiSourceFiles(root: string, base: string): string[] {
     const stat = statSync(full);
     if (stat.isDirectory()) {
       files.push(...findUiSourceFiles(full, base));
-    } else if (/\.(ts|tsx)$/.test(entry)) {
+    } else if (/\.(ts|tsx|css|svg)$/.test(entry)) {
       files.push(full);
     }
   }
@@ -133,6 +136,16 @@ describe("foreign-script guard for Sinhala UI copy", () => {
     const uiRoots = ["src/app", "src/components"].map((root) => join(workspace, root));
     const files = uiRoots.flatMap((root) => findUiSourceFiles(root, workspace)).sort();
     expect(files.length).toBeGreaterThan(20);
+
+    // Pin the extension breadth: if someone narrows findUiSourceFiles back to
+    // .ts/.tsx only, this assertion fails structurally instead of letting the
+    // .css/.svg text channels silently drop out of coverage again.
+    for (const extension of [".css", ".svg"]) {
+      expect(
+        files.some((file) => file.endsWith(extension)),
+        `guard scope must still include ${extension} assets (found none)`,
+      ).toBe(true);
+    }
 
     const violations: string[] = [];
     for (const file of files) {

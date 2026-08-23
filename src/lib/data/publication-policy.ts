@@ -20,6 +20,7 @@ import {
   isRecord,
   normalizeRecordId,
   readOwnDataField,
+  safeOwnEntries,
 } from "@/lib/shared/bounded-values";
 import {
   getEvidenceRegistrySnapshot,
@@ -432,10 +433,20 @@ function collectDependencyDispositions(
         );
       });
     }
-    const keys = Object.keys(record);
-    for (const key of keys) {
+    // One descriptor snapshot per record: iterating safeOwnEntries() entries
+    // keeps this walk linear. Re-reading each key through readOwnDataField()
+    // here made wide records quadratic (O(keys²) descriptor reads), which is
+    // what dominated the budget-scale boundary workload.
+    //
+    // An unreadable record is skipped individually (continue), preserving the
+    // old per-field fail-closed granularity; queued siblings still contribute
+    // their dispositions. Through exported boundaries this branch is
+    // unreachable: every caller passes captureSafeSnapshot output whose
+    // members are plain objects, so it only guards future internal callers.
+    const own = safeOwnEntries(record);
+    if (!own) continue;
+    for (const { key, value: child } of own.entries) {
       if (key === "prerequisites" || key === "steps" || key === "lessonId") continue;
-      const child = readOwnDataField(record, key);
       const childPath = `${prefix}${key}`;
       const dependencyRule = dependencyFieldRules.get(key);
       if (dependencyRule) {
