@@ -55,7 +55,7 @@ describe("cycle engine (synthetic graphs)", () => {
   });
 
   it("finds two disjoint cyclic sets independently of iteration order", () => {
-    const edges: Array<[string, string[]]> = [
+    const edges: Array<[string, Set<string>]> = [
       ["z.ts", new Set(["y.ts"])],
       ["y.ts", new Set(["z.ts"])],
       ["a.ts", new Set(["b.ts"])],
