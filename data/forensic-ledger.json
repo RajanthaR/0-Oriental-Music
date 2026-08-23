@@ -1339,8 +1339,12 @@
           "exactSection": "tests: rejects both CMS publication entry points when raw metadata is synthesized or incomplete; rejects every required route-rendered Raga and Lesson shape",
           "semanticReferences": [
             {
-              "path": "src/test/content-contracts.test.ts",
-              "symbol": "tests: rejects both CMS publication entry points when raw metadata is synthesized or incomplete; rejects every required route-rendered Raga and Lesson shape"
+              "path": "src/test/review-closeout.test.ts",
+              "symbol": "tests: rejects both CMS publication entry points when raw metadata is synthesized or incomplete"
+            },
+            {
+              "path": "src/test/publication-containment.test.ts",
+              "symbol": "tests: rejects every required route-rendered Raga and Lesson shape"
             }
           ]
         }
@@ -1376,7 +1380,7 @@
           "semanticReferences": [
             {
               "path": "src/test/content-contracts.test.ts",
-              "symbol": "tests: rejects unsupported finite-domain values across every known entity contract"
+              "symbol": "tests: rejects an invalid finite-domain %s"
             }
           ]
         }
@@ -1473,7 +1477,7 @@
           "semanticReferences": [
             {
               "path": "src/lib/search/search-engine.ts",
-              "symbol": "classifySearchQuery, searchFilter, and SearchIndex.search"
+              "symbol": "classifySearchQuery, searchFilter, and SearchIndex"
             }
           ]
         },
@@ -1484,7 +1488,7 @@
           "semanticReferences": [
             {
               "path": "src/test/search-engine.test.ts",
-              "symbol": "tests: treats raw-empty and normalized-empty queries as different states"
+              "symbol": "tests: keeps featured results for raw empty input but rejects normalized-empty controls"
             }
           ]
         }
@@ -1514,13 +1518,13 @@
           ]
         },
         {
-          "path": "src/test/synth.test.ts and src/test/components.test.tsx",
+          "path": "src/test/components.test.tsx",
           "locator": "initialization, active-node, delay, StrictMode, replacement, unmount, and co-mounted ownership regressions",
-          "exactSection": "tests: cancels owned Swara tone and scale work; retains ready Swara ownership until finished",
+          "exactSection": "tests: cancels owned Swara tone and scale work on replacement and unmount; retains ready Swara ownership until finished on every direct-tone consumer",
           "semanticReferences": [
             {
-              "path": "src/test/synth.test.ts and src/test/components.test.tsx",
-              "symbol": "tests: cancels owned Swara tone and scale work; retains ready Swara ownership until finished"
+              "path": "src/test/components.test.tsx",
+              "symbol": "tests: cancels owned Swara tone and scale work on replacement and unmount; retains ready Swara ownership until finished on every direct-tone consumer"
             }
           ]
         }
@@ -2469,6 +2473,20 @@
       "verification.tests: 19 files / 552 corrected to 20 files / 555 on the final HEAD of that section.",
       "disposition: IMPLEMENTATION-COMPLETE-PENDING-REVIEW superseded by MERGED-VIA-PR-4 with the merge commit SHA."
     ],
+    "a4SemanticResolution": {
+      "scope": "The deferred item 'Semantic resolution of forensic-ledger evidence targets': entries whose evidence pointers are structurally valid but not semantically resolved.",
+      "found": [
+        "12 compound prose-style anchors in issues[].evidence[].semanticReferences were never mechanically verified (the A3 anchor mechanism deliberately skips them).",
+        "9 cited tokens pointed at text that does not exist: test titles quoted with wording or in files that do not match the tree, one nonexistent symbol form 'SearchIndex.search', and a two-file citation whose first file contains neither named regression.",
+        "27 evidence pointers reference external artifact directories (C:/tmp/compound-engineering/... review artifacts) outside this repository; they remain historical pointers by policy and are not fabricable."
+      ],
+      "resolved": [
+        "New guard src/test/ledger-semantic-resolution.test.ts resolves every compound anchor token mechanically (symbols against source files; 'tests:' entries as exact double-quoted test titles), proven to fail on an injected dead symbol.",
+        "Citations corrected to point only at text that verifiably exists today; no new musical fact, reviewer, date, or publication state was introduced - every correction re-points an existing claim at its existing implementation/test evidence.",
+        "External artifact paths documented as accepted historical pointers, not silently deleted: their run IDs and verdicts stay preserved above."
+      ],
+      "legacyValidatorDebt": "The second deferred item ('Legacy validator debt not naturally closed by the shared collection boundary') remains OPEN: src/lib/validation/content-validator.ts still carries validateSelectedSourceMetadata over four selected Phase 2 source IDs plus thin re-exports. Closing it means redesigning source-metadata validation onto the shared collection boundary, which is structural scope beyond this bounded maintenance slice; it is recorded here rather than half-closed."
+    },
     "status": "IN-PROGRESS"
   }
 }
