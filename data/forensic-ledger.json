@@ -2475,7 +2475,7 @@
   "p02CiAndTraversalCost": {
     "branch": "codex/p02-ci-and-traversal-cost",
     "base": "1d0ee6a11d7a05306252b110b019abd8be9e2965",
-    "scope": "Bounded maintenance slice: real CI, budget-scale traversal cost, and forensic traceability reconciliation. Not a content phase; no musical fact, publisher, year, location, licence, organization, reviewer, review date, or publication state is added or promoted.",
+    "scope": "Bounded maintenance slice: real hosted CI, budget-scale traversal cost reduction, forensic traceability reconciliation, closure of recorded residuals from the previous slice (lazy same-layer cycle pinning, ui-script-guard .css/.svg coverage, eslint-config-next alignment), advisory dispositioning, and A4 deferred-item assessment. Not a content phase; no musical fact, publisher, year, location, licence, organization, reviewer, review date, or publication state is added or promoted.",
     "correctionsToP02FollowupStructuralDebt": [
       "A2_structural_split: the 'content-validator imports no data module at runtime' claim was false and is now corrected to describe the acyclic property with its mechanical guard; line counts restated from measured newline counts.",
       "A2b: commit 4ab4707 was absent from this ledger entirely and is now recorded (identity-contracts leaf extraction, layering guard, interim 600s timeout).",

@@ -245,6 +245,18 @@ state.
 | A5 dependency upgrades | Minimal targeted upgrades only: `next ^14.2.15→^15.5.23`, `postcss ^8.4.47→^8.5.26`, `vitest ^2.1.3→^3.2.7`. npm audit falls from 10 vulnerabilities (1 critical) to 6 high **as measured on that slice's HEAD**; every remaining advisory requires an out-of-scope major (Next 16 / Vitest 4) and is reported as remaining. Correction (P02 CI-and-traversal-cost slice): the eslint-config-next 14→15 alignment in this later slice exits two more advisory ranges, so the current count is **3 high** — per-advisory exposure dispositions live in `data/forensic-ledger.json under p02CiAndTraversalCost, a5AdvisoryDisposition`; this row's historical numbers are preserved as measured-at-the-time, not updated in place. | `package.json`; `data/forensic-ledger.json` (`p02FollowupStructuralDebt.workItems.A5_dependency_upgrades`) | **PARTIAL BY DESIGN — majors out of scope** |
 | A6 housekeeping | `npm ci` from scratch verified after removing the stale dev server that held the SWC binary (the recorded EPERM cause reproduced as EBUSY); retained recovery worktree at `dc7d582` confirmed fully contained in main via `git cherry` (0 unique commits) and removed; `.claude/launch.json` assessed and retained pending owner decision; unapproved install scripts (`esbuild`, `sharp`, `unrs-resolver`) investigated — they do not affect test or build correctness. | `git worktree list`; `data/forensic-ledger.json` (`p02FollowupStructuralDebt`) | **COMPLETE** |
 
+
+### Correction convention (recorded by the P02 CI-and-traversal-cost slice)
+
+When a later slice corrects a factual claim in an earlier ledger or log
+entry, the correction follows this pattern so history stays auditable:
+append the corrected value, keep the prior claim's text with inline
+provenance ("earlier version claimed X - false because Y", or "as
+measured at <commit>"), record the supersession in the new section's
+corrections array quoting the old claim, and never delete historical
+entries, run IDs, or verdicts. Dispositions move forward only by adding
+an explicit superseding state (e.g. IMPLEMENTATION-COMPLETE-PENDING-
+REVIEW -> MERGED-VIA-PR-4), not by rewriting.
 Track B honesty re-verified on final HEAD: all eight Talas remain whole-entity
 quarantined with raw records retained; all 21 public source rows expose only the
 unknown/unverified provenance representation (probe: 0 leaks); `raga-bhairav`
