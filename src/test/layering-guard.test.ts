@@ -153,14 +153,19 @@ describe("module layering", () => {
   /**
    * Accepted same-layer residual, now mechanically pinned (M1).
    *
-   * Phase 2 recorded a lazy same-layer factory cycle as accepted structural
-   * residual: `publication-policy` <-> `source-evidence-policy`,
-   * `publication-policy` <-> `tala-disposition-policy`, and the
-   * `repository` <-> `search-engine` pair. Every cyclically imported binding
-   * in these modules is dereferenced only inside function bodies at call
-   * time (default-parameter factories and per-call lookups), never at module
-   * top level, so evaluation order cannot observe a partially-initialized
-   * binding. Both import orders were verified to evaluate cleanly.
+   * The Phase 2 follow-up recorded a lazy same-layer factory cycle as an
+   * accepted structural residual; the acceptance record itself lives in the
+   * PR #4 review narrative and data/forensic-ledger.json, not in a
+   * resolvable in-repo symbol — so this comment deliberately states the
+   * provenance instead of citing a path#symbol anchor that does not exist.
+   * This slice enumerated every runtime import cycle under src/lib
+   * mechanically (three same-layer pairs: `publication-policy` <->
+   * `source-evidence-policy`, `publication-policy` <->
+   * `tala-disposition-policy`, `repository` <-> `search-engine`) and
+   * verified each cyclically imported binding is dereferenced only inside
+   * function bodies at call time (default-parameter factories and per-call
+   * lookups), never at module top level, with both import orders evaluating
+   * cleanly.
    *
    * That property is what this guard pins. If any new cycle appears anywhere,
    * or one of these intended cycles gains a third member, gains a top-level

@@ -93,5 +93,16 @@ describe("tracked JSON files contain no duplicate object keys", () => {
         .map((d) => `${d.file}: "${d.key}" at line ${d.line}`)
         .join("\n")}`,
     ).toEqual([]);
+
+    // Bind the correction to parser-visible reality: after the duplicate-key
+    // fix, JSON.parse consumers must observe the CORRECTED A3 text (233),
+    // not a stale 228 claim shadowing it. This is the executable form of the
+    // correctionsToP02FollowupStructuralDebt ledger entry.
+    const ledger = JSON.parse(fs.readFileSync(path.join(ROOT, "data/forensic-ledger.json"), "utf8")) as {
+      p02FollowupStructuralDebt?: { workItems?: { A3_anchor_mechanism?: string } };
+    };
+    const parsedA3 = ledger.p02FollowupStructuralDebt?.workItems?.A3_anchor_mechanism ?? "";
+    expect(parsedA3).toContain("233 anchors machine-verified");
+    expect(parsedA3).not.toMatch(/228 anchors machine-verified/);
   });
 });
