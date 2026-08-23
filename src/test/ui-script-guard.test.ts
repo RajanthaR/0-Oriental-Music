@@ -137,6 +137,16 @@ describe("foreign-script guard for Sinhala UI copy", () => {
     const files = uiRoots.flatMap((root) => findUiSourceFiles(root, workspace)).sort();
     expect(files.length).toBeGreaterThan(20);
 
+    // Pin the extension breadth: if someone narrows findUiSourceFiles back to
+    // .ts/.tsx only, this assertion fails structurally instead of letting the
+    // .css/.svg text channels silently drop out of coverage again.
+    for (const extension of [".css", ".svg"]) {
+      expect(
+        files.some((file) => file.endsWith(extension)),
+        `guard scope must still include ${extension} assets (found none)`,
+      ).toBe(true);
+    }
+
     const violations: string[] = [];
     for (const file of files) {
       const relative = file.slice(workspace.length + 1).replace(/\\/g, "/");

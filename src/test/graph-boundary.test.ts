@@ -223,12 +223,14 @@ describe("bounded graph limits at every public boundary", () => {
     // (readOwnDataField per Object.keys entry), making wide records quadratic.
     // The walk now iterates one safeOwnEntries() descriptor snapshot, which is
     // linear. Measured after the fix: each budget-scale boundary probe runs in
-    // tens of milliseconds and this whole file passes in ~16s wall clock; the
-    // publication-decision parity dump is byte-identical between pristine
-    // 1d0ee6a and the fixed tree (SHA256
-    // 832A96F0479E320E7A57FDBE9F153312607AEBFC3690E632A2D60AB0556BF9BC;
-    // an earlier draft of this comment cited ACA5F893..., which was a
-    // probe-internal intermediate hash, not the baseline-vs-final oracle).
+    // tens of milliseconds and this whole file passes in ~16s wall clock (~20s
+    // under full-suite parallel load). The publication-decision parity dump
+    // was measured byte-identical between pristine 1d0ee6a and the fixed tree
+    // (SHA256 832A96F0479E320E7A57FDBE9F153312607AEBFC3690E632A2D60AB0556BF9BC)
+    // via scripts/dump-publication-parity.mjs — an earlier draft cited
+    // ACA5F893..., a probe-internal intermediate hash. Expect well under 10s
+    // per hosted-CI run of this file; >30s would mean the traversal went
+    // superlinear again, not slow hardware.
     // 60s leaves more than an order of magnitude of headroom over measured
     // per-test cost while staying bounded; the graph shapes, boundaries, and
     // assertions are unchanged.

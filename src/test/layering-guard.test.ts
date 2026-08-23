@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { canonicalCycleSet, cyclicModuleSets, type Graph } from "./support/cycles";
 import fs from "fs";
 import path from "path";
 
@@ -21,8 +22,6 @@ import path from "path";
  */
 
 const LIB = path.join(process.cwd(), "src", "lib");
-
-type Graph = Map<string, Set<string>>;
 
 function sourceFiles(dir: string): string[] {
   const out: string[] = [];
@@ -83,52 +82,18 @@ function layerOf(file: string): "data" | "validation" | null {
   return null;
 }
 
-/** Every cycle through `node`, reported as readable path chains. */
-function findCycles(graph: Graph): string[][] {
-  const cycles: string[][] = [];
-  const stack: string[] = [];
-  const onStack = new Set<string>();
-  const done = new Set<string>();
-
-  const walk = (node: string): void => {
-    stack.push(node);
-    onStack.add(node);
-    for (const next of graph.get(node) ?? []) {
-      if (onStack.has(next)) {
-        cycles.push([...stack.slice(stack.indexOf(next)), next]);
-      } else if (!done.has(next) && graph.has(next)) {
-        walk(next);
-      }
-    }
-    stack.pop();
-    onStack.delete(node);
-    done.add(node);
-  };
-
-  for (const node of graph.keys()) if (!done.has(node)) walk(node);
-  return cycles;
-}
-
-/**
- * Order-independent canonical form of one cyclic module set. The DFS above
- * reports a cycle starting wherever the walk entered it; a guard that asserts
- * exact chains would silently pass or fail depending on module discovery
- * order, so intended shapes are compared as sets instead.
- */
-function canonicalCycleSet(cycle: string[]): string {
-  return [...new Set(cycle)].sort().join(" -> ");
-}
 
 describe("module layering", () => {
   const graph = buildGraph();
+  const cyclicSets = cyclicModuleSets(graph).map((set) => canonicalCycleSet(set));
 
   it("has no runtime import cycle crossing the data/validation boundary", () => {
-    const crossLayer = findCycles(graph)
-      .filter((cycle) => {
-        const layers = new Set(cycle.map(layerOf).filter(Boolean));
+    const crossLayer = cyclicModuleSets(graph)
+      .filter((component) => {
+        const layers = new Set(component.map(layerOf).filter(Boolean));
         return layers.has("data") && layers.has("validation");
       })
-      .map((cycle) => cycle.join(" -> "));
+      .map((component) => component.join(" -> "));
 
     expect(crossLayer).toEqual([]);
   });
@@ -158,28 +123,30 @@ describe("module layering", () => {
    * PR #4 review narrative and data/forensic-ledger.json, not in a
    * resolvable in-repo symbol — so this comment deliberately states the
    * provenance instead of citing a path#symbol anchor that does not exist.
+   *
    * This slice enumerated every runtime import cycle under src/lib
-   * mechanically (three same-layer pairs: `publication-policy` <->
-   * `source-evidence-policy`, `publication-policy` <->
-   * `tala-disposition-policy`, `repository` <-> `search-engine`) and
-   * verified each cyclically imported binding is dereferenced only inside
-   * function bodies at call time (default-parameter factories and per-call
-   * lookups), never at module top level, with both import orders evaluating
-   * cleanly.
+   * mechanically. Correction found by switching to complete SCC
+   * decomposition: the earlier DFS back-edge walk reported two separate
+   * pairs, but `publication-policy`, `source-evidence-policy`, and
+   * `tala-disposition-policy` are actually ONE strongly connected module set
+   * of three (policy imports both policies; both import policy's context
+   * factory; tala-disposition also imports source-evidence). The second
+   * cyclic set is the `repository` <-> `search-engine` pair. Every
+   * cyclically imported binding is dereferenced only inside function bodies
+   * at call time (default-parameter factories and per-call lookups), never
+   * at module top level, and each set evaluates cleanly under either import
+   * order.
    *
    * That property is what this guard pins. If any new cycle appears anywhere,
-   * or one of these intended cycles gains a third member, gains a top-level
-   * dereference of a cyclically imported binding, or stops evaluating under
-   * reversed import order, this test fails instead of drifting silently.
+   * if one of these intended sets gains or loses a member, or if a member
+   * stops evaluating under reversed import order, this test fails instead of
+   * drifting silently.
    */
-  it("allows exactly the three documented lazy same-layer cycles", () => {
+  it("allows exactly the documented lazy same-layer cycle sets", () => {
     const allowed = new Set([
       canonicalCycleSet([
         "src/lib/data/publication-policy.ts",
         "src/lib/data/source-evidence-policy.ts",
-      ]),
-      canonicalCycleSet([
-        "src/lib/data/publication-policy.ts",
         "src/lib/data/tala-disposition-policy.ts",
       ]),
       canonicalCycleSet([
@@ -188,9 +155,9 @@ describe("module layering", () => {
       ]),
     ]);
 
-    // Deduplicate: two distinct simple cycles over one module set must not
-    // masquerade as a fourth unauthorized cycle.
-    const observed = [...new Set(findCycles(graph).map((cycle) => canonicalCycleSet(cycle)))];
+    // SCC decomposition is complete and order-independent by construction;
+    // deduplication keeps the comparison a set of distinct module sets.
+    const observed = [...new Set(cyclicSets)];
     expect(observed.sort()).toEqual([...allowed].sort());
   });
 
