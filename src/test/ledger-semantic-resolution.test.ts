@@ -58,9 +58,12 @@ function splitSymbolTail(tail: string): string[] {
 function buildTokens(ref: Record<string, unknown>): SemanticToken[] {
   const pathValue = String(ref.path ?? "");
   const symbolValue = String(ref.symbol ?? "");
+  // Comma tolerance: current semanticReferences cite single files, but an
+  // Oxford-comma list ("a.json, b.json, and c.json") must resolve against
+  // every named file rather than dead-tokenize on trailing commas.
   const files = pathValue
-    .split(/\s+and\s+/)
-    .map((part) => part.trim())
+    .split(/,\s*|\s+and\s+/)
+    .map((part) => part.trim().replace(/[.,]+$/, ""))
     .filter(Boolean);
   const tokens: SemanticToken[] = [];
   const isTestList = symbolValue.startsWith("tests:");
