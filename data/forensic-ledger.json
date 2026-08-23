@@ -2509,6 +2509,31 @@
       "testFileSplits": "DEFERRED: publication-containment.test.ts (1535 lines), components.test.tsx (1185), publication-parity.test.ts (1069), synth.test.ts (1044) exceed comfortable review size, but no low-risk seam presented itself that would not reshelve shared fixtures and mutation matrices mid-slice; splitting for line count alone adds churn without behavioral gain. Left as recorded debt for a dedicated structural pass.",
       "claudeLaunchJson": ".claude/launch.json remains tracked. RECOMMENDATION (owner decision pending, not executed): tool-local agent configuration does not belong in version control; move it to a developer-specific ignored path once no workflow depends on the committed copy."
     },
-    "status": "IN-PROGRESS"
+    "reviewRecord": {
+      "method": "Ten review lenses dispatched as independent subagents (correctness, maintainability, agent-native, learnings-researcher, security, performance, reliability, adversarial, project-standards, testing); every finding reproduced before fixing; rejected findings recorded with evidence; one reviewer failed mid-run and was retried to completion.",
+      "keyFindingsApplied": [
+        "P1 duplicate A3_anchor_mechanism key (three lenses converged on it independently): JSON.parse last-wins shadowed the corrected 233 text behind the stale 228 entry; fixed and made class-impossible by src/test/json-duplicate-keys.test.ts with a parsed-value binding.",
+        "P1 anchor verifier could never fail and masked a live dead anchor: script now exits nonzero on unresolved anchors; proven both ways.",
+        "P2 walk-abort granularity: collectDependencyDispositions now skips an unreadable record individually (continue) instead of abandoning queued siblings.",
+        "P2 incomplete DFS cycle inventory: replaced with complete Tarjan SCC decomposition in a shared engine with synthetic-graph fixtures; discovered the true topology is ONE three-module strongly connected set plus repository<->search-engine - the earlier 'two separate pairs' reading was an enumeration artifact.",
+        "P2 semantically lossy citation edit: synth.test.ts's real surviving Swara-ownership titles restored beside the components citations.",
+        "P2 parity oracle had no committed reproducer: scripts/dump-publication-parity.mjs added and verified to regenerate 832A96F0479E320E7A57FDBE9F153312607AEBFC3690E632A2D60AB0556BF9BC.",
+        "P2/P3s also applied: anchor-verifier CI step, Node-floor comment precision, cycle-set deduplication (superseded by SCC rewrite), comma-tolerant multi-file citation splitting, ui-script-guard breadth pin, A5 row superseding pointer, ledger line-count measurement-head annotations, call-time binding usability proofs."
+      ],
+      "rejectedFindings": [
+        "'package.json declares engines >=18' (correctness lens): rejected with evidence - no engines field exists; the CI comment was corrected to cite README's documentation-level floor instead.",
+        "Oxford-comma semanticReferences paths (correctness lens self-suppressed; reliability lens asserted they exist): settled mechanically - zero multi-file paths inside semanticReferences blocks; comma tolerance still added defensively.",
+        "'zero .svg UI files' (agent-native lens): rejected with evidence - src/app/icon.svg exists and is covered by the guard breadth pin."
+      ],
+      "acceptedResidualsFromReview": [
+        "Namespace-view introspection is unreliable for cyclic bindings under vitest; guards assert call-time usability instead.",
+        "verify-symbol-anchors.mjs matches only the first token of each cited symbol; tightening deferred - it is now fail-closed in CI so drift surfaces.",
+        "Semantic resolver accepts quoted source-text matches including it.each templates; acceptable floor, documented.",
+        "60s budget-scale ceiling calibrated on one workstation; first hosted CI run doubles as the calibration experiment (>30s means superlinear regression, not slow hardware).",
+        "CI runs ubuntu-latest while historical verification was win32-specific; SWC-binary incident class would surface late off-CI."
+      ],
+      "coverageNote": "project-standards lens was dispatched late (initial dispatch missed two always-on personas; corrected mid-review). All ten lenses returned artifacts or compact reports; none missing at close."
+    },
+    "status": "IMPLEMENTATION-COMPLETE-PENDING-REVIEW-ACCEPTANCE"
   }
 }
