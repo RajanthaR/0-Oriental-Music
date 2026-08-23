@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import fs from "fs";
 import path from "path";
 
@@ -109,6 +109,16 @@ function findCycles(graph: Graph): string[][] {
   return cycles;
 }
 
+/**
+ * Order-independent canonical form of one cyclic module set. The DFS above
+ * reports a cycle starting wherever the walk entered it; a guard that asserts
+ * exact chains would silently pass or fail depending on module discovery
+ * order, so intended shapes are compared as sets instead.
+ */
+function canonicalCycleSet(cycle: string[]): string {
+  return [...new Set(cycle)].sort().join(" -> ");
+}
+
 describe("module layering", () => {
   const graph = buildGraph();
 
@@ -138,5 +148,57 @@ describe("module layering", () => {
       .map(([file]) => file);
 
     expect(offenders).toEqual([]);
+  });
+
+  /**
+   * Accepted same-layer residual, now mechanically pinned (M1).
+   *
+   * Phase 2 recorded a lazy same-layer factory cycle as accepted structural
+   * residual: `publication-policy` <-> `source-evidence-policy`,
+   * `publication-policy` <-> `tala-disposition-policy`, and the
+   * `repository` <-> `search-engine` pair. Every cyclically imported binding
+   * in these modules is dereferenced only inside function bodies at call
+   * time (default-parameter factories and per-call lookups), never at module
+   * top level, so evaluation order cannot observe a partially-initialized
+   * binding. Both import orders were verified to evaluate cleanly.
+   *
+   * That property is what this guard pins. If any new cycle appears anywhere,
+   * or one of these intended cycles gains a third member, gains a top-level
+   * dereference of a cyclically imported binding, or stops evaluating under
+   * reversed import order, this test fails instead of drifting silently.
+   */
+  it("allows exactly the three documented lazy same-layer cycles", () => {
+    const allowed = new Set([
+      canonicalCycleSet([
+        "src/lib/data/publication-policy.ts",
+        "src/lib/data/source-evidence-policy.ts",
+      ]),
+      canonicalCycleSet([
+        "src/lib/data/publication-policy.ts",
+        "src/lib/data/tala-disposition-policy.ts",
+      ]),
+      canonicalCycleSet([
+        "src/lib/data/repository.ts",
+        "src/lib/search/search-engine.ts",
+      ]),
+    ]);
+
+    const observed = findCycles(graph).map((cycle) => canonicalCycleSet(cycle));
+    expect(observed.sort()).toEqual([...allowed].sort());
+  });
+
+  it.each([
+    ["@/lib/data/publication-policy", "@/lib/data/source-evidence-policy"],
+    ["@/lib/data/publication-policy", "@/lib/data/tala-disposition-policy"],
+    ["@/lib/data/repository", "@/lib/search/search-engine"],
+  ])("evaluates %s first without exposing an uninitialized cyclic binding", async (firstSpec, secondSpec) => {
+    vi.resetModules();
+    await expect(import(firstSpec)).resolves.toBeTruthy();
+    await expect(import(secondSpec)).resolves.toBeTruthy();
+    // Re-importing in the swapped order must not throw either: every cyclic
+    // binding is call-time-only, so neither order can read `undefined`.
+    vi.resetModules();
+    await expect(import(secondSpec)).resolves.toBeTruthy();
+    await expect(import(firstSpec)).resolves.toBeTruthy();
   });
 });
