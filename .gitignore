@@ -35,3 +35,9 @@ next-env.d.ts
 
 # Tool-local agent configuration (owner decision 2026-08-23: untrack)
 .claude/launch.json
+
+# Verification artifact: scripts/dump-publication-parity.mjs writes here by
+# default (override with --out). It is a throwaway comparison input, and the
+# workflow requires a clean worktree before review, so running the documented
+# parity check must not leave a file to notice and delete by hand.
+/parity-dump.json
