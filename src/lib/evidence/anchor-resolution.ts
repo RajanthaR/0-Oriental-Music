@@ -9,9 +9,10 @@
  *
  * Strictness tiers:
  * - "first-token": the historical floor. The first whitespace-delimited token
- *   of the symbol must appear in the file. Kept for the CI verifier so the
- *   existing 233-anchor corpus keeps its exact meaning across the migration;
- *   fail-closed there since commit 4ca371d.
+ *   of the symbol must appear in the file. Kept for the CI verifier: the
+ *   pre-migration corpus was 233 unique anchors and zero were dropped; the
+ *   canonical extractor additionally sees 3 cross-document .md references
+ *   (236 total). Fail-closed in CI since commit 4ca371d.
  * - "definition": stronger. The symbol must appear in a declaration-shaped
  *   position (function/const/class/type/interface/enum) OR as a quoted
  *   test title, closing the comment/prose false-match hole the testing lens
@@ -56,14 +57,20 @@ function escapeRegExp(value: string): string {
 /**
  * Definition-shaped match: symbol appears as a declared name or as a quoted
  * test title. Handles standalone declarations (`function x`, `const x`,
- * `class X`, `type X`, `interface X`, `enum X`), visibility-modified class
- * methods (`public x(...)`, `private x(...)`), and `"x"` / `'x'` quoting
- * used by it()/describe().
+ * `class X`, `type X`, `interface X`, `enum X`), class members with leading
+ * modifiers including an intervening modifier (`public async x(...)`), and
+ * `"x"` / `'x'` quoting used by it()/describe(). Boundaries are
+ * non-ASCII-safe so Sinhala-named symbols resolve in this Sinhala-first
+ * repository.
  */
 export function hasDefinitionShapedMatch(fileText: string, symbol: string): boolean {
   const escaped = escapeRegExp(symbol);
+  // Non-ASCII-safe boundaries: JS \b is ASCII-only, which would silently
+  // reject Sinhala-named symbols in this Sinhala-first repository.
+  const boundaryStart = "(?<![A-Za-z0-9_$])";
+  const boundaryEnd = "(?![A-Za-z0-9_$])";
   const declaration = new RegExp(
-    `\\b(?:(?:function|const|let|var|class|type|interface|enum)|(?:public|private|protected|readonly|static))\\s+${escaped}\\b`,
+    `${boundaryStart}(?:(?:function|const|let|var|class|type|interface|enum)|(?:public|private|protected|readonly|static))(?:\\s+(?:async|readonly))*\\s+${escaped}${boundaryEnd}`,
   );
   if (declaration.test(fileText)) return true;
   // Test titles are double-quoted strings in this codebase.
@@ -90,22 +97,25 @@ export function resolveAgainstText(
       ? { resolved: true }
       : { resolved: false, reason: "symbol-absent" };
   }
-  // Multi-token compound anchors resolve when their first token exists AND
-  // the full symbol text appears (prose anchors like "a, b, and c" keep
-  // working). Single tokens must be definition-shaped or quoted — the raw
-  // substring below would otherwise reintroduce exactly the comment/prose
-  // false-match hole the definition tier exists to close.
+  // Definition tier: a single-token symbol must be definition-shaped or
+  // appear as a quoted test title — never a bare prose/substring mention.
   const tokens = symbol.split(" ");
+  if (tokens.length === 1) {
+    return hasDefinitionShapedMatch(fileText, symbol)
+      ? { resolved: true }
+      : { resolved: false, reason: "not-definition-shaped" };
+  }
+  // Multi-token compound anchors: first AND last tokens must be
+  // definition-shaped in-file (the middle may be prose connectors), OR the
+  // full symbol text must appear verbatim.
   const firstToken = tokens[0];
   if (!fileText.includes(firstToken)) {
     return { resolved: false, reason: "symbol-absent" };
   }
-  if (tokens.length === 1) {
-    return hasDefinitionShapedMatch(fileText, firstToken)
-      ? { resolved: true }
-      : { resolved: false, reason: "not-definition-shaped" };
-  }
-  if (hasDefinitionShapedMatch(fileText, firstToken)) {
+  if (
+    hasDefinitionShapedMatch(fileText, firstToken) &&
+    hasDefinitionShapedMatch(fileText, tokens[tokens.length - 1])
+  ) {
     return { resolved: true };
   }
   return fileText.includes(symbol)

@@ -21,16 +21,16 @@ import path from "path";
  * Scope notes:
  * - data/ is scanned RECURSIVELY so a future subdirectory cannot silently
  *   escape the scan; src/data/ is flat today and scanned directly;
- * - package-lock.json is EXCLUDED by design: its lockfile schema legitimately
- *   repeats keys ("dependencies", "resolved", "version") across sibling
- *   objects that npm's tooling owns and regenerates;
- * - package.json IS scanned (root manifest, hand-edited).
+ * - package-lock.json is excluded by directory scope (repo root is not in
+ *   SCAN_DIRS): its lockfile schema legitimately repeats keys
+ *   ("dependencies", "resolved", "version") across sibling objects that
+ *   npm's tooling owns and regenerates;
+ * - package.json IS scanned explicitly (root manifest, hand-edited).
  */
 
 const ROOT = process.cwd();
 const SCAN_DIRS = ["data", "src/data"];
 const ROOT_FILES = ["package.json"];
-const EXCLUDED = new Set(["package-lock.json"]);
 
 interface Duplicate {
   file: string;
@@ -109,13 +109,14 @@ describe("tracked JSON files contain no duplicate object keys", () => {
     }
     for (const name of ROOT_FILES) {
       const full = path.join(ROOT, name);
-      if (!fs.existsSync(full)) continue;
+      // Hard-expect rather than skip: silent root-manifest coverage loss must
+      // fail the guard instead of degrading to data/-only scanning.
+      expect(fs.existsSync(full), `${name} must exist for the root-manifest scan leg`).toBe(true);
       filesScanned += 1;
       for (const d of scanText(fs.readFileSync(full, "utf8"))) {
         duplicates.push({ file: name, key: d.key, line: d.line });
       }
     }
-    void EXCLUDED;
     // The two canonical data directories must both stay present so the guard
     // cannot silently degrade to scanning nothing.
     expect(filesScanned).toBeGreaterThanOrEqual(20);
@@ -127,14 +128,17 @@ describe("tracked JSON files contain no duplicate object keys", () => {
     ).toEqual([]);
 
     // Bind the correction to parser-visible reality: after the duplicate-key
-    // fix, JSON.parse consumers must observe the CORRECTED A3 text (233),
-    // not a stale 228 claim shadowing it. This is the executable form of the
-    // correctionsToP02FollowupStructuralDebt ledger entry.
+    // fix, JSON.parse consumers must observe the CORRECTED A3 text, not a
+    // stale 228 claim shadowing it. The positive pin matches the corrected
+    // count phrase without hard-coding the number (the count was legitimately
+    // re-measured 233 -> 236 when the extractor widened; pinning the digit
+    // made the ledger uncorrectable), while the negative guard keeps the
+    // original stale value dead.
     const ledger = JSON.parse(fs.readFileSync(path.join(ROOT, "data/forensic-ledger.json"), "utf8")) as {
       p02FollowupStructuralDebt?: { workItems?: { A3_anchor_mechanism?: string } };
     };
     const parsedA3 = ledger.p02FollowupStructuralDebt?.workItems?.A3_anchor_mechanism ?? "";
-    expect(parsedA3).toContain("233 anchors machine-verified");
+    expect(parsedA3).toMatch(/anchors machine-verified resolvable/);
     expect(parsedA3).not.toMatch(/228 anchors machine-verified/);
   });
 });

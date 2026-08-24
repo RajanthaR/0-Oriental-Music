@@ -121,11 +121,12 @@ describe("forensic-ledger semanticReferences resolve semantically (A4)", () => {
         }
       }
     }
-    // Measured 30 tokens across 12 anchor groups after the synth.test.ts
-    // citation restoration. Consolidating or splitting a citation may legally
-    // move this count, but a collapse toward zero means the walker above
-    // silently stopped matching ledger entries (that exact bug shipped while
-    // writing this guard), so a generous floor stays.
+    // Measured 30 tokens across 13 holder objects (15 semanticReferences)
+    // after the synth.test.ts citation restoration. Consolidating or
+    // splitting a citation may legally move this count, but a collapse toward
+    // zero means the walker above silently stopped matching ledger entries
+    // (that exact bug shipped while writing this guard), so a generous floor
+    // stays.
     expect(checked, "tokens checked").toBeGreaterThanOrEqual(20);
     expect(failures, `Unresolved semantic anchor tokens (A4):\n${failures.join("\n")}`).toEqual([]);
   });

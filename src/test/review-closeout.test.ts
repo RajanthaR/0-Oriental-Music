@@ -8,7 +8,12 @@ import sourcePageQualityData from "../../data/source-page-quality.json";
 import { repository } from "@/lib/data/repository";
 import { getRecordPublicationDecision, UNKNOWN_PROVENANCE } from "@/lib/data/publication-policy";
 import { validateContentRecord } from "@/lib/validation/content-contracts";
-import { hasDefinitionShapedMatch } from "../lib/evidence/anchor-resolution";
+import {
+  extractMarkdownAnchors,
+  hasDefinitionShapedMatch,
+  parseAnchor,
+  resolveAgainstText,
+} from "../lib/evidence/anchor-resolution";
 import type { Question, QuestionType, RenderableQuestionType } from "@/types/content";
 
 type RawRecord = Record<string, unknown>;
@@ -106,7 +111,15 @@ function findNumericSourceAnchors(markdown: string): string[] {
   return findings;
 }
 
-/** Resolve a stable `path#symbol` anchor against the live tree. */
+/**
+ * Resolve a stable `path#symbol` anchor against the live tree.
+ *
+ * Currently UNCALLED: kept as the documented escalation path for the planned
+ * anchor-remediation slice (repointing re-export citations to their defining
+ * modules and then enforcing the definition-shaped check corpus-wide). Do
+ * not cite it as active coverage — the wired document-anchor test below runs
+ * at the verifier's first-token tier only.
+ */
 function expectPathSymbolAnchor(anchor: string, label: string): void {
   const separator = anchor.indexOf("#");
   // Data-file anchors may legitimately cite exact lines because JSON is
@@ -626,5 +639,45 @@ describe("Phase 2 final contract closeout", () => {
       violations,
       `Numeric path:line anchors drifted again. Convert them to stable path#symbol form instead of refreshing the numbers:\n${violations.map((v) => `${v.document}: ${v.anchor}`).join("\n")}`,
     ).toEqual([]);
+  });
+
+  it("resolves every path#symbol anchor the traceability documents cite (A3, via the shared engine)", () => {
+    let checked = 0;
+    const failures: string[] = [];
+    for (const documentPath of TRACEABILITY_DOCUMENT_PATHS) {
+      for (const anchor of extractMarkdownAnchors(readWorkspaceFile(documentPath))) {
+        // Data-file anchors may cite exact JSON lines (append-only, machine-
+        // stable). All document anchors resolve at the verifier's first-token
+        // tier. Definition-shaped escalation would require a corpus-wide
+        // repointing of re-export citations first (several cite modules that
+        // only re-export their symbols - e.g.
+        // publication-policy.ts#isKnownQuarantinedEntityId is defined in
+        // decision-types.ts); that remediation slice is deliberately
+        // deferred rather than half-landed here.
+        const dataLineMatch = anchor.match(/^(data\/[A-Za-z0-9_./-]+\.json):(\d+)$/);
+        if (!anchor.includes("#") && dataLineMatch) {
+          checked += 1;
+          expect(readWorkspaceFile(dataLineMatch[1]), `${anchor} data file`).toBeDefined();
+          continue;
+        }
+        const parsed = parseAnchor(anchor);
+        if (!parsed) {
+          failures.push(`${documentPath}: ${anchor} has no # separator`);
+          continue;
+        }
+        checked += 1;
+        const outcome = resolveAgainstText(
+          readWorkspaceFile(parsed.path) ?? null,
+          parsed.symbol,
+          "first-token",
+        );
+        if (!outcome.resolved) failures.push(`${documentPath}: ${anchor} -> ${outcome.reason}`);
+      }
+    }
+    // Measured 311 anchors across the three documents when this guard was
+    // wired (including data-line anchors); a collapse toward zero means
+    // extraction silently stopped matching.
+    expect(checked, "anchors checked").toBeGreaterThanOrEqual(200);
+    expect(failures, `Unresolved document anchors:\n${failures.join("\n")}`).toEqual([]);
   });
 });

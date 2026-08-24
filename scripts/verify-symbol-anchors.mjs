@@ -2,13 +2,14 @@
 //
 // Resolves every `path#symbol` anchor in the three traceability documents
 // through the shared resolver (src/lib/evidence/anchor-resolution.ts), at the
-// historical "first-token" strictness tier: the existing 233-anchor corpus
-// keeps its exact meaning across the consolidation. Fails the run (exit 1)
-// when anything is unresolved; a green print with exit 0 was itself a defect
-// until commit 4ca371d.
+// historical "first-token" strictness tier. Migration note: the pre-migration
+// corpus was 233 unique anchors, zero dropped; the canonical extractor
+// additionally sees 3 cross-document .md references (236 total). Fails the
+// run (exit 1) when anything is unresolved OR when extraction collapses
+// below a floor — a green print over an empty corpus would be vacuous.
 //
 // Run under vite-node so the TypeScript resolver is importable:
-//   npx vite-node scripts/verify-symbol-anchors.mjs
+//   npx --no-install vite-node scripts/verify-symbol-anchors.mjs
 import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -32,6 +33,15 @@ const anchors = new Set();
 for (const doc of docs) {
   const text = readFileSync(join(repoRoot, doc), "utf8");
   for (const anchor of extractMarkdownAnchors(text)) anchors.add(anchor);
+}
+
+// Extraction floor: a collapsed extraction (regex regression, renamed docs)
+// would otherwise print "0 resolved, 0 unresolved" and exit 0 — a vacuous
+// pass. The live corpus measures 236; 100 leaves massive room while catching
+// collapse.
+if (anchors.size < 100) {
+  console.log(`EXTRACTION COLLAPSE: only ${anchors.size} anchors extracted (expected >= 100)`);
+  process.exitCode = 1;
 }
 
 let ok = 0;

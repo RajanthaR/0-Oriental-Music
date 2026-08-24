@@ -88,6 +88,31 @@ describe("anchor resolution engine (permanent fixtures)", () => {
       expect(outcome.resolved).toBe(false);
       expect(outcome.reason).toBe("not-definition-shaped");
     });
+
+    it("accepts Sinhala-named declarations (non-ASCII-safe boundaries)", () => {
+      // JS \b is ASCII-only; the engine must not silently reject
+      // Sinhala-named symbols in this Sinhala-first repository.
+      expect(hasDefinitionShapedMatch("const ස්වරය = 1;", "ස්වරය")).toBe(true);
+    });
+
+    it("accepts class members with an intervening modifier (public async x)", () => {
+      const cls = ["class PitchDetector {", "  public async startListening() {}", "}"].join("\n");
+      expect(hasDefinitionShapedMatch(cls, "startListening")).toBe(true);
+    });
+
+    it("pins multi-token branch order: full-text fallback vs definition pair", () => {
+      // Both tokens declared on separate lines -> definition pair resolves.
+      const bothDeclared = [
+        "export function inspectGraph() {}",
+        "export function projectPublicRecord() {}",
+      ].join("\n");
+      expect(resolveAgainstText(bothDeclared, "inspectGraph and projectPublicRecord", "definition").resolved).toBe(true);
+      // Only the first token declared, full compound text absent -> rejected.
+      const onlyFirst = "export function inspectGraph() {}";
+      const outcome = resolveAgainstText(onlyFirst, "inspectGraph and projectPublicRecord", "definition");
+      expect(outcome.resolved).toBe(false);
+      expect(outcome.reason).toBe("not-definition-shaped");
+    });
   });
 
   describe("extraction", () => {

@@ -2552,12 +2552,15 @@
         "src/test/review-closeout.test.ts (first-token floor retained + definition-shaped check for single-token anchors)"
       ],
       "strictnessTiers": "first-token (historical floor, CI continuity) and definition (declaration-shaped incl. visibility-modified class methods, or quoted test title); single-token symbols require definition shape, multi-token compound anchors fall back to full-substring after first-token presence.",
-      "migrationDeltaProof": "verifier 233/0 -> 236/0 (+3: cross-document .md references the old extraction regex could not see - FORENSIC_CORRECTION_LOG.md#P02-FINAL-06 and two P02_CLOSEOUT_FINDINGS.md cycle headings - each verified present in its target document); semantic guard 30/0 -> 31/0 under the stricter tier with zero regressions."
+      "migrationDeltaProof": "verifier 233/0 -> 236/0 (+3: cross-document .md references the old extraction regex could not see - FORENSIC_CORRECTION_LOG.md#P02-FINAL-06 and two P02_CLOSEOUT_FINDINGS.md cycle headings - each verified present in its target document); semantic guard 30 tokens / 0 failures before AND after under the stricter tier (the true delta is semanticReferences 14 -> 15: the compound inspectGraph+projectPublicRecord citation was split into two single-token refs); zero regressions."
     },
     "legacyValidatorDebtClosed": {
       "disposition": "CLOSED - relocated verbatim to publication-audit.ts beside sibling audits; content-validator re-exports preserve the API surface; all 29 source-metadata-consistency tests pass byte-for-byte; production wiring unchanged (admin never consumed this function).",
       "assessmentNote": "The earlier 'redesign onto the shared collection boundary' framing was wrong: the function's value is CROSS-surface identity (runtime vs manifest vs extracted documents vs human SOURCES.md rows), which the single-collection boundary cannot express. Deletion was rejected as coverage loss.",
-      "supersedes": "p02CiAndTraversalCost.a4SemanticResolution.legacyValidatorDebt (recorded OPEN there) is superseded by this entry."
+      "supersedes": "p02CiAndTraversalCost.a4SemanticResolution.legacyValidatorDebt (recorded OPEN there) is superseded by this entry.",
+      "corrections": [
+        "p02CiAndTraversalCost.a4SemanticResolution.legacyValidatorDebt recorded OPEN with rationale 'Closing it means redesigning source-metadata validation onto the shared collection boundary'. That framing is superseded by the assessment above: the function's cross-surface joins cannot be expressed by the single-collection boundary, and its actual defect was location drift, now corrected. Prior text preserved verbatim in that section."
+      ]
     },
     "hardenedScanners": {
       "duplicateKeys": "data/ scanned recursively plus package.json; package-lock.json excluded by documented design (npm-owned repeating schema); proven against a duplicate planted in a NEW nested subdirectory that the previous non-recursive scan would have missed.",
