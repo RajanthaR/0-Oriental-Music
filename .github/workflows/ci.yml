@@ -53,8 +53,10 @@ jobs:
       # The forensic ledger's path#symbol anchors decay silently unless the
       # verifier runs somewhere mandatory; this is the machine proof behind
       # the "N resolved, 0 unresolved" claims in the traceability documents.
+      # Runs under vite-node so the shared TypeScript resolver module
+      # (src/lib/evidence/anchor-resolution.ts) is importable from a script.
       - name: Verify traceability anchors
-        run: node scripts/verify-symbol-anchors.mjs
+        run: npx vite-node scripts/verify-symbol-anchors.mjs
 
       - name: Test
         run: npm run test

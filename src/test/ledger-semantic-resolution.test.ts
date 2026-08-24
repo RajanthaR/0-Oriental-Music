@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import fs from "fs";
 import path from "path";
+import { readRepoFile, resolveAgainstText } from "../lib/evidence/anchor-resolution";
 
 /**
- * A4 semantic resolution guard (P02 CI-and-traversal-cost slice).
+ * A4 semantic resolution guard (P02 CI-and-traversal-cost slice), migrated to
+ * the shared resolver (src/lib/evidence/anchor-resolution.ts) by the
+ * validation-consolidation slice.
  *
  * The A3 anchor mechanism verifies that `path#symbol` anchors resolve, but it
  * deliberately skips the compound prose-style anchors in the historical
@@ -12,12 +15,13 @@ import path from "path";
  * ledger pointing at text that no longer exists — structurally valid JSON,
  * semantically dead evidence.
  *
- * This guard resolves every compound anchor token mechanically:
- * - `symbol` fields split on commas and "and" must each appear in the file;
- * - `tests:`-prefixed fields split on ";" must match an `it("...")`/test
- *   title in the cited test file (exact substring);
- * - a `path` citing multiple files ("a and b") must exist, and every token
- *   must resolve in at least one cited file.
+ * Token semantics (unchanged from the original guard, now backed by the
+ * shared engine where applicable):
+ * - `tests:`-prefixed fields split on ";" must match a double-quoted test
+ *   title in the cited test file;
+ * - plain `symbol` tokens resolve through the shared definition tier: a
+ *   declaration-shaped match (function/const/class/type/interface/enum) or,
+ *   for multi-token compound anchors, the full symbol text.
  *
  * Historical wording is preserved verbatim in the ledger; this test only
  * proves the tokens still point at real text.
@@ -94,37 +98,35 @@ describe("forensic-ledger semanticReferences resolve semantically (A4)", () => {
       for (const ref of refs) {
         for (const token of buildTokens(ref)) {
           checked += 1;
-          const absolute = path.join(ROOT, token.file);
-          let text: string | null = null;
-          try {
-            text = fs.readFileSync(absolute, "utf8");
-          } catch {
+          const text = readRepoFile(ROOT, token.file);
+          if (text === null) {
             failures.push(`${token.file}: file missing (cited by ledger)`);
             continue;
           }
           if (token.kind === "test-name") {
             // Test titles are double-quoted strings in the source; require the
             // exact title text between quotes to avoid prose false hits.
-            const quoted = new RegExp(`["']${escapeRegExp(token.token)}["']`);
+            const quoted = new RegExp(`["']${token.token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["']`);
             if (!quoted.test(text)) {
               failures.push(`${token.file}: test title not found: "${token.token}"`);
             }
-          } else if (!text.includes(token.token)) {
-            failures.push(`${token.file}: symbol not found: ${token.token}`);
+          } else {
+            // Definition tier through the shared engine: declaration-shaped
+            // match, or full compound-symbol text for multi-token anchors.
+            const outcome = resolveAgainstText(text, token.token, "definition");
+            if (!outcome.resolved) {
+              failures.push(`${token.file}: symbol not resolved (${outcome.reason}): ${token.token}`);
+            }
           }
         }
       }
     }
-    // Measured 28 tokens across 12 anchor groups when this guard was written.
-    // Consolidating or splitting a citation may legally move this count, but
-    // a collapse toward zero means the walker above silently stopped matching
-    // ledger entries (that exact bug shipped while writing this guard), so a
-    // generous floor stays.
+    // Measured 30 tokens across 12 anchor groups after the synth.test.ts
+    // citation restoration. Consolidating or splitting a citation may legally
+    // move this count, but a collapse toward zero means the walker above
+    // silently stopped matching ledger entries (that exact bug shipped while
+    // writing this guard), so a generous floor stays.
     expect(checked, "tokens checked").toBeGreaterThanOrEqual(20);
     expect(failures, `Unresolved semantic anchor tokens (A4):\n${failures.join("\n")}`).toEqual([]);
   });
 });
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}

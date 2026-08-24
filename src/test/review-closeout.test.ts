@@ -8,6 +8,7 @@ import sourcePageQualityData from "../../data/source-page-quality.json";
 import { repository } from "@/lib/data/repository";
 import { getRecordPublicationDecision, UNKNOWN_PROVENANCE } from "@/lib/data/publication-policy";
 import { validateContentRecord } from "@/lib/validation/content-contracts";
+import { hasDefinitionShapedMatch } from "../lib/evidence/anchor-resolution";
 import type { Question, QuestionType, RenderableQuestionType } from "@/types/content";
 
 type RawRecord = Record<string, unknown>;
@@ -119,7 +120,17 @@ function expectPathSymbolAnchor(anchor: string, label: string): void {
   const path = anchor.slice(0, separator);
   const symbol = anchor.slice(separator + 1).replace(/\s+\(.*\)$/, "");
   expect(path, `${label} path`).toMatch(/^(?:src|docs|data|AGENTS\.md)/);
-  expect(readWorkspaceFile(path), `${label} symbol ${symbol}`).toContain(symbol.split(" ")[0]);
+  const source = readWorkspaceFile(path);
+  // First-token floor (historical contract for this corpus) plus the shared
+  // engine's definition-shaped check when the symbol is a single identifier:
+  // the anchor must be a real declared name or quoted test title, not prose.
+  expect(source, `${label} symbol ${symbol}`).toContain(symbol.split(" ")[0]);
+  if (!symbol.includes(" ")) {
+    expect(
+      hasDefinitionShapedMatch(source, symbol),
+      `${label} symbol ${symbol} should be declaration-shaped or a quoted title`,
+    ).toBe(true);
+  }
 }
 
 function expectSemanticReference(reference: SemanticReference, label: string): void {
