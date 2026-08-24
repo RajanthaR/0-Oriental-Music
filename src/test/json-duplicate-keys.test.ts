@@ -3,7 +3,8 @@ import fs from "fs";
 import path from "path";
 
 /**
- * Duplicate-key guard for every tracked JSON file under data/ and src/data/.
+ * Duplicate-key guard for every tracked JSON file under data/ (recursive) and
+ * src/data/, plus the root-level package manifests.
  *
  * JSON.parse silently keeps the LAST occurrence of a duplicated key
  * (ECMA-262 "last wins"), so a structural duplicate can ship behind green
@@ -16,15 +17,34 @@ import path from "path";
  * The scan is a small state machine, not JSON.parse: string literals are
  * consumed atomically, keys are identified by a following colon, and each
  * nesting level records its own key list.
+ *
+ * Scope notes:
+ * - data/ is scanned RECURSIVELY so a future subdirectory cannot silently
+ *   escape the scan; src/data/ is flat today and scanned directly;
+ * - package-lock.json is EXCLUDED by design: its lockfile schema legitimately
+ *   repeats keys ("dependencies", "resolved", "version") across sibling
+ *   objects that npm's tooling owns and regenerates;
+ * - package.json IS scanned (root manifest, hand-edited).
  */
 
 const ROOT = process.cwd();
 const SCAN_DIRS = ["data", "src/data"];
+const ROOT_FILES = ["package.json"];
+const EXCLUDED = new Set(["package-lock.json"]);
 
 interface Duplicate {
   file: string;
   key: string;
   line: number;
+}
+
+function collectJsonFiles(dir: string, out: string[] = []): string[] {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) collectJsonFiles(full, out);
+    else if (entry.name.endsWith(".json")) out.push(full);
+  }
+  return out;
 }
 
 function scanText(text: string): Array<{ key: string; line: number }> {
@@ -71,19 +91,28 @@ function scanText(text: string): Array<{ key: string; line: number }> {
 }
 
 describe("tracked JSON files contain no duplicate object keys", () => {
-  it("scans data/ and src/data/ structurally instead of trusting JSON.parse", () => {
+  it("scans data/ recursively, src/data/, and the root manifest structurally instead of trusting JSON.parse", () => {
     const duplicates: Duplicate[] = [];
     let filesScanned = 0;
     for (const dir of SCAN_DIRS) {
       const full = path.join(ROOT, dir);
-      for (const name of fs.readdirSync(full).filter((f) => f.endsWith(".json"))) {
+      for (const file of collectJsonFiles(full)) {
         filesScanned += 1;
-        const rel = `${dir}/${name}`;
-        for (const d of scanText(fs.readFileSync(path.join(full, name), "utf8"))) {
+        const rel = `${path.relative(ROOT, file).split(path.sep).join("/")}`;
+        for (const d of scanText(fs.readFileSync(file, "utf8"))) {
           duplicates.push({ file: rel, key: d.key, line: d.line });
         }
       }
     }
+    for (const name of ROOT_FILES) {
+      const full = path.join(ROOT, name);
+      if (!fs.existsSync(full)) continue;
+      filesScanned += 1;
+      for (const d of scanText(fs.readFileSync(full, "utf8"))) {
+        duplicates.push({ file: name, key: d.key, line: d.line });
+      }
+    }
+    void EXCLUDED;
     // The two canonical data directories must both stay present so the guard
     // cannot silently degrade to scanning nothing.
     expect(filesScanned).toBeGreaterThanOrEqual(20);
