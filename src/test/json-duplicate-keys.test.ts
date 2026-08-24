@@ -49,7 +49,10 @@ function collectJsonFiles(dir: string, out: string[] = []): string[] {
 
 function scanText(text: string): Array<{ key: string; line: number }> {
   const dupes: Array<{ key: string; line: number }> = [];
-  const keyStack: string[][] = [[]];
+  // Set per nesting level: duplicate detection must not degrade to O(k^2)
+  // in keys per object (the original string[] version did; flagged by the
+  // performance lens after the recursive scope expansion).
+  const keyStack: Set<string>[] = [new Set<string>()];
   let i = 0;
   const n = text.length;
   while (i < n) {
@@ -75,15 +78,15 @@ function scanText(text: string): Array<{ key: string; line: number }> {
           key = literal;
         }
         const level = keyStack[keyStack.length - 1];
-        if (level.includes(key)) {
+        if (level.has(key)) {
           dupes.push({ key, line: text.slice(0, i).split("\n").length });
         }
-        level.push(key);
+        level.add(key);
       }
       i = j + 1;
       continue;
     }
-    if (c === "{") keyStack.push([]);
+    if (c === "{") keyStack.push(new Set<string>());
     else if (c === "}") keyStack.pop();
     i++;
   }
