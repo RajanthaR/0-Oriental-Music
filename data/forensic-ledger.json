@@ -2539,5 +2539,35 @@
       "coverageNote": "project-standards lens was dispatched late (initial dispatch missed two always-on personas; corrected mid-review). All ten lenses returned artifacts or compact reports; none missing at close."
     },
     "status": "IMPLEMENTATION-COMPLETE-PENDING-REVIEW-ACCEPTANCE"
+  },
+  "validationConsolidation": {
+    "branch": "codex/validation-consolidation",
+    "base": "a634de1f4f965eb15b625c750757db5c0e3e2e94",
+    "scope": "Validation-evidence consolidation: one shared anchor resolver replacing three divergent mechanisms, legacy validator debt closed, scanners hardened with permanent negative fixtures. Not a content phase; no musical fact, publisher, year, location, licence, organization, reviewer, review date, or publication state is added or promoted.",
+    "sharedAnchorResolver": {
+      "module": "src/lib/evidence/anchor-resolution.ts",
+      "consumers": [
+        "scripts/verify-symbol-anchors.mjs (CI gate; invocation updated to npx vite-node because the script imports the TypeScript module)",
+        "src/test/ledger-semantic-resolution.test.ts (migrated to the stricter definition tier)",
+        "src/test/review-closeout.test.ts (first-token floor retained + definition-shaped check for single-token anchors)"
+      ],
+      "strictnessTiers": "first-token (historical floor, CI continuity) and definition (declaration-shaped incl. visibility-modified class methods, or quoted test title); single-token symbols require definition shape, multi-token compound anchors fall back to full-substring after first-token presence.",
+      "migrationDeltaProof": "verifier 233/0 -> 236/0 (+3: cross-document .md references the old extraction regex could not see - FORENSIC_CORRECTION_LOG.md#P02-FINAL-06 and two P02_CLOSEOUT_FINDINGS.md cycle headings - each verified present in its target document); semantic guard 30/0 -> 31/0 under the stricter tier with zero regressions."
+    },
+    "legacyValidatorDebtClosed": {
+      "disposition": "CLOSED - relocated verbatim to publication-audit.ts beside sibling audits; content-validator re-exports preserve the API surface; all 29 source-metadata-consistency tests pass byte-for-byte; production wiring unchanged (admin never consumed this function).",
+      "assessmentNote": "The earlier 'redesign onto the shared collection boundary' framing was wrong: the function's value is CROSS-surface identity (runtime vs manifest vs extracted documents vs human SOURCES.md rows), which the single-collection boundary cannot express. Deletion was rejected as coverage loss.",
+      "supersedes": "p02CiAndTraversalCost.a4SemanticResolution.legacyValidatorDebt (recorded OPEN there) is superseded by this entry."
+    },
+    "hardenedScanners": {
+      "duplicateKeys": "data/ scanned recursively plus package.json; package-lock.json excluded by documented design (npm-owned repeating schema); proven against a duplicate planted in a NEW nested subdirectory that the previous non-recursive scan would have missed.",
+      "permanentFixtures": "src/test/anchor-resolution-fixtures.test.ts replaces transient session proofs: dead anchors, prose-only mention rejection, %s template handling, unterminated-backtick line swallowing, and the documented text-level (non-AST) comment boundary."
+    },
+    "engineFixturesCaughtDuringDevelopment": [
+      "Single-token symbols bypassed the definition check through an unconditional multi-token fallback substring test - fixed before commit via the fixture suite.",
+      "Visibility-modified class method declarations were not recognized as definition-shaped - added.",
+      "Markdown anchor extraction could swallow following lines into one symbol on an unterminated backtick - newline-bounded."
+    ],
+    "status": "IN-REVIEW"
   }
 }
