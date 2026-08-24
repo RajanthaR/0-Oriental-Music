@@ -1435,13 +1435,17 @@
       "currentClaim": "Recursive inspection or cloning could overflow on deep acyclic data and did not share one bounded cycle/node/depth policy.",
       "evidence": [
         {
-          "path": "src/lib/validation/content-contracts.ts",
-          "locator": "inspectGraph / projectPublicRecord / cloneBoundedJson",
+          "path": "src/lib/shared/bounded-values.ts",
+          "locator": "inspectGraph (defined here; content-contracts re-exports it)",
           "exactSection": "inspectGraph and projectPublicRecord",
           "semanticReferences": [
             {
+              "path": "src/lib/shared/bounded-values.ts",
+              "symbol": "inspectGraph"
+            },
+            {
               "path": "src/lib/validation/content-contracts.ts",
-              "symbol": "inspectGraph and projectPublicRecord"
+              "symbol": "projectPublicRecord"
             }
           ]
         },

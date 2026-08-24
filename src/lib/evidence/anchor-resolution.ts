@@ -55,12 +55,16 @@ function escapeRegExp(value: string): string {
 
 /**
  * Definition-shaped match: symbol appears as a declared name or as a quoted
- * test title. Handles `function x`, `const x`, `class X`, `type X`,
- * `interface X`, `enum X`, and `"x"` / `'x'` quoting used by it()/describe().
+ * test title. Handles standalone declarations (`function x`, `const x`,
+ * `class X`, `type X`, `interface X`, `enum X`), visibility-modified class
+ * methods (`public x(...)`, `private x(...)`), and `"x"` / `'x'` quoting
+ * used by it()/describe().
  */
 export function hasDefinitionShapedMatch(fileText: string, symbol: string): boolean {
   const escaped = escapeRegExp(symbol);
-  const declaration = new RegExp(`\\b(?:function|const|let|var|class|type|interface|enum)\\s+${escaped}\\b`);
+  const declaration = new RegExp(
+    `\\b(?:(?:function|const|let|var|class|type|interface|enum)|(?:public|private|protected|readonly|static))\\s+${escaped}\\b`,
+  );
   if (declaration.test(fileText)) return true;
   // Test titles are double-quoted strings in this codebase.
   const quoted = new RegExp(`["']${escaped}["']`);
@@ -86,12 +90,20 @@ export function resolveAgainstText(
       ? { resolved: true }
       : { resolved: false, reason: "symbol-absent" };
   }
-  // Multi-token symbols resolve when their first definition-shaped token
-  // matches AND the full symbol text exists (compound prose anchors keep
-  // working); single tokens must be definition-shaped or quoted.
-  const firstToken = symbol.split(" ")[0];
+  // Multi-token compound anchors resolve when their first token exists AND
+  // the full symbol text appears (prose anchors like "a, b, and c" keep
+  // working). Single tokens must be definition-shaped or quoted — the raw
+  // substring below would otherwise reintroduce exactly the comment/prose
+  // false-match hole the definition tier exists to close.
+  const tokens = symbol.split(" ");
+  const firstToken = tokens[0];
   if (!fileText.includes(firstToken)) {
     return { resolved: false, reason: "symbol-absent" };
+  }
+  if (tokens.length === 1) {
+    return hasDefinitionShapedMatch(fileText, firstToken)
+      ? { resolved: true }
+      : { resolved: false, reason: "not-definition-shaped" };
   }
   if (hasDefinitionShapedMatch(fileText, firstToken)) {
     return { resolved: true };
@@ -110,10 +122,14 @@ export function readRepoFile(repoRoot: string, relativePath: string): string | n
   }
 }
 
-/** Extract `path#symbol` anchors from markdown text using the canonical regex. */
+/** Extract `path#symbol` anchors from markdown text using the canonical regex.
+ * The symbol tail excludes backticks/separators AND newlines: a missing
+ * closing backtick must not let one anchor swallow following lines (the
+ * swallowed text used to pass silently at first-token tier because its first
+ * word happened to exist in the target file). */
 export function extractMarkdownAnchors(markdown: string): string[] {
   const anchors = new Set<string>();
-  for (const m of markdown.matchAll(/`?((?:src|data|docs)\/[A-Za-z0-9_./-]+\.(?:ts|tsx|mjs|json|md))#([^`;,|)]+)/g)) {
+  for (const m of markdown.matchAll(/`?((?:src|data|docs)\/[A-Za-z0-9_./-]+\.(?:ts|tsx|mjs|json|md))#([^\n`;,|)]+)/g)) {
     anchors.add(`${m[1]}#${m[2].trim()}`);
   }
   return [...anchors];
