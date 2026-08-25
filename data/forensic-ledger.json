@@ -2592,6 +2592,104 @@
         "Adversarial scope-gap finding accepted: initial files.txt omitted package.json/package-lock.json/vite.config.ts; final review artifacts regenerated from git diff base..HEAD."
       ]
     },
-    "status": "REVIEW-COMPLETE-PENDING-PR"
+    "mergeRecord": {
+      "pullRequest": "#6",
+      "mergedAs": "eb309e4329eace71ecff549214aadda3f0b7bf4e",
+      "ownerStabilization": {
+        "commit": "2ba97dc test: stabilize the suite against worker contention; ignore parity artifact",
+        "content": "vitest.config.ts adds testTimeout 30_000 and maxWorkers 2 after five-run measurement on a 4-CPU host (three failing runs before; three consecutive clean runs at 72-73s wall clock after); .gitignore adds parity-dump.json. Owner-authored; preserved verbatim through later slices.",
+        "attribution": "Owner commit, not part of the validation-consolidation phase diff."
+      },
+      "localSync": "main fast-forwarded a634de1 -> eb309e4; branch codex/validation-consolidation deleted locally and on origin."
+    },
+    "status": "MERGED (PR #6 as eb309e4); owner stabilization 2ba97dc recorded"
+  },
+  "nextSixteenModernization": {
+    "branch": "codex/next16-modernization",
+    "base": "eb309e4329eace71ecff549214aadda3f0b7bf4e",
+    "scope": "Toolchain modernization only: Next.js 15 -> 16, React 18 -> 19 cascade, ESLint 8 -> 9 flat config (next lint removed upstream), Vitest 3 -> 4. No musical fact, curriculum claim, publisher, year, location, licence, organization, reviewer identity, review date, or publication state is added or promoted; the public Grades 6-11 boundary, quarantine set, and UNKNOWN_PROVENANCE handling are untouched.",
+    "commits": [
+      "5698090 chore(deps): upgrade to Next 16.3.2 + React 19 + ESLint 9 flat config",
+      "1fadfb9 chore(deps): upgrade vitest ^3.2.7 -> ^4.1.11"
+    ],
+    "versions": {
+      "next": "^15.5.23 -> 16.3.2 (Turbopack is now the default bundler for dev and build)",
+      "react": "^18.3.1 -> ^19.2.8 (+ @types/react 19.2.18, @types/react-dom 19.2.5)",
+      "eslint": "^8.57.1 -> ^9.39.5 (forced: eslint-config-next@16 peer-requires eslint >=9)",
+      "eslintConfigNext": "15.5.23 -> 16.3.2 kept EXACT per repo supply-chain convention",
+      "vitest": "^3.2.7 -> ^4.1.11 (separate commit; vite-node stays pinned 3.2.4 exact for the CI anchor/parity scripts)"
+    },
+    "lintMigration": {
+      "from": ".eslintrc.json { extends: next/core-web-vitals } + next lint",
+      "to": "eslint.config.mjs flat config + eslint .",
+      "evidence": "node_modules/eslint-config-next/dist/core-web-vitals.js exports a native flat-config array; no FlatCompat bridge needed.",
+      "presetParity": "core-web-vitals only, one-to-one with the previous .eslintrc.json; the additional typescript preset was deliberately NOT adopted inside a migration commit.",
+      "scopeExpansion": "Plain `eslint .` covers root *.mjs configs that next lint never linted; both anonymous default exports (postcss.config.mjs, new eslint.config.mjs) were fixed properly rather than suppressed.",
+      "deferredDebt": "eslint-config-next@16 ships react-hooks v6 whose new compiler-powered rules flag 13 pre-existing sites (12 react-hooks/set-state-in-effect across 11 files + 1 react-hooks/refs in RhythmTapGame.tsx). Pinned to warn in eslint.config.mjs with rationale; faithful fixes are useSyncExternalStore-shaped refactors deferred to a dedicated adoption slice. Lint gate reports exactly 13 warnings / 0 errors. Review-cycle 1 hardening (validated finding S2): package.json lint script now carries \"--max-warnings=13\" so any NEW violation of either pinned rule turns the gate red while existing debt stays green; the floor MUST be lowered whenever a site is fixed, and both rules flip to error once the debt reaches zero."
+    },
+    "breakingChangesHandled": [
+      "next lint removed in Next 16: script replaced by eslint CLI against flat config.",
+      "@vitest/spy v4 invokes mocked constructors with real `new` semantics: mockImplementation with an arrow function threw '() => detector is not a constructor' in the three PitchDetectorView microphone-session tests. Fixed in test code only (regular-function implementations whose object return becomes the `new` result). Production code untouched.",
+      "Vitest 4 type change: ReturnType<typeof vi.fn> resolves to Mock<Procedure | Constructable>; the constructor union broke mockImplementation argument assignability at the readyCancel helper. Annotated explicitly as Mock<(...args: any[]) => any>. Test-code-only.",
+      "tsconfig.json auto-synced by Next 16 tooling: jsx preserve -> react-jsx and .next/dev/types added to include; type-check re-verified under the rewritten file.",
+      "Build static-page counter moved 23 -> 22; route-table diff proved 28 = 28 identical routes (metadata-route accounting change, not a lost page)."
+    ],
+    "processCorrectionRecorded": "Commit ba48778 (superseded by amendment 1fadfb9) initially landed after running only the vitest gate; the full battery then caught the Vitest-4 typing regression at type-check and build. Root cause of the miss: vitest's esbuild transform strips types without checking, so the test gate alone could not see it. The amended commit contains both forced adaptations; final numbers below are measured on 1fadfb9.",
+    "measuredOnHead": {
+      "head": "1fadfb9",
+      "baselineBranchPoint": "eb309e4: type-check 6.06s exit 0; lint 6.66s exit 0 no warnings; test 24 files/583 tests 66.94s exit 0; build 42.01s exit 0 (webpack, 23 static pages); audit critical 0/high 3/moderate 0",
+      "typeCheck": "exit 0, 3.23s",
+      "lint": "exit 0, 0 errors / 13 warnings (exact deferred set), 11.18s",
+      "test": "24 files / 583 tests passed, 56.17s (owner stabilization intact)",
+      "build": "exit 0, 10.86s Turbopack (baseline webpack 42.01s), 28 routes identical to baseline by programmatic diff",
+      "parityOracle": "npx --no-install vite-node scripts/dump-publication-parity.mjs --out <file> -> sha256 832a96f0479e320e7a57fdbe9f153312607aebfc3690e632a2d60ab0556bf9bc EXACT MATCH against acceptance invariant",
+      "anchors": "verify-symbol-anchors: 236 resolved, 0 unresolved, exit 0 (unchanged from base)",
+      "audit": "critical 0 / high 0 / moderate 0 / low 0 / total 0 (baseline had 3 high: next, postcss, sharp; none present at HEAD - per-advisory resolution paths not individually traced)",
+      "installScriptPolicy": "esbuild@0.28.2 and unrs-resolver@1.12.2 postinstall hooks explicitly approved into package.json allowScripts via npm install-scripts approve during review-cycle 1 (validated finding S4); both are standard binary/napi resolution hooks on transitive chains (esbuild <- vite <- vite-node 3.2.4; unrs-resolver <- eslint-import-resolver-typescript <- eslint-config-next), consistent with the earlier A6 housekeeping investigation. Scope note (cycle-2 security advisory): package.json allowScripts is authoritative for this repository and shadows any user-level ~/.npmrc allow-scripts line within this project (npm emits a shadowing warning; direction is fail-closed). The user-level file itself is owner-owned environment and intentionally untouched.",
+      "duplicateKeyScan": "total duplicate keys: 0",
+      "browserQA": "Production server (next start): 5 routes x 2 viewports (360x740, 1280x800) via Playwright chromium - all HTTP 200, zero console errors, zero page errors, 0px horizontal overflow at mobile width, navbar visible, non-empty rendered text, home renders Sinhala brand string. Screenshots saved for owner review at C:/tmp/swara-slice/shots/ (driving agent has no image input; layout verified programmatically).",
+      "postFixReverification": "After review-cycle-1 fixes landed on HEAD 6fb2df0 (config comment rewrite + --max-warnings=13 floor): npm run lint exits 0 with exactly '13 problems (0 errors, 13 warnings)' - the floor equals the current count exactly, so existing debt stays green and any new violation of the two pinned rules fails the gate; type-check exit 0. Verified by coordinator and independently reproduced by the cycle-2 correctness and agent-native reviewers."
+    },
+    "reviewCycle1": {
+      "runId": "20260825-091500-next16-c1",
+      "artifacts": "C:/tmp/compound-engineering/ce-code-review/20260825-091500-next16-c1/",
+      "team": "correctness, testing, maintainability, project-standards, agent-native-reviewer, learnings-researcher (always-on) + security, performance, reliability, adversarial (conditional: supply-chain majors / bundler change / CI-gate compatibility / evidence-honesty attack surface)",
+      "coverage": "9 of 10 lenses produced complete artifacts; performance lens DEGRADED after repeated infrastructure deaths - its mechanical questions were coordinator-verified directly (Turbopack logs carry no size table; gate timings re-read from logs) and the residue is disclosed as non-independent",
+      "infrastructure": "first dispatch wave lost 8 agents incl. trivial canaries on both subagent and subagent_fork rails; workflow+schema rail returned nulls; recovery via write-first micro-briefs (<=6 tool calls); 12 failures logged in orchestrator-verification.json - no failed lens treated as a clean pass",
+      "findingsSummary": "0 P0/P1. Validated and applied: S1 P2 A5 correction-log staleness; S2-S6 P3 lint warning-ceiling ratchet, config-header provenance repoint, install-script allowlist, vitest-config annotation, AGENTS.md directory-map label. Resolved-by-verification: maintainability-F2. Demoted: testing-F1 (advisory deferral -> testing gaps). Adversarial honesty probes all clean.",
+      "validatorWave": "all six surviving findings independently validated true by per-finding validators (validator-S1..S6 artifacts)"
+    },
+    "residualRisks": [
+      "Bundle-size comparison UNKNOWN-by-format: Turbopack build output carries no per-route or shared-first-load size table (verified against final build log; webpack baseline reported 103 kB shared). No regression evidence either way; runtime QA clean across 10 route loads. Follow-up with proper tooling if first-load budget becomes a concern.",
+      "Hosted-CI behavior items recorded UNKNOWN by the reliability lens (lockfileVersion read on hosted npm, runner patch drift, Turbopack peak RSS, Vitest 4 default-worker RPC behavior): the unchanged workflow needs no edit locally; the PR's first hosted run closes the observable ones empirically."
+    ],
+    "reviewCycle2": {
+      "runId": "20260825-110000-next16-c2",
+      "artifacts": "C:/tmp/compound-engineering/ce-code-review/20260825-110000-next16-c2/",
+      "scope": "rereview of fix commits c544156 + 6fb2df0 within full phase diff eb309e4..HEAD",
+      "outcome": "all ten lenses re-dispatched and completed; correctness/testing/maintainability/project-standards/learnings/performance/reliability returned 0 findings each with explicit resolution verifications of the cycle-1 fixes; performance produced a normal artifact this cycle, closing its cycle-1 degraded caveat",
+      "advisoriesDispositioned": [
+        "agent-native P3 APPLIED: AGENTS.md section 5 lint-floor explanation added",
+        "security P3 remedy REJECTED as owner-scope (user-home .npmrc); repo-side authoritative-shadowing scope note recorded in installScriptPolicy",
+        "adversarial P3 APPLIED: postFixReverification block records lint/type-check on 6fb2df0"
+      ],
+      "validatorWave": "not required - no new actionable findings survived synthesis; advisories dispositioned inline with evidence"
+    },
+    "finalVerificationOnReviewedHead": {
+      "head": "9cc633a fix(review): apply cycle-2 advisory dispositions and record post-fix verification",
+      "gates": "type-check exit 0; lint exit 0 with exactly 13 warnings (0 errors) at the --max-warnings=13 floor; test 24 files / 583 tests passed exit 0; build exit 0 (Turbopack)",
+      "invariants": "publication-decision parity sha256 832a96f0479e320e7a57fdbe9f153312607aebfc3690e632a2d60ab0556bf9bc EXACT MATCH; symbol anchors 236 resolved / 0 unresolved; npm audit total 0; duplicate-key scan 0",
+      "timingCaveat": "gate wall-clocks in this final pass ran roughly 2x slower than earlier measurements because cycle-2 reviewer agents were still executing concurrently; all exit codes and counts are unaffected and match prior clean runs"
+    },
+    "independentVerificationOnReviewedHead": {
+      "performedBy": "separate verification session, reviewed head 0bd9805, no slice work performed",
+      "reproduced": "type-check exit 0; lint exit 0 at exactly 13 warnings / 0 errors against the --max-warnings=13 floor (12 react-hooks/set-state-in-effect + 1 react-hooks/refs); vitest 24 files / 583 passed exit 0 with no reporter RPC error; next build exit 0 on 16.3.2 Turbopack; publication parity dump sha256 832a96f0479e320e7a57fdbe9f153312607aebfc3690e632a2d60ab0556bf9bc identical to the pre-upgrade value; anchors 236 resolved / 0 unresolved; npm audit 0 total; installed versions match the declared set.",
+      "routeModeCheck": "Route table compared against the Next 15 build captured in the prior slice: identical 28 routes, 21 static and 7 dynamic, and no route changed rendering mode across the major upgrade. The historical \"23 static pages\" figure in earlier handoffs was Next 15's \"Generating static pages (23/23)\" progress counter, not the static-route marker count; Turbopack reports 22/22 for the same route set. Bundler accounting difference, not a lost page.",
+      "testFixtureReview": "The components.test.tsx changes are Vitest 4 API adaptations only (mocked constructors now invoked with real new semantics, so arrow implementations are not constructable; and vi.fn overload resolution required an explicit Mock shape). No assertion was removed, weakened, or skipped.",
+      "artifactDefectFoundAndRepaired": "The cycle-1 orchestrator-verification.json was not valid JSON and could not be parsed by any tool: a comma was missing between two entries of the verified array, and once that was added a second defect surfaced as an illegal trailing comma before the same array closed. Both were punctuation-only repairs made in place, proven content-preserving: file size unchanged at 6006 bytes, and the text is byte-identical after normalising whitespace and commas, so no claim, method, result, or session string was altered. The pre-repair file is retained alongside it as orchestrator-verification.json.bak-before-comma-repair. 29 of the 30 JSON artifacts across both review runs already parsed; this was the only malformed one.",
+      "gapDisclosed": "Repository JSON is gated for parseability and duplicate keys, but review artifacts live outside the repository and are gated for neither. An unparseable evidence file therefore reads as complete evidence until something tries to machine-read it. Closing this needs an orchestrator-side write-time validation step, not a repo test, since a repo test cannot see an external temp path.",
+      "degradedLensConfirmed": "The disclosed cycle-1 performance-lens degradation is corroborated by its artifact, which contains notes [\"in progress\"] with zero findings. It was correctly counted as missing coverage rather than a clean lens."
+    },
+    "status": "REVIEW-COMPLETE-READY-FOR-PR"
   }
 }

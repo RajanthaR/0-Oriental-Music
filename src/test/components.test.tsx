@@ -1,5 +1,6 @@
 import React, { StrictMode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { Mock } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { hydrateRoot } from "react-dom/client";
@@ -67,7 +68,12 @@ const getKhemtaFixture = (): Tala => {
   return tala;
 };
 
-const readyCancel = (cancel: ReturnType<typeof vi.fn> = vi.fn()) =>
+// Vitest 4 note: `ReturnType<typeof vi.fn>` resolves through an overloaded
+// signature to `Mock<Procedure | Constructable>`, and that constructor union
+// makes mockImplementation argument types incompatible (TS2322 at every
+// readyCancel() call site). Annotating the explicit non-union shape keeps
+// the runtime behavior identical while restoring assignability.
+const readyCancel = (cancel: Mock<(...args: any[]) => any> = vi.fn()) =>
   Object.assign(cancel, { ready: Promise.resolve(true) });
 
 const deferredPlayback = () => {
@@ -150,7 +156,14 @@ describe("Interactive Audio & Quiz Components Suite", () => {
       stopListening: vi.fn(),
     };
     const onTargetMatched = vi.fn();
-    pitchMocks.PitchDetector.mockImplementation(() => detector);
+    // Vitest 4 (@vitest/spy v4) invokes mocked constructors with real `new`
+    // semantics: an arrow-function implementation is not constructable and
+    // throws "() => detector is not a constructor". A regular function whose
+    // body returns an object makes `new` yield that object, preserving the
+    // exact fixture contract the Vitest 3 mock relied on.
+    pitchMocks.PitchDetector.mockImplementation(function () {
+      return detector;
+    });
 
     render(<PitchDetectorView onTargetMatched={onTargetMatched} />);
     const startButton = screen.getByRole("button", { name: "මයික්‍රෆෝනය අරඹන්න" });
@@ -192,7 +205,14 @@ describe("Interactive Audio & Quiz Components Suite", () => {
       stopListening: vi.fn(),
     };
     const onTargetMatched = vi.fn();
-    pitchMocks.PitchDetector.mockImplementation(() => detector);
+    // Vitest 4 (@vitest/spy v4) invokes mocked constructors with real `new`
+    // semantics: an arrow-function implementation is not constructable and
+    // throws "() => detector is not a constructor". A regular function whose
+    // body returns an object makes `new` yield that object, preserving the
+    // exact fixture contract the Vitest 3 mock relied on.
+    pitchMocks.PitchDetector.mockImplementation(function () {
+      return detector;
+    });
 
     render(<PitchDetectorView onTargetMatched={onTargetMatched} />);
     fireEvent.click(screen.getByRole("button", { name: "මයික්‍රෆෝනය අරඹන්න" }));
@@ -222,7 +242,14 @@ describe("Interactive Audio & Quiz Components Suite", () => {
       stopListening: vi.fn(),
     };
     const onTargetMatched = vi.fn();
-    pitchMocks.PitchDetector.mockImplementation(() => detector);
+    // Vitest 4 (@vitest/spy v4) invokes mocked constructors with real `new`
+    // semantics: an arrow-function implementation is not constructable and
+    // throws "() => detector is not a constructor". A regular function whose
+    // body returns an object makes `new` yield that object, preserving the
+    // exact fixture contract the Vitest 3 mock relied on.
+    pitchMocks.PitchDetector.mockImplementation(function () {
+      return detector;
+    });
 
     const { unmount } = render(<PitchDetectorView onTargetMatched={onTargetMatched} />);
     fireEvent.click(screen.getByRole("button", { name: "මයික්‍රෆෝනය අරඹන්න" }));
