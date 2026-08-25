@@ -72,7 +72,7 @@ describe("ProgressStorage reactive snapshot layer", () => {
     const server = getServerProgressSnapshot();
     expect(server.completedLessonIds).toEqual([]);
     expect(server.streakDays).toBe(1);
-    expect(server.lastLessonId ?? server.savedLessonIds).toBeDefined();
+    expect(server.savedLessonIds).toEqual([]);
     expect(getServerProgressSnapshot()).toBe(server);
     expect(getServerLowBandwidthModeSnapshot()).toBe(false);
   });
