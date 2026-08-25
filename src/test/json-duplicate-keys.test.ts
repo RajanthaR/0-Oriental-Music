@@ -3,7 +3,8 @@ import fs from "fs";
 import path from "path";
 
 /**
- * Duplicate-key guard for every tracked JSON file under data/ and src/data/.
+ * Duplicate-key guard for every tracked JSON file under data/ (recursive) and
+ * src/data/, plus the root-level package manifests.
  *
  * JSON.parse silently keeps the LAST occurrence of a duplicated key
  * (ECMA-262 "last wins"), so a structural duplicate can ship behind green
@@ -16,10 +17,20 @@ import path from "path";
  * The scan is a small state machine, not JSON.parse: string literals are
  * consumed atomically, keys are identified by a following colon, and each
  * nesting level records its own key list.
+ *
+ * Scope notes:
+ * - data/ is scanned RECURSIVELY so a future subdirectory cannot silently
+ *   escape the scan; src/data/ is flat today and scanned directly;
+ * - package-lock.json is excluded by directory scope (repo root is not in
+ *   SCAN_DIRS): its lockfile schema legitimately repeats keys
+ *   ("dependencies", "resolved", "version") across sibling objects that
+ *   npm's tooling owns and regenerates;
+ * - package.json IS scanned explicitly (root manifest, hand-edited).
  */
 
 const ROOT = process.cwd();
 const SCAN_DIRS = ["data", "src/data"];
+const ROOT_FILES = ["package.json"];
 
 interface Duplicate {
   file: string;
@@ -27,9 +38,21 @@ interface Duplicate {
   line: number;
 }
 
+function collectJsonFiles(dir: string, out: string[] = []): string[] {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) collectJsonFiles(full, out);
+    else if (entry.name.endsWith(".json")) out.push(full);
+  }
+  return out;
+}
+
 function scanText(text: string): Array<{ key: string; line: number }> {
   const dupes: Array<{ key: string; line: number }> = [];
-  const keyStack: string[][] = [[]];
+  // Set per nesting level: duplicate detection must not degrade to O(k^2)
+  // in keys per object (the original string[] version did; flagged by the
+  // performance lens after the recursive scope expansion).
+  const keyStack: Set<string>[] = [new Set<string>()];
   let i = 0;
   const n = text.length;
   while (i < n) {
@@ -55,15 +78,15 @@ function scanText(text: string): Array<{ key: string; line: number }> {
           key = literal;
         }
         const level = keyStack[keyStack.length - 1];
-        if (level.includes(key)) {
+        if (level.has(key)) {
           dupes.push({ key, line: text.slice(0, i).split("\n").length });
         }
-        level.push(key);
+        level.add(key);
       }
       i = j + 1;
       continue;
     }
-    if (c === "{") keyStack.push([]);
+    if (c === "{") keyStack.push(new Set<string>());
     else if (c === "}") keyStack.pop();
     i++;
   }
@@ -71,17 +94,27 @@ function scanText(text: string): Array<{ key: string; line: number }> {
 }
 
 describe("tracked JSON files contain no duplicate object keys", () => {
-  it("scans data/ and src/data/ structurally instead of trusting JSON.parse", () => {
+  it("scans data/ recursively, src/data/, and the root manifest structurally instead of trusting JSON.parse", () => {
     const duplicates: Duplicate[] = [];
     let filesScanned = 0;
     for (const dir of SCAN_DIRS) {
       const full = path.join(ROOT, dir);
-      for (const name of fs.readdirSync(full).filter((f) => f.endsWith(".json"))) {
+      for (const file of collectJsonFiles(full)) {
         filesScanned += 1;
-        const rel = `${dir}/${name}`;
-        for (const d of scanText(fs.readFileSync(path.join(full, name), "utf8"))) {
+        const rel = `${path.relative(ROOT, file).split(path.sep).join("/")}`;
+        for (const d of scanText(fs.readFileSync(file, "utf8"))) {
           duplicates.push({ file: rel, key: d.key, line: d.line });
         }
+      }
+    }
+    for (const name of ROOT_FILES) {
+      const full = path.join(ROOT, name);
+      // Hard-expect rather than skip: silent root-manifest coverage loss must
+      // fail the guard instead of degrading to data/-only scanning.
+      expect(fs.existsSync(full), `${name} must exist for the root-manifest scan leg`).toBe(true);
+      filesScanned += 1;
+      for (const d of scanText(fs.readFileSync(full, "utf8"))) {
+        duplicates.push({ file: name, key: d.key, line: d.line });
       }
     }
     // The two canonical data directories must both stay present so the guard
@@ -95,14 +128,17 @@ describe("tracked JSON files contain no duplicate object keys", () => {
     ).toEqual([]);
 
     // Bind the correction to parser-visible reality: after the duplicate-key
-    // fix, JSON.parse consumers must observe the CORRECTED A3 text (233),
-    // not a stale 228 claim shadowing it. This is the executable form of the
-    // correctionsToP02FollowupStructuralDebt ledger entry.
+    // fix, JSON.parse consumers must observe the CORRECTED A3 text, not a
+    // stale 228 claim shadowing it. The positive pin matches the corrected
+    // count phrase without hard-coding the number (the count was legitimately
+    // re-measured 233 -> 236 when the extractor widened; pinning the digit
+    // made the ledger uncorrectable), while the negative guard keeps the
+    // original stale value dead.
     const ledger = JSON.parse(fs.readFileSync(path.join(ROOT, "data/forensic-ledger.json"), "utf8")) as {
       p02FollowupStructuralDebt?: { workItems?: { A3_anchor_mechanism?: string } };
     };
     const parsedA3 = ledger.p02FollowupStructuralDebt?.workItems?.A3_anchor_mechanism ?? "";
-    expect(parsedA3).toContain("233 anchors machine-verified");
+    expect(parsedA3).toMatch(/anchors machine-verified resolvable/);
     expect(parsedA3).not.toMatch(/228 anchors machine-verified/);
   });
 });

@@ -1435,13 +1435,17 @@
       "currentClaim": "Recursive inspection or cloning could overflow on deep acyclic data and did not share one bounded cycle/node/depth policy.",
       "evidence": [
         {
-          "path": "src/lib/validation/content-contracts.ts",
-          "locator": "inspectGraph / projectPublicRecord / cloneBoundedJson",
+          "path": "src/lib/shared/bounded-values.ts",
+          "locator": "inspectGraph (defined here; content-contracts re-exports it)",
           "exactSection": "inspectGraph and projectPublicRecord",
           "semanticReferences": [
             {
+              "path": "src/lib/shared/bounded-values.ts",
+              "symbol": "inspectGraph"
+            },
+            {
               "path": "src/lib/validation/content-contracts.ts",
-              "symbol": "inspectGraph and projectPublicRecord"
+              "symbol": "projectPublicRecord"
             }
           ]
         },
@@ -2535,5 +2539,59 @@
       "coverageNote": "project-standards lens was dispatched late (initial dispatch missed two always-on personas; corrected mid-review). All ten lenses returned artifacts or compact reports; none missing at close."
     },
     "status": "IMPLEMENTATION-COMPLETE-PENDING-REVIEW-ACCEPTANCE"
+  },
+  "validationConsolidation": {
+    "branch": "codex/validation-consolidation",
+    "base": "a634de1f4f965eb15b625c750757db5c0e3e2e94",
+    "scope": "Validation-evidence consolidation: one shared anchor resolver replacing three divergent mechanisms, legacy validator debt closed, scanners hardened with permanent negative fixtures. Not a content phase; no musical fact, publisher, year, location, licence, organization, reviewer, review date, or publication state is added or promoted.",
+    "sharedAnchorResolver": {
+      "module": "src/lib/evidence/anchor-resolution.ts",
+      "consumers": [
+        "scripts/verify-symbol-anchors.mjs (CI gate; invocation updated to npx vite-node because the script imports the TypeScript module)",
+        "src/test/ledger-semantic-resolution.test.ts (migrated to the stricter definition tier)",
+        "src/test/review-closeout.test.ts (first-token floor retained + definition-shaped check for single-token anchors)"
+      ],
+      "strictnessTiers": "first-token (historical floor, CI continuity) and definition (declaration-shaped incl. visibility-modified class methods, or quoted test title); single-token symbols require definition shape, multi-token compound anchors fall back to full-substring after first-token presence.",
+      "migrationDeltaProof": "verifier 233/0 -> 236/0 (+3: cross-document .md references the old extraction regex could not see - FORENSIC_CORRECTION_LOG.md#P02-FINAL-06 and two P02_CLOSEOUT_FINDINGS.md cycle headings - each verified present in its target document); semantic guard 30 tokens / 0 failures before AND after under the stricter tier (the true delta is semanticReferences 14 -> 15: the compound inspectGraph+projectPublicRecord citation was split into two single-token refs); zero regressions."
+    },
+    "legacyValidatorDebtClosed": {
+      "disposition": "CLOSED - relocated verbatim to publication-audit.ts beside sibling audits; content-validator re-exports preserve the API surface; all 29 source-metadata-consistency tests pass byte-for-byte; production wiring unchanged (admin never consumed this function).",
+      "assessmentNote": "The earlier 'redesign onto the shared collection boundary' framing was wrong: the function's value is CROSS-surface identity (runtime vs manifest vs extracted documents vs human SOURCES.md rows), which the single-collection boundary cannot express. Deletion was rejected as coverage loss.",
+      "supersedes": "p02CiAndTraversalCost.a4SemanticResolution.legacyValidatorDebt (recorded OPEN there) is superseded by this entry.",
+      "corrections": [
+        "p02CiAndTraversalCost.a4SemanticResolution.legacyValidatorDebt recorded OPEN with rationale 'Closing it means redesigning source-metadata validation onto the shared collection boundary'. That framing is superseded by the assessment above: the function's cross-surface joins cannot be expressed by the single-collection boundary, and its actual defect was location drift, now corrected. Prior text preserved verbatim in that section."
+      ]
+    },
+    "hardenedScanners": {
+      "duplicateKeys": "data/ scanned recursively plus package.json; package-lock.json excluded by documented design (npm-owned repeating schema); proven against a duplicate planted in a NEW nested subdirectory that the previous non-recursive scan would have missed.",
+      "permanentFixtures": "src/test/anchor-resolution-fixtures.test.ts replaces transient session proofs: dead anchors, prose-only mention rejection, %s template handling, unterminated-backtick line swallowing, and the documented text-level (non-AST) comment boundary."
+    },
+    "engineFixturesCaughtDuringDevelopment": [
+      "Single-token symbols bypassed the definition check through an unconditional multi-token fallback substring test - fixed before commit via the fixture suite.",
+      "Visibility-modified class method declarations were not recognized as definition-shaped - added.",
+      "Markdown anchor extraction could swallow following lines into one symbol on an unterminated backtick - newline-bounded."
+    ],
+    "reviewRecord": {
+      "method": "Ten lenses dispatched as independent subagents against base a634de1 (correctness, maintainability, agent-native, learnings-researcher, security, performance, reliability, adversarial, project-standards, testing). Every finding reproduced before fixing; converged findings deduplicated; rejected findings recorded with evidence.",
+      "keyFindingsApplied": [
+        "P2 CI gate rode on undeclared vite-node via bare npx: vite-node@3.2.4 declared exact, npx --no-install fails instead of fetching (performance/security/reliability/agent-native converged).",
+        "Dead hardened helper replaced by a WIRED document-anchor resolution test over all three traceability documents through the shared engine (311 anchors checked at the verifier's first-token tier).",
+        "P2 single-token strictness hole in resolveAgainstText (multi-token fallback ran unconditionally): definition tier now requires declaration shape for single tokens; multi-token contract enforced as first+last tokens definition-shaped or full text verbatim. Caught by the permanent fixture suite before commit.",
+        "Invented count corrected: migrationDeltaProof claimed semantic 30 -> 31 tokens; exact walker recomputes 30 at BOTH commits (true delta refs 14 -> 15). Three lenses converged on this invented-evidence instance.",
+        "Unicode boundary fix: JS \\b is ASCII-only and silently rejected Sinhala-named symbols; non-ASCII-safe lookarounds added with fixtures (correctness lens).",
+        "Method-form recognition widened to intervening modifiers ('public async x') after maintainability lens demonstrated 'public async startListening' failed to match."
+      ],
+      "rejectedFindings": [
+        "Adversarial claim that recursive-scan escape vectors were unproven: case-variant extensions and symlink descent ruled out empirically (core.symlinks=false, tracked names lowercase); documented residual instead of speculative fixtures."
+      ],
+      "acceptedResidualsFromReview": [
+        "Document-anchor definition-shape escalation deferred: ~48 corpus anchors cite re-export sites and need a planned repointing slice (enumerated, not half-landed).",
+        "Engine is text-level, not AST: comment-placed declaration keywords match by design (documented in module docstring and fixtures); no live anchor exploits it.",
+        "Same-line double-anchor absorption persists by design (newline-bounded only); first-token tier tolerates it.",
+        "vite.config.ts implicitly couples verifier + parity reproducer; header documents both consumers.",
+        "Adversarial scope-gap finding accepted: initial files.txt omitted package.json/package-lock.json/vite.config.ts; final review artifacts regenerated from git diff base..HEAD."
+      ]
+    },
+    "status": "REVIEW-COMPLETE-PENDING-PR"
   }
 }

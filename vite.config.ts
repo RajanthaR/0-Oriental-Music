@@ -1,6 +1,8 @@
-// Minimal vite config for scripts/dump-publication-parity.mjs (vite-node).
-// Vitest keeps reading vitest.config.ts; this file only exists so the parity
-// reproducer resolves the "@/..." alias outside the test runner.
+// Minimal vite config for vite-node-run scripts (vitest keeps reading
+// vitest.config.ts and is unaffected):
+// - scripts/dump-publication-parity.mjs (parity-oracle reproducer)
+// - scripts/verify-symbol-anchors.mjs (CI traceability-anchor gate)
+// Both import TypeScript modules through the "@/..." alias defined below.
 import { defineConfig } from "vite";
 import path from "path";
 

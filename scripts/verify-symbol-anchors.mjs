@@ -1,4 +1,27 @@
+// Traceability anchor verifier — CI gate (.github/workflows/ci.yml).
+//
+// Resolves every `path#symbol` anchor in the three traceability documents
+// through the shared resolver (src/lib/evidence/anchor-resolution.ts), at the
+// historical "first-token" strictness tier. Migration note: the pre-migration
+// corpus was 233 unique anchors, zero dropped; the canonical extractor
+// additionally sees 3 cross-document .md references (236 total). Fails the
+// run (exit 1) when anything is unresolved OR when extraction collapses
+// below a floor — a green print over an empty corpus would be vacuous.
+//
+// Run under vite-node so the TypeScript resolver is importable:
+//   npx --no-install vite-node scripts/verify-symbol-anchors.mjs
 import { readFileSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  extractMarkdownAnchors,
+  normalizeAnchorSymbol,
+  parseAnchor,
+  readRepoFile,
+  resolveAgainstText,
+} from "../src/lib/evidence/anchor-resolution";
+
+const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const docs = [
   "docs/FORENSIC_CORRECTION_LOG.md",
@@ -8,35 +31,42 @@ const docs = [
 
 const anchors = new Set();
 for (const doc of docs) {
-  const text = readFileSync(doc, "utf8");
-  for (const m of text.matchAll(/`?((?:src|data)\/[A-Za-z0-9_./-]+\.(?:ts|tsx|json))#([^`;,|)]+)/g)) {
-    anchors.add(`${m[1]}#${m[2].trim()}`);
-  }
+  const text = readFileSync(join(repoRoot, doc), "utf8");
+  for (const anchor of extractMarkdownAnchors(text)) anchors.add(anchor);
 }
 
-const cache = new Map();
+// Extraction floor: a collapsed extraction (regex regression, renamed docs)
+// would otherwise print "0 resolved, 0 unresolved" and exit 0 — a vacuous
+// pass. The live corpus measures 236; 100 leaves massive room while catching
+// collapse.
+if (anchors.size < 100) {
+  console.log(`EXTRACTION COLLAPSE: only ${anchors.size} anchors extracted (expected >= 100)`);
+  process.exitCode = 1;
+}
+
 let ok = 0;
 let bad = 0;
+const fileCache = new Map();
 for (const anchor of anchors) {
-  const sep = anchor.indexOf("#");
-  const path = anchor.slice(0, sep);
-  let symbol = anchor.slice(sep + 1).replace(/\s+\(.*\)$/, "").trim();
-  // Strip markdown emphasis and trailing punctuation that ride along in tables.
-  symbol = symbol.replace(/\*\*/g, "").replace(/[.;]$/, "");
-  let content = cache.get(path);
-  if (content === undefined) {
-    try {
-      content = readFileSync(path, "utf8");
-    } catch {
-      content = null;
-    }
-    cache.set(path, content);
+  const parsed = parseAnchor(anchor);
+  if (!parsed) {
+    console.log(`UNRESOLVED: ${anchor} (no # separator)`);
+    bad += 1;
+    continue;
   }
-  if (content === null || !content.includes(symbol.split(" ")[0])) {
+  if (!fileCache.has(parsed.path)) {
+    fileCache.set(parsed.path, readRepoFile(repoRoot, parsed.path));
+  }
+  const outcome = resolveAgainstText(
+    fileCache.get(parsed.path) ?? null,
+    normalizeAnchorSymbol(parsed.symbol),
+    "first-token",
+  );
+  if (outcome.resolved) {
+    ok += 1;
+  } else {
     console.log(`UNRESOLVED: ${anchor}`);
     bad += 1;
-  } else {
-    ok += 1;
   }
 }
 console.log(`${ok} resolved, ${bad} unresolved`);
