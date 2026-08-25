@@ -70,10 +70,21 @@ export default function LessonDetailPage() {
     releaseTimerRef(audioTimerRef, (timerId) => window.clearTimeout(timerId));
   }, []);
 
-  useEffect(() => {
-    mountedRef.current = true;
+  // Route-param change resets transient audio state during render (react-hooks
+  // v6 adoption, "adjust state when a prop changes" pattern): the component
+  // instance is reused across /lessons/[id] navigations, and the previous
+  // mount-effect reset was a synchronous setState-in-effect. Cancellation
+  // timing is unchanged -- the keyed effect below still releases owned audio
+  // on id change and unmount.
+  const [lastLessonId, setLastLessonId] = useState(lessonId);
+  if (lastLessonId !== lessonId) {
+    setLastLessonId(lessonId);
     setAudioPlaying(false);
     setAudioError(false);
+  }
+
+  useEffect(() => {
+    mountedRef.current = true;
     return () => {
       mountedRef.current = false;
       cancelOwnedAudio();
