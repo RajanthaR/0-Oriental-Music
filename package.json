@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=13",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -35,5 +35,9 @@
     "typescript": "^5.6.3",
     "vite-node": "3.2.4",
     "vitest": "^4.1.11"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "unrs-resolver@1.12.2": true
   }
 }

@@ -48,6 +48,16 @@ export default defineConfig({
     // 2 is tuned to this 4-CPU host. A CI runner with more cores can afford
     // more; raise it only alongside measurements like the above, since the
     // failure it prevents is intermittent and reports as a red build.
+    //
+    // Vitest 4 re-validation (next16-modernization slice): both values were
+    // retained unchanged through the vitest ^3.2.7 -> ^4.1.11 upgrade and
+    // re-validated on the upgraded runner - full suite 24 files / 583 tests
+    // in ~56s, exit 0, no RPC errors observed across repeated runs. Whether
+    // the Vitest 3-era RPC diagnosis above still reproduces under Vitest 4
+    // is unknown; the conservative settings are kept because the failure
+    // they guarded against presented as a red build and their cost is
+    // bounded. Standard ubuntu-latest runners are also 4-vCPU, so hosted CI
+    // inherits the same scheduling envelope.
     maxWorkers: 2,
   },
   resolve: {

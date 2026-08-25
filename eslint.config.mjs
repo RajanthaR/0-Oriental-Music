@@ -2,26 +2,28 @@
 // "next/core-web-vitals" } because Next.js 16 removed `next lint`, and
 // eslint-config-next >=16 peer-requires eslint >=9.
 //
-// Evidence for this shape: node_modules/eslint-config-next/dist/core-web-vitals.js
-// exports a flat-config array (Linter.Config[]) directly -- no
-// @eslint/eslintrc FlatCompat bridge is needed.
+// Provenance: eslint-config-next@16 ships native flat-config arrays, so no
+// @eslint/eslintrc FlatCompat bridge is needed. Discovery evidence and the
+// full deferred-debt census live in the tracked record rather than here:
+// data/forensic-ledger.json -> nextSixteenModernization.lintMigration.
 //
 // Scope note: this deliberately extends ONLY core-web-vitals, matching the
-// previous .eslintrc.json one-to-one. The additional `eslint-config-next/
-// typescript` preset exists but was NOT part of the pre-migration lint
-// surface; adopting it would add rules inside a migration commit instead of
-// being a measured, separate decision.
+// previous .eslintrc.json one-to-one. The additional typescript preset was
+// NOT adopted inside a migration commit; that remains a separate measured
+// decision.
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 
 // eslint-config-next@16 ships react-hooks v6, whose new compiler-powered
-// rules (set-state-in-effect, refs) did not exist under the previous
-// toolchain and flag 13 existing sites (12 set-state-in-effect across 11
-// files + 1 ref-during-render). Faithful fixes are useSyncExternalStore-
-// shaped refactors with real hydration-timing implications -- deliberately
-// deferred to a dedicated adoption slice (recorded in
-// data/forensic-ledger.json) rather than smuggled into this migration.
-// Pinned at "warn": every run still enumerates the debt; the gate does not
-// fail on findings that predate this migration.
+// rules flag pre-existing sites that did not exist under the previous
+// toolchain. Faithful fixes are useSyncExternalStore-shaped refactors with
+// hydration-timing implications -- deliberately deferred to a dedicated
+// adoption slice (rationale and per-site census: ledger section above).
+//
+// These two pins pair with the --max-warnings floor in package.json's lint
+// script: the floor equals the current warn count, so any NEW violation of
+// either rule turns the gate red while this slice's debt stays green. The
+// floor MUST be lowered whenever one of these sites is fixed, and both
+// rules flip to "error" once the debt reaches zero, retiring this block.
 const deferredReactHooksV6Rules = {
   "react-hooks/set-state-in-effect": "warn",
   "react-hooks/refs": "warn",
