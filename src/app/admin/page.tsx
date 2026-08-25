@@ -23,48 +23,40 @@ import {
 import { ReviewStatus, Lesson } from "@/types/content";
 import { releaseTimerRef } from "@/lib/audio/cleanup";
 
-export default function AdminReviewDashboardPage() {
-  const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [validationReport, setValidationReport] = useState<{
-    isValid: boolean;
-    issues: ValidationIssue[];
-  }>({ isValid: true, issues: [] });
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>("all");
-  const [updateNotice, setUpdateNotice] = useState<{ kind: "success" | "error"; message: string } | null>(null);
-  const noticeTimerRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => {
-      releaseTimerRef(noticeTimerRef, (id) => window.clearTimeout(id));
-    };
-  }, []);
-
-  useEffect(() => {
-    const all = repository.getLessons({ visibility: "review" });
-    setLessons(all);
-    const contentReport = validateContent(
-      repository.getLessons(),
-      repository.getRagas(),
-      repository.getTalas(),
-      repository.getInstruments(),
-      repository.getCulturalTraditions(),
-      repository.getTheatreTraditions()
-    );
-    const baselineReport = validateForensicInventory();
-    const dispositionReport = validateMusicalCoreFieldDispositions();
-    const boundaryReport = validatePublicBoundary({
-      lessons: repository.getLessons(),
-      ragas: repository.getRagas(),
-      talas: repository.getTalas(),
-      instruments: repository.getInstruments(),
-      culturalTraditions: repository.getCulturalTraditions(),
-      theatreTraditions: repository.getTheatreTraditions(),
-      learningPaths: repository.getLearningPaths(),
-      exams: repository.getExamPapers(),
-      quizzes: repository.getQuizzes(),
-      glossary: repository.getGlossary(),
-    });
-    setValidationReport({
+// Deterministic baseline over the static in-memory catalog. Computed once
+// via a lazy initializer (react-hooks v6 adoption): the repository and
+// validators are pure over shipped data, so server and client renders agree
+// and the mount-effect setState pass was pure cascade.
+function buildAdminBaseline(): {
+  lessons: Lesson[];
+  report: { isValid: boolean; issues: ValidationIssue[] };
+} {
+  const all = repository.getLessons({ visibility: "review" });
+  const contentReport = validateContent(
+    repository.getLessons(),
+    repository.getRagas(),
+    repository.getTalas(),
+    repository.getInstruments(),
+    repository.getCulturalTraditions(),
+    repository.getTheatreTraditions()
+  );
+  const baselineReport = validateForensicInventory();
+  const dispositionReport = validateMusicalCoreFieldDispositions();
+  const boundaryReport = validatePublicBoundary({
+    lessons: repository.getLessons(),
+    ragas: repository.getRagas(),
+    talas: repository.getTalas(),
+    instruments: repository.getInstruments(),
+    culturalTraditions: repository.getCulturalTraditions(),
+    theatreTraditions: repository.getTheatreTraditions(),
+    learningPaths: repository.getLearningPaths(),
+    exams: repository.getExamPapers(),
+    quizzes: repository.getQuizzes(),
+    glossary: repository.getGlossary(),
+  });
+  return {
+    lessons: all,
+    report: {
       isValid: contentReport.isValid && baselineReport.isValid && dispositionReport.isValid && boundaryReport.isValid,
       issues: [
         {
@@ -79,7 +71,25 @@ export default function AdminReviewDashboardPage() {
         ...dispositionReport.issues,
         ...boundaryReport.issues,
       ],
-    });
+    },
+  };
+}
+
+export default function AdminReviewDashboardPage() {
+  const [baseline] = useState(buildAdminBaseline);
+  const [lessons, setLessons] = useState<Lesson[]>(baseline.lessons);
+  const [validationReport, setValidationReport] = useState<{
+    isValid: boolean;
+    issues: ValidationIssue[];
+  }>(baseline.report);
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>("all");
+  const [updateNotice, setUpdateNotice] = useState<{ kind: "success" | "error"; message: string } | null>(null);
+  const noticeTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      releaseTimerRef(noticeTimerRef, (id) => window.clearTimeout(id));
+    };
   }, []);
 
   const handleUpdateStatus = (lessonId: string, newStatus: ReviewStatus) => {
