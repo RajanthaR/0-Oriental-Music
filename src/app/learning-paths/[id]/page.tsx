@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState, useSyncExternalStore } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -16,7 +16,11 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { repository } from "@/lib/data/repository";
-import { ProgressStorage } from "@/lib/storage/progress-storage";
+import {
+  getProgressSnapshot,
+  getServerProgressSnapshot,
+  subscribeToStorageChanges,
+} from "@/lib/storage/progress-storage";
 import { QuizRunner } from "@/components/quiz/QuizRunner";
 
 export default function LearningPathDetailPage() {
@@ -25,24 +29,24 @@ export default function LearningPathDetailPage() {
   const pathId = params.id as string;
 
   const path = repository.getLearningPathById(pathId);
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [showDiagnostic, setShowDiagnostic] = useState<boolean>(true);
   const [diagnosticPassed, setDiagnosticPassed] = useState<boolean | null>(null);
   const [selectedDiagnosticOpt, setSelectedDiagnosticOpt] = useState<number | null>(null);
   const [showMastery, setShowMastery] = useState(false);
 
-  useEffect(() => {
-    if (!path) return;
-    const progress = ProgressStorage.getProgress();
-    const doneSteps: number[] = [];
-
-    path.steps.forEach((step) => {
-      if (progress.completedLessonIds.includes(step.lessonId)) {
-        doneSteps.push(step.stepNumber);
-      }
-    });
-    setCompletedSteps(doneSteps);
-  }, [path]);
+  // Completed steps derive from the storage snapshot (react-hooks v6
+  // adoption): server snapshot null yields the legacy initial empty list.
+  const progressSnapshot = useSyncExternalStore(
+    subscribeToStorageChanges,
+    getProgressSnapshot,
+    getServerProgressSnapshot,
+  );
+  const completedSteps = useMemo(() => {
+    if (!path) return [];
+    return path.steps
+      .filter((step) => progressSnapshot.completedLessonIds.includes(step.lessonId))
+      .map((step) => step.stepNumber);
+  }, [path, progressSnapshot]);
 
   if (!path) {
     return (

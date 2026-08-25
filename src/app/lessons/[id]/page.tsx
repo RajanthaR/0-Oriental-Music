@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -19,7 +19,12 @@ import {
 } from "lucide-react";
 import { repository } from "@/lib/data/repository";
 import { formatPublicSourceReference } from "@/lib/data/publication-policy";
-import { ProgressStorage } from "@/lib/storage/progress-storage";
+import {
+  ProgressStorage,
+  getProgressSnapshot,
+  getServerProgressSnapshot,
+  subscribeToStorageChanges,
+} from "@/lib/storage/progress-storage";
 import { swaraSynth, type SwaraPlaybackHandle } from "@/lib/audio/synth";
 import { releaseHandleRef, releaseTimerRef } from "@/lib/audio/cleanup";
 import { SwaraKeyboard } from "@/components/audio/SwaraKeyboard";
@@ -38,8 +43,6 @@ export default function LessonDetailPage() {
   const quiz = lesson ? repository.getQuizById(lesson.quizId) : undefined;
   const source = lesson ? repository.getSourceById(lesson.sourceReference.sourceId) : undefined;
 
-  const [isSaved, setIsSaved] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
   const [diagnosticSelected, setDiagnosticSelected] = useState<number | null>(null);
   const [showDiagnosticResult, setShowDiagnosticResult] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
@@ -49,6 +52,16 @@ export default function LessonDetailPage() {
   const sequenceHandleRef = useRef<SwaraPlaybackHandle | null>(null);
   const audioTimerRef = useRef<number | null>(null);
 
+  // Saved/completed flags derive from the storage snapshot (react-hooks v6
+  // adoption): writes through toggleSaveLesson/markLessonComplete notify the
+  // layer, so no mount-effect mirror pass. Server snapshot matches the legacy
+  // initial false/false render.
+  const progressSnapshot = useSyncExternalStore(
+    subscribeToStorageChanges,
+    getProgressSnapshot,
+    getServerProgressSnapshot,
+  );
+
   // Invalidate the generation and surrender ownership before cancelling, so a
   // throwing sequence cancellation cannot leave the pending timer running.
   const cancelOwnedAudio = useCallback(() => {
@@ -56,13 +69,6 @@ export default function LessonDetailPage() {
     releaseHandleRef(sequenceHandleRef);
     releaseTimerRef(audioTimerRef, (timerId) => window.clearTimeout(timerId));
   }, []);
-
-  useEffect(() => {
-    if (!lesson) return;
-    const p = ProgressStorage.getProgress();
-    setIsSaved(p.savedLessonIds.includes(lesson.id));
-    setIsCompleted(p.completedLessonIds.includes(lesson.id));
-  }, [lesson]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -85,9 +91,13 @@ export default function LessonDetailPage() {
     );
   }
 
+  // Derived from the storage snapshot now that `lesson` is known to exist;
+  // writes through the handlers below notify the layer and re-render.
+  const isSaved = progressSnapshot.savedLessonIds.includes(lesson.id);
+  const isCompleted = progressSnapshot.completedLessonIds.includes(lesson.id);
+
   const handleToggleSave = () => {
-    const saved = ProgressStorage.toggleSaveLesson(lesson.id);
-    setIsSaved(saved);
+    ProgressStorage.toggleSaveLesson(lesson.id);
   };
 
   const handlePlayLessonAudio = async () => {
@@ -134,8 +144,8 @@ export default function LessonDetailPage() {
 
   const handleQuizComplete = (score: number, maxScore: number, passed: boolean) => {
     if (passed) {
+      // Snapshot notification refreshes the derived isCompleted flag.
       ProgressStorage.markLessonComplete(lesson.id, lesson.competencyIds);
-      setIsCompleted(true);
     }
   };
 

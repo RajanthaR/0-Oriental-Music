@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -20,20 +20,28 @@ import {
   Wifi,
   WifiOff,
 } from "lucide-react";
-import { ProgressStorage } from "@/lib/storage/progress-storage";
+import {
+  ProgressStorage,
+  getLowBandwidthModeSnapshot,
+  getServerLowBandwidthModeSnapshot,
+  subscribeToStorageChanges,
+} from "@/lib/storage/progress-storage";
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLowBandwidth, setIsLowBandwidth] = useState(false);
-
-  useEffect(() => {
-    setIsLowBandwidth(ProgressStorage.getLowBandwidthMode());
-  }, []);
+  // Low-bandwidth flag via useSyncExternalStore (react-hooks v6 adoption):
+  // server snapshot false matches the legacy initial useState; own-tab writes
+  // notify through the storage layer.
+  const isLowBandwidth = useSyncExternalStore(
+    subscribeToStorageChanges,
+    getLowBandwidthModeSnapshot,
+    getServerLowBandwidthModeSnapshot,
+  );
 
   const toggleLowBandwidth = () => {
     const next = !isLowBandwidth;
-    setIsLowBandwidth(next);
+    // Storage write notifies the snapshot layer; no local mirror needed.
     ProgressStorage.setLowBandwidthMode(next);
     if (next) {
       document.body.classList.add("reduced-motion", "low-bandwidth-mode");

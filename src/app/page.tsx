@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import {
   Music,
@@ -20,25 +20,31 @@ import {
 } from "lucide-react";
 import { GradeBandType } from "@/types/content";
 import { repository } from "@/lib/data/repository";
-import { ProgressStorage } from "@/lib/storage/progress-storage";
+import {
+  getProgressSnapshot,
+  getServerProgressSnapshot,
+  subscribeToStorageChanges,
+} from "@/lib/storage/progress-storage";
 import { SwaraKeyboard } from "@/components/audio/SwaraKeyboard";
 
 export default function HomePage() {
   const [selectedGrade, setSelectedGrade] = useState<GradeBandType>("10-11");
-  const [studentProgress, setStudentProgress] = useState({
-    completedCount: 0,
-    streak: 1,
-    lastLessonId: "les-swara-01",
-  });
-
-  useEffect(() => {
-    const p = ProgressStorage.getProgress();
-    setStudentProgress({
-      completedCount: p.completedLessonIds.length,
-      streak: p.streakDays || 1,
-      lastLessonId: p.completedLessonIds[p.completedLessonIds.length - 1] || "les-swara-01",
-    });
-  }, []);
+  // Storage-derived state via useSyncExternalStore (react-hooks v6 adoption):
+  // the server snapshot returns the same defaults the legacy mount-effect
+  // initial state used, so prerendered markup is unchanged; the client
+  // snapshot replaces the post-hydration setState-in-effect pass.
+  const progressSnapshot = useSyncExternalStore(
+    subscribeToStorageChanges,
+    getProgressSnapshot,
+    getServerProgressSnapshot,
+  );
+  const studentProgress = {
+    completedCount: progressSnapshot.completedLessonIds.length,
+    streak: progressSnapshot.streakDays || 1,
+    lastLessonId:
+      progressSnapshot.completedLessonIds[progressSnapshot.completedLessonIds.length - 1] ||
+      "les-swara-01",
+  };
 
   const strands = repository.getStrands();
   const learningPaths = repository.getLearningPaths(selectedGrade);
