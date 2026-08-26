@@ -15,7 +15,9 @@ import {
   type SourcePageQualityRecord,
 } from "@/lib/evidence/source-evidence";
 import { captureEvaluationValue } from "@/lib/data/snapshot-capture";
-import { createPublicationEvaluationContext } from "@/lib/data/publication-policy";
+// Neutral context creation lives below every policy module; importing it from
+// here (rather than from publication-policy) is what broke the policy triangle.
+import { createPublicationEvaluationContext } from "@/lib/data/evaluation-context";
 import { validateContentRecord, isSourceReference as isContractSourceReference } from "@/lib/validation/content-contracts";
 import { cloneBoundedRecord, isRecord, normalizeRecordId, readOwnDataField } from "@/lib/shared/bounded-values";
 

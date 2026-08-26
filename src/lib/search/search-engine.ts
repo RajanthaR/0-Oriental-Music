@@ -1,9 +1,22 @@
 /**
  * Sinhala-aware Search Engine
  * Handles diacritic normalization, spelling variants (ස/ශ/ෂ, න/ණ, ල/ළ), and transliterations.
+ *
+ * This module is repository-free: it owns query classification and filtering
+ * only. The default index bound to the content repository lives in
+ * `public-search-index.ts`, the repository-facing composition layer, which
+ * hands SearchIndex explicit per-operation inputs. Search must never import
+ * the repository merely to obtain default data.
  */
 
-import { repository } from "@/lib/data/repository";
+import type {
+  Lesson,
+  Raga,
+  Tala,
+  Instrument,
+  GlossaryTerm,
+  CulturalTradition,
+} from "@/types/content";
 import { normalizeSinhalaText } from "@/lib/search/normalize-sinhala";
 export { normalizeSinhalaText } from "@/lib/search/normalize-sinhala";
 
@@ -15,6 +28,26 @@ export interface SearchResultItem {
   snippet_si: string;
   url: string;
   gradeBand?: string;
+}
+
+/** One immutable public-catalog capture handed to the search engine per operation. */
+export interface PublicSearchCatalogs {
+  lessons: Lesson[];
+  ragas: Raga[];
+  talas: Tala[];
+  instruments: Instrument[];
+  glossary: GlossaryTerm[];
+  culturalTraditions: CulturalTradition[];
+}
+
+/**
+ * Explicit inputs for the search engine. Both accessors are invoked inside
+ * every `search()` call, so each operation observes fresh repository state
+ * without any cross-operation caching.
+ */
+export interface SearchDataSource {
+  getFeaturedLessons(): readonly Lesson[];
+  getPublicSearchCatalogs(): PublicSearchCatalogs;
 }
 
 // Transliteration map for English phonetic queries
@@ -134,11 +167,13 @@ export function searchFilter<T>(
 }
 
 class SearchIndex {
+  constructor(private readonly data: SearchDataSource) {}
+
   public search(query?: unknown): SearchResultItem[] {
     const classification = classifySearchQuery(query);
     if (classification.kind === "featured") {
       // Return top featured
-      const lessons = repository.getLessons().slice(0, 4);
+      const lessons = [...this.data.getFeaturedLessons()].slice(0, 4);
       return lessons.map((l) => ({
         id: l.id,
         type: "lesson" as const,
@@ -152,7 +187,7 @@ class SearchIndex {
 
     const results: SearchResultItem[] = [];
     const searchQuery = classification.raw;
-    const catalogs = repository.getPublicSearchCatalogs();
+    const catalogs = this.data.getPublicSearchCatalogs();
 
     // Search Lessons
     const lessons = searchFilter(catalogs.lessons, searchQuery, (lesson) => [
@@ -271,4 +306,4 @@ class SearchIndex {
   }
 }
 
-export const searchIndex = new SearchIndex();
+export { SearchIndex };

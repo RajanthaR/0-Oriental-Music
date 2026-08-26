@@ -4,7 +4,9 @@ import {
   getSafeEvaluationState,
   type PublicationEvaluationContext,
 } from "@/lib/data/evaluation-state";
-import { createPublicationEvaluationContext } from "@/lib/data/publication-policy";
+// Neutral context creation lives below every policy module; importing it from
+// here (rather than from publication-policy) is what broke the policy triangle.
+import { createPublicationEvaluationContext } from "@/lib/data/evaluation-context";
 import { evaluateSourceReference } from "@/lib/data/source-evidence-policy";
 import { captureEvaluationValue } from "@/lib/data/snapshot-capture";
 import type { EvidenceQuality } from "@/lib/evidence/source-evidence";

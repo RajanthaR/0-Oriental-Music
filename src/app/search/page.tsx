@@ -3,7 +3,8 @@
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, Music, ArrowRight, Sparkles, BookOpen, Activity, Radio, Feather } from "lucide-react";
-import { searchIndex, SearchResultItem } from "@/lib/search/search-engine";
+import { searchIndex } from "@/lib/search/public-search-index";
+import type { SearchResultItem } from "@/lib/search/search-engine";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");

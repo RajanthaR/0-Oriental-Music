@@ -1,90 +1,34 @@
-import { describe, expect, it, vi } from "vitest";
-import { canonicalCycleSet, cyclicModuleSets, type Graph } from "./support/cycles";
-import fs from "fs";
-import path from "path";
+import { describe, expect, it } from "vitest";
+import { canonicalCycleSet, cyclicModuleSets } from "./support/cycles";
+import { buildLibGraph } from "./support/lib-module-graph";
 
 /**
- * Layering guard: the `src/lib/data` and `src/lib/validation` layers must not
- * form a runtime import cycle.
+ * Layering guard: the runtime import graph under `src/lib` must contain zero
+ * strongly connected components.
  *
- * Phase 2 recorded the bidirectional `data` <-> `validation` dependency as
- * accepted structural residual, and the follow-up slice was tasked with
- * resolving it. Nothing verified that mechanically, so a rearranged-but-still
- * bidirectional graph read as "closed": `data/publication-audit` and
- * `data/catalog-integrity` imported `validation/content-validator`, which in
- * turn imported runtime values from `data/publication-policy` and re-exported
- * from both of those data modules.
+ * Phase 2 recorded the bidirectional `data` <-> `validation` dependency as an
+ * accepted structural residual, and the follow-up slice resolved it. Two
+ * same-layer residuals remained intentionally permitted and pinned here:
  *
- * Cycles like that survive because the bindings are only dereferenced inside
- * function bodies at call time, not during module evaluation. They break later,
- * silently, when an import is hoisted or a binding is read at module top level.
- * This test fails the build instead.
+ *   1. publication-policy <-> source-evidence-policy <-> tala-disposition-policy
+ *      (default-parameter context factories pointing upward)
+ *   2. repository <-> search-engine (search pulling default data from the
+ *      repository while the repository filtered results through search)
+ *
+ * Both were call-time-dereferenced and safe under either import order, but
+ * they were accepted residuals, not desired architecture: every cyclically
+ * imported binding only worked because dereference happened to stay inside
+ * function bodies. The P02 structural slice removed both SCCs at real
+ * dependency seams (neutral evaluation-context module below the policies;
+ * explicit-input SearchIndex composed at the repository-facing layer), so the
+ * guard now demands a completely acyclic runtime graph.
+ *
+ * Type-only imports stay excluded from classification: they are erased at
+ * compile time and cannot participate in a runtime cycle.
  */
-
-const LIB = path.join(process.cwd(), "src", "lib");
-
-function sourceFiles(dir: string): string[] {
-  const out: string[] = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...sourceFiles(full));
-    else if (/\.tsx?$/.test(entry.name)) out.push(full);
-  }
-  return out;
-}
-
-function toPosix(file: string): string {
-  return path.relative(process.cwd(), file).split(path.sep).join("/");
-}
-
-/** Resolve an `@/...` specifier to a concrete file, or null if it isn't source. */
-function resolveAlias(spec: string): string | null {
-  if (!spec.startsWith("@/")) return null;
-  const base = path.join(process.cwd(), "src", spec.slice(2));
-  for (const candidate of [`${base}.ts`, `${base}.tsx`, path.join(base, "index.ts")]) {
-    if (fs.existsSync(candidate)) return toPosix(candidate);
-  }
-  return null;
-}
-
-/**
- * Runtime dependency edges only. `import type` and type-only named specifiers
- * are erased at compile time and cannot participate in a runtime cycle;
- * `export ... from` re-exports very much can, so they are included.
- */
-function runtimeEdges(file: string): Set<string> {
-  const text = fs.readFileSync(file, "utf-8");
-  const edges = new Set<string>();
-  const pattern = /^(?:import|export)\s+(type\s+)?([^;]*?)from\s+["']([^"']+)["']/gm;
-  for (const match of text.matchAll(pattern)) {
-    const [, typeKeyword, clause, spec] = match;
-    if (typeKeyword) continue;
-    const inner = clause.trim();
-    if (inner.startsWith("{")) {
-      const specifiers = inner.replace(/^\{|\}$/g, "").split(",").map((s) => s.trim()).filter(Boolean);
-      if (specifiers.length > 0 && specifiers.every((s) => s.startsWith("type "))) continue;
-    }
-    const resolved = resolveAlias(spec);
-    if (resolved) edges.add(resolved);
-  }
-  return edges;
-}
-
-function buildGraph(): Graph {
-  const graph: Graph = new Map();
-  for (const file of sourceFiles(LIB)) graph.set(toPosix(file), runtimeEdges(file));
-  return graph;
-}
-
-function layerOf(file: string): "data" | "validation" | null {
-  if (file.includes("src/lib/data/")) return "data";
-  if (file.includes("src/lib/validation/")) return "validation";
-  return null;
-}
-
 
 describe("module layering", () => {
-  const graph = buildGraph();
+  const graph = buildLibGraph();
   const cyclicSets = cyclicModuleSets(graph).map((set) => canonicalCycleSet(set));
 
   it("has no runtime import cycle crossing the data/validation boundary", () => {
@@ -116,117 +60,60 @@ describe("module layering", () => {
   });
 
   /**
-   * Accepted same-layer residual, now mechanically pinned (M1).
-   *
-   * The Phase 2 follow-up recorded a lazy same-layer factory cycle as an
-   * accepted structural residual; the acceptance record itself lives in the
-   * PR #4 review narrative and data/forensic-ledger.json, not in a
-   * resolvable in-repo symbol — so this comment deliberately states the
-   * provenance instead of citing a path#symbol anchor that does not exist.
-   *
-   * This slice enumerated every runtime import cycle under src/lib
-   * mechanically. Correction found by switching to complete SCC
-   * decomposition: the earlier DFS back-edge walk reported two separate
-   * pairs, but `publication-policy`, `source-evidence-policy`, and
-   * `tala-disposition-policy` are actually ONE strongly connected module set
-   * of three (policy imports both policies; both import policy's context
-   * factory; tala-disposition also imports source-evidence). The second
-   * cyclic set is the `repository` <-> `search-engine` pair. Every
-   * cyclically imported binding is dereferenced only inside function bodies
-   * at call time (default-parameter factories and per-call lookups), never
-   * at module top level, and each set evaluates cleanly under either import
-   * order.
-   *
-   * That property is what this guard pins. If any new cycle appears anywhere,
-   * if one of these intended sets gains or loses a member, or if a member
-   * stops evaluating under reversed import order, this test fails instead of
-   * drifting silently.
+   * Zero-tolerance pin. The two previously documented same-layer residual SCCs
+   * were eliminated by the P02 structural slice; any runtime cycle anywhere
+     under src/lib now fails the build instead of being added to an allowlist.
    */
-  it("allows exactly the documented lazy same-layer cycle sets", () => {
-    const allowed = new Set([
-      canonicalCycleSet([
-        "src/lib/data/publication-policy.ts",
-        "src/lib/data/source-evidence-policy.ts",
-        "src/lib/data/tala-disposition-policy.ts",
-      ]),
-      canonicalCycleSet([
-        "src/lib/data/repository.ts",
-        "src/lib/search/search-engine.ts",
-      ]),
-    ]);
-
-    // SCC decomposition is complete and order-independent by construction;
-    // deduplication keeps the comparison a set of distinct module sets.
-    const observed = [...new Set(cyclicSets)];
-    expect(observed.sort()).toEqual([...allowed].sort());
+  it("permits zero runtime import cycles anywhere under src/lib", () => {
+    expect(cyclicSets).toEqual([]);
   });
 
-  it.each([
-    [
-      "@/lib/data/publication-policy",
-      "@/lib/data/tala-disposition-policy",
-      (ns: Record<string, unknown>) =>
-        expect(typeof ns.createPublicationEvaluationContext).toBe("function"),
-      // The real claimed property is call-time dereference: the default
-      // context parameter internally calls policy's factory through this
-      // module's own import view. Invoke it without a context and require a
-      // usable result instead of asserting on the namespace view, which
-      // vitest's module registry does not reliably expose for cyclic
-      // bindings.
-      async (ns: Record<string, unknown>) => {
-        expect(typeof ns.getTalaFieldDisposition).toBe("function");
-        const disposition = await (ns.getTalaFieldDisposition as (id: string) => Promise<unknown>)(
-          "tala-khemta",
-        );
-        expect(disposition === undefined || typeof disposition === "object").toBe(true);
-      },
-    ],
-    [
-      "@/lib/data/publication-policy",
-      "@/lib/data/source-evidence-policy",
-      (ns: Record<string, unknown>) =>
-        expect(typeof ns.createPublicationEvaluationContext).toBe("function"),
-      async (ns: Record<string, unknown>) => {
-        expect(typeof ns.evaluateSourceReference).toBe("function");
-        const decision = await (ns.evaluateSourceReference as (
-          reference: unknown,
-        ) => Promise<{ supportable?: boolean }>)({ sourceId: "SRC-G10-NADA", pageOrSection: "p. 3" });
-        expect(decision && typeof decision === "object").toBe(true);
-      },
-    ],
-    [
-      "@/lib/data/repository",
-      "@/lib/search/search-engine",
-      (ns: Record<string, unknown>) => expect(typeof ns.repository).toBe("object"),
-      async (ns: Record<string, unknown>) => {
-        expect(typeof ns.searchIndex).toBe("object");
-        // searchIndex.search dereferences repository at call time; a featured
-        // query exercises it end to end without throwing or reading an
-        // uninitialized binding.
-        expect(() => (ns.searchIndex as { search: () => unknown }).search()).not.toThrow();
-      },
-    ],
-  ])(
-    "evaluates %s first with cyclic bindings call-time-usable in both orders",
-    async (
-      firstSpec,
-      secondSpec,
-      checkFirst: (ns: Record<string, unknown>) => void,
-      checkSecond: (ns: Record<string, unknown>) => Promise<void>,
-    ) => {
-      // Order 1: first module evaluates before its cyclic partner.
-      vi.resetModules();
-      const first = (await import(firstSpec)) as Record<string, unknown>;
-      checkFirst(first);
-      const second = (await import(secondSpec)) as Record<string, unknown>;
-      await checkSecond(second);
-      // Order 2: reversed. Every cyclic binding is call-time-only, so neither
-      // order may observe an uninitialized value at call time.
-      vi.resetModules();
-      const secondReversed = (await import(secondSpec)) as Record<string, unknown>;
-      const firstReversed = (await import(firstSpec)) as Record<string, unknown>;
-      checkFirst(firstReversed);
-      await checkSecond(secondReversed);
-    },
-  );
+  /**
+   * Negative fixture proving this guard still bites: re-introducing the exact
+   * back-edge this slice removed (search engine pulling default data from the
+   * repository) recreates the historical SCC through the live
+   * repository -> engine filtering edge, and the zero-cycle pin above reports
+   * it as a failure.
+   */
+  it("fails when a new runtime import cycle is introduced", () => {
+    const engine = "src/lib/search/search-engine.ts";
+    const mutated = new Map(graph);
+    mutated.set(engine, new Set([...(graph.get(engine) ?? []), "src/lib/data/repository.ts"]));
+    const injected = cyclicModuleSets(mutated).map((component) => canonicalCycleSet(component));
+    expect(injected).toEqual([
+      canonicalCycleSet(["src/lib/data/repository.ts", engine]),
+    ]);
+    // And the live graph itself must not contain the back-edge.
+    expect([...(graph.get(engine) ?? [])]).not.toContain("src/lib/data/repository.ts");
+  });
+
+  /**
+   * Negative fixture pinning the type-only exclusion rule: mutual imports that
+   * carry no runtime bindings must not enter the graph, so a type-level
+   * dependency can never be misreported as a runtime cycle.
+   */
+  it("classifies type-only imports as non-runtime edges", async () => {
+    const { runtimeEdgesFromSource } = await import("./support/lib-module-graph");
+    const typeOnlyPair = [
+      'import type { Raga } from "@/lib/types/content";',
+      'import { type Lesson } from "@/lib/types/content";',
+    ].join("\n");
+    expect(runtimeEdgesFromSource(typeOnlyPair).size).toBe(0);
+
+    // The value form of the same specifier IS a runtime edge: flipping one
+    // import back to a value import must produce an edge, proving the rule
+    // distinguishes the two rather than dropping all imports of that module.
+    const valueImport = [
+      'import { repository } from "@/lib/data/repository";',
+    ].join("\n");
+    expect(runtimeEdgesFromSource(valueImport)).toEqual(
+      new Set(["src/lib/data/repository.ts"]),
+    );
+  });
 });
+
+function layerOf(file: string): "data" | "validation" | null {
+  if (file.includes("src/lib/data/")) return "data";
+  if (file.includes("src/lib/validation/")) return "validation";
+  return null;
+}
