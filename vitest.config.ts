@@ -58,6 +58,17 @@ export default defineConfig({
     // they guarded against presented as a red build and their cost is
     // bounded. Standard ubuntu-latest runners are also 4-vCPU, so hosted CI
     // inherits the same scheduling envelope.
+    //
+    // EMPIRICAL ANSWER (anchor-engine-hardening slice): the Vitest 4 RPC
+    // failure does NOT reproduce at higher concurrency. Measured on this
+    // host, three consecutive full runs per setting, all exit 0 with zero
+    // RPC errors and zero test failures:
+    //   maxWorkers 2: 101.8s / 85.0s / 89.6s   (25 files / 596 tests)
+    //   maxWorkers 4: 71.0s / 56.9s / 53.3s    (27 files / 600 tests)
+    // The cap is therefore raised to match this host's logical CPU count;
+    // hosted ubuntu-latest runners share the same 4-vCPU envelope. If a red
+    // build ever reappears with all tests passing, drop back to 2 and record
+    // it here.
     maxWorkers: 4,
   },
   resolve: {
