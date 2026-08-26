@@ -69,7 +69,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-01.json",
         "test": {
           "path": "src/test/review-closeout.test.ts",
-          "symbol": "rejects every CMS status/published mismatch"
+          "symbol": "rejects every CMS status/published mismatch without changing raw state"
         },
         "fix": {
           "path": "src/lib/data/repository.ts",
@@ -85,7 +85,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-02.json",
         "test": {
           "path": "src/test/review-closeout.test.ts",
-          "symbol": "recomputes publication summaries"
+          "symbol": "recomputes publication summaries from current inputs without memoized identity"
         },
         "fix": {
           "path": "src/lib/data/repository.ts",
@@ -101,7 +101,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-03.json",
         "test": {
           "path": "src/test/source-metadata-consistency.test.ts",
-          "symbol": "unknown provenance representation"
+          "symbol": "uses the same unknown provenance representation in direct and repository source projections"
         },
         "fix": {
           "path": "src/lib/validation/content-contracts.ts",
@@ -117,7 +117,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-04.json",
         "test": {
           "path": "src/test/publication-containment.test.ts",
-          "symbol": "duplicate IDs"
+          "symbol": "fails publication batches closed for whitespace-normalized duplicate IDs"
         },
         "fix": {
           "path": "src/lib/data/publication-policy.ts",
@@ -133,7 +133,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-05.json",
         "test": {
           "path": "src/test/content-contracts.test.ts",
-          "symbol": "detached snapshot"
+          "symbol": "uses one detached snapshot for decision and public projection"
         },
         "fix": {
           "path": "src/lib/data/snapshot-capture.ts",
@@ -149,7 +149,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-06.json",
         "test": {
           "path": "src/test/review-closeout.test.ts",
-          "symbol": "fails closed for duplicate top-level IDs"
+          "symbol": "fails closed for duplicate top-level IDs across public list, lookup, and summary consumers"
         },
         "fix": {
           "path": "src/lib/data/publication-audit.ts",
@@ -165,7 +165,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-07.json",
         "test": {
           "path": "src/test/content-contracts.test.ts",
-          "symbol": "unknown or ambiguous kinds"
+          "symbol": "rejects unknown or ambiguous kinds and never publishes them"
         },
         "fix": {
           "path": "src/lib/validation/content-contracts.ts",
@@ -181,7 +181,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-08.json",
         "test": {
           "path": "src/test/publication-containment.test.ts",
-          "symbol": "identity containment"
+          "symbol": "rebuilds identity containment when a catalog mutates without changing length"
         },
         "fix": {
           "path": "src/lib/data/publication-policy.ts",
@@ -197,7 +197,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-09.json",
         "test": {
           "path": "src/test/content-validator.test.ts",
-          "symbol": "malformed tala fields"
+          "symbol": "returns validation issues instead of throwing on malformed tala fields"
         },
         "fix": {
           "path": "src/lib/data/publication-audit.ts",
@@ -213,7 +213,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-10.json",
         "test": {
           "path": "src/test/source-metadata-consistency.test.ts",
-          "symbol": "ambiguous extracted-document mappings"
+          "symbol": "rejects ambiguous extracted-document mappings"
         },
         "fix": {
           "path": "src/lib/data/publication-audit.ts",
@@ -229,7 +229,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-11.json",
         "test": {
           "path": "src/test/publication-containment.test.ts",
-          "symbol": "declarative %s dependency rule"
+          "symbol": "applies the declarative %s dependency rule to the publication decision"
         },
         "fix": {
           "path": "src/lib/data/dependency-rules.ts",
@@ -245,7 +245,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-12.json",
         "test": {
           "path": "src/test/source-metadata-consistency.test.ts",
-          "symbol": "ambiguous extracted-document mappings"
+          "symbol": "rejects ambiguous extracted-document mappings"
         },
         "fix": {
           "path": "src/lib/data/publication-audit.ts",
@@ -261,7 +261,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-13.json",
         "test": {
           "path": "src/test/review-closeout.test.ts",
-          "symbol": "resolves current musical-core anchors"
+          "symbol": "resolves current musical-core anchors by symbol and heading, not by nonblank line counts"
         },
         "fix": {
           "path": "src/test/review-closeout.test.ts",
@@ -277,7 +277,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-14.json",
         "test": {
           "path": "src/test/content-contracts.test.ts",
-          "symbol": "discriminator-compatible fields"
+          "symbol": "projects only discriminator-compatible fields for every renderable question variant"
         },
         "fix": {
           "path": "src/lib/validation/content-contracts.ts",
@@ -293,7 +293,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-15.json",
         "test": {
           "path": "src/test/quiz-runner.test.tsx",
-          "symbol": "duplicate question IDs"
+          "symbol": "renders a safe unavailable state for duplicate question IDs"
         },
         "fix": {
           "path": "src/components/quiz/QuizRunner.tsx",
@@ -309,7 +309,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-16.json",
         "test": {
           "path": "src/test/search-engine.test.ts",
-          "symbol": "normalized-empty controls"
+          "symbol": "keeps featured results for raw empty input but rejects normalized-empty controls"
         },
         "fix": {
           "path": "src/lib/search/search-engine.ts",
@@ -325,7 +325,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-17.json",
         "test": {
           "path": "src/test/components.test.tsx",
-          "symbol": "rhythm session"
+          "symbol": "keeps an active rhythm session when only the completion callback changes"
         },
         "fix": {
           "path": "src/components/audio/RhythmTapGame.tsx",
@@ -341,7 +341,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-18.json",
         "test": {
           "path": "src/test/components.test.tsx",
-          "symbol": "completed rhythm playback handles"
+          "symbol": "removes completed rhythm playback handles before reset"
         },
         "fix": {
           "path": "src/components/audio/TalaVisualizer.tsx",
@@ -357,7 +357,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-19.json",
         "test": {
           "path": "src/test/components.test.tsx",
-          "symbol": "stale Tala unavailable callbacks"
+          "symbol": "suppresses stale Tala unavailable callbacks after reset and replacement"
         },
         "fix": {
           "path": "src/components/audio/TalaVisualizer.tsx",
@@ -373,7 +373,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-20.json",
         "test": {
           "path": "src/test/components.test.tsx",
-          "symbol": "Tabla promises reject"
+          "symbol": "keeps RhythmTapGame playback ownership isolated when Tabla promises reject"
         },
         "fix": {
           "path": "src/lib/audio/tabla.ts",
@@ -389,7 +389,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/metadata.json authorizedAdditionalFindings",
         "test": {
           "path": "src/test/pitch.test.ts",
-          "symbol": "late stream"
+          "symbol": "stops a late stream when stopped while permission is pending"
         },
         "fix": {
           "path": "src/lib/audio/pitch.ts",
@@ -405,7 +405,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/metadata.json authorizedAdditionalFindings",
         "test": {
           "path": "src/test/review-closeout.test.ts",
-          "symbol": "records the acceptance-hardening scope"
+          "symbol": "records the acceptance-hardening scope without rewriting blocked review history"
         },
         "fix": {
           "path": "AGENTS.md",
@@ -2337,9 +2337,9 @@
       "AH-C2-V05": "src/test/swara-consumers.test.tsx#continues EarTraining cleanup after Next, replacement, and unmount cancellations throw",
       "AH-C2-V06": "src/test/swara-consumers.test.tsx#clears every remaining instrument timer when an owned Tabla cancellation throws",
       "AH-C2-V07": "src/test/synth.test.ts#fails closed for the prototype-key Tabla bol %s without throwing",
-      "AH-C2-V08": "src/test/publication-parity.test.ts#makes the evaluation context unsafe for a verified-looking registry with %s",
+      "AH-C2-V08": "src/test/tala-disposition-registry.test.ts#makes the evaluation context unsafe for a verified-looking registry with %s",
       "AH-C2-V09": "src/test/graph-boundary.test.ts#traverses %s alone but fails the combined catalog closed without throwing",
-      "AH-C2-V10": "src/test/publication-parity.test.ts#refreshes every consumer when only the source-document reviewStatus changes",
+      "AH-C2-V10": "src/test/source-document-freshness.test.ts#refreshes every consumer when only the source-document reviewStatus changes",
       "AH-C2-R01": "src/test/pitch.test.ts#releases an active session when stream.getTracks() throws on stop",
       "AH-C2-R02": "src/test/synth.test.ts#cannot strand Tabla playback ownership when a timer callback registers synchronously",
       "AH-C2-R03": "src/test/graph-boundary.test.ts#withholds %s from every public surface",
@@ -2357,13 +2357,13 @@
       "AH-C2-V07": "src/lib/audio/tabla.ts#COMPOUND_BOL_CELLS",
       "AH-C2-V08": "src/lib/evidence/disposition-registry.ts#inspectDispositionRegistry",
       "AH-C2-V09": "src/test/graph-boundary.test.ts#expectBoundedFailClosed",
-      "AH-C2-V10": "src/test/publication-parity.test.ts#readEveryConsumer",
+      "AH-C2-V10": "src/test/source-document-freshness.test.ts#readEveryConsumer",
       "AH-C2-R01": "src/lib/audio/pitch.ts#stopStream",
       "AH-C2-R02": "src/lib/audio/tabla.ts#scheduleTablaPlan",
       "AH-C2-R03": "src/test/graph-boundary.test.ts#withholds %s from every public surface",
       "AH-C2-R04": "src/app/sources/page.tsx#inventory.available",
       "AH-C2-R05": "src/lib/audio/cleanup.ts#runIsolatedCleanup",
-      "AH-C2-R06": "src/test/review-closeout.test.ts#mutableRepository.lessons = originalCatalog"
+      "AH-C2-R06": "src/test/review-closeout.test.ts#recomputes publication summaries from current inputs without memoized identity"
     },
     "reviewModelPolicy": "The original gpt-5.6-luna/MAX reviewer specification is superseded: the deactivated external workspace cannot dispatch it. This cycle uses Claude Opus 5 at high effort for every reviewer and validator, and the adversarial lens uses the review skill's documented in-process fallback with the peer skip reason recorded in Coverage.",
     "status": "All ten remaining cycle-2 candidate findings and six authorized additional regressions are fixed locally with focused regressions; a complete fresh original-base review is still pending; not acceptance evidence and no push, ready PR, merge, or deployment is authorized",
@@ -2749,6 +2749,31 @@
         "dead-code sweep across edited pages not completed by the maintainability lens within budget (recorded gap)"
       ]
     },
-    "status": "IMPLEMENTATION-COMPLETE-PENDING-FINAL-GATES"
+    "status": "MERGED (PR #8)"
+  },
+  "anchorEngineHardening": {
+    "branch": "codex/anchor-engine-hardening",
+    "base": "39ec9ab263f92ea73b8021192bbb7357491de407",
+    "scope": "Bounded hardening: close the multi-token verbatim-fallback looseness in the anchor engine (A1), split an oversized test file along real seams (A2), re-measure Vitest concurrency knobs empirically (A3). No content claims or publication decisions; parity oracle exact match maintained throughout; src/data untouched.",
+    "a1TightenedRule": "Multi-token definition-tier anchors resolve iff first AND last tokens are definition-shaped in-file, OR the full symbol appears as an exact QUOTED test title, OR -- for .md evidence targets via the new markdownTarget option -- inside a section heading line. The bare fileText.includes(symbol) fallback is REMOVED.",
+    "a1ProofBeforeAndAfter": "Four permanent fixtures name the holes from the removed KNOWN LOOSENESS comment (truncated-vs-longer quoted title, comma-cut title, incidental multi-token prose, markdown-heading gating including prose rejection). Observed failing 4/22 against the loose engine immediately before the engine commit, passing 22/22 after. parseAnchor fix included: legacy trailing-annotation stripping now applies only when the pre-parenthetical text is a single token, so full titles ending in parentheticals survive verbatim.",
+    "a1RepointedAnchors": {
+      "count": 37,
+      "breakdown": "truncated/comma-cut/paraphrased test-title citations restored to their current full it()/describe() strings (comma-, paren- and pipe-bearing titles use the quoted-symbol extraction form)",
+      "selfHeadingAnchors": "2 P02_CLOSEOUT_FINDINGS self-section anchors retained as heading citations resolvable through the markdownTarget branch against the document's real headings",
+      "followthrough": "3 further doc anchors + acceptanceHardeningReviewCycle2 semanticTraceability (AH-C2-V08/V10 test refs) and fixSymbols (AH-C2-V10 readEveryConsumer, AH-C2-R06 restore-statement) repointed when the parity split moved their targets into tala-disposition-registry.test.ts / source-document-freshness.test.ts"
+    },
+    "corpusAccounting": {
+      "baseCorpus": 230,
+      "headCorpus": 218,
+      "removedLooseForms": 39,
+      "addedCompleteTitles": 27,
+      "netExplanation": "net -12 is fragment deduplication: multiple paraphrase/prefix citations of one test merge into its single canonical quoted title, and instrumented set probing proved several added full titles already existed at base in sibling rows",
+      "accountingArtifact": "C:/tmp/swara-slice/corpus-final.txt (instrumented set probe with explicit needle checks)"
+    },
+    "a2TestSplits": {
+      "completed": "publication-parity.test.ts (998 lines) -> publication-parity.test.ts + tala-disposition-registry.test.ts + source-document-freshness.test.ts with shared support module src/test/support/publication-parity-fixtures.ts; every describe moved verbatim; suite total preserved (596 baseline -> 600 with the four new A1 fixtures)"
+    },
+    "a3ConcurrencyDecision": "Six consecutive full-suite runs, all exit 0, zero reporter-RPC errors: maxWorkers 2 -> 101.8s/85.0s/89.6s; maxWorkers 4 -> 71.0s/56.9s/53.3s (~35% faster). The Vitest 3-era RPC failure does not reproduce under Vitest 4 at host concurrency; cap raised to 4 (= host logical CPUs; ubuntu-latest matches), rollback instruction recorded in vitest.config.ts comment."
   }
 }

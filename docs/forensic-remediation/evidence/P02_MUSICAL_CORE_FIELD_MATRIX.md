@@ -187,7 +187,7 @@ finding-level mapping required by `V15` and `V23`; both remain
 
 | Cycle-2 finding | Semantic repair evidence | Disposition |
 |---|---|---|
-| `V15` | `src/test/musical-core.test.ts#verifies bounded quarantine status for out-of-scope entities`; `src/lib/data/publication-policy.ts#gradeScopeMatchesSource`; `src/test/publication-containment.test.ts#requires each public grade band to contain a grade established by its source`; `src/test/components.test.tsx#retains ready Swara ownership until finished`; `src/test/search-engine.test.ts#should not discover quarantined Bhairav or Roopak claims`; closeout and correction-log rows now carry these symbols/headings. | **FIXED-PENDING-REREVIEW** |
+| `V15` | `src/test/musical-core.test.ts#"verifies bounded quarantine status for out-of-scope entities (Bhairav & Roopak)"`; `src/lib/data/publication-policy.ts#gradeScopeMatchesSource`; `src/test/publication-containment.test.ts#requires each public grade band to contain a grade established by its source`; `src/test/components.test.tsx#"retains ready Swara ownership until finished on every direct-tone consumer"`; `src/test/search-engine.test.ts#should not discover quarantined Bhairav or Roopak claims`; closeout and correction-log rows now carry these symbols/headings. | **FIXED-PENDING-REREVIEW** |
 | `V23` | `src/test/review-closeout.test.ts` exact scoped ID and semantic mapping assertions; `data/forensic-ledger.json` `acceptanceHardeningInput.traceability` mirrors test/fix/anchor/disposition fields. | **FIXED-PENDING-REREVIEW** |
 
 The rejected Deepchandi retrieval-only disposition, all prior blocked run IDs,
@@ -204,8 +204,8 @@ work only and remain pending the final acceptance review.
 |---|---|---|
 | Quarantine/source evidence | `src/lib/data/decision-types.ts#KNOWN_QUARANTINED_ENTITY_IDS`; `src/lib/data/publication-policy.ts#getSourceCorpusInventory`; `src/lib/data/source-evidence-policy.ts#evaluateSourceReference`; `src/test/publication-containment.test.ts#keeps unsupported grades and named quarantined entities out of public data`; `src/test/publication-containment.test.ts#keeps generated counts synchronized with the canonical baseline`. | **FIXED-PENDING-ACCEPTANCE-REVIEW** |
 | Quiz/collection/source identity | `src/components/quiz/QuizRunner.tsx#getUsableQuiz`; `src/lib/data/publication-audit.ts#validatePublicCollection`; `src/test/quiz-runner.test.tsx#renders a safe unavailable state for duplicate question IDs`; `src/test/publication-containment.test.ts#rejects every required route-rendered Raga and Lesson shape`. | **FIXED-PENDING-ACCEPTANCE-REVIEW** |
-| Search/dependency parity | `src/lib/search/normalize-sinhala.ts#normalizeSinhalaText`; `src/test/search-engine.test.ts#should normalize Sinhala characters, diacritics, and rakaransaya variations`; `src/test/publication-parity.test.ts#"proves %s through contract, decision, projection, and checked batch boundaries"`. | **FIXED-PENDING-ACCEPTANCE-REVIEW** |
-| Traceability/audio/privacy test integrity | `src/test/review-closeout.test.ts#records the acceptance-hardening scope without rewriting blocked review history`; `src/test/review-closeout.test.ts#resolves current musical-core anchors by symbol and heading, not by nonblank line counts`; `src/test/components.test.tsx#keeps arranger and ear-training Swara ownership isolated`; `src/test/pitch.test.ts#lets only the newest pending start acquire ownership and emit callbacks`; `src/test/synth.test.ts#fails Web Audio initialization closed without throwing and bounds hostile BPM`; `src/test/publication-containment.test.ts#keeps unsupported grades and named quarantined entities out of public data`. | **FIXED-PENDING-ACCEPTANCE-REVIEW** |
+| Search/dependency parity | `src/lib/search/normalize-sinhala.ts#normalizeSinhalaText`; `src/test/search-engine.test.ts#"should normalize Sinhala characters, diacritics, and rakaransaya variations"`; `src/test/publication-parity.test.ts#"proves %s through contract, decision, projection, and checked batch boundaries"`. | **FIXED-PENDING-ACCEPTANCE-REVIEW** |
+| Traceability/audio/privacy test integrity | `src/test/review-closeout.test.ts#records the acceptance-hardening scope without rewriting blocked review history`; `src/test/review-closeout.test.ts#"resolves current musical-core anchors by symbol and heading, not by nonblank line counts"`; `src/test/components.test.tsx#keeps arranger and ear-training Swara ownership isolated`; `src/test/pitch.test.ts#lets only the newest pending start acquire ownership and emit callbacks`; `src/test/synth.test.ts#fails Web Audio initialization closed without throwing and bounds hostile BPM`; `src/test/publication-containment.test.ts#keeps unsupported grades and named quarantined entities out of public data`. | **FIXED-PENDING-ACCEPTANCE-REVIEW** |
 
 All eight Talas remain whole-entity quarantined. Deepchandi remains a rejected
 retrieval-only variant finding; original-PDF/manual/SME work is still deferred.
@@ -215,7 +215,7 @@ retrieval-only variant finding; original-PDF/manual/SME work is still deferred.
 The 14 findings from `20260817-054012-p02-final-acceptance-a17068ff` are
 application-contract and audit-integrity repairs only. They do not change any
 musical-core field disposition. Stable mapping lives in
-`P02_CLOSEOUT_FINDINGS.md#Final-acceptance follow-up (14 validated blockers)`;
+`P02_CLOSEOUT_FINDINGS.md#"Final-acceptance follow-up (14 validated blockers)"`;
 all eight Tala records remain quarantined as whole entities.
 
 ## Acceptance-hardening review cycle 1 boundary
@@ -223,7 +223,7 @@ all eight Tala records remain quarantined as whole entities.
 The twenty findings in run `20260817-p02-hardening-c1-06568d6f` concern
 runtime validation, publication parity, identity safety, and local-audio
 ownership only. Their exact validator-to-test-to-fix mapping is recorded under
-`P02_CLOSEOUT_FINDINGS.md#Acceptance-hardening review cycle 1 (20 validated findings; pending rereview)`
+`P02_CLOSEOUT_FINDINGS.md#"Acceptance-hardening review cycle 1 (20 validated findings; pending rereview)"`
 and `data/forensic-ledger.json#acceptanceHardeningReviewCycle1`.
 
 They do not revise any musical-core value in this matrix. All eight Talas stay
@@ -239,7 +239,7 @@ concern runtime identity normalization, aggregate quiz evidence, the central
 Tala disposition-registry contract, bounded-graph coverage at public
 boundaries, source-document freshness, and local-audio cleanup atomicity only.
 Their exact finding-to-test-to-fix mapping is recorded under
-`P02_CLOSEOUT_FINDINGS.md#Acceptance-hardening review cycle 2 (incomplete input run; ten findings closed; pending rereview)`
+`P02_CLOSEOUT_FINDINGS.md#"Acceptance-hardening review cycle 2 (incomplete input run; ten findings closed; pending rereview)"`
 and `data/forensic-ledger.json#acceptanceHardeningReviewCycle2`.
 
 That input run is incomplete: the required frontend-races reviewer artifact was

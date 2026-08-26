@@ -116,11 +116,62 @@ describe("anchor resolution engine (permanent fixtures)", () => {
 
     it("resolves a comma-bearing quoted title at the definition tier (testing-F4)", () => {
       // End-to-end half of the comma-title pin: extraction captures the full
-      // quoted title, and the definition tier's verbatim branch matches it
-      // inside the file's own quotes.
+      // quoted title, and the definition tier's quoted-exact branch matches
+      // it inside the file's own quotes.
       const title = "rejects filename digits, out-of-range pages, and mismatched PDF locators";
       const fileText = `it("${title}", () => {});`;
       expect(resolveAgainstText(fileText, title, "definition").resolved).toBe(true);
+    });
+
+    // -------------------------------------------------------------------
+    // Anchor-engine hardening slice (A1): the multi-token bare-substring
+    // fallback is replaced by a QUOTED-EXACT requirement. Each fixture
+    // below names one hole from the KNOWN LOOSENESS comment and must fail
+    // against the loose engine (bare includes resolved them) and pass once
+    // tightened. Proof-before was observed in-session; these pins make the
+    // rejections permanent.
+    // -------------------------------------------------------------------
+
+    it("rejects a suffix-substring title cut from a longer quoted title", () => {
+      const fileText = 'it("keeps RhythmTapGame playback ownership isolated when Tabla promises reject", () => {});';
+      expect(resolveAgainstText(fileText, "Tabla promises reject", "definition").resolved).toBe(false);
+    });
+
+    it("rejects a comma-cut title against the longer real title", () => {
+      const fileText = 'it("cancels playback on Reset, tala change, and unmount", () => {});';
+      expect(resolveAgainstText(fileText, "cancels playback on Reset", "definition").resolved).toBe(false);
+    });
+
+    it("rejects incidental prose for a multi-token symbol", () => {
+      const prose = [
+        "// The rhythm session continues across renders because timers own it.",
+        "export function unrelated() {}",
+      ].join("\n");
+      expect(prose.includes("rhythm session")).toBe(true); // substring really is present
+      expect(resolveAgainstText(prose, "rhythm session", "definition").resolved).toBe(false);
+    });
+
+    it("accepts a markdown heading only for markdown targets", () => {
+      // Document-structure anchors: a heading is the declaration site of a
+      // markdown evidence file. The branch is gated behind an explicit
+      // markdownTarget option so code files never gain heading matches.
+      const md = [
+        "intro prose",
+        "## Acceptance-hardening review cycle 1 (20 validated findings; pending rereview)",
+        "- item",
+      ].join("\n");
+      const symbol = "Acceptance-hardening review cycle 1 (20 validated findings; pending rereview)";
+      expect(
+        resolveAgainstText(md, symbol, "definition", { markdownTarget: true }).resolved,
+      ).toBe(true);
+      expect(
+        resolveAgainstText(md, symbol, "definition").resolved,
+      ).toBe(false);
+      // A prose line merely containing the heading text is still rejected.
+      const proseMd = ["body text mentioning Acceptance-hardening review cycle 1 (20 validated findings; pending rereview) mid-sentence"].join("\n");
+      expect(
+        resolveAgainstText(proseMd, symbol, "definition", { markdownTarget: true }).resolved,
+      ).toBe(false);
     });
   });
 

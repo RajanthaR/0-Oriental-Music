@@ -73,6 +73,7 @@ for (const anchor of anchors) {
     fileCache.get(parsed.path) ?? null,
     normalizeAnchorSymbol(parsed.symbol),
     tier,
+    { markdownTarget: parsed.path.endsWith(".md") },
   );
   if (outcome.resolved) {
     ok += 1;

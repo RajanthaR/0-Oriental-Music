@@ -36,9 +36,19 @@ export interface ParsedAnchor {
 export function parseAnchor(anchor: string): ParsedAnchor | undefined {
   const separator = anchor.indexOf("#");
   if (separator <= 0) return undefined;
+  const rawSymbol = anchor.slice(separator + 1);
+  // Legacy trailing-annotation form: `#mySymbol (applied to synth)` strips to
+  // `mySymbol`. The strip applies ONLY when the text before the parenthetical
+  // is a single token — a multi-word title that itself ENDS with a
+  // parenthetical (e.g. `...entities (Bhairav & Roopak)`) is real title text
+  // and must survive verbatim (anchor-engine-hardening slice: this strip was
+  // silently truncating four full titles).
+  const annotationStripped = rawSymbol.replace(/\s+\(.*\)$/, "");
+  const symbol =
+    /\s/.test(annotationStripped) || !/\(/.test(rawSymbol) ? rawSymbol : annotationStripped;
   return {
     path: anchor.slice(0, separator),
-    symbol: anchor.slice(separator + 1).replace(/\s+\(.*\)$/, "").trim(),
+    symbol: symbol.trim(),
   };
 }
 
@@ -83,51 +93,73 @@ export interface ResolutionOutcome {
   reason?: "file-missing" | "symbol-absent" | "not-definition-shaped";
 }
 
+export interface ResolveOptions {
+  /** Target is a Markdown evidence document: section headings count as
+   * declaration sites (the md analogue of a code declaration). Off by
+   * default so code files never gain heading matches. */
+  markdownTarget?: boolean;
+}
+
+function hasMarkdownHeadingMatch(fileText: string, symbol: string): boolean {
+  const escaped = escapeRegExp(symbol);
+  // A heading line (#..######) whose text after the hashes contains the
+  // symbol. Line-anchored and hash-prefixed, so incidental prose never
+  // qualifies; suffixes on real headings ("; pending rereview") are why this
+  // is contains-not-equals.
+  return new RegExp(`^#{1,6} .*${escaped}`, "m").test(fileText);
+}
+
 /** Resolve one already-parsed anchor against file text at a given tier. */
 export function resolveAgainstText(
   fileText: string | null,
   rawSymbol: string,
   strictness: AnchorStrictness,
+  options?: ResolveOptions,
 ): ResolutionOutcome {
   if (fileText === null) return { resolved: false, reason: "file-missing" };
   const symbol = normalizeAnchorSymbol(rawSymbol);
   if (!symbol) return { resolved: false, reason: "symbol-absent" };
+  const mdHeadings = options?.markdownTarget === true;
   if (strictness === "first-token") {
     return fileText.includes(symbol.split(" ")[0])
       ? { resolved: true }
       : { resolved: false, reason: "symbol-absent" };
   }
-  // Definition tier: a single-token symbol must be definition-shaped or
-  // appear as a quoted test title — never a bare prose/substring mention.
+  // Definition tier: a single-token symbol must be definition-shaped, appear
+  // as a quoted test title, or -- for markdown targets -- sit in a heading.
   const tokens = symbol.split(" ");
   if (tokens.length === 1) {
-    return hasDefinitionShapedMatch(fileText, symbol)
-      ? { resolved: true }
-      : { resolved: false, reason: "not-definition-shaped" };
+    if (hasDefinitionShapedMatch(fileText, symbol)) return { resolved: true };
+    if (mdHeadings && hasMarkdownHeadingMatch(fileText, symbol)) return { resolved: true };
+    return { resolved: false, reason: "not-definition-shaped" };
   }
-  // Multi-token compound anchors: first AND last tokens must be
-  // definition-shaped in-file (the middle may be prose connectors), OR the
-  // full symbol text must appear verbatim.
-  //
-  // KNOWN LOOSENESS (adversarial review, hooks-adoption slice): the verbatim
-  // fallback below also satisfies truncated/comma-cut titles against longer
-  // quoted titles, and could match incidental prose. Tightening it broke 39
-  // pre-existing corpus anchors that still rely on it — recorded as the
-  // first item of a follow-up anchor-hardening wave, not silently kept as
-  // invisible debt.
+  // Multi-token compound anchors (definition tier, tightened by the
+  // anchor-engine-hardening slice): first AND last tokens must be
+  // definition-shaped in-file, the full symbol must appear as a QUOTED test
+  // title, or -- markdown targets only -- inside a section heading. The
+  // former bare fileText.includes(symbol) fallback was REMOVED here: it let
+  // truncated/comma-cut titles satisfy longer quoted titles and let
+  // incidental prose satisfy compound symbols. The fixtures above pin all
+  // three holes; the 39 corpus anchors that depended on the fallback were
+  // repointed to their real titles in this same slice.
   const firstToken = tokens[0];
   if (!fileText.includes(firstToken)) {
     return { resolved: false, reason: "symbol-absent" };
   }
+  const lastToken = tokens[tokens.length - 1];
   if (
     hasDefinitionShapedMatch(fileText, firstToken) &&
-    hasDefinitionShapedMatch(fileText, tokens[tokens.length - 1])
+    hasDefinitionShapedMatch(fileText, lastToken)
   ) {
     return { resolved: true };
   }
-  return fileText.includes(symbol)
-    ? { resolved: true }
-    : { resolved: false, reason: "not-definition-shaped" };
+  if (new RegExp(`["']${escapeRegExp(symbol)}["']`).test(fileText)) {
+    return { resolved: true };
+  }
+  if (mdHeadings && hasMarkdownHeadingMatch(fileText, symbol)) {
+    return { resolved: true };
+  }
+  return { resolved: false, reason: "not-definition-shaped" };
 }
 
 /** Read a repo-relative file for resolution; null when missing. */
