@@ -40,6 +40,11 @@ export default function RagaDetailPage() {
     setLastRagaId(ragaId);
     setPlayingPhraseIdx(null);
     setAudioError(false);
+    // NOTE: stale-audio cancellation deliberately stays in the keyed cleanup
+    // effect below. Moving it into this render-phase block was tried and
+    // rejected: react-hooks/refs (now error severity) forbids ref mutation
+    // during render, and passive effects flush before discrete events can
+    // interleave, so baseline ordering is already race-safe.
   }
 
   useEffect(() => {

@@ -10,6 +10,10 @@
 //     response bodies (what a first-time visitor downloads)
 //   - requestCount and decodedBytes for context
 // Usage: node scripts/measure-route-bytes.mjs [baseUrl] [outFile]
+//   baseUrl defaults to http://127.0.0.1:3100 — port 3100 by convention so a
+//   dev server on the documented port 3000 never collides during measurement.
+//   baseUrl must be an http(s) URL; outFile must resolve inside the current
+//   working directory.
 // Requires a running production server and playwright with chromium.
 
 import { createRequire } from "node:module";
@@ -24,7 +28,15 @@ const require =
 const { chromium } = require("playwright");
 
 const BASE = process.argv[2] ?? "http://127.0.0.1:3100";
+if (!/^https?:\/\//.test(BASE)) {
+  console.log(`BASE must be an http(s) URL, got: ${BASE}`);
+  process.exit(1);
+}
 const OUT = process.argv[3] ?? null;
+if (OUT && !join(process.cwd(), OUT).startsWith(process.cwd())) {
+  console.log(`OUT must stay inside the current working directory, got: ${OUT}`);
+  process.exit(1);
+}
 
 const ROUTES = [
   "/", "/_not-found", "/admin", "/attributions", "/curriculum-map",
@@ -83,5 +95,13 @@ const summary = {
   averageTransferBytesPerRoute: ok.length ? Math.round(total / ok.length) : 0,
   rows: rows.sort((a, b) => (b.transferBytes || 0) - (a.transferBytes || 0)),
 };
+// A baseline with zero successfully measured routes is not a baseline: fail
+// BEFORE writing anything rather than emitting a vacuous artifact (review
+// finding api-F1).
+if (ok.length === 0) {
+  console.log(JSON.stringify(summary, null, 1));
+  console.log("MEASUREMENT FAILED: no route returned HTTP 200; refusing to emit a baseline");
+  process.exit(1);
+}
 console.log(JSON.stringify(summary, null, 1));
 if (OUT) writeFileSync(OUT, JSON.stringify(summary, null, 1) + "\n");

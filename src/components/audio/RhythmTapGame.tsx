@@ -180,12 +180,8 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
     if (isPlaying) {
       // Session-start resets live in handleStart (the event that flips
       // isPlaying), not here: a synchronous setState in this effect body was
-      // the react-hooks/set-state-in-effect finding. Ref resets stay -- refs
-      // are not component state and effects may write them.
-      startTimeRef.current = Date.now();
-      expectedBeatTimesRef.current = [];
-      tapTimesRef.current = [];
-      accuracyListRef.current = [];
+      // the react-hooks/set-state-in-effect finding, and races-F3 moved the
+      // ref resets alongside them for tick coherence.
 
       const sessionGeneration = sessionGenerationRef.current;
       let beatCount = 0;
@@ -254,10 +250,15 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
 
   const handleStart = () => {
     sessionGenerationRef.current += 1;
-    // Session-start state resets belong to this event (react-hooks v6
-    // adoption): the previous reset lived in the isPlaying effect body as a
-    // synchronous setState-in-effect. Same visible sequence, one event tick
-    // earlier.
+    // Session-start resets belong to this event (react-hooks v6 adoption +
+    // review finding races-F3): ref and state resets in one place keep
+    // accuracyListRef coherent with accuracyList within the same tick,
+    // closing the commit-to-effects window where a tap could score stale
+    // refs. The previous arrangement reset refs in the isPlaying effect.
+    startTimeRef.current = Date.now();
+    expectedBeatTimesRef.current = [];
+    tapTimesRef.current = [];
+    accuracyListRef.current = [];
     setAccuracyList([]);
     setCurrentBeat(0);
     setIsFinished(false);

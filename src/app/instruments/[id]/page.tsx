@@ -48,6 +48,8 @@ export default function InstrumentDetailPage() {
     setLastInstId(instId);
     setIsPlayingAudio(false);
     setAudioError(false);
+    // Stale-audio cancellation stays in the keyed cleanup effect below --
+    // see the note in src/app/ragas/[id]/page.tsx (races-F1 rejected).
   }
 
   useEffect(() => {

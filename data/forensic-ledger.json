@@ -2691,5 +2691,64 @@
       "degradedLensConfirmed": "The disclosed cycle-1 performance-lens degradation is corroborated by its artifact, which contains notes [\"in progress\"] with zero findings. It was correctly counted as missing coverage rather than a clean lens."
     },
     "status": "REVIEW-COMPLETE-READY-FOR-PR"
+  },
+  "reactHooksV6Adoption": {
+    "branch": "codex/react-hooks-v6-adoption",
+    "base": "fc585dd8c3d3726c3071dee72169880a8b5cc239",
+    "scope": "Bounded debt-paydown: retire the react-hooks v6 warn-pinned lint debt (13 sites), repoint re-export evidence anchors to defining sites and escalate the CI anchor gate to the definition tier, close the review-artifact parse-validation gap with a committed validator, establish a Turbopack bundle-size baseline. No content claims, no publication-boundary changes (parity oracle exact match maintained; src/data semantically untouched per review diff scan).",
+    "a1HooksRetired": {
+      "floorHistory": "--max-warnings 13 -> 7 -> 5 -> 2 -> removed; both rules now enforced at ERROR severity in eslint.config.mjs (reactHooksV6Enforcement); AGENTS.md section 5 documents the strict posture.",
+      "perSiteShapes": [
+        "6 storage-derived state sites (home progress, Navbar low-bandwidth, lessons saved set, progress dashboard, learning-paths completed steps, lesson detail saved/completed) -> useSyncExternalStore over a new reactive snapshot layer in progress-storage.ts (cached raw-keyed snapshots, subscribeToStorageChanges, notify on every write path + cross-tab storage events, frozen shared snapshots). Server snapshots return exactly the legacy initial values, preserving pre-hydration markup.",
+        "2 deterministic-from-static-data sites (admin baseline, search results) -> lazy useState initializer and useMemo derivation respectively.",
+        "3 audio-detail route-change resets (ragas/instruments/lessons [id]) -> render-phase adjust-state-on-param-change pattern; owned-audio cancellation timing unchanged, kept in the keyed cleanup effect after races-F1's suggested in-render cancellation was REJECTED because react-hooks/refs at error severity forbids ref mutation during render (attempted, lint-caught, reverted with rationale comments in all three files).",
+        "RhythmTapGame refs site -> useLatestRef effect-synced helper; session-start setState trio moved into handleStart alongside the ref resets (races-F3) so state and refs reset in one tick."
+      ]
+    },
+    "a2AnchorRepointing": {
+      "enumerationFirst": "mechanical, before any edit: 236 corpus anchors; 201 passed both tiers; 35 passed first-token only. The historical '~48' estimate was high; 35 is the real count for the three markdown documents.",
+      "secondCorpusFound": "the ledger's own acceptanceHardeningInput.traceability block held 14 more stale refs across six findings (C3-05/06/09/10/11/13 fix+anchor), exposed when the review-closeout guard failed against the docs-side repoint; all 14 repointed via structural JSON fixup.",
+      "repointCategories": "11 defining-module moves (dependency-rules, snapshot-capture, tala-disposition-policy, decision-types, source-evidence, bounded-values x3, publication-audit x3); 16 renamed-test-title remaps verified against live it/describe strings; 3 comma-truncated titles recovered through a new explicit quoted-symbol extraction form (`path#\"title, with commas\"`) pinned by permanent fixtures; 4 special contexts (SourcesCatalogPage, pitch generation field, bandContainsSourceGrade, P02-FINAL-06 -> its review-closeout trace); 1 umbrella title split into its two real suites.",
+      "gateEscalated": "scripts/verify-symbol-anchors.mjs defaults to the DEFINITION tier (--tier first-token kept for comparison); poison-proofed by planting a dead anchor and observing exit 1 before removal. Extraction floor raised 100 -> 180 (~78% of the live 230-anchor corpus) per adversarial finding F4.",
+      "corpusCountChange": "236 -> 230 resolved anchors because comma-truncated duplicate entries merged into their full quoted titles.",
+      "knownResidual": "multi-token verbatim fallback still resolves truncated titles against longer quoted titles (adversarial F3): tightening it invalidated 39 pre-existing anchors outside this slice's scope. Recorded as the first item of a follow-up anchor-hardening wave; engine comment marks the looseness inline."
+    },
+    "a3ArtifactValidation": {
+      "orchestrationLocation": "NOT repo-resident (agent harness + ce-code-review skill runtime); stated plainly per slice contract.",
+      "committedClosure": "scripts/validate-review-artifacts.mjs <dir> JSON-parses every artifact and structurally scans duplicate keys; hardened per review (per-file I/O isolation, realpath visited-set against symlink cycles, depth and size caps, usage + nonzero exits). The driving agent MUST run it after every wave and before citing a run; unexecuted = UNVERIFIED ARTIFACTS.",
+      "proofBothDirections": "cycle-1 dir (19 JSON files incl. repaired orchestrator-verification.json) and cycle-2 dir (11 files) validate clean; synthetic broken+dupe fixtures fail with exit 1 naming each offender."
+    },
+    "a4BundleBaseline": {
+      "method": "Playwright chromium against production next start; fresh context per route; compressed transferSize summed over navigation + same-origin subresources.",
+      "baselineFile": "docs/bundle-baseline-turbopack.json",
+      "numbers": "25 routes at HTTP 200 plus /_not-found at expected 404; total 9,739,069 transferred bytes; average ~389,563 bytes/route; heaviest /talas/tala-dadra 425,539; lightest /_not-found 350,230.",
+      "honestyNote": "NOT comparable to webpack First Load JS accounting; recorded as today's number measured this way, never retrofitted."
+    },
+    "reviewCycle1": {
+      "runId": "20260825-124000-hooks-c1",
+      "artifacts": "C:/tmp/compound-engineering/ce-code-review/20260825-124000-hooks-c1/",
+      "lenses": "correctness, testing, maintainability, project-standards, security, api-contract, reliability, frontend-races, adversarial (9 lenses per section 7 plus standards)",
+      "headlineResults": "correctness: no behavior regression at any of three targeted risk points. frontend-races: no exploitable race on HEAD. adversarial: count arithmetic verified airtight; scope clean. project-standards: scope PASS, Track-B honesty PASS (src/data diff empty), commit truthfulness PASS. parity oracle exact match throughout; browser QA matrix 45 checks clean across 1440x900 and 360x568 including audio start/stop/unmount, phrase replacement, hostile search input, keyboard access, touch targets, and the eight quarantined Tala routes serving their honest unavailable states at 200.",
+      "findingsApplied": [
+        "api-F1/P2 measure-route-bytes exits 1 instead of emitting a zero-route baseline (check moved before the write)",
+        "correctness-F1/api-F2 shared snapshots frozen (defaults singleton + cache fill) with documented read-only contract",
+        "api-F3 inaccurate server-snapshot comment corrected on learning-paths page",
+        "api-F4/security-F3 artifact validator: per-file I/O isolation + realpath visited-set/depth/size walk guards",
+        "security-F1/security-F2 measurement script: http(s)-only BASE validation; OUT confined to cwd",
+        "races-F4 storage notifier isolates throwing subscribers",
+        "testing-F1/F2/F4 new pins: rapid same-tick writes coalesce to newest state; unsubscribe isolation incl. post-unsubscribe cross-tab events and survivor notification; end-to-end definition-tier resolve of a comma-bearing quoted title",
+        "maintainability-F1 this section supersedes the active-sounding --max-warnings=13 references in nextSixteenModernization.lintMigration.deferredDebt and related lines: the ratchet retired at floor 0 in this slice",
+        "maintainability-F2 measurement-script usage line documents the port-3100 convention"
+      ],
+      "rejectedWithEvidence": [
+        "races-F1 in-render cancellation: attempted across all three detail pages; react-hooks/refs at error severity rejected ref mutation during render (lint errors caught pre-commit); reverted to keyed-cleanup ordering, which React's flush-before-discrete-events guarantee already makes race-safe"
+      ],
+      "acceptedResiduals": [
+        "adversarial-F3 multi-token verbatim fallback looseness (39-anchor second wave; engine comment marks it inline)",
+        "testing-F3 no dedicated unit tests per uSES site (page-render smoke, 590-test suite, and the non-CI 45-check QA matrix cover behavior; learning-paths completedSteps derivation flagged specifically)",
+        "dead-code sweep across edited pages not completed by the maintainability lens within budget (recorded gap)"
+      ]
+    },
+    "status": "IMPLEMENTATION-COMPLETE-PENDING-FINAL-GATES"
   }
 }

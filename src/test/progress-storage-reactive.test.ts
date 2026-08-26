@@ -43,21 +43,53 @@ describe("ProgressStorage reactive snapshot layer", () => {
 
   it("notifies subscribers on own-tab writes and cross-tab storage events", () => {
     const listener = vi.fn();
-    const unsubscribe = subscribeToStorageChanges(listener);
+    const listener2 = vi.fn();
+    const unsub1 = subscribeToStorageChanges(listener);
+    subscribeToStorageChanges(listener2);
 
     ProgressStorage.setLowBandwidthMode(true);
     expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener2).toHaveBeenCalledTimes(1);
 
     window.dispatchEvent(new StorageEvent("storage", { key: "swara_maga_student_progress_v1" }));
     expect(listener).toHaveBeenCalledTimes(2);
+    expect(listener2).toHaveBeenCalledTimes(2);
 
     // Unrelated keys must not wake consumers.
     window.dispatchEvent(new StorageEvent("storage", { key: "unrelated" }));
     expect(listener).toHaveBeenCalledTimes(2);
+    expect(listener2).toHaveBeenCalledTimes(2);
 
-    unsubscribe();
+    // First unsubscribe removes only its own listener; cross-tab events after
+    // it must reach the survivor but not the removed one (testing-F2).
+    unsub1();
     ProgressStorage.setLowBandwidthMode(false);
     expect(listener).toHaveBeenCalledTimes(2);
+    expect(listener2).toHaveBeenCalledTimes(3);
+  });
+
+  it("returns the latest values when multiple writes land within one tick", () => {
+    // testing-F1: two writes with no intervening read must coalesce to the
+    // newest state on the next snapshot read.
+    const seen: number[] = [];
+    const snapshotAtWrite = () => getProgressSnapshot().savedLessonIds.length;
+    ProgressStorage.saveProgress({ ...getProgressSnapshot(), savedLessonIds: ["a"] });
+    seen.push(snapshotAtWrite());
+    ProgressStorage.saveProgress({ ...getProgressSnapshot(), savedLessonIds: ["a", "b"] });
+    seen.push(snapshotAtWrite());
+
+    expect(seen).toEqual([1, 2]);
+    expect(getProgressSnapshot().savedLessonIds).toEqual(["a", "b"]);
+  });
+
+  it("does not let a throwing subscriber starve the others", () => {
+    const poison = vi.fn(() => { throw new Error("broken consumer"); });
+    const healthy = vi.fn();
+    subscribeToStorageChanges(poison);
+    subscribeToStorageChanges(healthy);
+    expect(() => ProgressStorage.setLowBandwidthMode(true)).not.toThrow();
+    expect(healthy).toHaveBeenCalled();
+    ProgressStorage.setLowBandwidthMode(false);
   });
 
   it("keeps low-bandwidth snapshot in step with setLowBandwidthMode", () => {

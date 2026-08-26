@@ -48,10 +48,11 @@ for (const doc of docs) {
 
 // Extraction floor: a collapsed extraction (regex regression, renamed docs)
 // would otherwise print "0 resolved, 0 unresolved" and exit 0 — a vacuous
-// pass. The live corpus measures 236; 100 leaves massive room while catching
-// collapse.
-if (anchors.size < 100) {
-  console.log(`EXTRACTION COLLAPSE: only ${anchors.size} anchors extracted (expected >= 100)`);
+// pass. The live corpus measures 230 at the definition tier; the floor is
+// set to 180 (~78% of live) so collapse or large-scale pruning turns the
+// gate red while tolerating legitimate consolidation.
+if (anchors.size < 180) {
+  console.log(`EXTRACTION COLLAPSE: only ${anchors.size} anchors extracted (expected >= 180)`);
   process.exitCode = 1;
 }
 

@@ -35,7 +35,8 @@ export default function LearningPathDetailPage() {
   const [showMastery, setShowMastery] = useState(false);
 
   // Completed steps derive from the storage snapshot (react-hooks v6
-  // adoption): server snapshot null yields the legacy initial empty list.
+  // adoption): server snapshot yields the legacy default progress (empty
+  // lists), matching the previous initial state.
   const progressSnapshot = useSyncExternalStore(
     subscribeToStorageChanges,
     getProgressSnapshot,

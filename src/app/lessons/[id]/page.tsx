@@ -81,6 +81,8 @@ export default function LessonDetailPage() {
     setLastLessonId(lessonId);
     setAudioPlaying(false);
     setAudioError(false);
+    // Stale-audio cancellation stays in the keyed cleanup effect below --
+    // see the note in src/app/ragas/[id]/page.tsx (races-F1 rejected).
   }
 
   useEffect(() => {

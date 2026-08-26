@@ -5,16 +5,20 @@ const STORAGE_KEY_TEACHER_COLLECTIONS = "swara_maga_teacher_collections_v1";
 const STORAGE_KEY_TEACHER_ASSIGNMENTS = "swara_maga_teacher_assignments_v1";
 const STORAGE_KEY_LOW_BANDWIDTH = "swara_maga_low_bandwidth_mode";
 
-const DEFAULT_PROGRESS: StudentProgress = {
-  completedLessonIds: [],
-  masteredConceptIds: [],
-  savedLessonIds: [],
-  learningPathProgress: {},
-  quizAttempts: {},
+// Frozen singleton: snapshots are shared by reference across consumers
+// (react-hooks v6 adoption review: correctness-F1 / api-F2). Callers must
+// treat snapshots as read-only; writes go through ProgressStorage mutators,
+// which always build fresh objects via spread.
+const DEFAULT_PROGRESS = Object.freeze({
+  completedLessonIds: [] as string[],
+  masteredConceptIds: [] as string[],
+  savedLessonIds: [] as string[],
+  learningPathProgress: {} as StudentProgress["learningPathProgress"],
+  quizAttempts: {} as StudentProgress["quizAttempts"],
   streakDays: 1,
   lastActiveDate: new Date().toISOString().split("T")[0],
   lowBandwidthMode: false,
-};
+} as StudentProgress);
 
 // ---------------------------------------------------------------------------
 // Reactive snapshot layer (react-hooks v6 adoption slice).
@@ -44,7 +48,16 @@ function readStoredValue(key: string): string | null {
 }
 
 function notifyStorageChanged(): void {
-  storageChangeListeners.forEach((listener) => listener());
+  // One throwing subscriber must not starve the rest (review finding
+  // races-F4). React's own listener re-throws after bookkeeping, so real
+  // errors still surface — isolation here is for foreign subscribers.
+  storageChangeListeners.forEach((listener) => {
+    try {
+      listener();
+    } catch {
+      // Swallow: a broken consumer must not block storage writes.
+    }
+  });
 }
 
 /** Subscribe to progress/low-bandwidth storage changes (own-tab writes and cross-tab storage events). */
@@ -62,7 +75,8 @@ export function getProgressSnapshot(): StudentProgress {
     let value = DEFAULT_PROGRESS;
     if (raw) {
       try {
-        value = { ...DEFAULT_PROGRESS, ...JSON.parse(raw) };
+        // Fresh mutable build, then frozen for the shared-snapshot contract.
+        value = Object.freeze({ ...DEFAULT_PROGRESS, ...JSON.parse(raw) }) as StudentProgress;
       } catch {
         value = DEFAULT_PROGRESS;
       }

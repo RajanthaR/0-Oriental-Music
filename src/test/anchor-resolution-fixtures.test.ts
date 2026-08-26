@@ -113,6 +113,15 @@ describe("anchor resolution engine (permanent fixtures)", () => {
       expect(outcome.resolved).toBe(false);
       expect(outcome.reason).toBe("not-definition-shaped");
     });
+
+    it("resolves a comma-bearing quoted title at the definition tier (testing-F4)", () => {
+      // End-to-end half of the comma-title pin: extraction captures the full
+      // quoted title, and the definition tier's verbatim branch matches it
+      // inside the file's own quotes.
+      const title = "rejects filename digits, out-of-range pages, and mismatched PDF locators";
+      const fileText = `it("${title}", () => {});`;
+      expect(resolveAgainstText(fileText, title, "definition").resolved).toBe(true);
+    });
   });
 
   describe("extraction", () => {

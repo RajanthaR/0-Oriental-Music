@@ -108,6 +108,13 @@ export function resolveAgainstText(
   // Multi-token compound anchors: first AND last tokens must be
   // definition-shaped in-file (the middle may be prose connectors), OR the
   // full symbol text must appear verbatim.
+  //
+  // KNOWN LOOSENESS (adversarial review, hooks-adoption slice): the verbatim
+  // fallback below also satisfies truncated/comma-cut titles against longer
+  // quoted titles, and could match incidental prose. Tightening it broke 39
+  // pre-existing corpus anchors that still rely on it — recorded as the
+  // first item of a follow-up anchor-hardening wave, not silently kept as
+  // invisible debt.
   const firstToken = tokens[0];
   if (!fileText.includes(firstToken)) {
     return { resolved: false, reason: "symbol-absent" };

@@ -26,8 +26,11 @@
 // using the same string-literal-aware scanner as the repository's
 // json-duplicate-keys guard.
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { join } from "node:path";
+
+const MAX_FILE_BYTES = 8 * 1024 * 1024; // review artifacts are small; a giant file is hostile
+const MAX_DEPTH = 6;
 
 function scanDuplicateKeys(text) {
   const dupes = [];
@@ -89,30 +92,62 @@ if (!stat.isDirectory()) {
 
 let checked = 0;
 const failures = [];
+const visitedReal = new Set();
 
-function walk(current) {
+function walk(current, depth) {
+  // Symlink-cycle and out-of-tree redirection guard (review finding
+  // security-F3): resolve each directory to its real path and never revisit.
+  let real;
+  try {
+    real = realpathSync(current);
+  } catch {
+    failures.push(`${current}: UNRESOLVABLE PATH`);
+    return;
+  }
+  if (visitedReal.has(real)) return;
+  visitedReal.add(real);
+  if (depth > MAX_DEPTH) {
+    failures.push(`${current}: DEPTH EXCEEDS ${MAX_DEPTH}`);
+    return;
+  }
   for (const name of readdirSync(current)) {
     const full = join(current, name);
-    const st = statSync(full);
+    let st;
+    try {
+      st = statSync(full);
+    } catch {
+      failures.push(`${full}: UNSTATABLE`);
+      continue;
+    }
     if (st.isDirectory()) {
-      walk(full);
+      walk(full, depth + 1);
       continue;
     }
     if (!name.endsWith(".json")) continue;
-    checked += 1;
-    const text = readFileSync(full, "utf8");
-    try {
-      JSON.parse(text);
-    } catch (e) {
-      failures.push(`${full}: NOT PARSEABLE (${String(e).split("\n")[0]})`);
-      continue; // duplicate scan on unparseable text is noise
+    if (st.size > MAX_FILE_BYTES) {
+      failures.push(`${full}: FILE EXCEEDS ${MAX_FILE_BYTES} BYTES`);
+      continue;
     }
-    for (const d of scanDuplicateKeys(text)) {
-      failures.push(`${full}: DUPLICATE KEY "${d.key}" at line ${d.line}`);
+    checked += 1;
+    try {
+      const text = readFileSync(full, "utf8");
+      try {
+        JSON.parse(text);
+      } catch (e) {
+        failures.push(`${full}: NOT PARSEABLE (${String(e).split("\n")[0]})`);
+        continue; // duplicate scan on unparseable text is noise
+      }
+      for (const d of scanDuplicateKeys(text)) {
+        failures.push(`${full}: DUPLICATE KEY "${d.key}" at line ${d.line}`);
+      }
+    } catch (e) {
+      // Per-file I/O isolation: one unreadable file must not abort the
+      // itemized report (review finding api-F4).
+      failures.push(`${full}: UNREADABLE (${String(e).split("\n")[0]})`);
     }
   }
 }
-walk(dir);
+walk(dir, 0);
 
 console.log(`review artifacts checked: ${checked} JSON files in ${dir}`);
 if (failures.length > 0) {
