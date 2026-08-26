@@ -2749,6 +2749,31 @@
         "dead-code sweep across edited pages not completed by the maintainability lens within budget (recorded gap)"
       ]
     },
-    "status": "IMPLEMENTATION-COMPLETE-PENDING-FINAL-GATES"
+    "status": "MERGED (PR #8)"
+  },
+  "anchorEngineHardening": {
+    "branch": "codex/anchor-engine-hardening",
+    "base": "39ec9ab263f92ea73b8021192bbb7357491de407",
+    "scope": "Bounded hardening: close the multi-token verbatim-fallback looseness in the anchor engine (A1), split an oversized test file along real seams (A2), re-measure Vitest concurrency knobs empirically (A3). No content claims or publication decisions; parity oracle exact match maintained throughout; src/data untouched.",
+    "a1TightenedRule": "Multi-token definition-tier anchors resolve iff first AND last tokens are definition-shaped in-file, OR the full symbol appears as an exact QUOTED test title, OR -- for .md evidence targets via the new markdownTarget option -- inside a section heading line. The bare fileText.includes(symbol) fallback is REMOVED.",
+    "a1ProofBeforeAndAfter": "Four permanent fixtures name the holes from the removed KNOWN LOOSENESS comment (truncated-vs-longer quoted title, comma-cut title, incidental multi-token prose, markdown-heading gating including prose rejection). Observed failing 4/22 against the loose engine immediately before the engine commit, passing 22/22 after. parseAnchor fix included: legacy trailing-annotation stripping now applies only when the pre-parenthetical text is a single token, so full titles ending in parentheticals survive verbatim.",
+    "a1RepointedAnchors": {
+      "count": 37,
+      "breakdown": "truncated/comma-cut/paraphrased test-title citations restored to their current full it()/describe() strings (comma-, paren- and pipe-bearing titles use the quoted-symbol extraction form)",
+      "selfHeadingAnchors": "2 P02_CLOSEOUT_FINDINGS self-section anchors retained as heading citations resolvable through the markdownTarget branch against the document's real headings",
+      "followthrough": "3 further doc anchors + acceptanceHardeningReviewCycle2 semanticTraceability (AH-C2-V08/V10 test refs) and fixSymbols (AH-C2-V10 readEveryConsumer, AH-C2-R06 restore-statement) repointed when the parity split moved their targets into tala-disposition-registry.test.ts / source-document-freshness.test.ts"
+    },
+    "corpusAccounting": {
+      "baseCorpus": 230,
+      "headCorpus": 218,
+      "removedLooseForms": 39,
+      "addedCompleteTitles": 27,
+      "netExplanation": "net -12 is fragment deduplication: multiple paraphrase/prefix citations of one test merge into its single canonical quoted title, and instrumented set probing proved several added full titles already existed at base in sibling rows",
+      "accountingArtifact": "C:/tmp/swara-slice/corpus-final.txt (instrumented set probe with explicit needle checks)"
+    },
+    "a2TestSplits": {
+      "completed": "publication-parity.test.ts (998 lines) -> publication-parity.test.ts + tala-disposition-registry.test.ts + source-document-freshness.test.ts with shared support module src/test/support/publication-parity-fixtures.ts; every describe moved verbatim; suite total preserved (596 baseline -> 600 with the four new A1 fixtures)"
+    },
+    "a3ConcurrencyDecision": "Six consecutive full-suite runs, all exit 0, zero reporter-RPC errors: maxWorkers 2 -> 101.8s/85.0s/89.6s; maxWorkers 4 -> 71.0s/56.9s/53.3s (~35% faster). The Vitest 3-era RPC failure does not reproduce under Vitest 4 at host concurrency; cap raised to 4 (= host logical CPUs; ubuntu-latest matches), rollback instruction recorded in vitest.config.ts comment."
   }
 }
