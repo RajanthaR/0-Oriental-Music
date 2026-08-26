@@ -136,10 +136,25 @@ export function readRepoFile(repoRoot: string, relativePath: string): string | n
  * The symbol tail excludes backticks/separators AND newlines: a missing
  * closing backtick must not let one anchor swallow following lines (the
  * swallowed text used to pass silently at first-token tier because its first
- * word happened to exist in the target file). */
+ * word happened to exist in the target file).
+ *
+ * Quoted-symbol form (`path#"symbol, with commas"`): test titles frequently
+ * contain commas, semicolons, and pipes that the bare capture must treat as
+ * terminators, so a symbol wrapped in double quotes is captured in full --
+ * commas included -- and stored without the surrounding quotes. Introduced by
+ * the hooks-adoption slice during the definition-tier repointing; the bare
+ * form is unchanged and remains the default. */
 export function extractMarkdownAnchors(markdown: string): string[] {
   const anchors = new Set<string>();
-  for (const m of markdown.matchAll(/`?((?:src|data|docs)\/[A-Za-z0-9_./-]+\.(?:ts|tsx|mjs|json|md))#([^\n`;,|)]+)/g)) {
+  let sequence = 0;
+  const working = markdown.replace(
+    /`?((?:src|data|docs)\/[A-Za-z0-9_./-]+\.(?:ts|tsx|mjs|json|md))#"([^"\n]+)"`?/g,
+    (_match, path: string, symbol: string) => {
+      anchors.add(`${path}#${symbol.trim()}`);
+      return `\u0000A${(sequence += 1)}\u0000`;
+    },
+  );
+  for (const m of working.matchAll(/`?((?:src|data|docs)\/[A-Za-z0-9_./-]+\.(?:ts|tsx|mjs|json|md))#([^\n`;,|)]+)/g)) {
     anchors.add(`${m[1]}#${m[2].trim()}`);
   }
   return [...anchors];

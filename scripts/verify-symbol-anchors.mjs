@@ -1,12 +1,15 @@
 // Traceability anchor verifier — CI gate (.github/workflows/ci.yml).
 //
 // Resolves every `path#symbol` anchor in the three traceability documents
-// through the shared resolver (src/lib/evidence/anchor-resolution.ts), at the
-// historical "first-token" strictness tier. Migration note: the pre-migration
-// corpus was 233 unique anchors, zero dropped; the canonical extractor
-// additionally sees 3 cross-document .md references (236 total). Fails the
-// run (exit 1) when anything is unresolved OR when extraction collapses
-// below a floor — a green print over an empty corpus would be vacuous.
+// through the shared resolver (src/lib/evidence/anchor-resolution.ts).
+// Strictness tier: "definition" by default since the hooks-adoption slice
+// repointed every re-export/prose citation to its defining site (the
+// historical floor was "first-token"; pass --tier first-token to compare).
+// Symbols wrapped in double quotes inside backticks (`path#"title, with
+// commas"`) are captured verbatim so comma-bearing test titles resolve.
+// Fails the run (exit 1) when anything is unresolved OR when extraction
+// collapses below a floor — a green print over an empty corpus would be
+// vacuous.
 //
 // Run under vite-node so the TypeScript resolver is importable:
 //   npx --no-install vite-node scripts/verify-symbol-anchors.mjs
@@ -20,6 +23,14 @@ import {
   readRepoFile,
   resolveAgainstText,
 } from "../src/lib/evidence/anchor-resolution";
+
+const tierArgIndex = process.argv.indexOf("--tier");
+const tier =
+  tierArgIndex > -1 ? process.argv[tierArgIndex + 1] : "definition";
+if (tier !== "first-token" && tier !== "definition") {
+  console.log(`UNKNOWN TIER: ${tier} (expected first-token | definition)`);
+  process.exitCode = 1;
+}
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -60,7 +71,7 @@ for (const anchor of anchors) {
   const outcome = resolveAgainstText(
     fileCache.get(parsed.path) ?? null,
     normalizeAnchorSymbol(parsed.symbol),
-    "first-token",
+    tier,
   );
   if (outcome.resolved) {
     ok += 1;
