@@ -1538,7 +1538,7 @@
           "exactSection": "tests: returns idempotent Swara handles that stop active nodes; keeps a Swara owner until the voice cleanup actually finishes",
           "semanticReferences": [
             {
-              "path": "src/test/synth.test.ts",
+              "path": "src/test/swara-synth-lifecycle.test.ts",
               "symbol": "tests: returns idempotent Swara handles that stop active nodes; keeps a Swara owner until the voice cleanup actually finishes"
             }
           ]
@@ -2200,7 +2200,7 @@
       "FA-V10": "src/lib/data/repository.ts#CmsMutationResult",
       "FA-V11": "src/types/content.ts#AnswerOption",
       "FA-V14": "src/test/review-closeout.test.ts#records the acceptance-hardening scope without rewriting blocked review history",
-      "FA-V15": "src/test/synth.test.ts#settles Swara cleanup when clearTimeout throws",
+      "FA-V15": "src/test/swara-synth-lifecycle.test.ts#settles Swara cleanup when clearTimeout throws",
       "FA-V16": "src/lib/data/repository.ts#updateLessonReviewStatus",
       "FA-V17": "src/lib/data/publication-policy.ts#parseSourceLocator"
     },
@@ -2248,7 +2248,7 @@
     ],
     "semanticTraceability": {
       "AH-C1-V01": "src/test/swara-consumers.test.tsx#cancels a NotationArranger tone when its arranged item is removed",
-      "AH-C1-V02": "src/test/synth.test.ts#rolls back earlier Tabla timers when an immediate stroke callback fails",
+      "AH-C1-V02": "src/test/tabla-plan-schedule.test.ts#rolls back earlier Tabla timers when an immediate stroke callback fails",
       "AH-C1-V03": "src/test/tala-visualizer.test.tsx#releases a Tala handle only after ready and finished settle",
       "AH-C1-V04": "src/test/pitch.test.ts#cleans the active graph when analyser sampling throws",
       "AH-C1-V05": "src/test/pitch.test.ts#releases an active session before installing a replacement",
@@ -2336,12 +2336,12 @@
       "AH-C2-V04": "src/test/content-validator.test.ts#accepts a valid aggregate Quiz that carries no direct source reference",
       "AH-C2-V05": "src/test/swara-consumers.test.tsx#continues EarTraining cleanup after Next, replacement, and unmount cancellations throw",
       "AH-C2-V06": "src/test/swara-consumers.test.tsx#clears every remaining instrument timer when an owned Tabla cancellation throws",
-      "AH-C2-V07": "src/test/synth.test.ts#fails closed for the prototype-key Tabla bol %s without throwing",
+      "AH-C2-V07": "src/test/tabla-plan-schedule.test.ts#fails closed for the prototype-key Tabla bol %s without throwing",
       "AH-C2-V08": "src/test/tala-disposition-registry.test.ts#makes the evaluation context unsafe for a verified-looking registry with %s",
       "AH-C2-V09": "src/test/graph-boundary.test.ts#traverses %s alone but fails the combined catalog closed without throwing",
       "AH-C2-V10": "src/test/source-document-freshness.test.ts#refreshes every consumer when only the source-document reviewStatus changes",
       "AH-C2-R01": "src/test/pitch.test.ts#releases an active session when stream.getTracks() throws on stop",
-      "AH-C2-R02": "src/test/synth.test.ts#cannot strand Tabla playback ownership when a timer callback registers synchronously",
+      "AH-C2-R02": "src/test/tabla-plan-schedule.test.ts#cannot strand Tabla playback ownership when a timer callback registers synchronously",
       "AH-C2-R03": "src/test/graph-boundary.test.ts#withholds %s from every public surface",
       "AH-C2-R04": "src/test/sources-page.test.tsx#renders the extracted-corpus counts while the corpus is certifiable",
       "AH-C2-R05": "src/test/audio-cleanup.test.ts#cancels every owned handle even when an earlier cancellation throws",
