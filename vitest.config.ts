@@ -68,7 +68,9 @@ export default defineConfig({
     // The cap is therefore raised to match this host's logical CPU count;
     // hosted ubuntu-latest runners share the same 4-vCPU envelope. If a red
     // build ever reappears with all tests passing, drop back to 2 and record
-    // it here.
+    // it here. Note the two timing sets bracket adjacent tree states (596 vs
+    // 600 tests — the parity split landed between them), so treat them as
+    // directionally comparable rather than a strict like-for-like benchmark.
     maxWorkers: 4,
   },
   resolve: {

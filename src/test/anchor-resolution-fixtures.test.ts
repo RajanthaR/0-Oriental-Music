@@ -132,7 +132,7 @@ describe("anchor resolution engine (permanent fixtures)", () => {
     // rejections permanent.
     // -------------------------------------------------------------------
 
-    it("rejects a truncated title that is a prefix of a longer quoted title", () => {
+    it("rejects a suffix-substring title cut from a longer quoted title", () => {
       const fileText = 'it("keeps RhythmTapGame playback ownership isolated when Tabla promises reject", () => {});';
       expect(resolveAgainstText(fileText, "Tabla promises reject", "definition").resolved).toBe(false);
     });

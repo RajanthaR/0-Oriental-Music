@@ -210,9 +210,13 @@ describe("Phase 2 final contract closeout", () => {
     const traceabilityRows = parseTraceabilityRows(exactTable ?? "");
 
     // Quoted-symbol syntax (`path#"title, with commas"`) is the canonical
-    // document form for titles bearing extractor terminators (anchor-engine
-    // hardening slice). Ledger labels stay bare; comparison normalizes the
-    // document-side quotes away so both sides assert the same path#symbol.
+// document form for titles bearing extractor terminators (anchor-engine
+// hardening slice). Ledger labels stay bare; comparison normalizes the
+// document-side quotes away so both sides assert the same path#symbol --
+// but only AFTER pinning the canonical form itself: any cell whose ledger
+// symbol carries an extractor terminator must arrive quoted, so a future
+// edit cannot silently degrade the precise citation style.
+    const needsQuotedForm = (symbol: string): boolean => /[,;|()]/.test(symbol);
     const unquoteCell = (cell: string): string => cell.replace(/#"([^"]+)"/g, "#$1");
 
     for (const findingId of ACCEPTANCE_HARDENING_FINDING_IDS) {
@@ -224,8 +228,22 @@ describe("Phase 2 final contract closeout", () => {
       expectSemanticReference(entry.fix, `${findingId} fix`);
       expectSemanticReference(entry.anchor, `${findingId} anchor`);
       expect(closeout, `${findingId} closeout row`).toContain(`| \`${findingId}\` |`);
+      const cells = traceabilityRows.get(findingId) ?? [];
+      for (const [cellIndex, reference] of [
+        [1, entry.test],
+        [2, entry.fix],
+        [3, entry.anchor],
+      ] as const) {
+        if (needsQuotedForm(reference.symbol)) {
+          const escaped = reference.symbol.replace(/[.*+?${}()|[\]\\]/g, '\\$&');
+          expect(
+            cells[cellIndex],
+            `${findingId} cell ${cellIndex} must use the quoted-symbol form`,
+          ).toMatch(new RegExp(`#"${escaped}"$`));
+        }
+      }
       expect(
-        traceabilityRows.get(findingId)?.map(unquoteCell),
+        cells.map(unquoteCell),
         `${findingId} exact traceability cells`,
       ).toEqual([
         entry.reviewEvidence.split("/").pop(),
