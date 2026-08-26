@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useSyncExternalStore } from "react";
 import Link from "next/link";
 import {
   Sparkles,
@@ -13,16 +13,22 @@ import {
   RotateCcw,
   Volume2,
 } from "lucide-react";
-import { ProgressStorage } from "@/lib/storage/progress-storage";
+import {
+  getProgressSnapshot,
+  subscribeToStorageChanges,
+} from "@/lib/storage/progress-storage";
 import { repository } from "@/lib/data/repository";
 import { StudentProgress, Lesson } from "@/types/content";
 
 export default function StudentProgressDashboard() {
-  const [progress, setProgress] = useState<StudentProgress | null>(null);
-
-  useEffect(() => {
-    setProgress(ProgressStorage.getProgress());
-  }, []);
+  // Server snapshot null preserves the legacy pre-hydration loading state;
+  // the client snapshot replaces the post-hydration setState-in-effect pass
+  // (react-hooks v6 adoption).
+  const progress = useSyncExternalStore<StudentProgress | null>(
+    subscribeToStorageChanges,
+    getProgressSnapshot,
+    () => null,
+  );
 
   if (!progress) {
     return <div className="p-10 text-center text-xs">ප්‍රගතිය පූරණය වෙමින් පවතී...</div>;

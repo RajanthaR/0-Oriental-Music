@@ -5,16 +5,114 @@ const STORAGE_KEY_TEACHER_COLLECTIONS = "swara_maga_teacher_collections_v1";
 const STORAGE_KEY_TEACHER_ASSIGNMENTS = "swara_maga_teacher_assignments_v1";
 const STORAGE_KEY_LOW_BANDWIDTH = "swara_maga_low_bandwidth_mode";
 
-const DEFAULT_PROGRESS: StudentProgress = {
-  completedLessonIds: [],
-  masteredConceptIds: [],
-  savedLessonIds: [],
-  learningPathProgress: {},
-  quizAttempts: {},
+// Frozen singleton: snapshots are shared by reference across consumers
+// (react-hooks v6 adoption review: correctness-F1 / api-F2). Callers must
+// treat snapshots as read-only; writes go through ProgressStorage mutators,
+// which always build fresh objects via spread.
+const DEFAULT_PROGRESS = Object.freeze({
+  completedLessonIds: [] as string[],
+  masteredConceptIds: [] as string[],
+  savedLessonIds: [] as string[],
+  learningPathProgress: {} as StudentProgress["learningPathProgress"],
+  quizAttempts: {} as StudentProgress["quizAttempts"],
   streakDays: 1,
   lastActiveDate: new Date().toISOString().split("T")[0],
   lowBandwidthMode: false,
-};
+} as StudentProgress);
+
+// ---------------------------------------------------------------------------
+// Reactive snapshot layer (react-hooks v6 adoption slice).
+//
+// Consumers that previously loaded storage inside a mount effect
+// (setState-in-effect) now read through useSyncExternalStore. That hook
+// requires getSnapshot to return a REFERENTIALLY STABLE value while the
+// underlying bytes are unchanged, so reads go through a raw-string-keyed
+// cache and writes notify subscribers instead of mutating local copies.
+// Server snapshots return the same defaults the old initial useState values
+// used, preserving pre-hydration rendering exactly.
+// ---------------------------------------------------------------------------
+
+type StorageChangeListener = () => void;
+const storageChangeListeners = new Set<StorageChangeListener>();
+
+let cachedProgress: { raw: string | null; value: StudentProgress } | null = null;
+let cachedLowBandwidth: { raw: string | null; value: boolean } | null = null;
+
+function readStoredValue(key: string): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function notifyStorageChanged(): void {
+  // One throwing subscriber must not starve the rest (review finding
+  // races-F4). React's own listener re-throws after bookkeeping, so real
+  // errors still surface — isolation here is for foreign subscribers.
+  storageChangeListeners.forEach((listener) => {
+    try {
+      listener();
+    } catch {
+      // Swallow: a broken consumer must not block storage writes.
+    }
+  });
+}
+
+/** Subscribe to progress/low-bandwidth storage changes (own-tab writes and cross-tab storage events). */
+export function subscribeToStorageChanges(listener: StorageChangeListener): () => void {
+  storageChangeListeners.add(listener);
+  return () => {
+    storageChangeListeners.delete(listener);
+  };
+}
+
+/** Stable-reference client snapshot of student progress. */
+export function getProgressSnapshot(): StudentProgress {
+  const raw = readStoredValue(STORAGE_KEY_PROGRESS);
+  if (!cachedProgress || cachedProgress.raw !== raw) {
+    let value = DEFAULT_PROGRESS;
+    if (raw) {
+      try {
+        // Fresh mutable build, then frozen for the shared-snapshot contract.
+        value = Object.freeze({ ...DEFAULT_PROGRESS, ...JSON.parse(raw) }) as StudentProgress;
+      } catch {
+        value = DEFAULT_PROGRESS;
+      }
+    }
+    cachedProgress = { raw, value };
+  }
+  return cachedProgress.value;
+}
+
+/** Server/hydration snapshot: the same defaults the legacy initial useState used. */
+export function getServerProgressSnapshot(): StudentProgress {
+  return DEFAULT_PROGRESS;
+}
+
+/** Stable-reference client snapshot of the low-bandwidth flag. */
+export function getLowBandwidthModeSnapshot(): boolean {
+  const raw = readStoredValue(STORAGE_KEY_LOW_BANDWIDTH);
+  if (!cachedLowBandwidth || cachedLowBandwidth.raw !== raw) {
+    cachedLowBandwidth = { raw, value: raw === "true" };
+  }
+  return cachedLowBandwidth.value;
+}
+
+/** Server/hydration snapshot: matches the legacy initial useState(false). */
+export function getServerLowBandwidthModeSnapshot(): boolean {
+  return false;
+}
+
+if (typeof window !== "undefined") {
+  // Cross-tab changes arrive as storage events; own-tab writes notify directly.
+  window.addEventListener("storage", (event) => {
+    if (event.key === null || event.key.startsWith("swara_maga_")) {
+      notifyStorageChanged();
+    }
+  });
+}
 
 export class ProgressStorage {
   public static getProgress(): StudentProgress {
@@ -32,6 +130,7 @@ export class ProgressStorage {
     if (typeof window === "undefined") return;
     try {
       localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(progress));
+      notifyStorageChanged();
     } catch (e) {
       console.error("Failed to save student progress to localStorage", e);
     }
@@ -114,6 +213,7 @@ export class ProgressStorage {
   public static setLowBandwidthMode(enabled: boolean): void {
     if (typeof window === "undefined") return;
     localStorage.setItem(STORAGE_KEY_LOW_BANDWIDTH, enabled ? "true" : "false");
+    notifyStorageChanged();
   }
 
   // Teacher Collections & Assignments

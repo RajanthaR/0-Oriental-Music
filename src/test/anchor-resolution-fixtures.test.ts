@@ -113,6 +113,15 @@ describe("anchor resolution engine (permanent fixtures)", () => {
       expect(outcome.resolved).toBe(false);
       expect(outcome.reason).toBe("not-definition-shaped");
     });
+
+    it("resolves a comma-bearing quoted title at the definition tier (testing-F4)", () => {
+      // End-to-end half of the comma-title pin: extraction captures the full
+      // quoted title, and the definition tier's verbatim branch matches it
+      // inside the file's own quotes.
+      const title = "rejects filename digits, out-of-range pages, and mismatched PDF locators";
+      const fileText = `it("${title}", () => {});`;
+      expect(resolveAgainstText(fileText, title, "definition").resolved).toBe(true);
+    });
   });
 
   describe("extraction", () => {
@@ -139,6 +148,30 @@ describe("anchor resolution engine (permanent fixtures)", () => {
 
     it("does not treat numeric path:line references as path#symbol anchors", () => {
       expect(extractMarkdownAnchors("see src/lib/a.ts:42 for details")).toEqual([]);
+    });
+
+    it("captures quoted symbols in full, commas and pipes included", () => {
+      // react-hooks-adoption slice: test titles routinely contain commas and
+      // pipes that the bare capture must treat as terminators. The
+      // double-quoted symbol form captures the whole title; the stored anchor
+      // keeps only the inner text (no surrounding quotes).
+      const md = 'see `src/test/a.test.ts#"rejects filename digits, out-of-range pages, and mismatched PDF locators"` here';
+      expect(extractMarkdownAnchors(md)).toEqual([
+        'src/test/a.test.ts#rejects filename digits, out-of-range pages, and mismatched PDF locators',
+      ]);
+    });
+
+    it("quoted form does not leak a bare prefix duplicate into the corpus", () => {
+      // Before masking, the legacy regex also matched `path#"first words`
+      // (up to the comma) as a second, truncated anchor. The masked pass must
+      // yield exactly one anchor.
+      const md = '`src/test/a.test.ts#"title with, comma"` plus prose';
+      expect(extractMarkdownAnchors(md)).toEqual(["src/test/a.test.ts#title with, comma"]);
+    });
+
+    it("bare-form anchors are unchanged when no quotes are present", () => {
+      const md = "- `src/lib/a.ts#symA` | table cell";
+      expect(extractMarkdownAnchors(md)).toEqual(["src/lib/a.ts#symA"]);
     });
   });
 });

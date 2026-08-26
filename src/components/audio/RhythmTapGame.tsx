@@ -5,6 +5,18 @@ import { tablaSynth, type TablaPlaybackHandle } from "@/lib/audio/tabla";
 import { normalizePracticeBpm } from "@/lib/audio/tempo";
 import { Play, Square, RotateCcw, Award, Sparkles, Touchpad } from "lucide-react";
 
+// Latest-callback ref sync happens in an effect (react-hooks v6 adoption):
+// writing a ref during render was flagged by react-hooks/refs, and effects
+// flush within the same act() window as the rerender that changed the prop,
+// so the finish path still observes the newest callback.
+function useLatestRef<T>(value: T): React.MutableRefObject<T> {
+  const ref = useRef(value);
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref;
+}
+
 export interface RhythmTapGameProps {
   bpm?: number;
   totalBeats?: number;
@@ -35,8 +47,7 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
   const playbackHandlesRef = useRef<Set<TablaPlaybackHandle>>(new Set());
   const mountedRef = useRef(true);
   const sessionGenerationRef = useRef(0);
-  const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
+  const onCompleteRef = useLatestRef(onComplete);
 
   const trackPlayback = useCallback((handle: TablaPlaybackHandle) => {
     playbackHandlesRef.current.add(handle);
@@ -153,7 +164,9 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
     }
 
     onCompleteRef.current?.(scorePercent);
-  }, [clearTimers, safeTotalBeats]);
+    // onCompleteRef comes from useLatestRef: stable identity, listed for the
+    // exhaustive-deps contract.
+  }, [clearTimers, safeTotalBeats, onCompleteRef]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -165,13 +178,10 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
 
   useEffect(() => {
     if (isPlaying) {
-      startTimeRef.current = Date.now();
-      expectedBeatTimesRef.current = [];
-      tapTimesRef.current = [];
-      accuracyListRef.current = [];
-      setAccuracyList([]);
-      setCurrentBeat(0);
-      setIsFinished(false);
+      // Session-start resets live in handleStart (the event that flips
+      // isPlaying), not here: a synchronous setState in this effect body was
+      // the react-hooks/set-state-in-effect finding, and races-F3 moved the
+      // ref resets alongside them for tick coherence.
 
       const sessionGeneration = sessionGenerationRef.current;
       let beatCount = 0;
@@ -240,6 +250,18 @@ export const RhythmTapGame: React.FC<RhythmTapGameProps> = ({
 
   const handleStart = () => {
     sessionGenerationRef.current += 1;
+    // Session-start resets belong to this event (react-hooks v6 adoption +
+    // review finding races-F3): ref and state resets in one place keep
+    // accuracyListRef coherent with accuracyList within the same tick,
+    // closing the commit-to-effects window where a tap could score stale
+    // refs. The previous arrangement reset refs in the isPlaying effect.
+    startTimeRef.current = Date.now();
+    expectedBeatTimesRef.current = [];
+    tapTimesRef.current = [];
+    accuracyListRef.current = [];
+    setAccuracyList([]);
+    setCurrentBeat(0);
+    setIsFinished(false);
     setIsPlaying(true);
     setFeedbackText("තාලයට අනුව තට්ටු කරන්න...");
     setFeedbackColor("text-text");

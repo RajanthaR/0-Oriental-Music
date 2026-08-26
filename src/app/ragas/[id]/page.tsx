@@ -29,10 +29,26 @@ export default function RagaDetailPage() {
     releaseHandleRef(sequenceHandleRef);
   }, []);
 
-  useEffect(() => {
-    mountedRef.current = true;
+  // Route-param change resets transient audio state during render (react-hooks
+  // v6 adoption, "adjust state when a prop changes" pattern): the component
+  // instance is reused across /ragas/[id] navigations, and the previous
+  // mount-effect reset was a synchronous setState-in-effect. Cancellation
+  // timing is unchanged -- the keyed effect below still releases owned audio
+  // on id change and unmount.
+  const [lastRagaId, setLastRagaId] = useState(ragaId);
+  if (lastRagaId !== ragaId) {
+    setLastRagaId(ragaId);
     setPlayingPhraseIdx(null);
     setAudioError(false);
+    // NOTE: stale-audio cancellation deliberately stays in the keyed cleanup
+    // effect below. Moving it into this render-phase block was tried and
+    // rejected: react-hooks/refs (now error severity) forbids ref mutation
+    // during render, and passive effects flush before discrete events can
+    // interleave, so baseline ordering is already race-safe.
+  }
+
+  useEffect(() => {
+    mountedRef.current = true;
     return () => {
       mountedRef.current = false;
       cancelOwnedAudio();

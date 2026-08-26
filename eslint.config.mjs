@@ -13,20 +13,15 @@
 // decision.
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 
-// eslint-config-next@16 ships react-hooks v6, whose new compiler-powered
-// rules flag pre-existing sites that did not exist under the previous
-// toolchain. Faithful fixes are useSyncExternalStore-shaped refactors with
-// hydration-timing implications -- deliberately deferred to a dedicated
-// adoption slice (rationale and per-site census: ledger section above).
-//
-// These two pins pair with the --max-warnings floor in package.json's lint
-// script: the floor equals the current warn count, so any NEW violation of
-// either rule turns the gate red while this slice's debt stays green. The
-// floor MUST be lowered whenever one of these sites is fixed, and both
-// rules flip to "error" once the debt reaches zero, retiring this block.
-const deferredReactHooksV6Rules = {
-  "react-hooks/set-state-in-effect": "warn",
-  "react-hooks/refs": "warn",
+// react-hooks v6 adoption COMPLETE (slice history: validation-consolidation
+// -> next16-modernization -> hooks-adoption). All thirteen flagged sites
+// were refactored, so the two compiler-powered rules that used to be
+// warn-pinned behind a --max-warnings ratchet are now enforced at error
+// severity. Do not downgrade either rule without a recorded decision in
+// data/forensic-ledger.json.
+const reactHooksV6Enforcement = {
+  "react-hooks/set-state-in-effect": "error",
+  "react-hooks/refs": "error",
 };
 
 const eslintConfig = [
@@ -37,7 +32,7 @@ const eslintConfig = [
   },
   ...nextCoreWebVitals,
   {
-    rules: deferredReactHooksV6Rules,
+    rules: reactHooksV6Enforcement,
   },
 ];
 

@@ -156,12 +156,9 @@ npm run type-check
 
 # 4. Run ESLint code quality checks
 npm run lint
-# Lint exits 0 at exactly 13 warnings: the script enforces
-# --max-warnings=13, paired with two warn-pinned react-hooks rules in
-# eslint.config.mjs (deferred-debt ratchet). A 14th warning fails the gate:
-# fix the new site or consciously lower the floor after fixing an existing
-# one - never raise it. When the floor is crossed ESLint's own output does
-# not name --max-warnings as the cause; see eslint.config.mjs lines 22-26.
+# Lint runs strict: react-hooks/set-state-in-effect and react-hooks/refs
+# are enforced at error severity (react-hooks v6 adoption complete; see
+# eslint.config.mjs and data/forensic-ledger.json -> reactHooksV6Adoption).
 
 # 5. Build production bundle (Statically optimized)
 npm run build

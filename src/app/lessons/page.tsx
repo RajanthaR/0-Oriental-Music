@@ -1,21 +1,29 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { BookOpen, Search, Clock, ArrowRight, Bookmark, BookmarkCheck } from "lucide-react";
 import { repository } from "@/lib/data/repository";
 import { GradeBandType } from "@/types/content";
-import { ProgressStorage } from "@/lib/storage/progress-storage";
+import {
+  ProgressStorage,
+  getProgressSnapshot,
+  getServerProgressSnapshot,
+  subscribeToStorageChanges,
+} from "@/lib/storage/progress-storage";
 
 export default function LessonsDirectoryPage() {
   const [selectedGrade, setSelectedGrade] = useState<GradeBandType | "all">("all");
   const [selectedStrand, setSelectedStrand] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [savedIds, setSavedIds] = useState<string[]>([]);
-
-  React.useEffect(() => {
-    setSavedIds(ProgressStorage.getProgress().savedLessonIds);
-  }, []);
+  // Saved-lesson set derived from the storage snapshot (react-hooks v6
+  // adoption): toggleSaveLesson notifies the layer, so no local mirror state.
+  const progressSnapshot = useSyncExternalStore(
+    subscribeToStorageChanges,
+    getProgressSnapshot,
+    getServerProgressSnapshot,
+  );
+  const savedIds = progressSnapshot.savedLessonIds;
 
   const strands = repository.getStrands();
   const lessons = repository.getLessons({
@@ -26,10 +34,7 @@ export default function LessonsDirectoryPage() {
 
   const toggleSave = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
-    const isSaved = ProgressStorage.toggleSaveLesson(id);
-    setSavedIds((prev) =>
-      isSaved ? [...prev, id] : prev.filter((item) => item !== id)
-    );
+    ProgressStorage.toggleSaveLesson(id);
   };
 
   return (

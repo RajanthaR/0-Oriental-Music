@@ -1,0 +1,192 @@
+{
+ "measuredWith": "playwright chromium against production next start; fresh context per route; transferSize = compressed bytes over the wire",
+ "bundler": "Turbopack (Next 16.3.2)",
+ "routesOk": 25,
+ "routesFailed": 1,
+ "totalTransferBytesAllMeasuredRoutes": 9739069,
+ "averageTransferBytesPerRoute": 389563,
+ "rows": [
+  {
+   "route": "/talas/tala-dadra",
+   "status": 200,
+   "transferBytes": 425539,
+   "decodedBytes": 1738459,
+   "requestCount": 72
+  },
+  {
+   "route": "/instruments/inst-gatabera",
+   "status": 200,
+   "transferBytes": 421848,
+   "decodedBytes": 1728066,
+   "requestCount": 70
+  },
+  {
+   "route": "/exams/exam-ol-model-01",
+   "status": 200,
+   "transferBytes": 421819,
+   "decodedBytes": 1726179,
+   "requestCount": 72
+  },
+  {
+   "route": "/learning-paths/path-sound-nada",
+   "status": 200,
+   "transferBytes": 419625,
+   "decodedBytes": 1717333,
+   "requestCount": 72
+  },
+  {
+   "route": "/theatre",
+   "status": 200,
+   "transferBytes": 416662,
+   "decodedBytes": 1713274,
+   "requestCount": 72
+  },
+  {
+   "route": "/instruments",
+   "status": 200,
+   "transferBytes": 414937,
+   "decodedBytes": 1709739,
+   "requestCount": 71
+  },
+  {
+   "route": "/exams",
+   "status": 200,
+   "transferBytes": 414790,
+   "decodedBytes": 1708914,
+   "requestCount": 71
+  },
+  {
+   "route": "/traditions",
+   "status": 200,
+   "transferBytes": 414771,
+   "decodedBytes": 1708787,
+   "requestCount": 71
+  },
+  {
+   "route": "/learning-paths",
+   "status": 200,
+   "transferBytes": 414692,
+   "decodedBytes": 1708880,
+   "requestCount": 71
+  },
+  {
+   "route": "/progress",
+   "status": 200,
+   "transferBytes": 414307,
+   "decodedBytes": 1706822,
+   "requestCount": 71
+  },
+  {
+   "route": "/curriculum-map",
+   "status": 200,
+   "transferBytes": 413183,
+   "decodedBytes": 1707847,
+   "requestCount": 70
+  },
+  {
+   "route": "/talas",
+   "status": 200,
+   "transferBytes": 410632,
+   "decodedBytes": 1702034,
+   "requestCount": 67
+  },
+  {
+   "route": "/admin",
+   "status": 200,
+   "transferBytes": 384430,
+   "decodedBytes": 1647499,
+   "requestCount": 46
+  },
+  {
+   "route": "/lessons/les-intro-01",
+   "status": 200,
+   "transferBytes": 382008,
+   "decodedBytes": 1580553,
+   "requestCount": 44
+  },
+  {
+   "route": "/search",
+   "status": 200,
+   "transferBytes": 368947,
+   "decodedBytes": 1534862,
+   "requestCount": 56
+  },
+  {
+   "route": "/attributions",
+   "status": 200,
+   "transferBytes": 364755,
+   "decodedBytes": 1528177,
+   "requestCount": 53
+  },
+  {
+   "route": "/practice",
+   "status": 200,
+   "transferBytes": 363863,
+   "decodedBytes": 1537722,
+   "requestCount": 50
+  },
+  {
+   "route": "/privacy",
+   "status": 200,
+   "transferBytes": 363079,
+   "decodedBytes": 1531096,
+   "requestCount": 50
+  },
+  {
+   "route": "/teachers",
+   "status": 200,
+   "transferBytes": 362964,
+   "decodedBytes": 1525688,
+   "requestCount": 50
+  },
+  {
+   "route": "/ragas/raga-bilawal",
+   "status": 200,
+   "transferBytes": 362282,
+   "decodedBytes": 1505166,
+   "requestCount": 43
+  },
+  {
+   "route": "/ragas",
+   "status": 200,
+   "transferBytes": 361781,
+   "decodedBytes": 1491210,
+   "requestCount": 52
+  },
+  {
+   "route": "/lessons",
+   "status": 200,
+   "transferBytes": 359585,
+   "decodedBytes": 1518289,
+   "requestCount": 48
+  },
+  {
+   "route": "/sources",
+   "status": 200,
+   "transferBytes": 354754,
+   "decodedBytes": 1543559,
+   "requestCount": 42
+  },
+  {
+   "route": "/",
+   "status": 200,
+   "transferBytes": 354268,
+   "decodedBytes": 1486305,
+   "requestCount": 42
+  },
+  {
+   "route": "/glossary",
+   "status": 200,
+   "transferBytes": 353548,
+   "decodedBytes": 1473894,
+   "requestCount": 43
+  },
+  {
+   "route": "/_not-found",
+   "status": 404,
+   "transferBytes": 350230,
+   "decodedBytes": 1461622,
+   "requestCount": 42
+  }
+ ]
+}
