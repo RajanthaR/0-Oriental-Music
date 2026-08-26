@@ -136,11 +136,11 @@
           "symbol": "detached snapshot"
         },
         "fix": {
-          "path": "src/lib/data/publication-policy.ts",
+          "path": "src/lib/data/snapshot-capture.ts",
           "symbol": "captureEvaluationValue"
         },
         "anchor": {
-          "path": "src/lib/data/publication-policy.ts",
+          "path": "src/lib/data/snapshot-capture.ts",
           "symbol": "captureEvaluationValue"
         },
         "disposition": "FIXED-PENDING-REREVIEW"
@@ -152,11 +152,11 @@
           "symbol": "fails closed for duplicate top-level IDs"
         },
         "fix": {
-          "path": "src/lib/validation/content-validator.ts",
+          "path": "src/lib/data/publication-audit.ts",
           "symbol": "validatePublicCollection"
         },
         "anchor": {
-          "path": "src/lib/validation/content-validator.ts",
+          "path": "src/lib/data/publication-audit.ts",
           "symbol": "validatePublicCollection"
         },
         "disposition": "FIXED-PENDING-REREVIEW"
@@ -200,11 +200,11 @@
           "symbol": "malformed tala fields"
         },
         "fix": {
-          "path": "src/lib/validation/content-validator.ts",
+          "path": "src/lib/data/publication-audit.ts",
           "symbol": "validateMusicalCoreFieldDispositions"
         },
         "anchor": {
-          "path": "src/lib/validation/content-validator.ts",
+          "path": "src/lib/data/publication-audit.ts",
           "symbol": "validateMusicalCoreFieldDispositions"
         },
         "disposition": "FIXED-PENDING-REREVIEW"
@@ -216,11 +216,11 @@
           "symbol": "ambiguous extracted-document mappings"
         },
         "fix": {
-          "path": "src/lib/validation/content-validator.ts",
+          "path": "src/lib/data/publication-audit.ts",
           "symbol": "validateSelectedSourceMetadata"
         },
         "anchor": {
-          "path": "src/lib/validation/content-validator.ts",
+          "path": "src/lib/data/publication-audit.ts",
           "symbol": "validateSelectedSourceMetadata"
         },
         "disposition": "FIXED-PENDING-REREVIEW"
@@ -232,11 +232,11 @@
           "symbol": "declarative %s dependency rule"
         },
         "fix": {
-          "path": "src/lib/data/publication-policy.ts",
+          "path": "src/lib/data/dependency-rules.ts",
           "symbol": "DEPENDENCY_FIELD_RULES"
         },
         "anchor": {
-          "path": "src/lib/data/publication-policy.ts",
+          "path": "src/lib/data/dependency-rules.ts",
           "symbol": "DEPENDENCY_FIELD_RULES"
         },
         "disposition": "FIXED-PENDING-REREVIEW"
@@ -248,11 +248,11 @@
           "symbol": "ambiguous extracted-document mappings"
         },
         "fix": {
-          "path": "src/lib/validation/content-validator.ts",
+          "path": "src/lib/data/publication-audit.ts",
           "symbol": "validateSelectedSourceMetadata"
         },
         "anchor": {
-          "path": "src/lib/validation/content-validator.ts",
+          "path": "src/lib/data/publication-audit.ts",
           "symbol": "validateSelectedSourceMetadata"
         },
         "disposition": "FIXED-PENDING-REREVIEW"
@@ -264,11 +264,11 @@
           "symbol": "resolves current musical-core anchors"
         },
         "fix": {
-          "path": "docs/FORENSIC_CORRECTION_LOG.md",
+          "path": "src/test/review-closeout.test.ts",
           "symbol": "P02-FINAL-06"
         },
         "anchor": {
-          "path": "docs/FORENSIC_CORRECTION_LOG.md",
+          "path": "src/test/review-closeout.test.ts",
           "symbol": "P02-FINAL-06"
         },
         "disposition": "FIXED-PENDING-REREVIEW"
