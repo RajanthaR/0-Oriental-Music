@@ -262,3 +262,21 @@ quarantined with raw records retained; all 21 public source rows expose only the
 unknown/unverified provenance representation (probe: 0 leaks); `raga-bhairav`
 stays quarantined; the rejected Deepchandi retrieval-only disposition and every
 prior blocked run ID are preserved unchanged.
+
+### Citation residency policy (P02 structural slice, 2026-08-26)
+
+The P02 structural slice split its three oversized test suites along
+behavioral seams: `src/test/components.test.tsx` and `src/test/synth.test.ts`
+were fully deleted into successor suites, while
+`src/test/publication-containment.test.ts` relocated 1260 lines and retained a
+slimmed CORE suite at the same path. Historical
+run-record citations in this log and in the remediation evidence files that
+name the former paths (`src/test/components.test.tsx`,
+`src/test/synth.test.ts`, `src/test/publication-containment.test.ts`) are
+retained verbatim by design: they record where evidence lived at the time each
+entry was written. Machine-readable current resolutions are provided as
+additive `semanticReferences` ledger fields pointing at successor titles, and
+the authoritative old-to-new suite map is
+`anchorEngineHardening.p02StructuralTestSplits` in `data/forensic-ledger.json`.
+Pointer-style fields must resolve to existing files; quoted historical text is
+never edited to satisfy resolution.

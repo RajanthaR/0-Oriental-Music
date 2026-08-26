@@ -885,7 +885,17 @@
         {
           "path": "src/test/components.test.tsx",
           "locator": "static quarantine regression",
-          "exactSection": "public EarTraining and Search UI contain no Roopak, Bhairav, Dadra, or Lawani claims; components.test.tsx:971 static quarantine regression; search-engine.test.ts:20 quarantined query regression"
+          "exactSection": "public EarTraining and Search UI contain no Roopak, Bhairav, Dadra, or Lawani claims; components.test.tsx:971 static quarantine regression; search-engine.test.ts:20 quarantined query regression",
+          "semanticReferences": [
+            {
+              "path": "src/test/quiz-static-containment.test.tsx",
+              "symbol": "tests: does not advertise quarantined Bhairav or Roopak claims in static public UI"
+            },
+            {
+              "path": "src/test/search-engine.test.ts",
+              "symbol": "tests: should not discover quarantined Bhairav or Roopak claims"
+            }
+          ]
         }
       ],
       "disposition": "remove quarantined static claims and regression-lock public UI copy independently of repository filtering",
@@ -943,7 +953,13 @@
         {
           "path": "src/test/components.test.tsx",
           "locator": "TalaVisualizer lifecycle and hydration regressions",
-          "exactSection": "Start/tick/Stop/Reset/audio-off/tala-change/unmount and co-mounted isolation are interaction-tested at components.test.tsx:182,261,286"
+          "exactSection": "Start/tick/Stop/Reset/audio-off/tala-change/unmount and co-mounted isolation are interaction-tested at components.test.tsx:182,261,286",
+          "semanticReferences": [
+            {
+              "path": "src/test/tala-visualizer.test.tsx",
+              "symbol": "tests: cancels playback on Reset, tala change, and unmount"
+            }
+          ]
         }
       ],
       "disposition": "replace global cancellation with caller-owned scheduling handles and regression-lock independent playback sessions",
@@ -1306,7 +1322,21 @@
         {
           "path": "src/test/components.test.tsx and src/test/synth.test.ts",
           "locator": "StrictMode lifecycle, unavailable-audio, and hostile-BPM regressions",
-          "exactSection": "caller-owned cancellation, deterministic hydration, localized fallback, and nonthrowing initialization"
+          "exactSection": "caller-owned cancellation, deterministic hydration, localized fallback, and nonthrowing initialization",
+          "semanticReferences": [
+            {
+              "path": "src/test/swara-detail-consumers.test.tsx",
+              "symbol": "tests: owns Swara playback across StrictMode replacement and unmount"
+            },
+            {
+              "path": "src/test/tala-visualizer.test.tsx",
+              "symbol": "tests: survives rapid StrictMode start-stop-start and reports unavailable Web Audio"
+            },
+            {
+              "path": "src/test/audio-context-failover.test.ts",
+              "symbol": "tests: fails Web Audio initialization closed without throwing and bounds hostile BPM"
+            }
+          ]
         }
       ],
       "disposition": "bound application tempo, make rhythm completion single-shot, return caller-owned readiness handles, and keep text/visual tools usable with localized feedback when Web Audio is unavailable",
@@ -2136,6 +2166,12 @@
         "artifact": "validator-11-rhythm-rerender-test.json",
         "test": "src/test/components.test.tsx:891",
         "fix": "complete latest-callback rhythm session regression",
+        "semanticReferences": [
+          {
+            "path": "src/test/rhythm-tap-game.test.tsx",
+            "symbol": "tests: keeps an active rhythm session when only the completion callback changes"
+          }
+        ],
         "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
       },
       {
@@ -2150,6 +2186,12 @@
         "artifact": "validator-13-synth-mock-restoration.json",
         "test": "src/test/synth.test.ts:57",
         "fix": "failure-safe AudioContext restoration",
+        "semanticReferences": [
+          {
+            "path": "src/test/audio-context-failover.test.ts",
+            "symbol": "tests: closes rejected AudioContexts and suppresses callbacks after cancellation"
+          }
+        ],
         "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
       },
       {
@@ -2812,6 +2854,46 @@
       "treeIdentityProof": "git rev-parse 82958795^{tree} equals git rev-parse a7fc94a^{tree} = 2c528b69577b223355a68ef68c311bf8192dc733, so the merge commit added no content beyond the reviewed branch head.",
       "supersession": "This entry supersedes any earlier prose or handoff that counted this slice as 10 non-merge commits, 27 changed files, or seven reviewer lenses. The auditable counts are exactly the 7 non-merge commits, 13 changed files, and 6 reviewer-lens artifacts enumerated above.",
       "modelAndProviderDisclosure": "The preserved review artifacts embed no model or provider identifiers for any reviewer or validator. No model or provider claim is recorded in this entry because none can be verified from repository evidence; only tool-skill coverage is provable from the artifact set."
+    },
+    "p02StructuralTestSplits": {
+      "completed": "P02 structural slice split three oversized test suites along behavioral seams; every it-block moved verbatim by line-range tooling and each successor suite's executed count equals its monolith predecessor's measured count (pre-split title manifests reconciled 1:1 against post-split suites: 76 publication-containment, 46 interactive-components, 28 synth-engine titles preserved)",
+      "splitCommits": [
+        {
+          "sha": "de053328cadd94444706d3227b821b5b9d73fc20",
+          "from": "src/test/publication-containment.test.ts (1260 relocated lines; slimmed CORE suite retained at the same path)",
+          "to": [
+            "src/test/publication-batch-boundary.test.ts",
+            "src/test/publication-contract-projections.test.ts",
+            "src/test/publication-evidence-containment.test.ts"
+          ]
+        },
+        {
+          "sha": "adf37c5434e8ce45fca7cf656ebf2f8ecf2ea47d",
+          "from": "src/test/components.test.tsx (1212 lines)",
+          "to": [
+            "src/test/pitch-detector.test.tsx",
+            "src/test/quiz-static-containment.test.tsx",
+            "src/test/rhythm-tap-game.test.tsx",
+            "src/test/swara-detail-consumers.test.tsx",
+            "src/test/tala-visualizer.test.tsx",
+            "src/test/support/audio-component-mocks.ts (shared pure fixture hoist)"
+          ]
+        },
+        {
+          "sha": "c708eeabeb3e168bdbd9e5ef138e69b466d342b1",
+          "from": "src/test/synth.test.ts (1044 lines)",
+          "to": [
+            "src/test/swara-synth-lifecycle.test.ts",
+            "src/test/tabla-plan-schedule.test.ts",
+            "src/test/audio-context-failover.test.ts"
+          ]
+        }
+      ],
+      "relatedStructuralCommit": {
+        "sha": "2809f2867a4023bf6c9f97e0187c9ecec565f73a",
+        "note": "eliminated both runtime import-cycle SCCs under src/lib via data/evaluation-context.ts leaf extraction and search/public-search-index.ts composition-root extraction; zero-tolerance layering pin in src/test/layering-guard.test.ts replaced the obsolete cyclic-order probes"
+      },
+      "accountingArtifact": "C:/tmp/swara-slice/p02-structural/post-split-all.manifest.txt (150 unique titles post-split vs per-suite pre-split manifests)"
     }
   }
 }

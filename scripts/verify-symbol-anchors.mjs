@@ -84,11 +84,11 @@ for (const anchor of anchors) {
   if (outcome.resolved) {
     ok += 1;
   } else {
-    console.log(`UNRESOLVED: ${anchor}`);
+    console.log(`UNRESOLVED: ${anchor}${outcome.reason ? ` (${outcome.reason})` : ""}`);
     bad += 1;
   }
 }
-console.log(`${ok} resolved, ${bad} unresolved`);
+console.log(`${ok} resolved, ${bad} unresolved (tier=${tier})`);
 // Fail the run when any cited anchor no longer resolves. This script gates
 // CI (see .github/workflows/ci.yml), so unresolved anchors must turn the
 // job red instead of printing a count nobody reads.

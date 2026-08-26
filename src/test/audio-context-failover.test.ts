@@ -47,38 +47,41 @@ describe("AudioContext Initialization, Replacement & Failure Atomicity", () => {
   it("closes rejected AudioContexts and suppresses callbacks after cancellation", async () => {
     const originalAudioContext = window.AudioContext;
     const close = vi.fn().mockResolvedValue(undefined);
-    class RejectingAudioContext {
-      state = "suspended";
-      currentTime = 0;
-      destination = {};
-      createGain() {
-        return {
-          gain: { setValueAtTime: vi.fn() },
-          connect: vi.fn(),
-        };
+    try {
+      class RejectingAudioContext {
+        state = "suspended";
+        currentTime = 0;
+        destination = {};
+        createGain() {
+          return {
+            gain: { setValueAtTime: vi.fn() },
+            connect: vi.fn(),
+          };
+        }
+        resume(): Promise<void> { return Promise.reject(new Error("blocked")); }
+        close() { return close(); }
       }
-      resume(): Promise<void> { return Promise.reject(new Error("blocked")); }
-      close() { return close(); }
-    }
-    Object.defineProperty(window, "AudioContext", { configurable: true, value: RejectingAudioContext });
-    await expect(new SwaraSynthEngine().playSwaraTone("S")).resolves.toBe(false);
-    await expect(new TablaSynthEngine().playBol("ධා").ready).resolves.toBe(false);
-    expect(close).toHaveBeenCalledTimes(2);
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: RejectingAudioContext });
+      await expect(new SwaraSynthEngine().playSwaraTone("S")).resolves.toBe(false);
+      await expect(new TablaSynthEngine().playBol("ධා").ready).resolves.toBe(false);
+      expect(close).toHaveBeenCalledTimes(2);
 
-    let releaseResume: (() => void) | undefined;
-    class DeferredAudioContext extends RejectingAudioContext {
-      resume() {
-        return new Promise<void>((resolve) => { releaseResume = resolve; });
+      let releaseResume: (() => void) | undefined;
+      class DeferredAudioContext extends RejectingAudioContext {
+        resume() {
+          return new Promise<void>((resolve) => { releaseResume = resolve; });
+        }
       }
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: DeferredAudioContext });
+      const unavailable = vi.fn();
+      const handle = new TablaSynthEngine().playBol("ධා", 500, unavailable);
+      handle();
+      releaseResume?.();
+      await expect(handle.ready).resolves.toBe(false);
+      expect(unavailable).not.toHaveBeenCalled();
+    } finally {
+      Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
     }
-    Object.defineProperty(window, "AudioContext", { configurable: true, value: DeferredAudioContext });
-    const unavailable = vi.fn();
-    const handle = new TablaSynthEngine().playBol("ධා", 500, unavailable);
-    handle();
-    releaseResume?.();
-    await expect(handle.ready).resolves.toBe(false);
-    expect(unavailable).not.toHaveBeenCalled();
-    Object.defineProperty(window, "AudioContext", { configurable: true, value: originalAudioContext });
   });
 
   it("rolls back partially constructed Swara and Tabla graphs", async () => {

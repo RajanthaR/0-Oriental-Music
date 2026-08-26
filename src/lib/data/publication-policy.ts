@@ -27,6 +27,10 @@ import {
 } from "@/lib/evidence/source-evidence";
 
 export { UNKNOWN_PROVENANCE } from "@/lib/shared/bounded-values";
+// Legacy/test-facing API shim: createPublicationEvaluationContext is defined
+// in ./evaluation-context and internal data-layer modules must import it
+// directly from there (zero-SCC layering pin). This re-export stays scoped
+// to external and test consumers pending their own migration slice.
 export { createPublicationEvaluationContext };
 export type { EvidenceQuality } from "@/lib/evidence/source-evidence";
 

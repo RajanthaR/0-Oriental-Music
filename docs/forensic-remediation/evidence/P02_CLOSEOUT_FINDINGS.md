@@ -456,3 +456,13 @@ All eight Talas remain whole-entity quarantined. No new musical fact,
 publisher, year, location, licence, organization, reviewer, review date, or
 publication state is invented. Original-PDF, diagram, notation, OCR, and SME
 boundaries remain unchanged. Disposition: **FIXED-PENDING-REREVIEW**.
+
+
+### Frozen citations note (P02 structural slice)
+
+Evidence tables above that cite `src/test/components.test.tsx` or
+`src/test/synth.test.ts` are historical run records kept verbatim by design.
+Current successor-suite resolutions live in the additive
+`semanticReferences` fields of `data/forensic-ledger.json` and in
+`anchorEngineHardening.p02StructuralTestSplits`; pointer-style ledger fields
+are existence-checked by tests, quoted history is never rewritten.

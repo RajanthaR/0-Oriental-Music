@@ -32,12 +32,12 @@ export interface SearchResultItem {
 
 /** One immutable public-catalog capture handed to the search engine per operation. */
 export interface PublicSearchCatalogs {
-  lessons: Lesson[];
-  ragas: Raga[];
-  talas: Tala[];
-  instruments: Instrument[];
-  glossary: GlossaryTerm[];
-  culturalTraditions: CulturalTradition[];
+  lessons: ReadonlyArray<Lesson>;
+  ragas: ReadonlyArray<Raga>;
+  talas: ReadonlyArray<Tala>;
+  instruments: ReadonlyArray<Instrument>;
+  glossary: ReadonlyArray<GlossaryTerm>;
+  culturalTraditions: ReadonlyArray<CulturalTradition>;
 }
 
 /**
@@ -144,12 +144,12 @@ function classifySearchQuery(query: unknown): SearchQueryClassification {
 }
 
 export function searchFilter<T>(
-  items: T[],
+  items: readonly T[],
   query: unknown,
   extractFields: (item: T) => string[]
 ): T[] {
   const classification = classifySearchQuery(query);
-  if (classification.kind === "featured") return items;
+  if (classification.kind === "featured") return [...items];
   if (classification.kind === "none") return [];
 
   return items.filter((item) => {
@@ -173,7 +173,7 @@ class SearchIndex {
     const classification = classifySearchQuery(query);
     if (classification.kind === "featured") {
       // Return top featured
-      const lessons = [...this.data.getFeaturedLessons()].slice(0, 4);
+      const lessons = this.data.getFeaturedLessons().slice(0, 4);
       return lessons.map((l) => ({
         id: l.id,
         type: "lesson" as const,
