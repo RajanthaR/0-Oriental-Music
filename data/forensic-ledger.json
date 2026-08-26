@@ -2774,6 +2774,44 @@
     "a2TestSplits": {
       "completed": "publication-parity.test.ts (998 lines) -> publication-parity.test.ts + tala-disposition-registry.test.ts + source-document-freshness.test.ts with shared support module src/test/support/publication-parity-fixtures.ts; every describe moved verbatim; suite total preserved (596 baseline -> 600 with the four new A1 fixtures)"
     },
-    "a3ConcurrencyDecision": "Six consecutive full-suite runs, all exit 0, zero reporter-RPC errors: maxWorkers 2 -> 101.8s/85.0s/89.6s; maxWorkers 4 -> 71.0s/56.9s/53.3s (~35% faster). The Vitest 3-era RPC failure does not reproduce under Vitest 4 at host concurrency; cap raised to 4 (= host logical CPUs; ubuntu-latest matches), rollback instruction recorded in vitest.config.ts comment."
+    "a3ConcurrencyDecision": "Six consecutive full-suite runs, all exit 0, zero reporter-RPC errors: maxWorkers 2 -> 101.8s/85.0s/89.6s; maxWorkers 4 -> 71.0s/56.9s/53.3s (~35% faster). The Vitest 3-era RPC failure does not reproduce under Vitest 4 at host concurrency; cap raised to 4 (= host logical CPUs; ubuntu-latest matches), rollback instruction recorded in vitest.config.ts comment.",
+    "pr9CloseoutAuthoritative": {
+      "status": "MERGED-VIA-PR-9",
+      "pullRequestUrl": "https://github.com/RajanthaR/0-Oriental-Music/pull/9",
+      "branch": "codex/anchor-engine-hardening",
+      "reviewRunId": "20260825-131500-hardening-c1",
+      "artifactDirectory": "C:/tmp/compound-engineering/ce-code-review/20260825-131500-hardening-c1",
+      "reviewBaseSha": "39ec9ab263f92ea73b8021192bbb7357491de407",
+      "reviewedHeadSha": "0a7921a3e71aaa88c5b6de11ff0cea3443890a2d",
+      "mergeCommitSha": "a7fc94ada0a0da103e3bc4b9d0cec8f347a9649a",
+      "nonMergeCommitCount": 7,
+      "nonMergeCommits": [
+        "fba33d269b301cb6616e1d94e20bb2f73694a72f",
+        "1b863e206d663b5e68e22d0d9ac54ba9c497f962",
+        "aee026d43f7da2b2df96cf21b4d48dca8994d895",
+        "9b78b9e643d65f2323125992523e33158b0945f1",
+        "0a7921a3e71aaa88c5b6de11ff0cea3443890a2d",
+        "e7b86aa4a53d46d9998d3c6ac1812d6a85d53722",
+        "82958795bba6b5f9ac7d8eea1752f2101cd76923"
+      ],
+      "changedFilesCount": 13,
+      "changedFilesProof": "git diff --name-only 39ec9ab263f92ea73b8021192bbb7357491de407..a7fc94ada0a0da103e3bc4b9d0cec8f347a9649a yields exactly 13 paths",
+      "reviewerLensCount": 6,
+      "reviewerLensArtifacts": [
+        "ce-adversarial.json",
+        "ce-correctness.json",
+        "ce-maintainability.json",
+        "ce-reliability.json",
+        "ce-security.json",
+        "ce-testing.json"
+      ],
+      "artifactValidation": {
+        "command": "node scripts/validate-review-artifacts.mjs \"C:/tmp/compound-engineering/ce-code-review/20260825-131500-hardening-c1\"",
+        "result": "review artifacts checked: 7 JSON files; all review artifacts parse cleanly with no duplicate keys"
+      },
+      "treeIdentityProof": "git rev-parse 82958795^{tree} equals git rev-parse a7fc94a^{tree} = 2c528b69577b223355a68ef68c311bf8192dc733, so the merge commit added no content beyond the reviewed branch head.",
+      "supersession": "This entry supersedes any earlier prose or handoff that counted this slice as 10 non-merge commits, 27 changed files, or seven reviewer lenses. The auditable counts are exactly the 7 non-merge commits, 13 changed files, and 6 reviewer-lens artifacts enumerated above.",
+      "modelAndProviderDisclosure": "The preserved review artifacts embed no model or provider identifiers for any reviewer or validator. No model or provider claim is recorded in this entry because none can be verified from repository evidence; only tool-skill coverage is provable from the artifact set."
+    }
   }
 }
