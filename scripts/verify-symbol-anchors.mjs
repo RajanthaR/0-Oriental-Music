@@ -48,11 +48,17 @@ for (const doc of docs) {
 
 // Extraction floor: a collapsed extraction (regex regression, renamed docs)
 // would otherwise print "0 resolved, 0 unresolved" and exit 0 — a vacuous
-// pass. The live corpus measures 230 at the definition tier; the floor is
-// set to 180 (~78% of live) so collapse or large-scale pruning turns the
-// gate red while tolerating legitimate consolidation.
-if (anchors.size < 180) {
-  console.log(`EXTRACTION COLLAPSE: only ${anchors.size} anchors extracted (expected >= 180)`);
+// pass. Ratchet evidence: the corpus measured 230 before the anchor-engine
+// hardening slice consolidated paraphrase citations into canonical full
+// titles (-39 loose forms, +27 complete titles), landing at 218 unique
+// anchors — and stayed at exactly 218 through the subsequent test-suite
+// splits and their citation repoints, at both definition and first-token
+// tiers. The floor therefore rises from 180 (~78% of live then) to 210
+// (~96% of live now): the post-consolidation corpus has no loose-form
+// redundancy left, so even small-scale pruning must turn the gate red
+// instead of passing under "legitimate consolidation".
+if (anchors.size < 210) {
+  console.log(`EXTRACTION COLLAPSE: only ${anchors.size} anchors extracted (expected >= 210)`);
   process.exitCode = 1;
 }
 
