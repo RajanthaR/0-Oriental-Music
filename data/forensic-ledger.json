@@ -69,7 +69,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-01.json",
         "test": {
           "path": "src/test/review-closeout.test.ts",
-          "symbol": "rejects every CMS status/published mismatch"
+          "symbol": "rejects every CMS status/published mismatch without changing raw state"
         },
         "fix": {
           "path": "src/lib/data/repository.ts",
@@ -85,7 +85,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-02.json",
         "test": {
           "path": "src/test/review-closeout.test.ts",
-          "symbol": "recomputes publication summaries"
+          "symbol": "recomputes publication summaries from current inputs without memoized identity"
         },
         "fix": {
           "path": "src/lib/data/repository.ts",
@@ -101,7 +101,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-03.json",
         "test": {
           "path": "src/test/source-metadata-consistency.test.ts",
-          "symbol": "unknown provenance representation"
+          "symbol": "uses the same unknown provenance representation in direct and repository source projections"
         },
         "fix": {
           "path": "src/lib/validation/content-contracts.ts",
@@ -117,7 +117,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-04.json",
         "test": {
           "path": "src/test/publication-containment.test.ts",
-          "symbol": "duplicate IDs"
+          "symbol": "fails publication batches closed for whitespace-normalized duplicate IDs"
         },
         "fix": {
           "path": "src/lib/data/publication-policy.ts",
@@ -133,7 +133,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-05.json",
         "test": {
           "path": "src/test/content-contracts.test.ts",
-          "symbol": "detached snapshot"
+          "symbol": "uses one detached snapshot for decision and public projection"
         },
         "fix": {
           "path": "src/lib/data/snapshot-capture.ts",
@@ -149,7 +149,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-06.json",
         "test": {
           "path": "src/test/review-closeout.test.ts",
-          "symbol": "fails closed for duplicate top-level IDs"
+          "symbol": "fails closed for duplicate top-level IDs across public list, lookup, and summary consumers"
         },
         "fix": {
           "path": "src/lib/data/publication-audit.ts",
@@ -165,7 +165,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-07.json",
         "test": {
           "path": "src/test/content-contracts.test.ts",
-          "symbol": "unknown or ambiguous kinds"
+          "symbol": "rejects unknown or ambiguous kinds and never publishes them"
         },
         "fix": {
           "path": "src/lib/validation/content-contracts.ts",
@@ -181,7 +181,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-08.json",
         "test": {
           "path": "src/test/publication-containment.test.ts",
-          "symbol": "identity containment"
+          "symbol": "rebuilds identity containment when a catalog mutates without changing length"
         },
         "fix": {
           "path": "src/lib/data/publication-policy.ts",
@@ -197,7 +197,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-09.json",
         "test": {
           "path": "src/test/content-validator.test.ts",
-          "symbol": "malformed tala fields"
+          "symbol": "returns validation issues instead of throwing on malformed tala fields"
         },
         "fix": {
           "path": "src/lib/data/publication-audit.ts",
@@ -213,7 +213,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-10.json",
         "test": {
           "path": "src/test/source-metadata-consistency.test.ts",
-          "symbol": "ambiguous extracted-document mappings"
+          "symbol": "rejects ambiguous extracted-document mappings"
         },
         "fix": {
           "path": "src/lib/data/publication-audit.ts",
@@ -229,7 +229,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-11.json",
         "test": {
           "path": "src/test/publication-containment.test.ts",
-          "symbol": "declarative %s dependency rule"
+          "symbol": "applies the declarative %s dependency rule to the publication decision"
         },
         "fix": {
           "path": "src/lib/data/dependency-rules.ts",
@@ -245,7 +245,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-12.json",
         "test": {
           "path": "src/test/source-metadata-consistency.test.ts",
-          "symbol": "ambiguous extracted-document mappings"
+          "symbol": "rejects ambiguous extracted-document mappings"
         },
         "fix": {
           "path": "src/lib/data/publication-audit.ts",
@@ -261,7 +261,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-13.json",
         "test": {
           "path": "src/test/review-closeout.test.ts",
-          "symbol": "resolves current musical-core anchors"
+          "symbol": "resolves current musical-core anchors by symbol and heading, not by nonblank line counts"
         },
         "fix": {
           "path": "src/test/review-closeout.test.ts",
@@ -277,7 +277,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-14.json",
         "test": {
           "path": "src/test/content-contracts.test.ts",
-          "symbol": "discriminator-compatible fields"
+          "symbol": "projects only discriminator-compatible fields for every renderable question variant"
         },
         "fix": {
           "path": "src/lib/validation/content-contracts.ts",
@@ -293,7 +293,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-15.json",
         "test": {
           "path": "src/test/quiz-runner.test.tsx",
-          "symbol": "duplicate question IDs"
+          "symbol": "renders a safe unavailable state for duplicate question IDs"
         },
         "fix": {
           "path": "src/components/quiz/QuizRunner.tsx",
@@ -309,7 +309,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-16.json",
         "test": {
           "path": "src/test/search-engine.test.ts",
-          "symbol": "normalized-empty controls"
+          "symbol": "keeps featured results for raw empty input but rejects normalized-empty controls"
         },
         "fix": {
           "path": "src/lib/search/search-engine.ts",
@@ -325,7 +325,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-17.json",
         "test": {
           "path": "src/test/components.test.tsx",
-          "symbol": "rhythm session"
+          "symbol": "keeps an active rhythm session when only the completion callback changes"
         },
         "fix": {
           "path": "src/components/audio/RhythmTapGame.tsx",
@@ -341,7 +341,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-18.json",
         "test": {
           "path": "src/test/components.test.tsx",
-          "symbol": "completed rhythm playback handles"
+          "symbol": "removes completed rhythm playback handles before reset"
         },
         "fix": {
           "path": "src/components/audio/TalaVisualizer.tsx",
@@ -357,7 +357,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-19.json",
         "test": {
           "path": "src/test/components.test.tsx",
-          "symbol": "stale Tala unavailable callbacks"
+          "symbol": "suppresses stale Tala unavailable callbacks after reset and replacement"
         },
         "fix": {
           "path": "src/components/audio/TalaVisualizer.tsx",
@@ -373,7 +373,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-20.json",
         "test": {
           "path": "src/test/components.test.tsx",
-          "symbol": "Tabla promises reject"
+          "symbol": "keeps RhythmTapGame playback ownership isolated when Tabla promises reject"
         },
         "fix": {
           "path": "src/lib/audio/tabla.ts",
@@ -389,7 +389,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/metadata.json authorizedAdditionalFindings",
         "test": {
           "path": "src/test/pitch.test.ts",
-          "symbol": "late stream"
+          "symbol": "stops a late stream when stopped while permission is pending"
         },
         "fix": {
           "path": "src/lib/audio/pitch.ts",
@@ -405,7 +405,7 @@
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/metadata.json authorizedAdditionalFindings",
         "test": {
           "path": "src/test/review-closeout.test.ts",
-          "symbol": "records the acceptance-hardening scope"
+          "symbol": "records the acceptance-hardening scope without rewriting blocked review history"
         },
         "fix": {
           "path": "AGENTS.md",

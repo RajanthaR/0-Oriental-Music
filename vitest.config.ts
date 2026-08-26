@@ -58,7 +58,7 @@ export default defineConfig({
     // they guarded against presented as a red build and their cost is
     // bounded. Standard ubuntu-latest runners are also 4-vCPU, so hosted CI
     // inherits the same scheduling envelope.
-    maxWorkers: 2,
+    maxWorkers: 4,
   },
   resolve: {
     alias: {

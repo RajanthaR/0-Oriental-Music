@@ -209,6 +209,12 @@ describe("Phase 2 final contract closeout", () => {
     expect(tableIds).toEqual([...ACCEPTANCE_HARDENING_FINDING_IDS]);
     const traceabilityRows = parseTraceabilityRows(exactTable ?? "");
 
+    // Quoted-symbol syntax (`path#"title, with commas"`) is the canonical
+    // document form for titles bearing extractor terminators (anchor-engine
+    // hardening slice). Ledger labels stay bare; comparison normalizes the
+    // document-side quotes away so both sides assert the same path#symbol.
+    const unquoteCell = (cell: string): string => cell.replace(/#"([^"]+)"/g, "#$1");
+
     for (const findingId of ACCEPTANCE_HARDENING_FINDING_IDS) {
       const entry = traceability[findingId];
       expect(entry, `${findingId} traceability`).toBeDefined();
@@ -218,7 +224,10 @@ describe("Phase 2 final contract closeout", () => {
       expectSemanticReference(entry.fix, `${findingId} fix`);
       expectSemanticReference(entry.anchor, `${findingId} anchor`);
       expect(closeout, `${findingId} closeout row`).toContain(`| \`${findingId}\` |`);
-      expect(traceabilityRows.get(findingId), `${findingId} exact traceability cells`).toEqual([
+      expect(
+        traceabilityRows.get(findingId)?.map(unquoteCell),
+        `${findingId} exact traceability cells`,
+      ).toEqual([
         entry.reviewEvidence.split("/").pop(),
         referenceLabel(entry.test, true),
         referenceLabel(entry.fix, false),
