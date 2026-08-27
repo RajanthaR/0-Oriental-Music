@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { canonicalCycleSet, cyclicModuleSets } from "./support/cycles";
-import { buildLibGraph } from "./support/lib-module-graph";
+import { buildLibGraph, runtimeEdgesFromSource } from "./support/lib-module-graph";
 
 /**
  * Layering guard: the runtime import graph under `src/lib` must contain zero
@@ -92,13 +92,14 @@ describe("module layering", () => {
    * carry no runtime bindings must not enter the graph, so a type-level
    * dependency can never be misreported as a runtime cycle.
    */
-  it("classifies type-only imports as non-runtime edges", async () => {
-    const { runtimeEdgesFromSource } = await import("./support/lib-module-graph");
+  it("classifies type-only imports as non-runtime edges", () => {
     const typeOnlyPair = [
       'import type { Raga } from "@/lib/types/content";',
       'import { type Lesson } from "@/lib/types/content";',
     ].join("\n");
-    expect(runtimeEdgesFromSource(typeOnlyPair).size).toBe(0);
+    expect(
+      runtimeEdgesFromSource(typeOnlyPair, "src/test/layering-guard.test.ts").size,
+    ).toBe(0);
 
     // The value form of the same specifier IS a runtime edge: flipping one
     // import back to a value import must produce an edge, proving the rule
@@ -106,9 +107,84 @@ describe("module layering", () => {
     const valueImport = [
       'import { repository } from "@/lib/data/repository";',
     ].join("\n");
-    expect(runtimeEdgesFromSource(valueImport)).toEqual(
-      new Set(["src/lib/data/repository.ts"]),
-    );
+    expect(
+      runtimeEdgesFromSource(valueImport, "src/test/layering-guard.test.ts"),
+    ).toEqual(new Set(["src/lib/data/repository.ts"]));
+
+    expect(
+      runtimeEdgesFromSource(
+        'export type { Raga } from "@/lib/types/content";',
+        "src/test/layering-guard.test.ts",
+      ),
+    ).toEqual(new Set());
+    expect(
+      runtimeEdgesFromSource(
+        'export { repository } from "@/lib/data/repository";',
+        "src/test/layering-guard.test.ts",
+      ),
+    ).toEqual(new Set(["src/lib/data/repository.ts"]));
+  });
+
+  it("resolves relative imports from the importing module", () => {
+    expect(
+      runtimeEdgesFromSource(
+        'import { resumeAudioContext } from "./context";',
+        "src/lib/audio/synth.ts",
+      ),
+    ).toEqual(new Set(["src/lib/audio/context.ts"]));
+
+    expect(
+      runtimeEdgesFromSource(
+        'import "./context";',
+        "src/lib/audio/synth.ts",
+      ),
+    ).toEqual(new Set(["src/lib/audio/context.ts"]));
+
+    expect(
+      runtimeEdgesFromSource(
+        'import type { AudioContextLike } from "./context";',
+        "src/lib/audio/synth.ts",
+      ),
+    ).toEqual(new Set());
+
+    expect(
+      runtimeEdgesFromSource(
+        'import { repository } from "../data/repository";',
+        "src/lib/audio/context.ts",
+      ),
+    ).toEqual(new Set(["src/lib/data/repository.ts"]));
+  });
+
+  it("detects a cycle made entirely from relative imports", () => {
+    const repository = "src/lib/data/repository.ts";
+    const context = "src/lib/audio/context.ts";
+    const relativeGraph = new Map([
+      [
+        repository,
+        runtimeEdgesFromSource('import { helper } from "../audio/context";', repository),
+      ],
+      [
+        context,
+        runtimeEdgesFromSource('import { helper } from "../data/repository";', context),
+      ],
+    ]);
+
+    expect(cyclicModuleSets(relativeGraph).map(canonicalCycleSet)).toEqual([
+      canonicalCycleSet([repository, context]),
+    ]);
+  });
+
+  it("ignores import-like text in comments and template literals", () => {
+    const nonCode = [
+      "/*",
+      'import "./context";',
+      "*/",
+      "const fixture = `",
+      'import "./context";',
+      "`;",
+    ].join("\n");
+
+    expect(runtimeEdgesFromSource(nonCode, "src/lib/audio/synth.ts")).toEqual(new Set());
   });
 });
 
