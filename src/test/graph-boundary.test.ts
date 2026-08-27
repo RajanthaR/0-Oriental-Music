@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { repository } from "@/lib/data/repository";
-import { searchIndex } from "@/lib/search/search-engine";
+import { searchIndex } from "@/lib/search/public-search-index";
 import ragasData from "@/data/ragas.json";
 import talasData from "@/data/talas.json";
 import {

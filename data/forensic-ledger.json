@@ -116,7 +116,7 @@
       "C3-04": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-04.json",
         "test": {
-          "path": "src/test/publication-containment.test.ts",
+          "path": "src/test/publication-batch-boundary.test.ts",
           "symbol": "fails publication batches closed for whitespace-normalized duplicate IDs"
         },
         "fix": {
@@ -180,15 +180,15 @@
       "C3-08": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-08.json",
         "test": {
-          "path": "src/test/publication-containment.test.ts",
+          "path": "src/test/publication-batch-boundary.test.ts",
           "symbol": "rebuilds identity containment when a catalog mutates without changing length"
         },
         "fix": {
-          "path": "src/lib/data/publication-policy.ts",
+          "path": "src/lib/data/evaluation-context.ts",
           "symbol": "createPublicationEvaluationContext"
         },
         "anchor": {
-          "path": "src/lib/data/publication-policy.ts",
+          "path": "src/lib/data/evaluation-context.ts",
           "symbol": "createPublicationEvaluationContext"
         },
         "disposition": "FIXED-PENDING-REREVIEW"
@@ -228,7 +228,7 @@
       "C3-11": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-11.json",
         "test": {
-          "path": "src/test/publication-containment.test.ts",
+          "path": "src/test/publication-contract-projections.test.ts",
           "symbol": "applies the declarative %s dependency rule to the publication decision"
         },
         "fix": {
@@ -324,7 +324,7 @@
       "C3-17": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-17.json",
         "test": {
-          "path": "src/test/components.test.tsx",
+          "path": "src/test/rhythm-tap-game.test.tsx",
           "symbol": "keeps an active rhythm session when only the completion callback changes"
         },
         "fix": {
@@ -340,7 +340,7 @@
       "C3-18": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-18.json",
         "test": {
-          "path": "src/test/components.test.tsx",
+          "path": "src/test/rhythm-tap-game.test.tsx",
           "symbol": "removes completed rhythm playback handles before reset"
         },
         "fix": {
@@ -356,7 +356,7 @@
       "C3-19": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-19.json",
         "test": {
-          "path": "src/test/components.test.tsx",
+          "path": "src/test/tala-visualizer.test.tsx",
           "symbol": "suppresses stale Tala unavailable callbacks after reset and replacement"
         },
         "fix": {
@@ -372,7 +372,7 @@
       "C3-20": {
         "reviewEvidence": "C:/tmp/compound-engineering/ce-code-review/20260816-191000-p02-final-contract-c3/validator-20.json",
         "test": {
-          "path": "src/test/components.test.tsx",
+          "path": "src/test/rhythm-tap-game.test.tsx",
           "symbol": "keeps RhythmTapGame playback ownership isolated when Tabla promises reject"
         },
         "fix": {
@@ -885,7 +885,17 @@
         {
           "path": "src/test/components.test.tsx",
           "locator": "static quarantine regression",
-          "exactSection": "public EarTraining and Search UI contain no Roopak, Bhairav, Dadra, or Lawani claims; components.test.tsx:971 static quarantine regression; search-engine.test.ts:20 quarantined query regression"
+          "exactSection": "public EarTraining and Search UI contain no Roopak, Bhairav, Dadra, or Lawani claims; components.test.tsx:971 static quarantine regression; search-engine.test.ts:20 quarantined query regression",
+          "semanticReferences": [
+            {
+              "path": "src/test/quiz-static-containment.test.tsx",
+              "symbol": "tests: does not advertise quarantined Bhairav or Roopak claims in static public UI"
+            },
+            {
+              "path": "src/test/search-engine.test.ts",
+              "symbol": "tests: should not discover quarantined Bhairav or Roopak claims"
+            }
+          ]
         }
       ],
       "disposition": "remove quarantined static claims and regression-lock public UI copy independently of repository filtering",
@@ -943,7 +953,13 @@
         {
           "path": "src/test/components.test.tsx",
           "locator": "TalaVisualizer lifecycle and hydration regressions",
-          "exactSection": "Start/tick/Stop/Reset/audio-off/tala-change/unmount and co-mounted isolation are interaction-tested at components.test.tsx:182,261,286"
+          "exactSection": "Start/tick/Stop/Reset/audio-off/tala-change/unmount and co-mounted isolation are interaction-tested at components.test.tsx:182,261,286",
+          "semanticReferences": [
+            {
+              "path": "src/test/tala-visualizer.test.tsx",
+              "symbol": "tests: cancels playback on Reset, tala change, and unmount"
+            }
+          ]
         }
       ],
       "disposition": "replace global cancellation with caller-owned scheduling handles and regression-lock independent playback sessions",
@@ -1306,7 +1322,21 @@
         {
           "path": "src/test/components.test.tsx and src/test/synth.test.ts",
           "locator": "StrictMode lifecycle, unavailable-audio, and hostile-BPM regressions",
-          "exactSection": "caller-owned cancellation, deterministic hydration, localized fallback, and nonthrowing initialization"
+          "exactSection": "caller-owned cancellation, deterministic hydration, localized fallback, and nonthrowing initialization",
+          "semanticReferences": [
+            {
+              "path": "src/test/swara-detail-consumers.test.tsx",
+              "symbol": "tests: owns Swara playback across StrictMode replacement and unmount"
+            },
+            {
+              "path": "src/test/tala-visualizer.test.tsx",
+              "symbol": "tests: survives rapid StrictMode start-stop-start and reports unavailable Web Audio"
+            },
+            {
+              "path": "src/test/audio-context-failover.test.ts",
+              "symbol": "tests: fails Web Audio initialization closed without throwing and bounds hostile BPM"
+            }
+          ]
         }
       ],
       "disposition": "bound application tempo, make rhythm completion single-shot, return caller-owned readiness handles, and keep text/visual tools usable with localized feedback when Web Audio is unavailable",
@@ -1343,7 +1373,7 @@
               "symbol": "tests: rejects both CMS publication entry points when raw metadata is synthesized or incomplete"
             },
             {
-              "path": "src/test/publication-containment.test.ts",
+              "path": "src/test/publication-contract-projections.test.ts",
               "symbol": "tests: rejects every required route-rendered Raga and Lesson shape"
             }
           ]
@@ -1527,7 +1557,7 @@
           "exactSection": "tests: cancels owned Swara tone and scale work on replacement and unmount; retains ready Swara ownership until finished on every direct-tone consumer",
           "semanticReferences": [
             {
-              "path": "src/test/components.test.tsx",
+              "path": "src/test/swara-detail-consumers.test.tsx",
               "symbol": "tests: cancels owned Swara tone and scale work on replacement and unmount; retains ready Swara ownership until finished on every direct-tone consumer"
             }
           ]
@@ -1538,7 +1568,7 @@
           "exactSection": "tests: returns idempotent Swara handles that stop active nodes; keeps a Swara owner until the voice cleanup actually finishes",
           "semanticReferences": [
             {
-              "path": "src/test/synth.test.ts",
+              "path": "src/test/swara-synth-lifecycle.test.ts",
               "symbol": "tests: returns idempotent Swara handles that stop active nodes; keeps a Swara owner until the voice cleanup actually finishes"
             }
           ]
@@ -2022,12 +2052,12 @@
         "symbol": "gradeScopeMatchesSource"
       },
       {
-        "path": "src/test/publication-containment.test.ts",
+        "path": "src/test/publication-contract-projections.test.ts",
         "symbol": "requires each public grade band to contain a grade established by its source"
       },
       {
-        "path": "src/test/components.test.tsx",
-        "symbol": "retains ready Swara ownership until finished"
+        "path": "src/test/swara-detail-consumers.test.tsx",
+        "symbol": "retains ready Swara ownership until finished on every direct-tone consumer"
       },
       {
         "path": "src/test/search-engine.test.ts",
@@ -2136,6 +2166,12 @@
         "artifact": "validator-11-rhythm-rerender-test.json",
         "test": "src/test/components.test.tsx:891",
         "fix": "complete latest-callback rhythm session regression",
+        "semanticReferences": [
+          {
+            "path": "src/test/rhythm-tap-game.test.tsx",
+            "symbol": "tests: keeps an active rhythm session when only the completion callback changes"
+          }
+        ],
         "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
       },
       {
@@ -2150,6 +2186,12 @@
         "artifact": "validator-13-synth-mock-restoration.json",
         "test": "src/test/synth.test.ts:57",
         "fix": "failure-safe AudioContext restoration",
+        "semanticReferences": [
+          {
+            "path": "src/test/audio-context-failover.test.ts",
+            "symbol": "tests: closes rejected AudioContexts and suppresses callbacks after cancellation"
+          }
+        ],
         "disposition": "FIXED-PENDING-ACCEPTANCE-REVIEW"
       },
       {
@@ -2191,7 +2233,7 @@
     "semanticTraceability": {
       "FA-V01": "src/lib/validation/content-validator.ts#validatePublicCollection",
       "FA-V03": "src/lib/validation/content-contracts.ts#safeOwnEntries",
-      "FA-V04": "src/lib/data/publication-policy.ts#createPublicationEvaluationContext",
+      "FA-V04": "src/lib/data/evaluation-context.ts#createPublicationEvaluationContext",
       "FA-V05": "src/lib/validation/content-validator.ts#validateMusicalCoreFieldDispositions",
       "FA-V06": "src/lib/audio/synth.ts#snapshotValidSwaraSequence",
       "FA-V07": "src/lib/audio/tabla.ts#planTablaBol",
@@ -2200,7 +2242,7 @@
       "FA-V10": "src/lib/data/repository.ts#CmsMutationResult",
       "FA-V11": "src/types/content.ts#AnswerOption",
       "FA-V14": "src/test/review-closeout.test.ts#records the acceptance-hardening scope without rewriting blocked review history",
-      "FA-V15": "src/test/synth.test.ts#settles Swara cleanup when clearTimeout throws",
+      "FA-V15": "src/test/swara-synth-lifecycle.test.ts#settles Swara cleanup when clearTimeout throws",
       "FA-V16": "src/lib/data/repository.ts#updateLessonReviewStatus",
       "FA-V17": "src/lib/data/publication-policy.ts#parseSourceLocator"
     },
@@ -2248,8 +2290,8 @@
     ],
     "semanticTraceability": {
       "AH-C1-V01": "src/test/swara-consumers.test.tsx#cancels a NotationArranger tone when its arranged item is removed",
-      "AH-C1-V02": "src/test/synth.test.ts#rolls back earlier Tabla timers when an immediate stroke callback fails",
-      "AH-C1-V03": "src/test/components.test.tsx#releases a Tala handle only after ready and finished settle",
+      "AH-C1-V02": "src/test/tabla-plan-schedule.test.ts#rolls back earlier Tabla timers when an immediate stroke callback fails",
+      "AH-C1-V03": "src/test/tala-visualizer.test.tsx#releases a Tala handle only after ready and finished settle",
       "AH-C1-V04": "src/test/pitch.test.ts#cleans the active graph when analyser sampling throws",
       "AH-C1-V05": "src/test/pitch.test.ts#releases an active session before installing a replacement",
       "AH-C1-V06": "src/lib/data/publication-policy.ts#toPublicationInput",
@@ -2336,12 +2378,12 @@
       "AH-C2-V04": "src/test/content-validator.test.ts#accepts a valid aggregate Quiz that carries no direct source reference",
       "AH-C2-V05": "src/test/swara-consumers.test.tsx#continues EarTraining cleanup after Next, replacement, and unmount cancellations throw",
       "AH-C2-V06": "src/test/swara-consumers.test.tsx#clears every remaining instrument timer when an owned Tabla cancellation throws",
-      "AH-C2-V07": "src/test/synth.test.ts#fails closed for the prototype-key Tabla bol %s without throwing",
+      "AH-C2-V07": "src/test/tabla-plan-schedule.test.ts#fails closed for the prototype-key Tabla bol %s without throwing",
       "AH-C2-V08": "src/test/tala-disposition-registry.test.ts#makes the evaluation context unsafe for a verified-looking registry with %s",
       "AH-C2-V09": "src/test/graph-boundary.test.ts#traverses %s alone but fails the combined catalog closed without throwing",
       "AH-C2-V10": "src/test/source-document-freshness.test.ts#refreshes every consumer when only the source-document reviewStatus changes",
       "AH-C2-R01": "src/test/pitch.test.ts#releases an active session when stream.getTracks() throws on stop",
-      "AH-C2-R02": "src/test/synth.test.ts#cannot strand Tabla playback ownership when a timer callback registers synchronously",
+      "AH-C2-R02": "src/test/tabla-plan-schedule.test.ts#cannot strand Tabla playback ownership when a timer callback registers synchronously",
       "AH-C2-R03": "src/test/graph-boundary.test.ts#withholds %s from every public surface",
       "AH-C2-R04": "src/test/sources-page.test.tsx#renders the extracted-corpus counts while the corpus is certifiable",
       "AH-C2-R05": "src/test/audio-cleanup.test.ts#cancels every owned handle even when an earlier cancellation throws",
@@ -2424,7 +2466,7 @@
       "AH-C3-P1-12": "src/lib/evidence/disposition-registry.ts#unclosedRequiredFields",
       "AH-C3-P1-13": "src/lib/audio/cleanup.ts#runIsolatedCleanup diagnostics",
       "AH-C3-P1-14": "src/app/instruments/page.tsx#Aerophone category term",
-      "AH-C3-P1-15": "src/test/publication-containment.test.ts#dependency matrix Map"
+      "AH-C3-P1-15": "src/test/publication-contract-projections.test.ts#\"declares the complete blocking and nonblocking dependency matrix\""
     },
     "fixSymbols": {
       "AH-C3-P0-01": "src/lib/data/repository.ts#getSources",
@@ -2774,6 +2816,84 @@
     "a2TestSplits": {
       "completed": "publication-parity.test.ts (998 lines) -> publication-parity.test.ts + tala-disposition-registry.test.ts + source-document-freshness.test.ts with shared support module src/test/support/publication-parity-fixtures.ts; every describe moved verbatim; suite total preserved (596 baseline -> 600 with the four new A1 fixtures)"
     },
-    "a3ConcurrencyDecision": "Six consecutive full-suite runs, all exit 0, zero reporter-RPC errors: maxWorkers 2 -> 101.8s/85.0s/89.6s; maxWorkers 4 -> 71.0s/56.9s/53.3s (~35% faster). The Vitest 3-era RPC failure does not reproduce under Vitest 4 at host concurrency; cap raised to 4 (= host logical CPUs; ubuntu-latest matches), rollback instruction recorded in vitest.config.ts comment."
+    "a3ConcurrencyDecision": "Six consecutive full-suite runs, all exit 0, zero reporter-RPC errors: maxWorkers 2 -> 101.8s/85.0s/89.6s; maxWorkers 4 -> 71.0s/56.9s/53.3s (~35% faster). The Vitest 3-era RPC failure does not reproduce under Vitest 4 at host concurrency; cap raised to 4 (= host logical CPUs; ubuntu-latest matches), rollback instruction recorded in vitest.config.ts comment.",
+    "pr9CloseoutAuthoritative": {
+      "status": "MERGED-VIA-PR-9",
+      "pullRequestUrl": "https://github.com/RajanthaR/0-Oriental-Music/pull/9",
+      "branch": "codex/anchor-engine-hardening",
+      "reviewRunId": "20260825-131500-hardening-c1",
+      "artifactDirectory": "C:/tmp/compound-engineering/ce-code-review/20260825-131500-hardening-c1",
+      "reviewBaseSha": "39ec9ab263f92ea73b8021192bbb7357491de407",
+      "reviewedHeadSha": "0a7921a3e71aaa88c5b6de11ff0cea3443890a2d",
+      "mergeCommitSha": "a7fc94ada0a0da103e3bc4b9d0cec8f347a9649a",
+      "nonMergeCommitCount": 7,
+      "nonMergeCommits": [
+        "fba33d269b301cb6616e1d94e20bb2f73694a72f",
+        "1b863e206d663b5e68e22d0d9ac54ba9c497f962",
+        "aee026d43f7da2b2df96cf21b4d48dca8994d895",
+        "9b78b9e643d65f2323125992523e33158b0945f1",
+        "0a7921a3e71aaa88c5b6de11ff0cea3443890a2d",
+        "e7b86aa4a53d46d9998d3c6ac1812d6a85d53722",
+        "82958795bba6b5f9ac7d8eea1752f2101cd76923"
+      ],
+      "changedFilesCount": 13,
+      "changedFilesProof": "git diff --name-only 39ec9ab263f92ea73b8021192bbb7357491de407..a7fc94ada0a0da103e3bc4b9d0cec8f347a9649a yields exactly 13 paths",
+      "reviewerLensCount": 6,
+      "reviewerLensArtifacts": [
+        "ce-adversarial.json",
+        "ce-correctness.json",
+        "ce-maintainability.json",
+        "ce-reliability.json",
+        "ce-security.json",
+        "ce-testing.json"
+      ],
+      "artifactValidation": {
+        "command": "node scripts/validate-review-artifacts.mjs \"C:/tmp/compound-engineering/ce-code-review/20260825-131500-hardening-c1\"",
+        "result": "review artifacts checked: 7 JSON files; all review artifacts parse cleanly with no duplicate keys"
+      },
+      "treeIdentityProof": "git rev-parse 82958795^{tree} equals git rev-parse a7fc94a^{tree} = 2c528b69577b223355a68ef68c311bf8192dc733, so the merge commit added no content beyond the reviewed branch head.",
+      "supersession": "This entry supersedes any earlier prose or handoff that counted this slice as 10 non-merge commits, 27 changed files, or seven reviewer lenses. The auditable counts are exactly the 7 non-merge commits, 13 changed files, and 6 reviewer-lens artifacts enumerated above.",
+      "modelAndProviderDisclosure": "The preserved review artifacts embed no model or provider identifiers for any reviewer or validator. No model or provider claim is recorded in this entry because none can be verified from repository evidence; only tool-skill coverage is provable from the artifact set."
+    },
+    "p02StructuralTestSplits": {
+      "completed": "P02 structural slice split three oversized test suites along behavioral seams; every it-block moved verbatim by line-range tooling and each successor suite's executed count equals its monolith predecessor's measured count (pre-split title manifests reconciled 1:1 against post-split suites: 76 publication-containment, 46 interactive-components, 28 synth-engine titles preserved)",
+      "splitCommits": [
+        {
+          "sha": "de053328cadd94444706d3227b821b5b9d73fc20",
+          "from": "src/test/publication-containment.test.ts (1260 relocated lines; slimmed CORE suite retained at the same path)",
+          "to": [
+            "src/test/publication-batch-boundary.test.ts",
+            "src/test/publication-contract-projections.test.ts",
+            "src/test/publication-evidence-containment.test.ts"
+          ]
+        },
+        {
+          "sha": "adf37c5434e8ce45fca7cf656ebf2f8ecf2ea47d",
+          "from": "src/test/components.test.tsx (1212 lines)",
+          "to": [
+            "src/test/pitch-detector.test.tsx",
+            "src/test/quiz-static-containment.test.tsx",
+            "src/test/rhythm-tap-game.test.tsx",
+            "src/test/swara-detail-consumers.test.tsx",
+            "src/test/tala-visualizer.test.tsx",
+            "src/test/support/audio-component-mocks.ts (shared pure fixture hoist)"
+          ]
+        },
+        {
+          "sha": "c708eeabeb3e168bdbd9e5ef138e69b466d342b1",
+          "from": "src/test/synth.test.ts (1044 lines)",
+          "to": [
+            "src/test/swara-synth-lifecycle.test.ts",
+            "src/test/tabla-plan-schedule.test.ts",
+            "src/test/audio-context-failover.test.ts"
+          ]
+        }
+      ],
+      "relatedStructuralCommit": {
+        "sha": "2809f2867a4023bf6c9f97e0187c9ecec565f73a",
+        "note": "eliminated both runtime import-cycle SCCs under src/lib via data/evaluation-context.ts leaf extraction and search/public-search-index.ts composition-root extraction; zero-tolerance layering pin in src/test/layering-guard.test.ts replaced the obsolete cyclic-order probes"
+      },
+      "accountingArtifact": "C:/tmp/swara-slice/p02-structural/post-split-all.manifest.txt (150 unique titles post-split vs per-suite pre-split manifests)"
+    }
   }
 }
