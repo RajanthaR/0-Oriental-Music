@@ -94,8 +94,8 @@ describe("module layering", () => {
    */
   it("classifies type-only imports as non-runtime edges", () => {
     const typeOnlyPair = [
-      'import type { Raga } from "@/lib/types/content";',
-      'import { type Lesson } from "@/lib/types/content";',
+      'import type { Raga } from "@/types/content";',
+      'import { type Lesson } from "@/types/content";',
     ].join("\n");
     expect(
       runtimeEdgesFromSource(typeOnlyPair, "src/test/layering-guard.test.ts").size,
@@ -105,15 +105,15 @@ describe("module layering", () => {
     // import back to a value import must produce an edge, proving the rule
     // distinguishes the two rather than dropping all imports of that module.
     const valueImport = [
-      'import { repository } from "@/lib/data/repository";',
+      'import { Raga } from "@/types/content";',
     ].join("\n");
     expect(
       runtimeEdgesFromSource(valueImport, "src/test/layering-guard.test.ts"),
-    ).toEqual(new Set(["src/lib/data/repository.ts"]));
+    ).toEqual(new Set(["src/types/content.ts"]));
 
     expect(
       runtimeEdgesFromSource(
-        'export type { Raga } from "@/lib/types/content";',
+        'export type { Raga } from "@/types/content";',
         "src/test/layering-guard.test.ts",
       ),
     ).toEqual(new Set());
