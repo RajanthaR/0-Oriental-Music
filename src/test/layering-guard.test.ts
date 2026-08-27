@@ -155,6 +155,17 @@ describe("module layering", () => {
     ).toEqual(new Set(["src/lib/data/repository.ts"]));
   });
 
+  it("keeps live relative audio imports in the module graph", () => {
+    const context = "src/lib/audio/context.ts";
+    for (const consumer of [
+      "src/lib/audio/synth.ts",
+      "src/lib/audio/tabla.ts",
+      "src/lib/audio/tanpura.ts",
+    ]) {
+      expect(graph.get(consumer)).toContain(context);
+    }
+  });
+
   it("detects a cycle made entirely from relative imports", () => {
     const repository = "src/lib/data/repository.ts";
     const context = "src/lib/audio/context.ts";
