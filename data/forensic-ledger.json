@@ -2856,7 +2856,7 @@
       "modelAndProviderDisclosure": "The preserved review artifacts embed no model or provider identifiers for any reviewer or validator. No model or provider claim is recorded in this entry because none can be verified from repository evidence; only tool-skill coverage is provable from the artifact set."
     },
     "p02StructuralTestSplits": {
-      "completed": "P02 structural slice split three oversized test suites along behavioral seams; every it-block moved verbatim by line-range tooling and each successor suite's executed count equals its monolith predecessor's measured count (pre-split title manifests reconciled 1:1 against post-split suites: 76 publication-containment, 46 interactive-components, 28 synth-engine titles preserved)",
+      "completed": "P02 structural slice split three oversized test suites along behavioral seams; all it-block titles and executed counts were preserved 1:1 by line-range tooling, with one intentional test-body hardening during the split: the AudioContext rejection/cancellation test now wraps global AudioContext replacement in try/finally restoration. All other it-blocks moved verbatim, and successor suite counts equal their monolith predecessors (pre-split title manifests reconciled 1:1: 76 publication-containment, 46 interactive-components, 28 synth-engine titles preserved)",
       "splitCommits": [
         {
           "sha": "de053328cadd94444706d3227b821b5b9d73fc20",

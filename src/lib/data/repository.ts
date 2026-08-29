@@ -35,6 +35,7 @@ import learningPathsData from "@/data/learning-paths.json";
 import quizzesData from "@/data/quizzes.json";
 import examPapersData from "@/data/exam-papers.json";
 import { searchFilter, type PublicSearchCatalogs } from "@/lib/search/search-engine";
+export type { PublicSearchCatalogs } from "@/lib/search/search-engine";
 import { createPublicationEvaluationContext } from "@/lib/data/evaluation-context";
 import {
   getRecordPublicationDecision,

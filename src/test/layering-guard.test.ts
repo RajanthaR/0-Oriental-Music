@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import type { PublicSearchCatalogs as RepositoryPublicSearchCatalogs } from "@/lib/data/repository";
+import type { PublicSearchCatalogs as EnginePublicSearchCatalogs } from "@/lib/search/search-engine";
 import { canonicalCycleSet, cyclicModuleSets } from "./support/cycles";
 import { buildLibGraph, runtimeEdgesFromSource } from "./support/lib-module-graph";
 
@@ -30,6 +32,12 @@ import { buildLibGraph, runtimeEdgesFromSource } from "./support/lib-module-grap
 describe("module layering", () => {
   const graph = buildLibGraph();
   const cyclicSets = cyclicModuleSets(graph).map((set) => canonicalCycleSet(set));
+
+  it("preserves the repository search-catalog type compatibility export", () => {
+    const repositoryCatalogs = null as unknown as RepositoryPublicSearchCatalogs;
+    const engineCatalogs: EnginePublicSearchCatalogs = repositoryCatalogs;
+    expect(engineCatalogs).toBe(repositoryCatalogs);
+  });
 
   it("has no runtime import cycle crossing the data/validation boundary", () => {
     const crossLayer = cyclicModuleSets(graph)
@@ -94,8 +102,8 @@ describe("module layering", () => {
    */
   it("classifies type-only imports as non-runtime edges", () => {
     const typeOnlyPair = [
-      'import type { Raga } from "@/types/content";',
-      'import { type Lesson } from "@/types/content";',
+      'import type { CurriculumStrandId } from "@/lib/data/curriculum-strands";',
+      'import { type StrandInfo } from "@/lib/data/curriculum-strands";',
     ].join("\n");
     expect(
       runtimeEdgesFromSource(typeOnlyPair, "src/test/layering-guard.test.ts").size,
@@ -105,15 +113,15 @@ describe("module layering", () => {
     // import back to a value import must produce an edge, proving the rule
     // distinguishes the two rather than dropping all imports of that module.
     const valueImport = [
-      'import { Raga } from "@/types/content";',
+      'import { CURRICULUM_STRANDS } from "@/lib/data/curriculum-strands";',
     ].join("\n");
     expect(
       runtimeEdgesFromSource(valueImport, "src/test/layering-guard.test.ts"),
-    ).toEqual(new Set(["src/types/content.ts"]));
+    ).toEqual(new Set(["src/lib/data/curriculum-strands.ts"]));
 
     expect(
       runtimeEdgesFromSource(
-        'export type { Raga } from "@/types/content";',
+        'export type { CurriculumStrandId } from "@/lib/data/curriculum-strands";',
         "src/test/layering-guard.test.ts",
       ),
     ).toEqual(new Set());
