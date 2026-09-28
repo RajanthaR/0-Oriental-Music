@@ -34,11 +34,12 @@ import glossaryData from "@/data/glossary.json";
 import learningPathsData from "@/data/learning-paths.json";
 import quizzesData from "@/data/quizzes.json";
 import examPapersData from "@/data/exam-papers.json";
-import { searchFilter } from "@/lib/search/search-engine";
+import { searchFilter, type PublicSearchCatalogs } from "@/lib/search/search-engine";
+export type { PublicSearchCatalogs } from "@/lib/search/search-engine";
+import { createPublicationEvaluationContext } from "@/lib/data/evaluation-context";
 import {
   getRecordPublicationDecision,
   evaluatePublicationBatch,
-  createPublicationEvaluationContext,
   getPublicationCatalogRawCount,
   getSourceDocumentSummary,
   UNKNOWN_PROVENANCE,
@@ -177,15 +178,6 @@ function cmsFailure(reasonCode: CmsMutationReasonCode, decision?: PublicationDec
 
 function cmsSuccess(): CmsMutationResult {
   return { ok: true, reasonCode: "updated" };
-}
-
-export interface PublicSearchCatalogs {
-  lessons: Lesson[];
-  ragas: Raga[];
-  talas: Tala[];
-  instruments: Instrument[];
-  glossary: GlossaryTerm[];
-  culturalTraditions: CulturalTradition[];
 }
 
 export type LessonVisibility = "public" | "review";

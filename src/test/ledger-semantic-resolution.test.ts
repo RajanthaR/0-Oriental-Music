@@ -130,4 +130,51 @@ describe("forensic-ledger semanticReferences resolve semantically (A4)", () => {
     expect(checked, "tokens checked").toBeGreaterThanOrEqual(20);
     expect(failures, `Unresolved semantic anchor tokens (A4):\n${failures.join("\n")}`).toEqual([]);
   });
+
+  it("requires current-resolution metadata wherever deleted suite paths are cited", () => {
+    // Basenames removed from src/test by later splits. Any ledger object that
+    // still points AT one through a citation-shaped key ("path"/"test") must
+    // provide additive semanticReferences resolving to a live successor.
+    // Note: publication-containment.test.ts was SPLIT, not deleted — its
+    // slimmed CORE suite remains a live citation target, so it is excluded
+    // here deliberately. Prose quotes and dedicated provenance records
+    // ("from"/"completed" fields) legitimately keep historical wording and
+    // carry no pointer keys, so they stay verbatim by design — see
+    // FORENSIC_CORRECTION_LOG.md "Citation residency policy".
+    const DELETED_SUITE_BASENAMES = [
+      "components.test.tsx",
+      "synth.test.ts",
+    ];
+    const CITATION_KEYS = ["path", "test"] as const;
+
+    const ledger = readLedger();
+    const unresovedPointers: string[] = [];
+    let covered = 0;
+    const walk = (node: unknown): void => {
+      if (Array.isArray(node)) {
+        node.forEach(walk);
+        return;
+      }
+      if (!node || typeof node !== "object") return;
+      const record = node as Record<string, unknown>;
+      for (const key of CITATION_KEYS) {
+        const value = record[key];
+        if (typeof value !== "string") continue;
+        if (!DELETED_SUITE_BASENAMES.some((name) => value.includes(name))) continue;
+        if (!Array.isArray(record.semanticReferences) || record.semanticReferences.length === 0) {
+          unresovedPointers.push(`${key}: ${value}`);
+          continue;
+        }
+        covered += 1;
+      }
+      Object.values(record).forEach(walk);
+    };
+    walk(ledger);
+
+    expect(
+      unresovedPointers,
+      `Deleted-suite citations lacking semanticReferences resolutions:\n${unresovedPointers.join("\n")}`,
+    ).toEqual([]);
+    expect(covered, "resolved deleted-suite pointers").toBeGreaterThanOrEqual(5);
+  });
 });

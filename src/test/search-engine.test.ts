@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { searchFilter, searchIndex, normalizeSinhalaText } from "@/lib/search/search-engine";
+// searchFilter/normalization come from the repository-free engine; the default
+// index is constructed at the repository-facing composition layer.
+import { searchFilter, normalizeSinhalaText } from "@/lib/search/search-engine";
+import { searchIndex } from "@/lib/search/public-search-index";
 import { repository } from "@/lib/data/repository";
 
 describe("Search Engine & Sinhala Normalizer Suite", () => {

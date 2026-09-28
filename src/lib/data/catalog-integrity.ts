@@ -7,9 +7,9 @@ import quizzesData from "@/data/quizzes.json";
 import terminologyData from "../../../data/terminology-si.json";
 import {
   evaluatePublicationBatch,
-  createPublicationEvaluationContext,
   getRecordPublicationDecision,
 } from "@/lib/data/publication-policy";
+import { createPublicationEvaluationContext } from "@/lib/data/evaluation-context";
 import { planTablaBol } from "@/lib/audio/tabla";
 import { isSafePracticeBpm } from "@/lib/audio/tempo";
 import {

@@ -216,13 +216,13 @@ import type { SourceReference } from "@/types/content";
 import {
   evaluateSourceReference,
   evaluatePublicationBatch,
-  createPublicationEvaluationContext,
   getRecordPublicationDecision,
   UNKNOWN_PROVENANCE,
   type PublicationCatalogInputs,
   type PublicationDecision,
   type PublicationEvaluationContext,
 } from "@/lib/data/publication-policy";
+import { createPublicationEvaluationContext } from "@/lib/data/evaluation-context";
 import { repository } from "@/lib/data/repository";
 import sourcesData from "@/data/sources.json";
 import lessonsData from "@/data/lessons.json";
