@@ -178,6 +178,48 @@ function parseTraceabilityRows(markdown: string): Map<string, string[]> {
 }
 
 describe("Phase 2 final contract closeout", () => {
+  it("owns the PR10 phase evidence and distinguishes the PR9 review and merge trees", () => {
+    const ledger = JSON.parse(readWorkspaceFile("data/forensic-ledger.json")) as Record<string, unknown>;
+    const correctionLog = readWorkspaceFile("docs/FORENSIC_CORRECTION_LOG.md");
+    const phase = ledger.p02RuntimeCyclesAndTestStructure as Record<string, unknown>;
+    const anchorHardening = ledger.anchorEngineHardening as Record<string, unknown>;
+    const pr9 = anchorHardening.pr9CloseoutAuthoritative as Record<string, unknown>;
+    const correction = pr9.postReviewCorrection as Record<string, unknown>;
+
+    expect(phase.branch).toBe("codex/p02-runtime-cycles-and-test-structure");
+    expect(phase.base).toBe("a7fc94ada0a0da103e3bc4b9d0cec8f347a9649a");
+    expect(phase.pullRequestUrl).toBe("https://github.com/RajanthaR/0-Oriental-Music/pull/10");
+    expect(phase.supervisorReviewFixCommits).toEqual([
+      "0a456fa1546e1acc55008bd4fe0b9834613a19dc",
+      "a2b70f42d78a65d4c4dfd61aef6953ad8d5a0b39",
+      "05d9a3f0451165d8a91d7bac8bd1ea9a9fc2f173",
+      "ff2e26608e695f093276f3ee831feae431b6d916",
+    ]);
+    expect(phase.trackedEvidenceStatus).toBe(
+      "PHASE-OWNED-RECORD-ESTABLISHED-PENDING-EXACT-HEAD-REREVIEW",
+    );
+
+    const reviewHistory = phase.reviewHistory as Array<Record<string, unknown>>;
+    expect(reviewHistory.map((run) => run.runId)).toEqual([
+      "20260826-23562f6-p02-structural-c2",
+      "20260829-acceptance-05d9a3f",
+      "20260829-acceptance2-ff2e266",
+    ]);
+    expect(
+      reviewHistory.every(
+        (run) => String(run.status).includes("NOT-ACCEPTANCE") || run.status === "HISTORICAL-INVALID",
+      ),
+    ).toBe(true);
+
+    expect(correction.reviewRunHead).toBe("0a7921a3e71aaa88c5b6de11ff0cea3443890a2d");
+    expect(correction.reviewRunHeadTree).toBe("170cf87c8ec633728fd78563b1fc0e1d10c12a7c");
+    expect(correction.finalBranchHead).toBe("82958795bba6b5f9ac7d8eea1752f2101cd76923");
+    expect(correction.mergeTipTree).toBe("2c528b69577b223355a68ef68c311bf8192dc733");
+    expect(correction.exactHeadRereviewEvidence).toContain("No preserved artifact");
+    expect(correctionLog).toContain("PR #10 phase evidence ownership");
+    expect(correctionLog).toContain("does not prove");
+  });
+
   it("records the acceptance-hardening scope without rewriting blocked review history", () => {
     const agents = readWorkspaceFile("AGENTS.md");
     const closeout = readWorkspaceFile("docs/forensic-remediation/evidence/P02_CLOSEOUT_FINDINGS.md");

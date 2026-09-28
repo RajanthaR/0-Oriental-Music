@@ -280,3 +280,25 @@ the authoritative old-to-new suite map is
 `anchorEngineHardening.p02StructuralTestSplits` in `data/forensic-ledger.json`.
 Pointer-style fields must resolve to existing files; quoted historical text is
 never edited to satisfy resolution.
+
+### PR #10 phase evidence ownership and PR #9 review-head correction (2026-08-29)
+
+The runtime-cycle and test-structure follow-up now owns an append-only tracked
+record at data/forensic-ledger.json#p02RuntimeCyclesAndTestStructure.
+The earlier anchorEngineHardening.p02StructuralTestSplits child remains the
+authoritative suite-relocation map, but it is not a substitute for PR #10's
+branch, base, commit, review, validator, verification, residual-risk, and
+delivery-boundary evidence.
+
+The PR #9 closeout record also now carries an additive correction at
+`data/forensic-ledger.json#postReviewCorrection`.
+Review run 20260825-131500-hardening-c1 is pinned to head 0a7921a; commits
+e7b86aa and 8295879 changed four paths afterward. Branch head 8295879
+and merge commit a7fc94a have the same tree, but that identity does not prove
+the merge tree equals the recorded review-run head tree. No historical run,
+verdict, or artifact is rewritten by this correction.
+
+The phase-owned record deliberately leaves exact final acceptance, browser QA,
+pushed PR head, and hosted checks to the final immutable handoff and PR body:
+those values do not exist until after the record's own commit is reviewed and
+therefore cannot be self-referenced truthfully in that commit.

@@ -2853,7 +2853,36 @@
       },
       "treeIdentityProof": "git rev-parse 82958795^{tree} equals git rev-parse a7fc94a^{tree} = 2c528b69577b223355a68ef68c311bf8192dc733, so the merge commit added no content beyond the reviewed branch head.",
       "supersession": "This entry supersedes any earlier prose or handoff that counted this slice as 10 non-merge commits, 27 changed files, or seven reviewer lenses. The auditable counts are exactly the 7 non-merge commits, 13 changed files, and 6 reviewer-lens artifacts enumerated above.",
-      "modelAndProviderDisclosure": "The preserved review artifacts embed no model or provider identifiers for any reviewer or validator. No model or provider claim is recorded in this entry because none can be verified from repository evidence; only tool-skill coverage is provable from the artifact set."
+      "modelAndProviderDisclosure": "The preserved review artifacts embed no model or provider identifiers for any reviewer or validator. No model or provider claim is recorded in this entry because none can be verified from repository evidence; only tool-skill coverage is provable from the artifact set.",
+      "postReviewCorrection": {
+        "status": "HISTORICAL-CORRECTION-RECORDED-BY-PR10",
+        "reviewRunHead": "0a7921a3e71aaa88c5b6de11ff0cea3443890a2d",
+        "reviewRunHeadTree": "170cf87c8ec633728fd78563b1fc0e1d10c12a7c",
+        "postReviewCommits": [
+          {
+            "sha": "e7b86aa4a53d46d9998d3c6ac1812d6a85d53722",
+            "role": "fix(review): apply validated hardening-slice review findings",
+            "changedPaths": [
+              "src/test/anchor-resolution-fixtures.test.ts",
+              "src/test/review-closeout.test.ts",
+              "vitest.config.ts"
+            ]
+          },
+          {
+            "sha": "82958795bba6b5f9ac7d8eea1752f2101cd76923",
+            "role": "docs(ledger): record anchor-engine hardening slice evidence",
+            "changedPaths": [
+              "data/forensic-ledger.json"
+            ]
+          }
+        ],
+        "postReviewChangedPathCount": 4,
+        "finalBranchHead": "82958795bba6b5f9ac7d8eea1752f2101cd76923",
+        "mergeCommit": "a7fc94ada0a0da103e3bc4b9d0cec8f347a9649a",
+        "mergeTipTree": "2c528b69577b223355a68ef68c311bf8192dc733",
+        "exactHeadRereviewEvidence": "No preserved artifact in 20260825-131500-hardening-c1 reviews a head after 0a7921a3e71aaa88c5b6de11ff0cea3443890a2d. The two post-review commits must not be represented as exact-head reviewed by that run.",
+        "treeIdentityProofCorrection": "The existing treeIdentityProof establishes only that final branch head 82958795 and merge commit a7fc94a have the same tree. It does not establish that the merge tree equals the review-run head tree."
+      }
     },
     "p02StructuralTestSplits": {
       "completed": "P02 structural slice split three oversized test suites along behavioral seams; all it-block titles and executed counts were preserved 1:1 by line-range tooling, with one intentional test-body hardening during the split: the AudioContext rejection/cancellation test now wraps global AudioContext replacement in try/finally restoration. All other it-blocks moved verbatim, and successor suite counts equal their monolith predecessors (pre-split title manifests reconciled 1:1: 76 publication-containment, 46 interactive-components, 28 synth-engine titles preserved)",
@@ -2895,5 +2924,86 @@
       },
       "accountingArtifact": "C:/tmp/swara-slice/p02-structural/post-split-all.manifest.txt (150 unique titles post-split vs per-suite pre-split manifests)"
     }
+  },
+  "p02RuntimeCyclesAndTestStructure": {
+    "phase": "P02 follow-up structural debt: runtime-cycle elimination and test-suite structure",
+    "phasePrompt": "Supervisor correction and acceptance closeout for PR #10; no separately saved plan file was supplied for this follow-up slice.",
+    "branch": "codex/p02-runtime-cycles-and-test-structure",
+    "base": "a7fc94ada0a0da103e3bc4b9d0cec8f347a9649a",
+    "pullRequestUrl": "https://github.com/RajanthaR/0-Oriental-Music/pull/10",
+    "scope": "Eliminate the two remaining runtime import-cycle SCCs under src/lib, split the three oversized test monoliths along behavioral seams, preserve title/body/count and publication parity, harden the live graph guard, and close independently validated review/evidence defects without changing curriculum content.",
+    "implementationCommits": [
+      "2809f2867a4023bf6c9f97e0187c9ecec565f73a",
+      "de053328cadd94444706d3227b821b5b9d73fc20",
+      "adf37c5434e8ce45fca7cf656ebf2f8ecf2ea47d",
+      "e811c4eecde91b479008f0d04f7f514ada1df16a",
+      "c708eeabeb3e168bdbd9e5ef138e69b466d342b1",
+      "9bcb072274c4d92e97ee5c576f8d635d86042d11",
+      "e1831a1938d0d130efdca2de029a5a926618a5d6",
+      "16c7bf39a56b7e97f63ebad1442d0fef8359bfb9",
+      "23562f6b0b3ac3ca780045b5df6720f1a1ea5b3b"
+    ],
+    "supervisorReviewFixCommits": [
+      "0a456fa1546e1acc55008bd4fe0b9834613a19dc",
+      "a2b70f42d78a65d4c4dfd61aef6953ad8d5a0b39",
+      "05d9a3f0451165d8a91d7bac8bd1ea9a9fc2f173",
+      "ff2e26608e695f093276f3ee831feae431b6d916"
+    ],
+    "reviewHistory": [
+      {
+        "runId": "20260826-23562f6-p02-structural-c2",
+        "status": "HISTORICAL-INVALID",
+        "disposition": "Imported artifacts were malformed and cannot establish acceptance."
+      },
+      {
+        "runId": "20260829-acceptance-05d9a3f",
+        "artifactDirectory": "C:/Users/Rajantha/AppData/Local/Temp/compound-engineering/ce-code-review/20260829-acceptance-05d9a3f",
+        "scopeHead": "05d9a3f0451165d8a91d7bac8bd1ea9a9fc2f173",
+        "reviewersCompleted": 11,
+        "validatorsDispatched": 3,
+        "validatorsValidated": 2,
+        "validatorsRejected": 1,
+        "status": "FINDINGS-INPUT-NOT-ACCEPTANCE",
+        "disposition": "Validated PublicSearchCatalogs compatibility and ledger wording findings were fixed in ff2e266; the searchIndex singleton compatibility claim was rejected because the package is private, has no old-path consumers, and restoration recreates the prohibited SCC."
+      },
+      {
+        "runId": "20260829-acceptance2-ff2e266",
+        "artifactDirectory": "C:/Users/Rajantha/AppData/Local/Temp/compound-engineering/ce-code-review/20260829-acceptance2-ff2e266",
+        "scopeHead": "ff2e26608e695f093276f3ee831feae431b6d916",
+        "reviewersCompleted": 11,
+        "validatorsDispatched": 2,
+        "validatorsValidated": 2,
+        "validatorsRejected": 0,
+        "status": "FINDINGS-INPUT-NOT-ACCEPTANCE",
+        "disposition": "The missing phase-owned record and the PR9 review-head conflation were independently validated; their append-only corrections are carried by the evidence-closure commit containing this record."
+      }
+    ],
+    "validatedCorrectionFindings": [
+      "Relative and side-effect imports were absent from the original live SCC guard.",
+      "The repository factory used a compatibility-shim import instead of the neutral evaluation-context seam.",
+      "The type-only/value graph fixture originally targeted a nonexistent module and then an interface-only value erased by TypeScript.",
+      "The repository stopped re-exporting the legacy PublicSearchCatalogs type.",
+      "The split-test ledger wording incorrectly claimed every body moved verbatim.",
+      "PR10 had no phase-owned tracked evidence record.",
+      "The newly added PR9 closeout record conflated review-run head and final merge tree."
+    ],
+    "verificationBeforeEvidenceClosure": {
+      "tests": "36 files / 605 tests passed",
+      "typeCheck": "exit 0",
+      "lint": "exit 0",
+      "build": "exit 0",
+      "anchors": "218 resolved / 0 unresolved",
+      "publicationParity": "SHA-256 832a96f0479e320e7a57fdbe9f153312607aebfc3690e632a2d60ab0556bf9bc exact match",
+      "diffCheck": "clean"
+    },
+    "sourceBoundary": "No src/data curriculum record changed. Grades 6-11 remain the public boundary; all eight Talas and raga-bhairav remain quarantined; the Deepchandi rejection and unknown/unverified source provenance remain intact.",
+    "preExistingResiduals": [
+      "Static graph coverage excludes CommonJS require, import-equals, dynamic imports, explicit .js remapping, and dependencies outside src/lib; no such production forms occur.",
+      "Custom PublicationEvaluationContext sources with control-only IDs can fail open at the direct exported policy boundary; this reproduces at the phase base and is not introduced by PR10.",
+      "Anchor resolution permits parent path segments before readRepoFile joins the repository root; this predates the phase and remains a follow-up integrity hardening item.",
+      "No standalone malformed custom SearchDataSource contract test exists."
+    ],
+    "trackedEvidenceStatus": "PHASE-OWNED-RECORD-ESTABLISHED-PENDING-EXACT-HEAD-REREVIEW",
+    "finalStatePolicy": "The exact final reviewed SHA, final read-only acceptance run, browser-QA artifacts, pushed PR head, and hosted checks are recorded in the immutable final handoff and PR body after they exist. They cannot be truthfully self-referenced by the commit that creates this tracked record; this entry must not be read as delivery acceptance."
   }
 }
