@@ -1,0 +1,129 @@
+{
+  "execution": "sequential-in-session persona passes (Freebuff: no sub-agent dispatch primitive; skill Fallback clause). Each pass below is an orchestrator-authored analysis under that persona's lens, not an independent agent artifact.",
+  "passes": [
+    {
+      "reviewer": "correctness",
+      "findings": [
+        {
+          "title": "Ledger reviewHistory cites evicted artifact directories as evidence",
+          "severity": "P3",
+          "file": "data/forensic-ledger.json",
+          "line": 2960,
+          "why_it_matters": "An auditor following the two artifactDirectory pointers added by this diff finds nothing on disk (verified absent from both the %TEMP% and C:/tmp ce-code-review roots), so the precise reviewer/validator counts they carry (11 reviewers, 3/2 and 2/2 validators) cannot be independently verified from any surviving evidence. In a repository whose central discipline is machine-checkable evidence (AGENTS.md 8.3: a bibliography entry by itself is not evidence), unqualified evidence pointers whose content has been evicted overstate the auditability of the record. The runs are correctly quarantined as non-acceptance, so nothing decision-critical rests on the counts; an additive availability disclosure (the repo's own postReviewCorrection pattern) plus durable preservation of future run artifacts closes the gap.",
+          "autofix_class": "gated_auto",
+          "owner": "downstream-resolver",
+          "requires_verification": true,
+          "suggested_fix": "Add an additive sibling field to p02RuntimeCyclesAndTestStructure (e.g. reviewArtifactAvailability) recording that both cited Temp directories were verified absent on 2026-09-28, that the counts are historical recorded claims and not independently auditable, and that this run's artifacts are preserved at docs/forensic-remediation/evidence/ce-code-review-20260928-145417-8d625e5f/; copy this run's artifacts there; note both in docs/FORENSIC_CORRECTION_LOG.md.",
+          "confidence": 75,
+          "evidence": [
+            "ls both roots: MISSING C:/tmp/compound-engineering/ce-code-review/20260829-acceptance-05d9a3f and MISSING C:/Users/Rajantha/AppData/Local/Temp/compound-engineering/ce-code-review/20260829-acceptance-05d9a3f (same for 20260829-acceptance2-ff2e266)",
+            "data/forensic-ledger.json p02RuntimeCyclesAndTestStructure.reviewHistory[1..2] cite artifactDirectory with reviewersCompleted/validatorsDispatched counts",
+            "AGENTS.md section 10.B.3 requires run artifacts preserved under /tmp/compound-engineering/ce-code-review/<run-id>/"
+          ],
+          "pre_existing": false
+        }
+      ],
+      "residual_risks": [
+        "Pre-existing (recorded at phase base): custom PublicationEvaluationContext sources with control-only IDs can fail open at the direct exported policy boundary.",
+        "Pre-existing: static graph guard excludes CommonJS require, import-equals, dynamic imports, explicit .js remapping, and dependencies outside src/lib (no such production forms occur)."
+      ],
+      "testing_gaps": [
+        "No test pins the relocated createPublicationEvaluationContext/readCatalogInput bodies as behavior-identical to their pre-move form (verified mechanically by move-identity-check.mjs, but not regression-locked)."
+      ]
+    },
+    {
+      "reviewer": "testing",
+      "findings": [],
+      "residual_risks": [],
+      "testing_gaps": [
+        "Split-suite manifests count source blocks and unique titles but do not pin runtime it.each expansion counts per family.",
+        "No contract test for a malformed custom SearchDataSource (recorded pre-existing residual)."
+      ]
+    },
+    {
+      "reviewer": "maintainability",
+      "findings": [],
+      "residual_risks": [
+        "The publication-policy re-export shim for createPublicationEvaluationContext is intentionally scoped to external/test consumers pending a migration slice; leaving it un-migrated indefinitely would re-blur the layering the slice established."
+      ],
+      "testing_gaps": []
+    },
+    {
+      "reviewer": "project-standards",
+      "findings": [
+        {
+          "title": "Ledger reviewHistory cites evicted artifact directories as evidence",
+          "severity": "P3",
+          "file": "data/forensic-ledger.json",
+          "line": 2960,
+          "why_it_matters": "AGENTS.md section 8.4 requires an explicit unknown/unverified state whenever the supplied corpus does not establish a value, and section 10.B.3 requires preserved run artifacts as reviewer-coverage evidence. Both cited artifactDirectory trees have been evicted, so the counts they support are recorded-but-unauditable and the record presents them without the availability caveat the repo's honesty policy demands. The additive-correction pattern already used by postReviewCorrection is the established remedy shape.",
+          "autofix_class": "gated_auto",
+          "owner": "downstream-resolver",
+          "requires_verification": true,
+          "suggested_fix": "Additive reviewArtifactAvailability disclosure field + durable artifact preservation under docs/forensic-remediation/evidence/, matching the postReviewCorrection pattern (no historical entry rewritten).",
+          "confidence": 75,
+          "evidence": [
+            "AGENTS.md section 8.4 and section 10.B.3 (quotable rules)",
+            "docs/FORENSIC_CORRECTION_LOG.md 'Citation residency policy' covers suite-path citations staying verbatim but provides no availability disclosure for artifact directories",
+            "Both cited artifactDirectory paths verified absent from both candidate roots on 2026-09-28"
+          ],
+          "pre_existing": false
+        }
+      ],
+      "residual_risks": [
+        "AGENTS.md section 9.8 says the phase agent never merges its phase PR; PR #10 was merged in the prior pass under explicit user/mission authorization. Process deviation owned by the human, recorded here as context."
+      ],
+      "testing_gaps": []
+    },
+    {
+      "reviewer": "security",
+      "findings": [],
+      "residual_risks": [],
+      "testing_gaps": []
+    },
+    {
+      "reviewer": "performance",
+      "findings": [],
+      "residual_risks": [
+        "Per-operation catalog snapshot capture (11 catalogs cloned per evaluation context) is by design and pre-move identical; cost profile unchanged by this diff."
+      ],
+      "testing_gaps": []
+    },
+    {
+      "reviewer": "api-contract",
+      "findings": [],
+      "residual_risks": [
+        "PublicSearchCatalogs moved from repository to search-engine with readonly arrays; repository keeps a type-only re-export. Mutability narrowing is assignability-safe and type-check is green, but external consumers of the old mutable shape (none exist; package is private) would need the migration slice the shim comment promises."
+      ],
+      "testing_gaps": []
+    },
+    {
+      "reviewer": "reliability",
+      "findings": [],
+      "residual_risks": [],
+      "testing_gaps": []
+    },
+    {
+      "reviewer": "adversarial",
+      "findings": [],
+      "residual_risks": [
+        "Hostile catalog inputs (accessor descriptors, arrays-as-inputs, throwing captures) route to context.safe=false and fail closed at every boundary checked (getSafeEvaluationState, repository getters, failClosedRecordDecision, tala-disposition-policy)."
+      ],
+      "testing_gaps": []
+    },
+    {
+      "reviewer": "ce-agent-native-reviewer",
+      "findings": [],
+      "residual_risks": [],
+      "testing_gaps": [],
+      "notes": "No new user-facing feature surface in this diff; verify-symbol-anchors.mjs remains CI-wired and runnable by agents. No agent-accessibility gaps introduced."
+    },
+    {
+      "reviewer": "ce-learnings-researcher",
+      "findings": [],
+      "residual_risks": [],
+      "testing_gaps": [],
+      "notes": "docs/solutions/ does not exist in this repo. Relevant known patterns live in data/forensic-ledger.json preExistingResiduals (4 recorded) and the closed 'KNOWN LOOSENESS' anchor-matching item (commit fba33d2). No past solution applies beyond those."
+    }
+  ]
+}

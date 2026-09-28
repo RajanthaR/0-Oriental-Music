@@ -302,3 +302,40 @@ The phase-owned record deliberately leaves exact final acceptance, browser QA,
 pushed PR head, and hosted checks to the final immutable handoff and PR body:
 those values do not exist until after the record's own commit is reviewed and
 therefore cannot be self-referenced truthfully in that commit.
+
+### Acceptance review of merged head 8535994 (run 20260928-145417-8d625e5f)
+
+The protocol-mandated acceptance review of the exact merged head of PR #10
+(base a7fc94a, head 8535994, 37 changed files) was executed on 2026-09-28 as
+skill run 20260928-145417-8d625e5f (rajantha-skills-library:ce-code-review,
+base:a7fc94a grouping:auto, default mode). Execution caveat, stated plainly:
+the platform has no sub-agent dispatch primitive, so per the skill's own
+fallback the eleven reviewer persona passes ran sequentially in-session and
+per-finding validation was a first-party falsification pass. No independent
+reviewer or validator agents are claimed, and no historical run identifiers
+or artifacts were fabricated.
+
+- Mechanical evidence: the publication-policy to evaluation-context move is
+  behavior-identical for all four relocated declarations (proof script
+  preserved with the run artifacts); publication parity sha256
+  832a96f0479e320e7a57fdbe9f153312607aebfc3690e632a2d60ab0556bf9bc is an
+  exact match; split-suite source-block counts equal their pre-split
+  monoliths exactly (78 / 47 / 28); unsafe evaluation contexts fail closed at
+  every boundary checked; no changed line touches review-metadata synthesis,
+  grade scope, or quarantine identities.
+- Finding 1 (P3, confidence 75, project-standards + correctness): the two
+  reviewHistory artifactDirectory citations for the 2026-08-29 acceptance
+  runs point at TEMP directories verified evicted on 2026-09-28, leaving the
+  counts they carry recorded-not-auditable without an availability
+  disclosure. The older C:/tmp-root citations were verified still present and
+  are not implicated.
+- Applied by the fix(review) commit that also lands this entry: the additive
+  `data/forensic-ledger.json#reviewArtifactAvailability` disclosure, durable
+  in-repo preservation of the run artifacts at
+  docs/forensic-remediation/evidence/ce-code-review-20260928-145417-8d625e5f/,
+  and this log section. No historical entry is rewritten.
+- Verdict for the reviewed tree: **Ready to merge**, zero actionable findings
+  remaining. The complete run record is
+  `data/forensic-ledger.json#p02AcceptanceReview`; the recording commit's own
+  SHA and the final gate outcomes live in the phase handoff, per the
+  finalStatePolicy self-reference rule.

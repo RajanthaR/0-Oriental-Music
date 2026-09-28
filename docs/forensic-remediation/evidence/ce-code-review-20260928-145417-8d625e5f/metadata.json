@@ -1,0 +1,16 @@
+{
+  "run_id": "20260928-145417-8d625e5f",
+  "skill": "rajantha-skills-library:ce-code-review",
+  "invocation": "base:a7fc94a grouping:auto (default/interactive mode)",
+  "branch": "main",
+  "head_sha": "8535994facb5916805d238578e7e5391028b822b",
+  "base": "a7fc94ada0a0da103e3bc4b9d0cec8f347a9649a",
+  "files_changed": 37,
+  "verdict": "Ready to merge",
+  "completed_at": "2026-09-28T09:49:58Z",
+  "execution_disclosure": "The Freebuff platform provides no sub-agent dispatch primitive (no Agent/spawn_agent/subagent tool), so the skill's own Fallback clause applies: all reviewer persona passes ran SEQUENTIALLY IN-SESSION by the orchestrator, and per-finding validation is a FIRST-PARTY FALSIFICATION pass with independence degraded and explicitly disclosed. No independent reviewer or validator agents were dispatched. The per-persona outputs in reviewer-passes.json are orchestrator-authored sequential-pass results labeled accordingly, NOT independent-agent artifacts. No historical run IDs, reviewer counts, or artifacts are claimed or fabricated for this run.",
+  "artifact_layout_note": "Consolidated layout (reviewer-passes.json carries all persona passes; synthesized-findings.json carries the merged set) instead of one file per persona, because no per-agent dispatch occurred.",
+  "validation_independence": "degraded-first-party (no dispatch primitive available)",
+  "verdict_scope": "The code-review verdict applies to the tree at head_sha (8535994). The fix(review) commit that lands the single applied finding and this durable evidence copy is bookkeeping-only (docs/ledger JSON/evidence files; zero executable code changed) and is excluded from the reviewed code scope, following the ledger finalStatePolicy pattern; its exact SHA is recorded in the phase handoff, not self-referenced here.",
+  "durable_copy": "docs/forensic-remediation/evidence/ce-code-review-20260928-145417-8d625e5f/"
+}

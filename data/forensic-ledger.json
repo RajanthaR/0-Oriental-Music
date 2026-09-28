@@ -3004,6 +3004,82 @@
       "No standalone malformed custom SearchDataSource contract test exists."
     ],
     "trackedEvidenceStatus": "PHASE-OWNED-RECORD-ESTABLISHED-PENDING-EXACT-HEAD-REREVIEW",
-    "finalStatePolicy": "The exact final reviewed SHA, final read-only acceptance run, browser-QA artifacts, pushed PR head, and hosted checks are recorded in the immutable final handoff and PR body after they exist. They cannot be truthfully self-referenced by the commit that creates this tracked record; this entry must not be read as delivery acceptance."
+    "finalStatePolicy": "The exact final reviewed SHA, final read-only acceptance run, browser-QA artifacts, pushed PR head, and hosted checks are recorded in the immutable final handoff and PR body after they exist. They cannot be truthfully self-referenced by the commit that creates this tracked record; this entry must not be read as delivery acceptance.",
+    "reviewArtifactAvailability": {
+      "checkedAt": "2026-09-28",
+      "status": "EVICTED-ARTIFACTS-DISCLOSED",
+      "scope": "Exactly the two artifactDirectory citations at reviewHistory entries 20260829-acceptance-05d9a3f and 20260829-acceptance2-ff2e266 (the %TEMP% root). The older C:/tmp-root citations (20260825-131500-hardening-c1, 20260825-era acceptance runs) were verified still present and are not implicated.",
+      "statement": "Both cited %TEMP% artifact directories were verified absent from the user-TEMP and C:/tmp ce-code-review roots on 2026-09-28. The reviewer and validator counts in those two entries are historical recorded claims made at run time; with the artifacts evicted they are recorded-not-auditable and must not be presented as independently verifiable reviewer coverage. No historical wording is rewritten; this additive disclosure is the artifact-availability counterpart to the Citation residency policy.",
+      "durablePreservation": "Run artifacts for acceptance review 20260928-145417-8d625e5f are preserved in-repo at docs/forensic-remediation/evidence/ce-code-review-20260928-145417-8d625e5f/ so this evidence class no longer depends on an evicting TEMP root."
+    }
+  },
+  "p02AcceptanceReview": {
+    "reviewEvent": "Protocol-mandated acceptance code review of the exact merged head of PR #10 (the Phase A closeout requirement that the PR-merge pass could not satisfy).",
+    "runId": "20260928-145417-8d625e5f",
+    "skill": "rajantha-skills-library:ce-code-review",
+    "invocation": "base:a7fc94a grouping:auto (default/interactive mode)",
+    "base": "a7fc94ada0a0da103e3bc4b9d0cec8f347a9649a",
+    "reviewedHead": "8535994facb5916805d238578e7e5391028b822b",
+    "filesChanged": 37,
+    "executedAt": "2026-09-28",
+    "executionDisclosure": "The platform provides no sub-agent dispatch primitive, so per the skill's own fallback clause the eleven reviewer persona passes ran sequentially in-session and per-finding validation was a first-party falsification pass. No independent reviewer or validator agents are claimed for this run, and no historical run identifiers, counts, or artifacts were fabricated. Independence is degraded and disclosed, not claimed.",
+    "reviewerPasses": [
+      { "persona": "correctness", "selection": "always-on", "outcome": "1 finding (F1, shared with project-standards); move proven behavior-identical" },
+      { "persona": "testing", "selection": "always-on", "outcome": "no findings; split-suite counts reconciled exactly" },
+      { "persona": "maintainability", "selection": "always-on", "outcome": "no findings" },
+      { "persona": "project-standards", "selection": "always-on", "outcome": "1 finding (F1, shared with correctness)" },
+      { "persona": "ce-agent-native-reviewer", "selection": "always-on", "outcome": "no gaps" },
+      { "persona": "ce-learnings-researcher", "selection": "always-on", "outcome": "no docs/solutions corpus; known patterns from ledger residuals" },
+      { "persona": "security", "selection": "conditional: publication policy is the public-exposure boundary and search accepts raw user queries", "outcome": "no findings; quarantine containment and Published-review red lines verified" },
+      { "persona": "performance", "selection": "conditional: per-operation snapshot capture on every repository read", "outcome": "no findings; cost profile pre-move identical" },
+      { "persona": "api-contract", "selection": "conditional: exported type moves (PublicSearchCatalogs, SearchIndex constructor, context factory re-export)", "outcome": "no findings" },
+      { "persona": "reliability", "selection": "conditional: new try/catch fail-closed error paths carry safe/unsafe semantics", "outcome": "no findings" },
+      { "persona": "adversarial", "selection": "conditional: >=50 changed non-test lines and hostile-input surface", "outcome": "no findings; hostile shapes fail closed" }
+    ],
+    "skippedPasses": [
+      { "persona": "data-migration", "reason": "no migration or schema artifacts in the diff" },
+      { "persona": "previous-comments", "reason": "base-scope review with no PR metadata gathered; PR #10 is merged" },
+      { "persona": "julik-frontend-races", "reason": "no Stimulus/Turbo or DOM race surface in the production diff" },
+      { "persona": "swift-ios", "reason": "no Swift files" },
+      { "persona": "ce-deployment-verification-agent", "reason": "migration-artifact gate unmet" }
+    ],
+    "mechanicalEvidence": [
+      "move-identity-check.mjs: RAW_PUBLICATION_CATALOGS, readCatalogInput, createPublicationEvaluationContext, and readDeclaredArrayLength are IDENTICAL between a7fc94a publication-policy.ts and the new evaluation-context.ts (behavior-preserving move)",
+      "publication parity sha256 832a96f0479e320e7a57fdbe9f153312607aebfc3690e632a2d60ab0556bf9bc exact match: zero public-inventory, summary, or source-projection change",
+      "split-suite source-block counts equal their pre-split monoliths exactly: 78 publication-containment family, 47 interactive-components family, 28 synth-engine family",
+      "fail-closed verified at getSafeEvaluationState, repository unsafe-context returns, failClosedRecordDecision, and tala-disposition-policy",
+      "no changed line touches review-metadata synthesis, grade scope, or quarantine identity surfaces",
+      "all 17 recorded commit SHAs and 3 recorded tree identities in this ledger verified against real git state (prior pass)"
+    ],
+    "findings": [
+      {
+        "index": 1,
+        "title": "Ledger reviewHistory cites evicted artifact directories as evidence",
+        "severity": "P3",
+        "confidence": 75,
+        "reviewers": ["project-standards", "correctness"],
+        "location": "data/forensic-ledger.json reviewHistory artifactDirectory citations for the two 2026-08-29 runs",
+        "validation": "validated by first-party falsification pass (independence degraded and disclosed): both cited trees mechanically verified absent, citing block introduced by this diff, and the Citation residency policy provides no artifact-availability disclosure",
+        "disposition": "APPLIED by the fix(review) commit landing this record: additive reviewArtifactAvailability disclosure, durable in-repo artifact preservation, and correction-log entry; no historical entry rewritten"
+      }
+    ],
+    "actionableRemaining": 0,
+    "verdict": "Ready to merge",
+    "verdictReasoning": "The complete phase diff was reviewed at the exact merged head. The single actionable finding was an evidence-availability bookkeeping gap, applied as an additive fix that changes no publication decision, quarantine state, or review state. Zero actionable findings remain. The mechanical oracles support both review red lines directly: the evaluation-context move is behavior-identical and the parity hash is unchanged, so no quarantined entity can newly surface and no record can newly claim a completed review.",
+    "caveats": [
+      "Execution caveat: reviewer passes were sequential in-session analyses and validation was first-party falsification because no sub-agent dispatch primitive exists on this platform. This record must not be represented as independent multi-agent coverage; a future dispatched re-run would upgrade it.",
+      "The two 2026-08-29 run artifact trees remain evicted; their counts stay recorded-not-auditable (see reviewArtifactAvailability)."
+    ],
+    "residualRisks": [
+      "Pre-existing: custom PublicationEvaluationContext sources with control-only IDs can fail open at the direct exported policy boundary (reproduces at the phase base).",
+      "Pre-existing: static graph guard excludes CommonJS require, import-equals, dynamic imports, explicit .js remapping, and dependencies outside src/lib (no such production forms occur).",
+      "Pre-existing: anchor resolution permits parent path segments before readRepoFile joins the repository root.",
+      "Pre-existing: no standalone malformed custom SearchDataSource contract test."
+    ],
+    "testingGaps": [
+      "No regression test pins the relocated context-factory bodies as behavior-identical to their pre-move form (verified mechanically for this run only).",
+      "Split-suite manifests do not pin runtime it.each expansion counts per family."
+    ],
+    "selfReferenceNote": "Following finalStatePolicy, the exact SHA of the fix(review) commit that lands this record, its post-commit delta re-review, and the final gate outcomes are delivered in the phase handoff and the correction-log addendum context rather than self-referenced inside this commit."
   }
 }
